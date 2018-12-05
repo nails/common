@@ -6,34 +6,48 @@ version: 2
 jobs:
   build:
     docker:
-      # specify the version you desire here
-      - image: circleci/php:7.2.9-cli-stretch-node
+    # specify the version you desire here
+    - image: circleci/php:7.2.9-cli-stretch-node
 
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mysql:9.4
+    # Specify service dependencies here if necessary
+    # CircleCI maintains a library of pre-built images
+    # documented at https://circleci.com/docs/2.0/circleci-images/
+    # - image: circleci/mysql:9.4
 
     working_directory: ~/repo
 
     steps:
-      - checkout
+    - checkout
 
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "composer.json" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+    # Restore Composer cache
+    - restore_cache:
+        keys:
+        - composer-dependencies-{{ checksum "composer.json" }}
+        - composer-dependencies-
 
-      - run: composer --no-interaction --optimize-autoloader install
-      - run: yarn install
-      - run: yarn build
+    # Execute Composer install
+    - run: composer --no-interaction --optimize-autoloader install
 
-      - save_cache:
-          paths:
-            - ./vendor
-          key: v1-dependencies-{{ checksum "composer.json" }}
+    # Save Composer cache
+    - save_cache:
+        paths:
+        - ./vendor
+        key: composer-dependencies-{{ checksum "composer.json" }}
 
-      # run tests!
-      - run: ./vendor/bin/phpunit
+    # Restore Yarn cache
+    - restore_cache:
+        keys:
+        - yarn-dependencies-{{ checksum "yarn.lock" }}
+
+    # Execute Yarn install and build
+    - run: yarn install
+    - run: yarn build
+
+    # Save Yarn cache
+    - save_cache:
+        paths:
+        - ./node_modules
+        key: yarn-dependencies-{{ checksum "yarn.lock" }}
+
+    # run tests!
+    - run: ./vendor/bin/phpunit
