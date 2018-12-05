@@ -219,7 +219,7 @@ trait GetCountCommon
      */
     protected function getCountCommonCompileFiltersString($sColumn, $mValue, $bIsQuery)
     {
-        if (is_callable($mValue)) {
+        if (is_object($mValue) && ($mValue instanceof \Closure)) {
             $mValue = $mValue();
         }
 
