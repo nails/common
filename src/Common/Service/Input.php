@@ -130,6 +130,7 @@ class Input
         $aOut   = [];
         $aArray = array_change_key_case($aArray, CASE_LOWER);
         $aKeys  = $mKeys !== null ? (array) $mKeys : array_keys($aArray);
+        $aKeys  = array_map('strtolower', $aKeys);
 
         foreach ($aKeys as $sKey) {
             $aOut[$sKey] = getFromArray($sKey, $aArray);
