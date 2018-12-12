@@ -1,6 +1,6 @@
 <?php
 
-namespace Nails\Common\Helper;
+namespace Tests;
 
 use Nails\Bootstrap;
 use PHPUnit\Framework\TestCase;
