@@ -100,7 +100,7 @@ class ErrorHandler
             foreach ($aCustomDrivers as $oErrorHandler) {
                 $aNames[] = $oErrorHandler->slug;
             }
-            _NAILS_ERROR(implode(', ', $aNames), 'More than one error handler installed');
+            static::halt(implode(', ', $aNames), 'More than one error handler installed');
             return;
         } elseif (count($aCustomDrivers) === 1) {
             $oErrorHandler = reset($aCustomDrivers);
@@ -113,9 +113,9 @@ class ErrorHandler
         $sClassName       = '\\' . $sDriverNamespace . $sDriverClass;
 
         if (!class_exists($sClassName)) {
-            _NAILS_ERROR('Expected: ' . $sClassName, 'Driver class not available');
+            static::halt('Expected: ' . $sClassName, 'Driver class not available');
         } elseif (!in_array(static::INTERFACE_NAME, class_implements($sClassName))) {
-            _NAILS_ERROR('Error Handler "' . $sClassName . '"  must implement "' . static::INTERFACE_NAME . '"');
+            static::halt('Error Handler "' . $sClassName . '"  must implement "' . static::INTERFACE_NAME . '"');
         }
 
         $sClassName::init();
@@ -560,7 +560,7 @@ class ErrorHandler
             echo $oView->load($sValidPath, [], true);
 
         } else {
-            _NAILS_ERROR('404 Page Not Found');
+            static::halt('404 Page Not Found');
         }
     }
 
