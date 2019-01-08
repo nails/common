@@ -17,7 +17,7 @@ class Components extends Base
     protected function configure()
     {
         $this->setName('install:components');
-        $this->setDescription('Executes any post install commands for installed components.');
+        $this->setDescription('Executes any post install commands for components');
     }
 
     // --------------------------------------------------------------------------
@@ -34,7 +34,40 @@ class Components extends Base
     protected function execute(InputInterface $oInput, OutputInterface $oOutput)
     {
         parent::execute($oInput, $oOutput);
-        //  @todo (Pablo - 2019-01-08) - Loop components and execute any scripts they define
+
+        foreach (\Nails\Components::available() as $oComponent) {
+            if (!empty($oComponent->scripts->install)) {
+                $this->oOutput->writeln('Executing post-install scripts for: <comment>' . $oComponent->slug . '</comment>');
+                $this->oOutput->writeln('> <info>cd ' . $oComponent->path . '</info>');
+                chdir($oComponent->path);
+                $this->executeCommand($oComponent->scripts->install);
+            }
+        }
+
         return static::EXIT_CODE_SUCCESS;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Executes a command
+     *
+     * @param string|iterable $sCommand The command to execute
+     */
+    protected function executeCommand($sCommand)
+    {
+        if (is_iterable($sCommand)) {
+            foreach ($sCommand as $sCommand) {
+                $this->executeCommand($sCommand);
+            }
+        } elseif (is_string($sCommand)) {
+
+            $this->oOutput->writeln('> <info>' . $sCommand . '</info>');
+            exec($sCommand, $aOutput, $iReturnVal);
+
+            if ($iReturnVal) {
+                throw new \RuntimeException('Failed to execute command: ' . $sCommand, $iReturnVal);
+            }
+        }
     }
 }
