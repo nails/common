@@ -28,6 +28,7 @@ final class Component
     private $subType;
     private $forModule;
     private $autoload;
+    private $scripts;
     private $fromApp;
 
     // --------------------------------------------------------------------------
@@ -59,6 +60,7 @@ final class Component
         $this->subType      = getFromArray('subType', $aNailsData, '');
         $this->forModule    = getFromArray('forModule', $aNailsData, '');
         $this->autoload     = getFromArray('autoload', $aNailsData, null);
+        $this->scripts      = getFromArray('scripts', $aNailsData, (object) []);
         $this->fromApp      = $bIsApp;
     }
 
