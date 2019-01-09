@@ -88,8 +88,10 @@ class Hooks extends CI_Hooks
             foreach ($this->aCustomHooks[$sWhich] as $aCustomHook) {
                 $this->runCustomHook($aCustomHook);
             }
+            return true;
         } else {
             $this->runCustomHook($this->aCustomHooks[$sWhich]);
+            return true;
         }
 
         return parent::call_hook($sWhich);
