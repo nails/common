@@ -148,12 +148,10 @@ class Factory
      */
     private static function findServicesForComponent($sComponentName)
     {
-        $aPaths = [
+        return self::findServicesAtPaths([
             NAILS_APP_PATH . 'application/services/' . $sComponentName . '/services.php',
             NAILS_APP_PATH . 'vendor/' . $sComponentName . '/services/services.php',
-        ];
-
-        return self::findServicesAtPaths($aPaths);
+        ]);
     }
 
     // --------------------------------------------------------------------------
@@ -165,11 +163,9 @@ class Factory
      */
     private static function findServicesForApp()
     {
-        $aPaths = [
+        return self::findServicesAtPaths([
             'application/services/services.php',
-        ];
-
-        return self::findServicesAtPaths($aPaths);
+        ]);
     }
 
     // --------------------------------------------------------------------------
