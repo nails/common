@@ -12,6 +12,7 @@
 namespace Nails;
 
 use Nails\Components;
+use Nails\Environment;
 use Nails\Common\Service\ErrorHandler;
 
 final class Bootstrap
@@ -75,7 +76,7 @@ final class Bootstrap
     {
         $sPath = static::$sBaseDirectory . 'config/' . $sFile . '.php';
         if (!file_exists($sPath)) {
-            ErrorHandler::die('Missing config/' . $sFile . '.php; please run installer.');
+            ErrorHandler::halt('Missing config/' . $sFile . '.php; please run installer.');
         }
 
         require_once $sPath;
@@ -113,7 +114,7 @@ final class Bootstrap
         Functions::define('NAILS_ASSETS_PATH', NAILS_PATH . 'module-asset/assets/');
 
         //  Environment
-        Functions::define('ENVIRONMENT', 'DEVELOPMENT');
+        Functions::define('ENVIRONMENT', Environment::ENV_DEV);
         Functions::define('NAILS_TIMEZONE', 'UTC');
 
         //  Cache constants
@@ -392,7 +393,7 @@ final class Bootstrap
     private static function loadFunctions()
     {
         if (!file_exists(NAILS_COMMON_PATH . 'src/Common/CodeIgniter/Core/Common.php')) {
-            Nails\Common\Service\ErrorHandler::die(
+            Nails\Common\Service\ErrorHandler::halt(
                 'Could not find <code>Nails\Common\CodeIgniter\Core\Common()</code>, ensure Nails is set up correctly.'
             );
         }

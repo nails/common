@@ -198,20 +198,7 @@ class Seed extends Base
     protected function getSeeders()
     {
         $aSeedClasses   = [];
-        $aAllComponents = Components::list();
-        array_unshift(
-            $aAllComponents,
-            (object) [
-                'slug'      => 'app',
-                'namespace' => 'App\\',
-                'path'      => NAILS_APP_PATH,
-            ],
-            (object) [
-                'slug'      => 'nails/common',
-                'namespace' => 'Nails\\Common\\',
-                'path'      => NAILS_COMMON_PATH,
-            ]
-        );
+        $aAllComponents = Components::available();
 
         foreach ($aAllComponents as $oComponent) {
             $sPath = $oComponent->path . 'src/Seed/';

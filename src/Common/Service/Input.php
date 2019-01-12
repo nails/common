@@ -22,6 +22,7 @@ class Input
      * @param bool         $bXssClean Whether to run the result through the XSS filter
      *
      * @return array|mixed
+     * @throws \Nails\Common\Exception\FactoryException
      */
     public static function get($mKeys = null, $bXssClean = false)
     {
@@ -38,6 +39,7 @@ class Input
      * @param bool         $bXssClean Whether to run the result through the XSS filter
      *
      * @return array|mixed
+     * @throws \Nails\Common\Exception\FactoryException
      */
     public static function post($mKeys = null, $bXssClean = false)
     {
@@ -54,6 +56,7 @@ class Input
      * @param bool         $bXssClean Whether to run the result through the XSS filter
      *
      * @return array|mixed
+     * @throws \Nails\Common\Exception\FactoryException
      */
     public static function server($mKeys = null, $bXssClean = false)
     {
@@ -70,11 +73,28 @@ class Input
      * @param bool         $bXssClean Whether to run the result through the XSS filter
      *
      * @return array|mixed
+     * @throws \Nails\Common\Exception\FactoryException
      */
     public static function cookie($mKeys = null, $bXssClean = false)
     {
         $aArray = isset($_COOKIE) ? $_COOKIE : [];
         return static::getItemsFromArray($mKeys, $bXssClean, $aArray);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns keys from the global $_FILES array
+     *
+     * @param string|array $mKeys The key(s) to return
+     *
+     * @return array|mixed
+     * @throws \Nails\Common\Exception\FactoryException
+     */
+    public static function file($mKeys = null)
+    {
+        $aArray = isset($_FILES) ? $_FILES : [];
+        return static::getItemsFromArray($mKeys, false, $aArray);
     }
 
     // --------------------------------------------------------------------------
@@ -86,6 +106,7 @@ class Input
      * @param bool         $bXssClean Whether to run the result through the XSS filter
      *
      * @return array|mixed
+     * @throws \Nails\Common\Exception\FactoryException
      */
     public static function header($mKeys = null, $bXssClean = false)
     {
@@ -102,11 +123,14 @@ class Input
      * @param array        $aArray    The array to inspect
      *
      * @return array|mixed
+     * @throws \Nails\Common\Exception\FactoryException
      */
     protected static function getItemsFromArray($mKeys = null, $bXssClean = false, $aArray = [])
     {
-        $aOut  = [];
-        $aKeys = $mKeys !== null ? (array) $mKeys : array_keys($aArray);
+        $aOut   = [];
+        $aArray = array_change_key_case($aArray, CASE_LOWER);
+        $aKeys  = $mKeys !== null ? (array) $mKeys : array_keys($aArray);
+        $aKeys  = array_map('strtolower', $aKeys);
 
         foreach ($aKeys as $sKey) {
             $aOut[$sKey] = getFromArray($sKey, $aArray);
@@ -123,7 +147,9 @@ class Input
 
     /**
      * Returns the user's IP Address
+     *
      * @return string
+     * @throws \Nails\Common\Exception\FactoryException
      */
     public static function ipAddress()
     {
@@ -163,6 +189,7 @@ class Input
 
     /**
      * Whether the current request is being executed on the CLI
+     *
      * @return bool
      */
     public static function isCli()
@@ -174,7 +201,9 @@ class Input
 
     /**
      * Whether the current request is an Ajax request
+     *
      * @return bool
+     * @throws \Nails\Common\Exception\FactoryException
      */
     public static function isAjax()
     {

@@ -48,7 +48,7 @@ class Events extends Base
                     'slug'      => 'nails/common',
                 ],
             ],
-            Components::list()
+            Components::available()
         );
 
         foreach ($aComponents as $oComponent) {

@@ -1,13 +1,22 @@
 <?php
 
-namespace Nails;
+namespace Tests;
 
-use Nails\Common\Tests\TestCase;
+use Nails\Bootstrap;
+use PHPUnit\Framework\TestCase;
 
 class BootstrapTest extends TestCase
 {
-    public function testFoo()
+    public function test_controller_data_is_an_array()
     {
-        $this->assertCount(0, array());
+        $this->assertInternalType('array', Bootstrap::getControllerData());
+    }
+
+    // --------------------------------------------------------------------------
+
+    public function test_can_set_controller_data()
+    {
+        Bootstrap::setControllerData('foo', 'bar');
+        $this->assertEquals(['foo' => 'bar'], Bootstrap::getControllerData());
     }
 }

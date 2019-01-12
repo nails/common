@@ -240,7 +240,7 @@ class Migrate extends Base
         //  Migrate the app
         if (!empty($oApp)) {
 
-            $oOutput->write('[' . $iCurStep . '/' . $iNumMigrations . '] Migrating <info>App</info>... ');
+            $oOutput->write('[' . $iCurStep . '/' . $iNumMigrations . '] Migrating <info>app</info>... ');
             if ($this->doMigration($oApp)) {
                 $oOutput->writeln('done!');
             } else {
@@ -344,7 +344,7 @@ class Migrate extends Base
     protected function findEnabledModules()
     {
         //  Look for components
-        $aModules = Components::list(false);
+        $aModules = Components::available(false);
         $aOut     = [];
 
         foreach ($aModules as $oModule) {

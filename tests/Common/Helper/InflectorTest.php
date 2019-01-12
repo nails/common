@@ -3,77 +3,84 @@
 namespace Nails\Common\Helper;
 
 use Nails\Common\Helper\Inflector;
-use Nails\Common\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class InflectorTest extends TestCase
 {
+    const TEST_STRING_RACHEL           = 'Rachel';
+    const TEST_STRING_ROSS             = 'Ross';
+    const TEST_STRING_AEROPLANE        = 'aeroplane';
+    const TEST_STRING_AEROPLANES       = 'aeroplanes';
+    const TEST_STRING_FACTORY          = 'factory';
+    const TEST_STRING_QUIZ             = 'quiz';
+    const TEST_STRING_SPECIFIED_PLURAL = 'specified_plural';
+
+    // --------------------------------------------------------------------------
+
     /**
      * Construct InflectorTest
      */
-    public function __construct()
+    public static function setUpBeforeClass()
     {
-        require_once dirname(__FILE__) . '/../../../vendor/codeigniter/framework/system/helpers/inflector_helper.php';
+        require_once dirname(__FILE__) . '/../../../helpers/inflector.php';
     }
 
     // --------------------------------------------------------------------------
 
-    /**
-     * Tests that possessive correctly appends the ', 's or 'S to a given string.
-     */
-    public function testPossessive()
+    public function test_possessive_appends_s_to_string()
     {
-        //  Lowercase tests
-        $sTestString = 'Rachel';
-        $sPossessive = Inflector::possessive($sTestString);
-        $this->assertEquals($sPossessive, "Rachel's");
-
-        $sTestString = 'Ross';
-        $sPossessive = Inflector::possessive($sTestString);
-        $this->assertEquals("Ross'", $sPossessive);
-
-        //  Uppercase tests
-        $sTestString = 'RACHEL';
-        $sPossessive = Inflector::possessive($sTestString);
-        $this->assertEquals("RACHEL'S", $sPossessive);
-
-        $sTestString = 'ROSS';
-        $sPossessive = Inflector::possessive($sTestString);
-        $this->assertEquals("ROSS'", $sPossessive);
+        $sPossessive = Inflector::possessive(static::TEST_STRING_RACHEL);
+        $this->assertEquals(static::TEST_STRING_RACHEL . "'s", $sPossessive);
     }
 
     // --------------------------------------------------------------------------
 
-    /**
-     * Tests that pluralise correctly pluralises words, taking into consideration English grammar
-     */
-    public function testPluralise()
+    public function test_possessive_appends_s_to_string_ending_in_s()
     {
-        //  Words NOT ending in vowel + y
-        //  Maintain singular
-        $sTestString = 'aeroplane';
-        $sPluralised = Inflector::pluralise(1, $sTestString);
-        $this->assertEquals('aeroplane', $sPluralised);
+        $sPossessive = Inflector::possessive(static::TEST_STRING_ROSS);
+        $this->assertEquals(static::TEST_STRING_ROSS . "'", $sPossessive);
+    }
 
-        //  Convert to plural
-        $sPluralised = Inflector::pluralise(2, $sTestString);
-        $this->assertEquals('aeroplanes', $sPluralised);
+    // --------------------------------------------------------------------------
 
-        //  Convert to specified plural
-        $sPluralised = Inflector::pluralise(2, $sTestString, 'specified plural');
-        $this->assertEquals('specified plural', $sPluralised);
+    public function test_possessive_maintains_case()
+    {
+        $sTestString = strtoupper(static::TEST_STRING_RACHEL);
+        $sPossessive = Inflector::possessive($sTestString);
+        $this->assertEquals($sTestString . "'S", $sPossessive);
+    }
 
+    // --------------------------------------------------------------------------
 
-        //  Words ending in vowel + y
-        $sTestString = 'factory';
-        $sPluralised = Inflector::pluralise(1, $sTestString);
-        $this->assertEquals('factory', $sPluralised);
+    public function test_puralise_does_not_pluralise_when_count_is_one()
+    {
+        $sPluralised = Inflector::pluralise(1, static::TEST_STRING_AEROPLANE);
+        $this->assertEquals(static::TEST_STRING_AEROPLANE, $sPluralised);
+    }
 
-        //  Convert to plural
-        $sPluralised = Inflector::pluralise(2, $sTestString);
-        $this->assertEquals('factories', $sPluralised);
+    // --------------------------------------------------------------------------
 
-        //  Convert to specified plural
-        $sPluralised = Inflector::pluralise(2, $sTestString, 'specified plural');
-        $this->assertEquals('specified plural', $sPluralised);
+    public function test_puralise_pluralsies_words_when_count_is_greater_than_one()
+    {
+        $sPluralised = Inflector::pluralise(2, static::TEST_STRING_AEROPLANE);
+        $this->assertEquals(static::TEST_STRING_AEROPLANE . 's', $sPluralised);
+
+        $sPluralised = Inflector::pluralise(2, static::TEST_STRING_AEROPLANES);
+        $this->assertEquals(static::TEST_STRING_AEROPLANES, $sPluralised);
+
+        $sPluralised = Inflector::pluralise(2, static::TEST_STRING_FACTORY);
+        $this->assertEquals(substr(static::TEST_STRING_FACTORY, 0, -1) . 'ies', $sPluralised);
+
+        $sPluralised = Inflector::pluralise(2, static::TEST_STRING_QUIZ);
+        $this->assertEquals(static::TEST_STRING_QUIZ . 'zes', $sPluralised);
+    }
+
+    // --------------------------------------------------------------------------
+
+    public function test_puralise_uses_specified_plural_when_count_is_greater_than_one()
+    {
+        $sPluralised = Inflector::pluralise(2, $sTestString, static::TEST_STRING_SPECIFIED_PLURAL);
+        $this->assertEquals(static::TEST_STRING_SPECIFIED_PLURAL, $sPluralised);
+
     }
 }

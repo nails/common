@@ -1,23 +1,24 @@
 {
-  "name": "nails-common",
-  "version": "0.0.0",
-  "description": "Nails is a framework for CodeIgniter designed to make building interactive web applications fast.",
-  "author": "hello@nailsapp.co.uk",
-  "contributors": [],
-  "analyze": true,
-  "license": "MIT",
-  "devDependencies": {
-    "autoprefixer": "^9.1.1",
-    "css-loader": "^1.0.0",
-    "mini-css-extract-plugin": "^0.4.1",
-    "node-sass": "^4.9.3",
-    "postcss-loader": "^3.0.0",
-    "sass-loader": "^7.1.0",
-    "webpack": "^4.14.0",
-    "webpack-command": "^0.3.1"
-  },
-  "scripts": {
-    "build": "webpack -p",
-    "watch": "webpack --watch"
-  }
+    "name": "nails-common",
+    "version": "0.0.0",
+    "description": "Nails is a framework for CodeIgniter designed to make building interactive web applications fast.",
+    "author": "hello@nailsapp.co.uk",
+    "contributors": [],
+    "analyze": true,
+    "license": "MIT",
+    "devDependencies": {
+        "css-loader": "^2.1.0",
+        "autoprefixer": "^9.4.4",
+        "mini-css-extract-plugin": "^0.5.0",
+        "node-sass": "^4.11.0",
+        "postcss-loader": "^3.0.0",
+        "sass-loader": "^7.1.0",
+        "webpack": "^4.28.4",
+        "webpack-command": "^0.4.2"
+    },
+    "scripts": {
+        "build": "webpack -p",
+        "build-dev": "webpack",
+        "watch": "webpack --watch"
+    }
 }

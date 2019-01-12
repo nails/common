@@ -99,7 +99,7 @@ class Asset
 
         // --------------------------------------------------------------------------
 
-        switch ($sAssetLocation) {
+        switch (strtoupper($sAssetLocation)) {
 
             case 'NAILS-BOWER':
 
@@ -919,13 +919,6 @@ class Asset
                         'jquery-serialize-object/dist/jquery.serialize-object.min.js',
                     ],
                     'NAILS-BOWER'
-                );
-                $this->load(
-                    [
-                        'admin.widgeteditor.css',
-                        'admin.widgeteditor.min.js',
-                    ],
-                    'nails/module-cms'
                 );
                 break;
 

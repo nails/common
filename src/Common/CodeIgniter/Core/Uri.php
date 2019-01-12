@@ -27,7 +27,7 @@ class Uri extends CI_Uri
         try {
             parent::filter_uri($str);
         } catch (\Exception $e) {
-            ErrorHandler::die($e->getMessage());
+            ErrorHandler::halt($e->getMessage());
         }
     }
 }

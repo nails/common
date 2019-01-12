@@ -28,6 +28,7 @@ final class Component
     private $subType;
     private $forModule;
     private $autoload;
+    private $scripts;
     private $fromApp;
 
     // --------------------------------------------------------------------------
@@ -59,6 +60,7 @@ final class Component
         $this->subType      = getFromArray('subType', $aNailsData, '');
         $this->forModule    = getFromArray('forModule', $aNailsData, '');
         $this->autoload     = getFromArray('autoload', $aNailsData, null);
+        $this->scripts      = getFromArray('scripts', $aNailsData, (object) []);
         $this->fromApp      = $bIsApp;
     }
 
@@ -67,7 +69,7 @@ final class Component
     /**
      * Returns the value of private properties
      *
-     * @param string $sProperty The proeprty being called
+     * @param string $sProperty The property being called
      *
      * @return mixed
      */
@@ -78,5 +80,19 @@ final class Component
         } else {
             trigger_error('Undefined property ' . get_class() . '::$' . $sProperty);
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns whether a property isset, or not
+     *
+     * @param string $sProperty The property being checked
+     *
+     * @return bool
+     */
+    public function __isset($sProperty)
+    {
+        return property_exists($this, $sProperty);
     }
 }

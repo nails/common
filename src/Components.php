@@ -13,6 +13,7 @@ namespace Nails;
 
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Factory\Component;
+use Nails\Common\Service\ErrorHandler;
 
 final class Components
 {
@@ -32,7 +33,7 @@ final class Components
      *
      * @return array
      */
-    public static function list($bUseCache = true)
+    public static function available($bUseCache = true)
     {
         /**
          * If we already know which Nails components are available then return that, save
@@ -48,13 +49,13 @@ final class Components
         $sComposer = @file_get_contents(NAILS_APP_PATH . 'vendor/composer/installed.json');
 
         if (empty($sComposer)) {
-            ErrorHandler::die('Failed to discover potential modules; could not load composer/installed.json');
+            ErrorHandler::halt('Failed to discover potential modules; could not load composer/installed.json');
         }
 
         $aComposer = @json_decode($sComposer);
 
         if (empty($aComposer)) {
-            ErrorHandler::die('Failed to discover potential modules; could not decode composer/installed.json');
+            ErrorHandler::halt('Failed to discover potential modules; could not decode composer/installed.json');
         }
 
         $aOut = [];
@@ -162,6 +163,11 @@ final class Components
 
         // --------------------------------------------------------------------------
 
+        //  And then glue the app's definition onto the front
+        array_unshift($aOut, static::getApp());
+
+        // --------------------------------------------------------------------------
+
         if ($bUseCache) {
             static::$aCache['COMPONENTS'] = $aOut;
         }
@@ -182,7 +188,7 @@ final class Components
     {
         if (!isset(static::$aCache[$sType])) {
 
-            $aComponents            = static::list();
+            $aComponents            = static::available();
             static::$aCache[$sType] = [];
 
             foreach ($aComponents as $oComponent) {
@@ -206,7 +212,7 @@ final class Components
      */
     public static function getBySlug($sSlug)
     {
-        $aComponents = static::list();
+        $aComponents = static::available();
 
         foreach ($aComponents as $oComponent) {
             if ($oComponent->slug === $sSlug) {
@@ -219,6 +225,13 @@ final class Components
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Returns an instance of the app as a component
+     *
+     * @param bool $bUseCache Whether to use the cache or not
+     *
+     * @return Component
+     */
     public static function getApp($bUseCache = true)
     {
         //  If we have already fetched this data then don't get it again
@@ -231,27 +244,27 @@ final class Components
         $sComposer = @file_get_contents(NAILS_APP_PATH . 'composer.json');
 
         if (empty($sComposer)) {
-            ErrorHandler::die('Failed to get app configuration; could not load composer.json');
+            ErrorHandler::halt('Failed to get app configuration; could not load composer.json');
         }
 
         $oComposer = @json_decode($sComposer);
 
         if (empty($oComposer)) {
-            ErrorHandler::die('Failed to get app configuration; could not decode composer.json');
+            ErrorHandler::halt('Failed to get app configuration; could not decode composer.json');
         }
 
         $aComposer = (array) $oComposer;
         $aNails    = !empty($oComposer->extra->nails) ? (array) $oComposer->extra->nails : [];
         $oOut      = new Component(
             (object) [
-                'slug'        => getFromArray('name', $aComposer),
-                'name'        => getFromArray('name', $aNails, getFromArray('name', $aComposer)),
+                'slug'        => 'app',
+                'name'        => 'app',
                 'description' => getFromArray('description', $aNails, getFromArray('description', $aComposer)),
                 'homepage'    => getFromArray('homepage', $aNails, getFromArray('homepage', $aComposer)),
                 'authors'     => getFromArray('authors', $aNails, getFromArray('authors', $aComposer)),
                 'extra'       => (object) [
                     'nails' => (object) [
-                        'namespace'  => '\\App',
+                        'namespace'  => '\\App\\',
                         'moduleName' => getFromArray('moduleName', $aNails, ''),
                         'data'       => getFromArray('data', $aNails, null),
                         'autoload'   => getFromArray('autoload', $aNails, null),
@@ -281,12 +294,12 @@ final class Components
      *
      * @return bool
      */
-    public function exists($sSlug)
+    public static function exists($sSlug)
     {
         $aModules = static::modules();
 
         foreach ($aModules as $oModule) {
-            if ($sModuleName === $oModule->name) {
+            if ($sSlug === $oModule->slug) {
                 return true;
             }
         }
