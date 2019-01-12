@@ -11,7 +11,7 @@
 
 namespace Nails\Common\Factory\HttpRequest;
 
-class Put extends Nails\Common\Factory\HttpRequest\Post
+class Put extends Post
 {
     const HTTP_METHOD = 'Put';
 }

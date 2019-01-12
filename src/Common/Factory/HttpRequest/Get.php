@@ -11,7 +11,9 @@
 
 namespace Nails\Common\Factory\HttpRequest;
 
-class Get extends Nails\Common\Factory\HttpRequest
+use Nails\Common\Factory\HttpRequest;
+
+class Get extends HttpRequest
 {
     const HTTP_METHOD = 'GET';
 

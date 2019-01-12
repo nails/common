@@ -1,8 +1,9 @@
 <?php
 
-namespace Nails\Common\Service;
+namespace Tests\Common\Service;
 
 use PHPUnit\Framework\TestCase;
+use Nails\Common\Service\Meta;
 
 class MetaTest extends TestCase
 {

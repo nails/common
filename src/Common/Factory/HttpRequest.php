@@ -13,7 +13,6 @@ namespace Nails\Common\Factory;
 
 use Nails\Factory;
 use Nails\Testing;
-use Nails\Common\Factory\HttpResponse;
 
 abstract class HttpRequest
 {

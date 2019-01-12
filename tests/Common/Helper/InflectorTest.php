@@ -1,6 +1,6 @@
 <?php
 
-namespace Nails\Common\Helper;
+namespace Tests\Common\Helper;
 
 use Nails\Common\Helper\Inflector;
 use PHPUnit\Framework\TestCase;
