@@ -13,10 +13,13 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Factory;
+
 class Output
 {
     /**
      * The CodeIgniter Output object
+     *
      * @var \CI_Output
      */
     private $oOutput;
@@ -30,6 +33,20 @@ class Output
     {
         $oCi           = get_instance();
         $this->oOutput = $oCi->output;
+
+        // --------------------------------------------------------------------------
+
+        //  If a display method has been defined, configure CodeIgniter to use it
+        if (method_exists($this, 'display')) {
+            get_instance()->hooks->addHook(
+                'display_override',
+                [
+                    'classref' => $this,
+                    'method'   => 'display',
+                    'params'   => [],
+                ]
+            );
+        }
     }
 
     // --------------------------------------------------------------------------

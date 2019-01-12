@@ -219,7 +219,7 @@ trait GetCountCommon
      */
     protected function getCountCommonCompileFiltersString($sColumn, $mValue, $bIsQuery)
     {
-        if (is_callable($mValue)) {
+        if (is_object($mValue) && ($mValue instanceof \Closure)) {
             $mValue = $mValue();
         }
 
@@ -506,7 +506,11 @@ trait GetCountCommon
                             }
 
                             //  Escaped?
-                            $bEscape = isset($mWhere['escape']) ? (bool) $mWhere['escape'] : true;
+                            $bEscape = isset($mWhere['escape']) ? (bool) $mWhere['escape'] : '[NAILS-ESCAPE-NOT-FOUND]';
+
+                            if ($bEscape === '[NAILS-ESCAPE-NOT-FOUND]') {
+                                $bEscape = isset($mWhere[2]) ? $mWhere[2] : true;
+                            }
 
                             if ($bEscape) {
                                 $mVal = $oDb->escape_like_str($mVal);

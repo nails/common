@@ -12,6 +12,7 @@
 namespace Nails;
 
 use Nails\Components;
+use Nails\Environment;
 use Nails\Common\Service\ErrorHandler;
 
 final class Bootstrap
@@ -113,7 +114,7 @@ final class Bootstrap
         Functions::define('NAILS_ASSETS_PATH', NAILS_PATH . 'module-asset/assets/');
 
         //  Environment
-        Functions::define('ENVIRONMENT', 'DEVELOPMENT');
+        Functions::define('ENVIRONMENT', Environment::ENV_DEV);
         Functions::define('NAILS_TIMEZONE', 'UTC');
 
         //  Cache constants

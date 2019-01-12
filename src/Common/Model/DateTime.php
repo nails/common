@@ -18,18 +18,21 @@ class DateTime
 {
     /**
      * The default timezone for users (defaults to system timezone)
+     *
      * @var string
      */
     const TIMEZONE_DEFAULT = null;
 
     /**
      * The default date format
+     *
      * @var string
      */
     const FORMAT_DATE_DEFAULT = 'DD/MM/YYYY';
 
     /**
      * The various date formats
+     *
      * @var array
      */
     const FORMAT_DATE = [
@@ -87,12 +90,14 @@ class DateTime
 
     /**
      * The default time format
+     *
      * @var string
      */
     const FORMAT_TIME_DEFAULT = '24H';
 
     /**
      * The various time formats
+     *
      * @var array
      */
     const FORMAT_TIME = [
@@ -130,6 +135,7 @@ class DateTime
 
     /**
      * Returns the default date format object
+     *
      * @return \stdClass|bool
      */
     public function getDateFormatDefault()
@@ -141,6 +147,7 @@ class DateTime
 
     /**
      * Returns the default date format's slug
+     *
      * @return string|bool
      */
     public function getDateFormatDefaultSlug()
@@ -153,6 +160,7 @@ class DateTime
 
     /**
      * Returns the default date format's label
+     *
      * @return string|bool
      */
     public function getDateFormatDefaultLabel()
@@ -165,6 +173,7 @@ class DateTime
 
     /**
      * Returns the default date format's format
+     *
      * @return string|bool
      */
     public function getDateFormatDefaultFormat()
@@ -177,6 +186,7 @@ class DateTime
 
     /**
      * Returns all the defined date format objects
+     *
      * @return array
      */
     public function getAllDateFormat()
@@ -194,6 +204,7 @@ class DateTime
 
     /**
      * Returns all the date format objects as a flat array
+     *
      * @return array
      */
     public function getAllDateFormatFlat()
@@ -233,6 +244,7 @@ class DateTime
 
     /**
      * Returns the default time format object
+     *
      * @return \stdClass
      */
     public function getTimeFormatDefault()
@@ -244,6 +256,7 @@ class DateTime
 
     /**
      * Returns the default time format's slug
+     *
      * @return string|bool
      */
     public function getTimeFormatDefaultSlug()
@@ -256,6 +269,7 @@ class DateTime
 
     /**
      * Returns the default time format's label
+     *
      * @return string|bool
      */
     public function getTimeFormatDefaultLabel()
@@ -268,6 +282,7 @@ class DateTime
 
     /**
      * Returns the default time format's format
+     *
      * @return string|bool
      */
     public function getTimeFormatDefaultFormat()
@@ -280,6 +295,7 @@ class DateTime
 
     /**
      * Returns all the defined time format objects
+     *
      * @return array
      */
     public function getAllTimeFormat()
@@ -299,6 +315,7 @@ class DateTime
 
     /**
      * Returns all the time format objects as a flat array
+     *
      * @return array
      */
     public function getAllTimeFormatFlat()
@@ -477,6 +494,7 @@ class DateTime
 
     /**
      * Returns the default timezone
+     *
      * @return string
      */
     public function getTimezoneDefault()
@@ -514,6 +532,7 @@ class DateTime
 
     /**
      * Returns the Nails timezone
+     *
      * @return string
      */
     public function getNailsTimezone()
@@ -537,6 +556,7 @@ class DateTime
 
     /**
      * Returns the User's timezone
+     *
      * @return string
      */
     public function getUserTimezone()
@@ -548,6 +568,7 @@ class DateTime
 
     /**
      * Returns a multi-dimensional array of supported timezones
+     *
      * @return array
      */
     public function getAllTimezone()
@@ -596,6 +617,7 @@ class DateTime
 
     /**
      * Returns all the supported timezones as a flat array
+     *
      * @return array
      */
     public function getAllTimezoneFlat()
@@ -607,7 +629,7 @@ class DateTime
             if (is_array($mValue)) {
                 foreach ($mValue as $subKey => $subValue) {
                     if (is_string($subValue)) {
-                        $aOut[$subKey] = $subValue;
+                        $aOut[$subKey] = $sKey . ' - ' . $subValue;
                     }
                 }
             } else {

@@ -16,30 +16,36 @@ use CI_Hooks;
 
 class Hooks extends CI_Hooks
 {
-    public $myhooks        = [];
-    public $my_in_progress = false;
-
-    public function MY_Hooks()
-    {
-        parent::CI_Hooks();
-    }
+    /**
+     * Custom hooks
+     *
+     * @var array
+     */
+    public $aCustomHooks = [];
 
     /**
-     * --Add Hook--
-     * Adds a particular hook
-     * @access    public
+     * Whether a custom hook is in progress
      *
-     * @param    string the hook name
-     * @param    array  (classref, method, params)
-     *
-     * @return    mixed
+     * @var bool
      */
-    public function add_hook($hookwhere, $hook)
+    public $bCustomHooksInProgress = false;
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Adds a particular hook
+     *
+     * @param string The hook name
+     * @param array  The hook configuration (classref, method, params)
+     *
+     * @return bool
+     */
+    public function addHook($hookwhere, $hook)
     {
         if (is_array($hook)) {
             if (isset($hook['classref']) && isset($hook['method']) && isset($hook['params'])) {
                 if (is_object($hook['classref']) && method_exists($hook['classref'], $hook['method'])) {
-                    $this->myhooks[$hookwhere][] = $hook;
+                    $this->aCustomHooks[$hookwhere][] = $hook;
                     return true;
                 }
             }
@@ -49,70 +55,99 @@ class Hooks extends CI_Hooks
 
     // --------------------------------------------------------------------------
 
-    public function call_hook($which = '')
+    /**
+     * Alias of addHook
+     *
+     * @param string The hook name
+     * @param array  The hook configuration (classref, method, params)
+     *
+     * @return bool
+     */
+    public function add_hook($hookwhere, $hook)
     {
-        if (!isset($this->myhooks[$which])) {
-            return parent::call_hook($which);
-        }
-        if (isset($this->myhooks[$which][0]) && is_array($this->myhooks[$which][0])) {
-            foreach ($this->myhooks[$which] as $val) {
-                $this->_my_run_hook($val);
-            }
-        } else {
-            $this->_my_run_hook($this->myhooks[$which]);
-        }
-        return parent::call_hook($which);
+        deprecatedError('add_hook', 'addHook');
+        return $this->addHook($hookwhere, $hook);
     }
 
     // --------------------------------------------------------------------------
 
-    public function _my_run_hook($data)
+    /**
+     * Call a particular hook
+     *
+     * @param string $sWhich The hook to cal
+     *
+     * @return bool
+     */
+    public function call_hook($sWhich = '')
     {
-        if (!is_array($data)) {
+        if (!isset($this->aCustomHooks[$sWhich])) {
+            return parent::call_hook($sWhich);
+        }
+
+        if (isset($this->aCustomHooks[$sWhich][0]) && is_array($this->aCustomHooks[$sWhich][0])) {
+            foreach ($this->aCustomHooks[$sWhich] as $aCustomHook) {
+                $this->runCustomHook($aCustomHook);
+            }
+            return true;
+        } else {
+            $this->runCustomHook($this->aCustomHooks[$sWhich]);
+            return true;
+        }
+
+        return parent::call_hook($sWhich);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Execute a cusotm hook
+     *
+     * @param array $aData The hook data
+     *
+     * @return bool|void
+     */
+    protected function runCustomHook($aData)
+    {
+        if (!is_array($aData)) {
             return false;
         }
 
-        // -----------------------------------
-        // Safety - Prevents run-away loops
-        // -----------------------------------
-        // If the script being called happens to have the same
-        // hook call within it a loop can happen
-        if ($this->my_in_progress == true) {
+        /** -----------------------------------
+         * Safety - Prevents run-away loops
+         * ------------------------------------
+         * If the script being called happens to have the same
+         * hook call within it a loop can happen
+         */
+        if ($this->bCustomHooksInProgress == true) {
             return;
         }
 
-        // -----------------------------------
         // Set class/method name
-        // -----------------------------------
-        $class  = null;
-        $method = null;
-        $params = '';
+        $oClass  = null;
+        $sMethod = null;
+        $aParams = [];
 
-        if (isset($data['classref'])) {
-            $class =& $data['classref'];
+        if (isset($aData['classref'])) {
+            $oClass =& $aData['classref'];
         }
 
-        if (isset($data['method'])) {
-            $method = $data['method'];
+        if (isset($aData['method'])) {
+            $sMethod = $aData['method'];
         }
-        if (isset($data['params'])) {
-            $params = $data['params'];
+        if (isset($aData['params'])) {
+            $aParams = $aData['params'];
         }
 
-        if (!is_object($class) || !method_exists($class, $method)) {
+        if (!is_object($oClass) || !method_exists($oClass, $sMethod)) {
             return false;
         }
 
-        // -----------------------------------
         // Set the in_progress flag
-        // -----------------------------------
-        $this->my_in_progress = true;
+        $this->bCustomHooksInProgress = true;
 
-        // -----------------------------------
         // Call the requested class and/or function
-        // -----------------------------------
-        $class->$method($params);
-        $this->my_in_progress = false;
+        $oClass->$sMethod($aParams);
+        $this->bCustomHooksInProgress = false;
         return true;
     }
 
@@ -123,104 +158,89 @@ class Hooks extends CI_Hooks
      *
      * Runs a particular hook
      *
-     * @access  private
+     * @param array The hook details
      *
-     * @param   array   the hook details
-     *
-     * @return  bool
+     * @return bool
      */
-    public function _run_hook($data)
+    public function _run_hook($aData)
     {
-        if (!is_array($data)) {
+        if (!is_array($aData)) {
             return false;
         }
 
-        // -----------------------------------
-        // Safety - Prevents run-away loops
-        // -----------------------------------
-
-        // If the script being called happens to have the same
-        // hook call within it a loop can happen
-
-        if ($this->my_in_progress == true) {
+        /** -----------------------------------
+         * Safety - Prevents run-away loops
+         * ------------------------------------
+         * If the script being called happens to have the same
+         * hook call within it a loop can happen
+         */
+        if ($this->bCustomHooksInProgress == true) {
             return;
         }
 
-        // -----------------------------------
         // Set file path
-        // -----------------------------------
-
-        if (!isset($data['filepath']) || !isset($data['filename'])) {
+        if (!isset($aData['filepath']) || !isset($aData['filename'])) {
             return false;
         }
 
         //  Using absolute filepath?
-        if (substr($data['filepath'], 0, 1) == '/') {
+        if (substr($aData['filepath'], 0, 1) == '/') {
 
-            $filepath = rtrim($data['filepath'], '/') . '/';
-            $filepath .= $data['filename'];
+            $sFilePath = rtrim($aData['filepath'], '/') . '/';
+            $sFilePath .= $aData['filename'];
 
         } else {
 
-            $filepath = APPPATH;
-            $filepath .= rtrim($data['filepath'], '/') . '/';
-            $filepath .= $data['filename'];
+            $sFilePath = APPPATH;
+            $sFilePath .= rtrim($aData['filepath'], '/') . '/';
+            $sFilePath .= $aData['filename'];
         }
 
-        if (!file_exists($filepath)) {
+        if (!file_exists($sFilePath)) {
             return false;
         }
 
-        // -----------------------------------
         // Set class/function name
-        // -----------------------------------
+        $sClass    = false;
+        $sFunction = false;
+        $sParams   = '';
 
-        $class    = false;
-        $function = false;
-        $params   = '';
-
-        if (isset($data['class']) && $data['class'] != '') {
-            $class = $data['class'];
+        if (isset($aData['class']) && $aData['class'] != '') {
+            $sClass = $aData['class'];
         }
 
-        if (isset($data['function'])) {
-            $function = $data['function'];
+        if (isset($aData['function'])) {
+            $sFunction = $aData['function'];
         }
 
-        if (isset($data['params'])) {
-            $params = $data['params'];
+        if (isset($aData['params'])) {
+            $sParams = $aData['params'];
         }
 
-        if ($class === false && $function === false) {
+        if ($sClass === false && $sFunction === false) {
             return false;
         }
 
-        // -----------------------------------
         // Set the in_progress flag
-        // -----------------------------------
-
         $this->in_progress = true;
 
-        // -----------------------------------
         // Call the requested class and/or function
-        // -----------------------------------
+        if ($sClass !== false) {
 
-        if ($class !== false) {
-
-            if (!class_exists($class)) {
-                require($filepath);
+            if (!class_exists($sClass)) {
+                require($sFilePath);
             }
 
-            $HOOK = new $class();
-            $HOOK->$function($params);
+            $HOOK = new $sClass();
+            $HOOK->$sFunction($sParams);
 
         } else {
 
-            if (!function_exists($function)) {
-                require($filepath);
+            if (!function_exists($sFunction)) {
+                require($sFilePath);
             }
 
-            $function($params);
+            $sFunction($sParams);
         }
 
         $this->in_progress = false;

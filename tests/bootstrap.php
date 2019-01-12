@@ -57,6 +57,6 @@ if (!empty($_ENV['ENVIRONMENT']) && $_ENV['ENVIRONMENT'] === 'TESTING') {
      */
     require 'vendor/autoload.php';
 
-    //  Prevent "No direct script access allowed" errors
-    define('BASEPATH', realpath(dirname(__FILE__) . '/../vendor/codeigniter/framework/system/'));
+    \Nails\Functions::define('NAILS_CI_SYSTEM_PATH', realpath(dirname(__FILE__) . '/../vendor/codeigniter/framework/system') . '/');
+    \Nails\Functions::define('BASEPATH', NAILS_CI_SYSTEM_PATH);
 }
