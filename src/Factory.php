@@ -444,14 +444,6 @@ class Factory
         require_once BASEPATH . 'core/Common.php';
 
         $aComponents = [];
-
-        //  App
-        $aComponents[] = (object) [
-            'slug'     => 'app',
-            'autoload' => static::extractAutoLoadItemsFromComposerJson(NAILS_APP_PATH . 'composer.json'),
-        ];
-
-        //  Modules
         foreach (Components::available() as $oModule) {
             $aComponents[] = (object) [
                 'slug'     => $oModule->slug,
