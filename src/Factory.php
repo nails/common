@@ -62,15 +62,15 @@ class Factory
         $aDiscoveredServices['app'] = self::findServicesForApp();
         $aDiscoveredServices        = array_filter($aDiscoveredServices);
 
-        foreach ($aDiscoveredServices as $ComponentName => $aComponentServices) {
+        foreach ($aDiscoveredServices as $sComponentName => $aComponentServices) {
 
             //  Properties
             if (!empty($aComponentServices['properties'])) {
-                if (empty(self::$aContainers[$ComponentName]['properties'])) {
-                    self::$aContainers[$ComponentName]['properties'] = new Container();
+                if (empty(self::$aContainers[$sComponentName]['properties'])) {
+                    self::$aContainers[$sComponentName]['properties'] = new Container();
                 }
                 foreach ($aComponentServices['properties'] as $sKey => $mValue) {
-                    self::$aContainers[$ComponentName]['properties'][$sKey] = $mValue;
+                    self::$aContainers[$sComponentName]['properties'][$sKey] = $mValue;
                 }
             }
 
@@ -83,11 +83,11 @@ class Factory
              * item's constructor
              */
             if (!empty($aComponentServices['services'])) {
-                if (empty(self::$aContainers[$ComponentName]['services'])) {
-                    self::$aContainers[$ComponentName]['services'] = new Container();
+                if (empty(self::$aContainers[$sComponentName]['services'])) {
+                    self::$aContainers[$sComponentName]['services'] = new Container();
                 }
                 foreach ($aComponentServices['services'] as $sKey => $cCallable) {
-                    self::$aContainers[$ComponentName]['services'][$sKey] = function () use ($sKey, $cCallable) {
+                    self::$aContainers[$sComponentName]['services'][$sKey] = function () use ($sKey, $cCallable) {
                         return $cCallable;
                     };;
                 }
@@ -102,11 +102,11 @@ class Factory
              * item's constructor
              */
             if (!empty($aComponentServices['models'])) {
-                if (empty(self::$aContainers[$ComponentName]['models'])) {
-                    self::$aContainers[$ComponentName]['models'] = new Container();
+                if (empty(self::$aContainers[$sComponentName]['models'])) {
+                    self::$aContainers[$sComponentName]['models'] = new Container();
                 }
                 foreach ($aComponentServices['models'] as $sKey => $cCallable) {
-                    self::$aContainers[$ComponentName]['models'][$sKey] = function () use ($cCallable) {
+                    self::$aContainers[$sComponentName]['models'][$sKey] = function () use ($cCallable) {
                         return $cCallable;
                     };
                 }
@@ -121,8 +121,8 @@ class Factory
              * item's constructor
              */
             if (!empty($aComponentServices['factories'])) {
-                if (empty(self::$aContainers[$ComponentName]['factories'])) {
-                    self::$aContainers[$ComponentName]['factories'] = new Container();
+                if (empty(self::$aContainers[$sComponentName]['factories'])) {
+                    self::$aContainers[$sComponentName]['factories'] = new Container();
                 }
                 foreach ($aComponentServices['factories'] as $sKey => $cCallable) {
 
@@ -130,7 +130,7 @@ class Factory
                         return $cCallable;
                     };
 
-                    self::$aContainers[$ComponentName]['factories'][$sKey] = self::$aContainers[$ComponentName]['factories']
+                    self::$aContainers[$sComponentName]['factories'][$sKey] = self::$aContainers[$sComponentName]['factories']
                         ->factory($cWrapper);
                 }
             }
@@ -148,12 +148,10 @@ class Factory
      */
     private static function findServicesForComponent($sComponentName)
     {
-        $aPaths = [
+        return self::findServicesAtPaths([
             NAILS_APP_PATH . 'application/services/' . $sComponentName . '/services.php',
             NAILS_APP_PATH . 'vendor/' . $sComponentName . '/services/services.php',
-        ];
-
-        return self::findServicesAtPaths($aPaths);
+        ]);
     }
 
     // --------------------------------------------------------------------------
@@ -165,11 +163,9 @@ class Factory
      */
     private static function findServicesForApp()
     {
-        $aPaths = [
+        return self::findServicesAtPaths([
             'application/services/services.php',
-        ];
-
-        return self::findServicesAtPaths($aPaths);
+        ]);
     }
 
     // --------------------------------------------------------------------------
@@ -448,14 +444,6 @@ class Factory
         require_once BASEPATH . 'core/Common.php';
 
         $aComponents = [];
-
-        //  App
-        $aComponents[] = (object) [
-            'slug'     => 'app',
-            'autoload' => static::extractAutoLoadItemsFromComposerJson(NAILS_APP_PATH . 'composer.json'),
-        ];
-
-        //  Modules
         foreach (Components::available() as $oModule) {
             $aComponents[] = (object) [
                 'slug'     => $oModule->slug,

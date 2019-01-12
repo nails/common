@@ -388,12 +388,12 @@ final class Bootstrap
     /**
      * Load the Nails Common function file
      *
-     * @todo (Pablo - 2018-11-15) - Move these out of the global namepace
+     * @todo (Pablo - 2018-11-15) - Move these out of the global namespace
      */
     private static function loadFunctions()
     {
         if (!file_exists(NAILS_COMMON_PATH . 'src/Common/CodeIgniter/Core/Common.php')) {
-            Nails\Common\Service\ErrorHandler::halt(
+            ErrorHandler::halt(
                 'Could not find <code>Nails\Common\CodeIgniter\Core\Common()</code>, ensure Nails is set up correctly.'
             );
         }

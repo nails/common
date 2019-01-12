@@ -1,12 +1,17 @@
 <?php
 
-namespace Tests\Functions;
+namespace Tests\Commnon\Helper\ArrayHelper;
 
-use Nails\Functions;
+use Nails\Common\Helper\ArrayHelper;
 use PHPUnit\Framework\TestCase;
 
 class GetFromArrayTest extends TestCase
 {
+    /**
+     * Test data
+     *
+     * @var array
+     */
     private $aTestArray = [
         'foo'  => 'bar',
         'fizz' => 'buzz',
@@ -14,41 +19,53 @@ class GetFromArrayTest extends TestCase
 
     // --------------------------------------------------------------------------
 
+    /**
+     * @covers \Nails\Common\Helper\ArrayHelper::getFromArray()
+     */
     public function test_getfromarray_valid_key()
     {
         $this->assertEquals(
             $this->aTestArray['foo'],
-            Functions::getFromArray('foo', $this->aTestArray)
+            ArrayHelper::getFromArray('foo', $this->aTestArray)
         );
     }
 
     // --------------------------------------------------------------------------
 
+    /**
+     * @covers \Nails\Common\Helper\ArrayHelper::getFromArray()
+     */
     public function test_getfromarray_invalid_key()
     {
         $this->assertEquals(
             null,
-            Functions::getFromArray('invalid', $this->aTestArray)
+            ArrayHelper::getFromArray('invalid', $this->aTestArray)
         );
     }
 
     // --------------------------------------------------------------------------
 
+    /**
+     * @covers \Nails\Common\Helper\ArrayHelper::getFromArray()
+     */
     public function test_getfromarray_cascading_keys()
     {
         $this->assertEquals(
             $this->aTestArray['fizz'],
-            Functions::getFromArray(['invalid', 'fizz'], $this->aTestArray)
+            ArrayHelper::getFromArray(['invalid', 'fizz'], $this->aTestArray)
         );
     }
 
     // --------------------------------------------------------------------------
 
+    /**
+     * @covers \Nails\Common\Helper\ArrayHelper::getFromArray()
+     */
     public function test_getfromarray_default_value()
     {
         $this->assertEquals(
             'default',
-            Functions::getFromArray('invalid', $this->aTestArray, 'default')
+            ArrayHelper::getFromArray('invalid', $this->aTestArray, 'default')
         );
     }
 }
