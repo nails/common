@@ -37,6 +37,13 @@ class Testing
      */
     const TEST_HEADER_VALUE = 'enabled';
 
+    /**
+     * The header which will contain the user ID to immitate
+     *
+     * @var string
+     */
+    const TEST_HEADER_USER_NAME = 'X-Testing-As-User';
+
     // --------------------------------------------------------------------------
 
     /**

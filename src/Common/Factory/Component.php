@@ -12,6 +12,8 @@
 
 namespace Nails\Common\Factory;
 
+use Nails\Common\Helper\ArrayHelper;
+
 final class Component
 {
     private $slug;
@@ -46,21 +48,21 @@ final class Component
         $aPackage   = (array) $oPackage;
         $aNailsData = !empty($aPackage['extra']->nails) ? (array) $aPackage['extra']->nails : [];
 
-        $this->slug         = getFromArray('name', $aPackage);
-        $this->namespace    = getFromArray('namespace', $aNailsData);
-        $this->name         = getFromArray('name', $aNailsData, $this->slug);
-        $this->description  = getFromArray('description', $aNailsData, getFromArray('description', $aPackage));
-        $this->homepage     = getFromArray('homepage', $aNailsData, getFromArray('homepage', $aPackage));
-        $this->authors      = getFromArray('authors', $aNailsData, getFromArray('authors', $aPackage));
+        $this->slug         = ArrayHelper::getFromArray('name', $aPackage);
+        $this->namespace    = ArrayHelper::getFromArray('namespace', $aNailsData);
+        $this->name         = ArrayHelper::getFromArray('name', $aNailsData, $this->slug);
+        $this->description  = ArrayHelper::getFromArray('description', $aNailsData, ArrayHelper::getFromArray('description', $aPackage));
+        $this->homepage     = ArrayHelper::getFromArray('homepage', $aNailsData, ArrayHelper::getFromArray('homepage', $aPackage));
+        $this->authors      = ArrayHelper::getFromArray('authors', $aNailsData, ArrayHelper::getFromArray('authors', $aPackage));
         $this->path         = rtrim($sAbsolutePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         $this->relativePath = rtrim($sRelativePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-        $this->moduleName   = getFromArray('moduleName', $aNailsData, '');
-        $this->data         = getFromArray('data', $aNailsData, null);
-        $this->type         = getFromArray('type', $aNailsData, '');
-        $this->subType      = getFromArray('subType', $aNailsData, '');
-        $this->forModule    = getFromArray('forModule', $aNailsData, '');
-        $this->autoload     = getFromArray('autoload', $aNailsData, null);
-        $this->scripts      = getFromArray('scripts', $aNailsData, (object) []);
+        $this->moduleName   = ArrayHelper::getFromArray('moduleName', $aNailsData, '');
+        $this->data         = ArrayHelper::getFromArray('data', $aNailsData, null);
+        $this->type         = ArrayHelper::getFromArray('type', $aNailsData, '');
+        $this->subType      = ArrayHelper::getFromArray('subType', $aNailsData, '');
+        $this->forModule    = ArrayHelper::getFromArray('forModule', $aNailsData, '');
+        $this->autoload     = ArrayHelper::getFromArray('autoload', $aNailsData, null);
+        $this->scripts      = ArrayHelper::getFromArray('scripts', $aNailsData, (object) []);
         $this->fromApp      = $bIsApp;
     }
 

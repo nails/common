@@ -17,6 +17,15 @@ use Nails\Testing;
 trait ControllerTestCase
 {
     /**
+     * The ID of the user to execute the request as
+     *
+     * @var integer
+     */
+    private static $aRequestAsUserId = null;
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Returns a new HttpClient, configured with some defaults
      *
      * @param array $aConfig A configiration array for the Http client
@@ -48,7 +57,18 @@ trait ControllerTestCase
             ];
         }
 
+        if (!empty(static::static::$aRequestAsUserId)) {
+            $aConfig['headers'][Testing::TEST_HEADER_USER_NAME] = static::$aRequestAsUserId;
+        }
+
         return Factory::factory('HttpClient', '', $aConfig);
+    }
+
+    // --------------------------------------------------------------------------
+
+    protected static function as($iUserId)
+    {
+        static::$aRequestAsUserId = $iUserId;
     }
 
     // --------------------------------------------------------------------------

@@ -13,6 +13,7 @@ namespace Nails;
 
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Factory\Component;
+use Nails\Common\Helper\ArrayHelper;
 use Nails\Common\Service\ErrorHandler;
 
 final class Components
@@ -99,19 +100,19 @@ final class Components
                         $aOut[]  = new Component(
                             (object) [
                                 'slug'        => 'app/' . $sDirName,
-                                'name'        => getFromArray('name', $aConfig, $sDirName),
-                                'description' => getFromArray('description', $aConfig, ''),
-                                'homepage'    => getFromArray('homepage', $aConfig, ''),
-                                'authors'     => getFromArray('authors', $aConfig, []),
+                                'name'        => ArrayHelper::getFromArray('name', $aConfig, $sDirName),
+                                'description' => ArrayHelper::getFromArray('description', $aConfig, ''),
+                                'homepage'    => ArrayHelper::getFromArray('homepage', $aConfig, ''),
+                                'authors'     => ArrayHelper::getFromArray('authors', $aConfig, []),
                                 'extra'       => (object) [
                                     'nails' => (object) [
-                                        'namespace'  => getFromArray('namespace', $aConfig, null),
-                                        'moduleName' => getFromArray('data', $aConfig, null),
-                                        'data'       => getFromArray('type', $aConfig, ''),
-                                        'type'       => getFromArray('subType', $aConfig, ''),
-                                        'subType'    => getFromArray('forModule', $aConfig, ''),
-                                        'forModule'  => getFromArray('autoload', $aConfig, null),
-                                        'autoload'   => getFromArray('autoload', $aConfig, null),
+                                        'namespace'  => ArrayHelper::getFromArray('namespace', $aConfig, null),
+                                        'moduleName' => ArrayHelper::getFromArray('data', $aConfig, null),
+                                        'data'       => ArrayHelper::getFromArray('type', $aConfig, ''),
+                                        'type'       => ArrayHelper::getFromArray('subType', $aConfig, ''),
+                                        'subType'    => ArrayHelper::getFromArray('forModule', $aConfig, ''),
+                                        'forModule'  => ArrayHelper::getFromArray('autoload', $aConfig, null),
+                                        'autoload'   => ArrayHelper::getFromArray('autoload', $aConfig, null),
                                     ],
                                 ],
                             ],
@@ -259,15 +260,15 @@ final class Components
             (object) [
                 'slug'        => 'app',
                 'name'        => 'app',
-                'description' => getFromArray('description', $aNails, getFromArray('description', $aComposer)),
-                'homepage'    => getFromArray('homepage', $aNails, getFromArray('homepage', $aComposer)),
-                'authors'     => getFromArray('authors', $aNails, getFromArray('authors', $aComposer)),
+                'description' => ArrayHelper::getFromArray('description', $aNails, ArrayHelper::getFromArray('description', $aComposer)),
+                'homepage'    => ArrayHelper::getFromArray('homepage', $aNails, ArrayHelper::getFromArray('homepage', $aComposer)),
+                'authors'     => ArrayHelper::getFromArray('authors', $aNails, ArrayHelper::getFromArray('authors', $aComposer)),
                 'extra'       => (object) [
                     'nails' => (object) [
                         'namespace'  => '\\App\\',
-                        'moduleName' => getFromArray('moduleName', $aNails, ''),
-                        'data'       => getFromArray('data', $aNails, null),
-                        'autoload'   => getFromArray('autoload', $aNails, null),
+                        'moduleName' => ArrayHelper::getFromArray('moduleName', $aNails, ''),
+                        'data'       => ArrayHelper::getFromArray('data', $aNails, null),
+                        'autoload'   => ArrayHelper::getFromArray('autoload', $aNails, null),
                     ],
                 ],
             ],

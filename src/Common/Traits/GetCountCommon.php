@@ -12,6 +12,7 @@
 
 namespace Nails\Common\Traits;
 
+use Nails\Common\Helper\ArrayHelper;
 use Nails\Factory;
 
 trait GetCountCommon
@@ -233,9 +234,9 @@ trait GetCountCommon
                 $oDb->escape($mValue),
             ];
         } else {
-            $sOperator = getFromArray(0, $mValue);
-            $sValue    = getFromArray(1, $mValue);
-            $bEscape   = (bool) getFromArray(2, $mValue, true);
+            $sOperator = ArrayHelper::getFromArray(0, $mValue);
+            $sValue    = ArrayHelper::getFromArray(1, $mValue);
+            $bEscape   = (bool) ArrayHelper::getFromArray(2, $mValue, true);
             $aBits     = [
                 $oDb->escape_str($sColumn, false),
                 $sOperator,

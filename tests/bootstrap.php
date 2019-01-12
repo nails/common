@@ -14,6 +14,7 @@
  * and it is using this file to bootstrap the tests, otherwise this
  * module itself is being tested.
  */
+
 if (!empty($_ENV['ENVIRONMENT']) && $_ENV['ENVIRONMENT'] === 'TESTING') {
 
     /*
@@ -28,7 +29,7 @@ if (!empty($_ENV['ENVIRONMENT']) && $_ENV['ENVIRONMENT'] === 'TESTING') {
      *---------------------------------------------------------------
      * Nails Testing Environment
      *---------------------------------------------------------------
-     * We create an oject here  so that we can leverage the constructor
+     * We create an object here  so that we can leverage the constructor
      * to set up the environment, and the destructor to tear it down.
      */
     $oTesting = new \Nails\Testing($sEntryPoint);
@@ -57,6 +58,7 @@ if (!empty($_ENV['ENVIRONMENT']) && $_ENV['ENVIRONMENT'] === 'TESTING') {
      */
     require 'vendor/autoload.php';
 
+    \Nails\Functions::define('NAILS_APP_PATH', realpath(dirname(__FILE__) . '/..') . '/');
     \Nails\Functions::define('NAILS_CI_SYSTEM_PATH', realpath(dirname(__FILE__) . '/../vendor/codeigniter/framework/system') . '/');
     \Nails\Functions::define('BASEPATH', NAILS_CI_SYSTEM_PATH);
 }

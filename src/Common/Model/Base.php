@@ -14,6 +14,7 @@ namespace Nails\Common\Model;
 
 use Behat\Transliterator\Transliterator;
 use Nails\Common\Exception\ModelException;
+use Nails\Common\Helper\ArrayHelper;
 use Nails\Common\Traits\Caching;
 use Nails\Common\Traits\ErrorHandling;
 use Nails\Common\Traits\GetCountCommon;
@@ -747,8 +748,8 @@ abstract class Base
                 $iPerPage = $aData['limit'];
             } elseif (is_array($aData['limit'])) {
                 //  Consider the first element to be the page number and the second the number of results
-                $iPage    = getFromArray(0, $aData['limit'], 0);
-                $iPerPage = getFromArray(1, $aData['limit']);
+                $iPage    = ArrayHelper::getFromArray(0, $aData['limit'], 0);
+                $iPerPage = ArrayHelper::getFromArray(1, $aData['limit']);
             }
         }
 
@@ -857,8 +858,8 @@ abstract class Base
                     $aTriggers[]             = $mTrigger;
                     $aTriggerData[$mTrigger] = [];
                 } elseif (is_array($mTrigger)) {
-                    $sArrayTrigger     = getFromArray(0, $mTrigger) ?: getFromArray('trigger', $mTrigger);
-                    $aArrayTriggerData = getFromArray(1, $mTrigger) ?: getFromArray('data', $mTrigger, []);
+                    $sArrayTrigger     = ArrayHelper::getFromArray(0, $mTrigger) ?: ArrayHelper::getFromArray('trigger', $mTrigger);
+                    $aArrayTriggerData = ArrayHelper::getFromArray(1, $mTrigger) ?: ArrayHelper::getFromArray('data', $mTrigger, []);
                     if (!empty($sArrayTrigger)) {
                         $aTriggers[]                  = $sArrayTrigger;
                         $aTriggerData[$sArrayTrigger] = $aArrayTriggerData;
@@ -890,7 +891,7 @@ abstract class Base
                 //  Merge any data defined with the expandable field with any custom data added by the expansion
                 $aMergedData = array_merge(
                     $oExpandableField->data,
-                    getFromArray($oExpandableField->trigger, $aTriggerData, [])
+                    ArrayHelper::getFromArray($oExpandableField->trigger, $aTriggerData, [])
                 );
 
                 if ($oExpandableField->type === static::EXPANDABLE_TYPE_SINGLE) {
@@ -1301,14 +1302,14 @@ abstract class Base
      * Get associated content for the items in the result set where the the relationship is 1 to 1 and the binding
      * is made in the item object (i.e current item contains the associated item's ID)
      *
-     * @param  array   &$aItems                  The result set of items
-     * @param  string  $sAssociatedItemIdColumn  Which property in the result set contains the associated content's ID
-     * @param  string  $sItemProperty            What property of each item to assign the associated content
-     * @param  string  $sAssociatedModel         The name of the model which handles the associated content
-     * @param  string  $sAssociatedModelProvider Which module provides the associated model
-     * @param  array   $aAssociatedModelData     Data to pass to the associated model's getByIds method()
-     * @param  boolean $bUnsetOriginalProperty   Whether to remove the original property (i.e the property defined by
-     *                                           $sAssociatedItemIdColumn)
+     * @param  array   &$aItems                   The result set of items
+     * @param  string   $sAssociatedItemIdColumn  Which property in the result set contains the associated content's ID
+     * @param  string   $sItemProperty            What property of each item to assign the associated content
+     * @param  string   $sAssociatedModel         The name of the model which handles the associated content
+     * @param  string   $sAssociatedModelProvider Which module provides the associated model
+     * @param  array    $aAssociatedModelData     Data to pass to the associated model's getByIds method()
+     * @param  boolean  $bUnsetOriginalProperty   Whether to remove the original property (i.e the property defined by
+     *                                            $sAssociatedItemIdColumn)
      *
      * @return void
      */
@@ -1365,12 +1366,12 @@ abstract class Base
     /**
      * Get associated content for the items in the result set where the the relationship is 1 to many
      *
-     * @param  array  &$aItems                  The result set of items
-     * @param  string $sItemProperty            What property of each item to assign the associated content
-     * @param  string $sAssociatedItemIdColumn  Which property in the associated content which contains the item's ID
-     * @param  string $sAssociatedModel         The name of the model which handles the associated content
-     * @param  string $sAssociatedModelProvider Which module provides the associated model
-     * @param  array  $aAssociatedModelData     Data to pass to the associated model's getByIds method()
+     * @param  array  &$aItems                   The result set of items
+     * @param  string  $sItemProperty            What property of each item to assign the associated content
+     * @param  string  $sAssociatedItemIdColumn  Which property in the associated content which contains the item's ID
+     * @param  string  $sAssociatedModel         The name of the model which handles the associated content
+     * @param  string  $sAssociatedModelProvider Which module provides the associated model
+     * @param  array   $aAssociatedModelData     Data to pass to the associated model's getByIds method()
      *
      * @return void
      */
@@ -1425,12 +1426,12 @@ abstract class Base
     /**
      * Count associated content for the items in the result set where the the relationship is 1 to many
      *
-     * @param  array  &$aItems                  The result set of items
-     * @param  string $sItemProperty            What property of each item to assign the associated content
-     * @param  string $sAssociatedItemIdColumn  Which property in the associated content which contains the item's ID
-     * @param  string $sAssociatedModel         The name of the model which handles the associated content
-     * @param  string $sAssociatedModelProvider Which module provides the associated model
-     * @param  array  $aAssociatedModelData     Data to pass to the associated model's getByIds method()
+     * @param  array  &$aItems                   The result set of items
+     * @param  string  $sItemProperty            What property of each item to assign the associated content
+     * @param  string  $sAssociatedItemIdColumn  Which property in the associated content which contains the item's ID
+     * @param  string  $sAssociatedModel         The name of the model which handles the associated content
+     * @param  string  $sAssociatedModelProvider Which module provides the associated model
+     * @param  array   $aAssociatedModelData     Data to pass to the associated model's getByIds method()
      *
      * @return void
      */
@@ -1479,15 +1480,15 @@ abstract class Base
     /**
      * Get associated content for the items in the result set using a taxonomy table
      *
-     * @param  array  &$aItems                     The result set of items
-     * @param  string $sItemProperty               What property of each item to assign the associated content
-     * @param  string $sTaxonomyModel              The name of the model which handles the taxonomy relationships
-     * @param  string $sTaxonomyModelProvider      Which module provides the taxonomy model
-     * @param  string $sAssociatedModel            The name of the model which handles the associated content
-     * @param  string $sAssociatedModelProvider    Which module provides the associated model
-     * @param  array  $aAssociatedModelData        Data to pass to the associated model's getByIds method()
-     * @param  string $sTaxonomyItemIdColumn       The name of the column in the taxonomy table for the item ID
-     * @param  string $sTaxonomyAssociatedIdColumn The name of the column in the taxonomy table for the associated ID
+     * @param  array  &$aItems                      The result set of items
+     * @param  string  $sItemProperty               What property of each item to assign the associated content
+     * @param  string  $sTaxonomyModel              The name of the model which handles the taxonomy relationships
+     * @param  string  $sTaxonomyModelProvider      Which module provides the taxonomy model
+     * @param  string  $sAssociatedModel            The name of the model which handles the associated content
+     * @param  string  $sAssociatedModelProvider    Which module provides the associated model
+     * @param  array   $aAssociatedModelData        Data to pass to the associated model's getByIds method()
+     * @param  string  $sTaxonomyItemIdColumn       The name of the column in the taxonomy table for the item ID
+     * @param  string  $sTaxonomyAssociatedIdColumn The name of the column in the taxonomy table for the associated ID
      *
      * @return void
      */
@@ -2063,7 +2064,7 @@ abstract class Base
             'provider'    => $aOptions['provider'],
 
             //  Any data to pass to the getAll (every time)
-            'data'        => getFromArray('data', $aOptions, []),
+            'data'        => ArrayHelper::getFromArray('data', $aOptions, []),
 
             /**
              * The ID column to use; for EXPANDABLE_TYPE_SINGLE this is property of the
@@ -2073,7 +2074,7 @@ abstract class Base
             'id_column'   => $aOptions['id_column'],
 
             //  Whether the field is expanded by default
-            'auto_expand' => getFromArray('auto_expand', $aOptions, false),
+            'auto_expand' => ArrayHelper::getFromArray('auto_expand', $aOptions, false),
 
             //  Whether to automatically save expanded objects when the trigger is
             //  passed as a key to the create or update methods
@@ -2279,8 +2280,8 @@ abstract class Base
     {
         preg_match('/^(.*?)(\((.+?)\)(.*))?$/', $sType, $aMatches);
 
-        $sType       = getFromArray(1, $aMatches, 'text');
-        $sTypeConfig = trim(getFromArray(3, $aMatches));
+        $sType       = ArrayHelper::getFromArray(1, $aMatches, 'text');
+        $sTypeConfig = trim(ArrayHelper::getFromArray(3, $aMatches));
         $iLength     = is_numeric($sTypeConfig) ? (int) $sTypeConfig : null;
 
         switch ($sType) {
@@ -2360,9 +2361,9 @@ abstract class Base
     {
         preg_match('/^(.*?)(\((.+?)\)(.*))?$/', $sType, $aMatches);
 
-        $sType   = getFromArray(1, $aMatches, 'text');
-        $iLength = getFromArray(3, $aMatches);
-        $sExtra  = trim(strtolower(getFromArray(4, $aMatches)));
+        $sType   = ArrayHelper::getFromArray(1, $aMatches, 'text');
+        $iLength = ArrayHelper::getFromArray(3, $aMatches);
+        $sExtra  = trim(strtolower(ArrayHelper::getFromArray(4, $aMatches)));
 
         switch ($sType) {
 

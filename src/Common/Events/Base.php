@@ -12,16 +12,20 @@
 
 namespace Nails\Common\Events;
 
+use Nails\Common\Helper\ArrayHelper;
+
 abstract class Base
 {
     /**
      * Stores all the DocComments
+     *
      * @var array
      */
     protected static $aDescriptions = [];
 
     /**
      * Stores all the arguments
+     *
      * @var array
      */
     protected static $aArguments = [];
@@ -145,6 +149,7 @@ abstract class Base
 
     /**
      * Returns an array of the available events with supporting information
+     *
      * @return array
      */
     public static function info()
@@ -157,8 +162,8 @@ abstract class Base
             $aOut[$sConstant] = (object) [
                 'constant'    => get_called_class() . '::' . $sConstant,
                 'value'       => $sValue,
-                'description' => getFromArray($sConstant, static::$aDescriptions),
-                'arguments'   => getFromArray($sConstant, static::$aArguments),
+                'description' => ArrayHelper::getFromArray($sConstant, static::$aDescriptions),
+                'arguments'   => ArrayHelper::getFromArray($sConstant, static::$aArguments),
             ];
         }
 

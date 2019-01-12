@@ -158,29 +158,6 @@ class Functions
     // --------------------------------------------------------------------------
 
     /**
-     * Retrieve a value from $sArray at $sKey, if it exists
-     *
-     * @param  string|array $sKey     The key to get, if an array is passed the first valid key will be returned
-     * @param  array        $aArray   The array to look in
-     * @param  mixed        $mDefault What to return if $sKey doesn't exist in $aArray
-     *
-     * @return mixed
-     */
-    public static function getFromArray($mKey, $aArray, $mDefault = null)
-    {
-        $aKeys = (array) $mKey;
-        foreach ($aKeys as $sKey) {
-            if (array_key_exists($sKey, $aArray)) {
-                return $aArray[$sKey];
-            }
-        }
-
-        return $mDefault;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Throw an error
      *
      * @param string $sMessage    The error message

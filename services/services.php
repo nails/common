@@ -229,5 +229,47 @@ return [
                 return new \GuzzleHttp\Client($aConfig);
             }
         },
+        'HttpRequestDelete' => function (array $aConfig = []) {
+            if (class_exists('\App\Common\Factory\HttpRequest\Delete')) {
+                return new \App\Common\Factory\HttpRequest\Delete($aConfig);
+            } else {
+                return new \Nails\Common\Factory\HttpRequest\Delete($aConfig);
+            }
+        },
+        'HttpRequestGet'    => function ($sBaseUri = null, $sPath = null, array $aHeaders = []) {
+            if (class_exists('\App\Common\Factory\HttpRequest\Get')) {
+                return new \App\Common\Factory\HttpRequest\Get($sBaseUri, $sPath, $aHeaders);
+            } else {
+                return new \Nails\Common\Factory\HttpRequest\Get($sBaseUri, $sPath, $aHeaders);
+            }
+        },
+        'HttpRequestPatch'  => function ($sBaseUri = null, $sPath = null, array $aHeaders = []) {
+            if (class_exists('\App\Common\Factory\HttpRequest\Patch')) {
+                return new \App\Common\Factory\HttpRequest\Patch($sBaseUri, $sPath, $aHeaders);
+            } else {
+                return new \Nails\Common\Factory\HttpRequest\Patch($sBaseUri, $sPath, $aHeaders);
+            }
+        },
+        'HttpRequestPost'   => function ($sBaseUri = null, $sPath = null, array $aHeaders = []) {
+            if (class_exists('\App\Common\Factory\HttpRequest\Post')) {
+                return new \App\Common\Factory\HttpRequest\Post($sBaseUri, $sPath, $aHeaders);
+            } else {
+                return new \Nails\Common\Factory\HttpRequest\Post($sBaseUri, $sPath, $aHeaders);
+            }
+        },
+        'HttpRequestPut'    => function ($sBaseUri = null, $sPath = null, array $aHeaders = []) {
+            if (class_exists('\App\Common\Factory\HttpRequest\Put')) {
+                return new \App\Common\Factory\HttpRequest\Put($sBaseUri, $sPath, $aHeaders);
+            } else {
+                return new \Nails\Common\Factory\HttpRequest\Put($sBaseUri, $sPath, $aHeaders);
+            }
+        },
+        'HttpResponse'      => function (GuzzleHttp\Psr7\Response $oClient) {
+            if (class_exists('\App\Common\Factory\HttpResponse')) {
+                return new \App\Common\Factory\HttpResponse($oClient);
+            } else {
+                return new \Nails\Common\Factory\HttpResponse($oClient);
+            }
+        },
     ],
 ];
