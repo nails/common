@@ -131,13 +131,13 @@ abstract class HttpRequest
     // --------------------------------------------------------------------------
 
     /**
-     * Set the required headers for immitating a user
+     * Set the required headers for imitating a user
      *
-     * @param integer $iUserId the user to immitate
+     * @param integer $iUserId the user to imitate
      *
      * @return $this
      */
-    public function as($iUserId)
+    public function asUser($iUserId)
     {
         return $this
             ->setHeader(Testing::TEST_HEADER_NAME, Testing::TEST_HEADER_VALUE)
@@ -154,11 +154,15 @@ abstract class HttpRequest
      * @return HttpResponse
      * @throws \Nails\Common\Exception\FactoryException
      */
-    public function execute($sPath)
+    public function execute($sPath = null)
     {
         if (!empty($sPath)) {
             $this->path($sPath);
         }
+
+        //  @todo (Pablo - 2019-01-12) - Validate the request
+        //  @todo (Pablo - 2019-01-12) - Compile the request
+
         return Factory::factory('HttpResponse');
     }
 }

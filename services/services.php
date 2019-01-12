@@ -264,11 +264,11 @@ return [
                 return new \Nails\Common\Factory\HttpRequest\Put($aConfig);
             }
         },
-        'HttpResponse'      => function (array $aConfig = []) {
+        'HttpResponse'      => function () {
             if (class_exists('\App\Common\Factory\HttpResponse')) {
-                return new \App\Common\Factory\HttpResponse($aConfig);
+                return new \App\Common\Factory\HttpResponse();
             } else {
-                return new \Nails\Common\Factory\HttpResponse($aConfig);
+                return new \Nails\Common\Factory\HttpResponse();
             }
         },
     ],
