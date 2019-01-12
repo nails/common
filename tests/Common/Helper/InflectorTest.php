@@ -27,6 +27,9 @@ class InflectorTest extends TestCase
 
     // --------------------------------------------------------------------------
 
+    /**
+     * @covers \Nails\Common\Helper\Inflector::possessive()
+     */
     public function test_possessive_appends_s_to_string()
     {
         $sPossessive = Inflector::possessive(static::TEST_STRING_RACHEL);
@@ -35,6 +38,9 @@ class InflectorTest extends TestCase
 
     // --------------------------------------------------------------------------
 
+    /**
+     * @covers \Nails\Common\Helper\Inflector::possessive()
+     */
     public function test_possessive_appends_s_to_string_ending_in_s()
     {
         $sPossessive = Inflector::possessive(static::TEST_STRING_ROSS);
@@ -43,6 +49,9 @@ class InflectorTest extends TestCase
 
     // --------------------------------------------------------------------------
 
+    /**
+     * @covers \Nails\Common\Helper\Inflector::possessive()
+     */
     public function test_possessive_maintains_case()
     {
         $sTestString = strtoupper(static::TEST_STRING_RACHEL);
@@ -52,6 +61,9 @@ class InflectorTest extends TestCase
 
     // --------------------------------------------------------------------------
 
+    /**
+     * @covers \Nails\Common\Helper\Inflector::pluralise()
+     */
     public function test_puralise_does_not_pluralise_when_count_is_one()
     {
         $sPluralised = Inflector::pluralise(1, static::TEST_STRING_AEROPLANE);
@@ -60,6 +72,9 @@ class InflectorTest extends TestCase
 
     // --------------------------------------------------------------------------
 
+    /**
+     * @covers \Nails\Common\Helper\Inflector::pluralise()
+     */
     public function test_puralise_pluralsies_words_when_count_is_greater_than_one()
     {
         $sPluralised = Inflector::pluralise(2, static::TEST_STRING_AEROPLANE);
@@ -77,6 +92,9 @@ class InflectorTest extends TestCase
 
     // --------------------------------------------------------------------------
 
+    /**
+     * @covers \Nails\Common\Helper\Inflector::pluralise()
+     */
     public function test_puralise_uses_specified_plural_when_count_is_greater_than_one()
     {
         $sPluralised = Inflector::pluralise(2, $sTestString, static::TEST_STRING_SPECIFIED_PLURAL);
