@@ -11,6 +11,7 @@
 
 namespace Nails\Common\Factory;
 
+use Nails\Common\Helper\ArrayHelper;
 use Nails\Factory;
 use Nails\Testing;
 
@@ -64,7 +65,7 @@ abstract class HttpRequest
      */
     public function getOption($sProperty)
     {
-        return getFromArray($sProperty, $this->aOptions);
+        return ArrayHelper::getFromArray($sProperty, $this->aOptions);
     }
 
     // --------------------------------------------------------------------------
@@ -79,12 +80,38 @@ abstract class HttpRequest
      */
     public function setHeader($sHeader, $mValue)
     {
-        if (empty($this->aConfig['headers'])) {
-            $this->aConfig['headers'] = [];
+        if (empty($this->aOptions['headers'])) {
+            $this->aOptions['headers'] = [];
         }
 
-        $this->aConfig['headers'][$sHeader] = $mValue;
+        $this->aOptions['headers'][$sHeader] = $mValue;
         return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the request headers
+     *
+     * @return array
+     */
+    public function getHeaders()
+    {
+        return isset($this->aOptions['headers']) ? $this->aOptions['headers'] : [];
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns a single header
+     *
+     * @param string $sHeader The header to return
+     *
+     * @return mixed|null
+     */
+    public function getHeader($sHeader)
+    {
+        return isset($this->aOptions['headers'][$sHeader]) ? $this->aOptions['headers'][$sHeader] : null;
     }
 
     // --------------------------------------------------------------------------
