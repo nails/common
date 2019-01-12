@@ -11,61 +11,61 @@
 
 namespace Nails\Common\Factory;
 
+use GuzzleHttp\Client;
 use Nails\Common\Helper\ArrayHelper;
+use Nails\Environment;
 use Nails\Factory;
 use Nails\Testing;
 
 abstract class HttpRequest
 {
     /**
-     * The request options
+     * The HTTP Method for the request
+     *
+     * @var string
+     */
+    const HTTP_METHOD = '';
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * The request headers
      *
      * @var array
      */
-    protected $aOptions = [];
+    protected $aHeaders = [];
+
+    /**
+     * The Base URI for the request
+     *
+     * @var string
+     */
+    protected $sBaseUri;
+
+    /**
+     * The path for the request
+     *
+     * @var string
+     */
+    protected $sPath;
 
     // --------------------------------------------------------------------------
 
     /**
      * HttpRequest constructor.
      *
-     * @param array $aOptions An array of options to set
+     * @param string $sBaseUri The Base URI for the request
+     * @param string $sPath    The path for the request
+     * @param array  $aHeaders An array of headers to set
      */
-    public function __construct(array $aOptions = [])
+    public function __construct($sBaseUri = null, $sPath = null, array $aHeaders = [])
     {
-        foreach ($aOptions as $sProperty => $mValue) {
-            $this->setOption($sProperty, $mValue);
+        $this->baseUri($sBaseUri);
+        $this->path($sPath);
+
+        foreach ($aHeaders as $sHeader => $mValue) {
+            $this->setHeader($sHeader, $mValue);
         }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Set an option
-     *
-     * @param string $sProperty The property to set
-     * @param mixed  $mValue    The value to set
-     *
-     * @return $this
-     */
-    public function setOption($sProperty, $mValue)
-    {
-        $this->aOptions[$sProperty] = $mValue;
-        return $this;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Get an option
-     *
-     * @param string $sProperty The property to return
-     *
-     * @return mixed
-     */
-    public function getOption($sProperty)
-    {
-        return ArrayHelper::getFromArray($sProperty, $this->aOptions);
     }
 
     // --------------------------------------------------------------------------
@@ -80,11 +80,11 @@ abstract class HttpRequest
      */
     public function setHeader($sHeader, $mValue)
     {
-        if (empty($this->aOptions['headers'])) {
-            $this->aOptions['headers'] = [];
+        if (empty($this->aHeaders)) {
+            $this->aHeaders = [];
         }
 
-        $this->aOptions['headers'][$sHeader] = $mValue;
+        $this->aHeaders[$sHeader] = $mValue;
         return $this;
     }
 
@@ -97,7 +97,7 @@ abstract class HttpRequest
      */
     public function getHeaders()
     {
-        return isset($this->aOptions['headers']) ? $this->aOptions['headers'] : [];
+        return isset($this->aHeaders) ? $this->aHeaders : [];
     }
 
     // --------------------------------------------------------------------------
@@ -111,21 +111,7 @@ abstract class HttpRequest
      */
     public function getHeader($sHeader)
     {
-        return isset($this->aOptions['headers'][$sHeader]) ? $this->aOptions['headers'][$sHeader] : null;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Set the path of the request
-     *
-     * @param string $sPath The path to set
-     *
-     * @return $this
-     */
-    public function path($sPath)
-    {
-        return $this->setOption('path', $sPath);
+        return isset($this->aHeaders[$sHeader]) ? $this->aHeaders[$sHeader] : null;
     }
 
     // --------------------------------------------------------------------------
@@ -147,22 +133,69 @@ abstract class HttpRequest
     // --------------------------------------------------------------------------
 
     /**
-     * Configures and executes the HTTP request
+     * Populates the baseUri property of the request
      *
-     * @param string $sPath The path to set for the request
+     * @param string $sBaseUri The base for the request
+     *
+     * @return $this
+     */
+    public function baseUri($sBaseUri)
+    {
+        $this->sBaseUri = $sBaseUri ?: site_url();
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Populates the path property of the request
+     *
+     * @param string $sPath The path for the request
+     *
+     * @return $this
+     */
+    public function path($sPath)
+    {
+        $this->sPath = $sPath;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Configures and executes the HTTP request
      *
      * @return HttpResponse
      * @throws \Nails\Common\Exception\FactoryException
      */
-    public function execute($sPath = null)
+    public function execute()
     {
-        if (!empty($sPath)) {
-            $this->path($sPath);
-        }
+        $aClientConfig   = [
+            'base_uri' => $this->sBaseUri,
+            'verify'   => !($this->sBaseUri === site_url() && Environment::is(Environment::ENV_DEV)),
+        ];
+        $aRequestOptions = [
+            'headers' => $this->aHeaders,
+        ];
 
-        //  @todo (Pablo - 2019-01-12) - Validate the request
-        //  @todo (Pablo - 2019-01-12) - Compile the request
+        $this->compile($aClientConfig, $aRequestOptions);
 
-        return Factory::factory('HttpResponse');
+        $oClient = Factory::factory('HttpClient', '', $aClientConfig);
+
+        return Factory::factory(
+            'HttpResponse',
+            '',
+            $oClient->request(static::HTTP_METHOD, $this->sPath, $aRequestOptions)
+        );
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Compile the request
+     *
+     * @param array $aClientConfig   The config array for the HTTP Client
+     * @param array $aRequestOptions The options for the request
+     */
+    abstract protected function compile(array &$aClientConfig, array &$aRequestOptions);
 }

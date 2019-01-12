@@ -15,19 +15,48 @@ use Nails\Common\Factory\HttpRequest;
 
 class Get extends HttpRequest
 {
+    /**
+     * The HTTP Method for the request
+     *
+     * @var string
+     */
     const HTTP_METHOD = 'GET';
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Any query parameters to add to the request
+     *
+     * @var array
+     */
+    protected $aQuery;
+
 
     // --------------------------------------------------------------------------
 
     /**
      * Populates the query property of the request
      *
-     * @param array $aParams The value to assign
+     * @param array $aQuery The value to assign
      *
      * @return $this
      */
-    public function query(array $aParams = [])
+    public function query(array $aQuery = [])
     {
-        return $this->setOption('query', $aParams);
+        $this->aQuery = $aQuery;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Compile the request
+     *
+     * @param array $aClientConfig   The config array for the HTTP Client
+     * @param array $aRequestOptions The options for the request
+     */
+    protected function compile(array &$aClientConfig, array &$aRequestOptions)
+    {
+        $aRequestOptions['query'] = $this->aQuery;
     }
 }

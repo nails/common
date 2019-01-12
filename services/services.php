@@ -236,39 +236,39 @@ return [
                 return new \Nails\Common\Factory\HttpRequest\Delete($aConfig);
             }
         },
-        'HttpRequestGet'    => function (array $aConfig = []) {
+        'HttpRequestGet'    => function ($sBaseUri = null, $sPath = null, array $aHeaders = []) {
             if (class_exists('\App\Common\Factory\HttpRequest\Get')) {
-                return new \App\Common\Factory\HttpRequest\Get($aConfig);
+                return new \App\Common\Factory\HttpRequest\Get($sBaseUri, $sPath, $aHeaders);
             } else {
-                return new \Nails\Common\Factory\HttpRequest\Get($aConfig);
+                return new \Nails\Common\Factory\HttpRequest\Get($sBaseUri, $sPath, $aHeaders);
             }
         },
-        'HttpRequestPatch'  => function (array $aConfig = []) {
+        'HttpRequestPatch'  => function ($sBaseUri = null, $sPath = null, array $aHeaders = []) {
             if (class_exists('\App\Common\Factory\HttpRequest\Patch')) {
-                return new \App\Common\Factory\HttpRequest\Patch($aConfig);
+                return new \App\Common\Factory\HttpRequest\Patch($sBaseUri, $sPath, $aHeaders);
             } else {
-                return new \Nails\Common\Factory\HttpRequest\Patch($aConfig);
+                return new \Nails\Common\Factory\HttpRequest\Patch($sBaseUri, $sPath, $aHeaders);
             }
         },
-        'HttpRequestPost'   => function (array $aConfig = []) {
+        'HttpRequestPost'   => function ($sBaseUri = null, $sPath = null, array $aHeaders = []) {
             if (class_exists('\App\Common\Factory\HttpRequest\Post')) {
-                return new \App\Common\Factory\HttpRequest\Post($aConfig);
+                return new \App\Common\Factory\HttpRequest\Post($sBaseUri, $sPath, $aHeaders);
             } else {
-                return new \Nails\Common\Factory\HttpRequest\Post($aConfig);
+                return new \Nails\Common\Factory\HttpRequest\Post($sBaseUri, $sPath, $aHeaders);
             }
         },
-        'HttpRequestPut'    => function (array $aConfig = []) {
+        'HttpRequestPut'    => function ($sBaseUri = null, $sPath = null, array $aHeaders = []) {
             if (class_exists('\App\Common\Factory\HttpRequest\Put')) {
-                return new \App\Common\Factory\HttpRequest\Put($aConfig);
+                return new \App\Common\Factory\HttpRequest\Put($sBaseUri, $sPath, $aHeaders);
             } else {
-                return new \Nails\Common\Factory\HttpRequest\Put($aConfig);
+                return new \Nails\Common\Factory\HttpRequest\Put($sBaseUri, $sPath, $aHeaders);
             }
         },
-        'HttpResponse'      => function () {
+        'HttpResponse'      => function (GuzzleHttp\Psr7\Response $oClient) {
             if (class_exists('\App\Common\Factory\HttpResponse')) {
-                return new \App\Common\Factory\HttpResponse();
+                return new \App\Common\Factory\HttpResponse($oClient);
             } else {
-                return new \Nails\Common\Factory\HttpResponse();
+                return new \Nails\Common\Factory\HttpResponse($oClient);
             }
         },
     ],

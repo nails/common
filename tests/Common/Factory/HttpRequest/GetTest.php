@@ -9,19 +9,6 @@ use PHPUnit\Framework\TestCase;
 class GetTest extends TestCase
 {
     /**
-     * @covers \Nails\Common\Factory\HttpRequest\Get::setOption
-     * @covers \Nails\Common\Factory\HttpRequest\Get::getOption
-     */
-    public function test_http_get_request_can_set_and_get_option()
-    {
-        $oRequest = new Get();
-        $oRequest->setOption('foo', 'bar');
-        $this->assertEquals('bar', $oRequest->getOption('foo'));
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * @covers \Nails\Common\Factory\HttpRequest\Get::setHeader
      * @covers \Nails\Common\Factory\HttpRequest\Get::getHeader
      */
@@ -30,19 +17,6 @@ class GetTest extends TestCase
         $oRequest = new Get();
         $oRequest->setHeader('X-header', 'foo');
         $this->assertEquals('foo', $oRequest->getHeader('X-header'));
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * @covers \Nails\Common\Factory\HttpRequest\Get::path
-     * @covers \Nails\Common\Factory\HttpRequest\Get::getOption
-     */
-    public function test_http_get_request_can_set_path()
-    {
-        $oRequest = new Get();
-        $oRequest->path('test');
-        $this->assertEquals('test', $oRequest->getOption('path'));
     }
 
     // --------------------------------------------------------------------------

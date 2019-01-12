@@ -18,14 +18,38 @@ class Post extends Get
     // --------------------------------------------------------------------------
 
     /**
-     * Populates the body property of the request
+     * The form values to POST
      *
-     * @param mixed $mBody The value to assign
+     * @var array
+     */
+    protected $aFormParams = [];
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Populates the form parameters of the request
+     *
+     * @param array $aParams The form parameters
      *
      * @return $this
      */
-    public function body(array $mBody = [])
+    public function params(array $aParams = [])
     {
-        return $this->setOption('body', $mBody);
+        $this->aFormParams = $aParams;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Compile the request
+     *
+     * @param array $aClientConfig   The config array for the HTTP Client
+     * @param array $aRequestOptions The options for the request
+     */
+    protected function compile(array &$aClientConfig, array &$aRequestOptions)
+    {
+        parent::compile($aClientConfig, $aRequestOptions);
+        $aRequestOptions['form_params'] = $this->aFormParams;
     }
 }
