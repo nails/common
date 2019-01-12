@@ -11,6 +11,7 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Common\Helper\ArrayHelper;
 use Nails\Factory;
 
 class Input
@@ -133,7 +134,7 @@ class Input
         $aKeys  = array_map('strtolower', $aKeys);
 
         foreach ($aKeys as $sKey) {
-            $aOut[$sKey] = getFromArray($sKey, $aArray);
+            $aOut[$sKey] = ArrayHelper::getFromArray($sKey, $aArray);
             if ($bXssClean) {
                 $oSecurity   = Factory::service('Security');
                 $aOut[$sKey] = $oSecurity->xss_clean($aOut[$sKey]);

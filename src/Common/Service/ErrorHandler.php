@@ -14,6 +14,7 @@ namespace Nails\Common\Service;
 
 use Nails\Common\Controller\Nails404Controller;
 use Nails\Common\Events;
+use Nails\Common\Helper\ArrayHelper;
 use Nails\Components;
 use Nails\Environment;
 use Nails\Factory;
@@ -108,8 +109,8 @@ class ErrorHandler
             $oErrorHandler = $oDefaultDriver;
         }
 
-        $sDriverNamespace = getFromArray('namespace', (array) $oErrorHandler->data);
-        $sDriverClass     = getFromArray('class', (array) $oErrorHandler->data);
+        $sDriverNamespace = ArrayHelper::getFromArray('namespace', (array) $oErrorHandler->data);
+        $sDriverClass     = ArrayHelper::getFromArray('class', (array) $oErrorHandler->data);
         $sClassName       = '\\' . $sDriverNamespace . $sDriverClass;
 
         if (!class_exists($sClassName)) {
@@ -153,8 +154,8 @@ class ErrorHandler
     {
         $this->init();
         $oDriver          = $this->getDefaultDriver();
-        $sDriverNamespace = getFromArray('namespace', (array) $oDriver->data);
-        $sDriverClass     = getFromArray('class', (array) $oDriver->data);
+        $sDriverNamespace = ArrayHelper::getFromArray('namespace', (array) $oDriver->data);
+        $sDriverClass     = ArrayHelper::getFromArray('class', (array) $oDriver->data);
         return '\\' . $sDriverNamespace . $sDriverClass;
     }
 
@@ -357,7 +358,7 @@ class ErrorHandler
     {
         $this->init();
 
-        $sPage = getFromArray('REQUEST_URI', $_SERVER);
+        $sPage = ArrayHelper::getFromArray('REQUEST_URI', $_SERVER);
 
         /**
          * By default we log this, but allow a dev to skip it. Additionally, skip
@@ -371,7 +372,7 @@ class ErrorHandler
          * If you disagree, open up an issue and we'll work something out.
          */
 
-        $sRequestMethod = isset($_SERVER) ? strtoupper(getFromArray('REQUEST_METHOD', $_SERVER)) : '';
+        $sRequestMethod = isset($_SERVER) ? strtoupper(ArrayHelper::getFromArray('REQUEST_METHOD', $_SERVER)) : '';
 
         if ($bLogError && $sRequestMethod != 'HEAD') {
             log_message('error', '404 Page Not Found --> ' . $sPage);
@@ -433,7 +434,7 @@ class ErrorHandler
         if (function_exists('isLoggedIn') && isLoggedIn()) {
 
             if ($bLogError) {
-                $sPage = getFromArray('REQUEST_URI', $_SERVER);
+                $sPage = ArrayHelper::getFromArray('REQUEST_URI', $_SERVER);
                 log_message('error', '401 Unauthorised --> ' . $sPage);
             }
 

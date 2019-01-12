@@ -10,6 +10,7 @@
  * @link
  */
 
+use Nails\Common\Helper\ArrayHelper;
 use Nails\Factory;
 
 if (!function_exists('form_text')) {
@@ -717,6 +718,7 @@ if (!function_exists('form_field_cdn_object_picker')) {
 
     /**
      * Generates a form field containing the media manager to select a file.
+     *
      * @todo  when form builder is updated, ensure that other things can create custom field types
      *
      * @param  array  $field The config array
@@ -846,6 +848,7 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
 
     /**
      * Generates a form field containing multiple object pickers
+     *
      * @todo  when form builder is updated, ensure that other things can create custom field types
      *
      * @param  array  $field The config array
@@ -1006,7 +1009,7 @@ EOT;
                 //  @todo find a way to not be evil
                 $aValues = eval('return !empty(' . $sPostKey . ') ? ' . $sPostKey . ' : [];');
             } else {
-                $aValues = getFromArray($_field_key, $_POST);
+                $aValues = ArrayHelper::getFromArray($_field_key, $_POST);
             }
         } else {
             $aValues = $_field_default;
@@ -1070,6 +1073,7 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
 
     /**
      * Generates a form field containing multiple object pickers
+     *
      * @todo  when form builder is updated, ensure that other things can create custom field types
      *
      * @param  array  $aConfig The config array
@@ -1080,36 +1084,36 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
     function form_field_cdn_object_picker_multi_with_label($aConfig, $sTip = '')
     {
         //  Set var defaults
-        $sFieldId        = getFromArray('id', $aConfig, null);
-        $sFieldType      = getFromArray('type', $aConfig, 'text');
-        $sFieldOddEven   = getFromArray('oddeven', $aConfig, null);
-        $sFieldKey       = getFromArray('key', $aConfig, null);
-        $sFieldLabel     = getFromArray('label', $aConfig, null);
-        $sFieldDefault   = array_filter((array) getFromArray('default', $aConfig));
-        $sFieldSubLabel  = getFromArray('sub_label', $aConfig, null);
-        $sFieldRequired  = getFromArray('required', $aConfig, false);
-        $sFieldReadonly  = getFromArray('readonly', $aConfig, false);
-        $sFieldError     = getFromArray('error', $aConfig, false);
-        $sFieldClass     = getFromArray('class', $aConfig, '');
-        $sFieldData      = getFromArray('data', $aConfig, []);
-        $sFieldInfo      = getFromArray('info', $aConfig, false);
-        $sFieldInfoClass = getFromArray('info_class', $aConfig, false);
-        $sFieldTip       = getFromArray('tip', $aConfig, $sTip);
-        $sFieldSortable  = getFromArray('sortable', $aConfig, false);
+        $sFieldId        = ArrayHelper::getFromArray('id', $aConfig, null);
+        $sFieldType      = ArrayHelper::getFromArray('type', $aConfig, 'text');
+        $sFieldOddEven   = ArrayHelper::getFromArray('oddeven', $aConfig, null);
+        $sFieldKey       = ArrayHelper::getFromArray('key', $aConfig, null);
+        $sFieldLabel     = ArrayHelper::getFromArray('label', $aConfig, null);
+        $sFieldDefault   = array_filter((array) ArrayHelper::getFromArray('default', $aConfig));
+        $sFieldSubLabel  = ArrayHelper::getFromArray('sub_label', $aConfig, null);
+        $sFieldRequired  = ArrayHelper::getFromArray('required', $aConfig, false);
+        $sFieldReadonly  = ArrayHelper::getFromArray('readonly', $aConfig, false);
+        $sFieldError     = ArrayHelper::getFromArray('error', $aConfig, false);
+        $sFieldClass     = ArrayHelper::getFromArray('class', $aConfig, '');
+        $sFieldData      = ArrayHelper::getFromArray('data', $aConfig, []);
+        $sFieldInfo      = ArrayHelper::getFromArray('info', $aConfig, false);
+        $sFieldInfoClass = ArrayHelper::getFromArray('info_class', $aConfig, false);
+        $sFieldTip       = ArrayHelper::getFromArray('tip', $aConfig, $sTip);
+        $sFieldSortable  = ArrayHelper::getFromArray('sortable', $aConfig, false);
 
-        $sFieldObjectKey        = getFromArray('object_key', $aConfig, 'object_id');
-        $sFieldTableLabelObject = getFromArray('table_label_object', $aConfig, 'File');
+        $sFieldObjectKey        = ArrayHelper::getFromArray('object_key', $aConfig, 'object_id');
+        $sFieldTableLabelObject = ArrayHelper::getFromArray('table_label_object', $aConfig, 'File');
 
-        $sFieldLabelKey        = getFromArray('label_key', $aConfig, 'label');
-        $sFieldTableLabelLabel = getFromArray('table_label_label', $aConfig, 'Label');
+        $sFieldLabelKey        = ArrayHelper::getFromArray('label_key', $aConfig, 'label');
+        $sFieldTableLabelLabel = ArrayHelper::getFromArray('table_label_label', $aConfig, 'Label');
 
         //  CDN Specific
         $sFieldBucket = isset($aConfig['bucket']) ? $aConfig['bucket'] : null;
 
         $aTip = [
-            'class' => getFromArray('class', (array) $sFieldTip, 'fa fa-question-circle fa-lg tip'),
-            'rel'   => getFromArray('rel', (array) $sFieldTip, 'tipsy-left'),
-            'title' => getFromArray('title', (array) $sFieldTip, $sFieldTip),
+            'class' => ArrayHelper::getFromArray('class', (array) $sFieldTip, 'fa fa-question-circle fa-lg tip'),
+            'rel'   => ArrayHelper::getFromArray('rel', (array) $sFieldTip, 'tipsy-left'),
+            'title' => ArrayHelper::getFromArray('title', (array) $sFieldTip, $sFieldTip),
         ];
 
         $sFieldIdTop    = $sFieldId ? 'id="field-' . $sFieldId . '"' : '';
@@ -1229,7 +1233,7 @@ EOT;
                 //  @todo find a way to not be evil
                 $aValues = eval('return !empty(' . $sPostKey . ') ? ' . $sPostKey . ' : [];');
             } else {
-                $aValues = getFromArray($sFieldKey, $_POST, []);
+                $aValues = ArrayHelper::getFromArray($sFieldKey, $_POST, []);
             }
 
         } else {
@@ -1295,6 +1299,7 @@ if (!function_exists('form_field_mm')) {
 
     /**
      * Generates a form field containing the media manager to select a file.
+     *
      * @deprecated Use form_field_cdn_object_picker instead
      *
      * @param  array  $aField The config array
@@ -1314,6 +1319,7 @@ if (!function_exists('form_field_mm_image')) {
 
     /**
      * Generates a form field containing the media manager to select an image
+     *
      * @deprecated Use form_field_cdn_object_picker instead
      *
      * @param  array  $aField The config array
@@ -2011,6 +2017,7 @@ if (!function_exists('form_field_cms_widgets')) {
 
     /**
      * Generates a form field containing a button to open the CMS widgets manager
+     *
      * @todo oh God, sort this file out, use a proper form building class
      *
      * @param  array  $field The config array
@@ -2154,6 +2161,7 @@ if (!function_exists('form_field_render')) {
     /**
      * This function renders a generic form field; the actual contents of the
      * form field must be passed in via $aField's html parameter
+     *
      * @todo - Implement this into the other functions so all are the same
      * @todo - Turn this into a class
      *
@@ -2169,30 +2177,30 @@ if (!function_exists('form_field_render')) {
         }
 
         $oField = (object) [
-            'id'          => getFromArray('id', $aField, null),
-            'type'        => getFromArray('type', $aField, null),
-            'oddeven'     => getFromArray('oddeven', $aField, null),
-            'key'         => getFromArray('key', $aField, null),
-            'label'       => getFromArray('label', $aField, null),
-            'default'     => getFromArray('default', $aField, null),
-            'sub_label'   => getFromArray('sub_label', $aField, null),
-            'required'    => getFromArray('required', $aField, false),
-            'placeholder' => getFromArray('placeholder', $aField, null),
-            'class'       => getFromArray('class', $aField, false),
-            'data'        => getFromArray('data', $aField, []),
-            'readonly'    => getFromArray('readonly', $aField, false),
-            'info'        => getFromArray('info', $aField, false),
-            'info_class'  => getFromArray('info_class', $aField, false),
-            'tip'         => getFromArray('tip', $aField, $sTip),
-            'error'       => getFromArray('error', $aField, null),
-            'html'        => getFromArray('html', $aField, ''),
+            'id'          => ArrayHelper::getFromArray('id', $aField, null),
+            'type'        => ArrayHelper::getFromArray('type', $aField, null),
+            'oddeven'     => ArrayHelper::getFromArray('oddeven', $aField, null),
+            'key'         => ArrayHelper::getFromArray('key', $aField, null),
+            'label'       => ArrayHelper::getFromArray('label', $aField, null),
+            'default'     => ArrayHelper::getFromArray('default', $aField, null),
+            'sub_label'   => ArrayHelper::getFromArray('sub_label', $aField, null),
+            'required'    => ArrayHelper::getFromArray('required', $aField, false),
+            'placeholder' => ArrayHelper::getFromArray('placeholder', $aField, null),
+            'class'       => ArrayHelper::getFromArray('class', $aField, false),
+            'data'        => ArrayHelper::getFromArray('data', $aField, []),
+            'readonly'    => ArrayHelper::getFromArray('readonly', $aField, false),
+            'info'        => ArrayHelper::getFromArray('info', $aField, false),
+            'info_class'  => ArrayHelper::getFromArray('info_class', $aField, false),
+            'tip'         => ArrayHelper::getFromArray('tip', $aField, $sTip),
+            'error'       => ArrayHelper::getFromArray('error', $aField, null),
+            'html'        => ArrayHelper::getFromArray('html', $aField, ''),
         ];
 
         if (is_array($oField->tip)) {
             $oTip = (object) [
-                'class' => getFromArray('class', $oField->tip, 'fa fa-question-circle fa-lg tip'),
-                'rel'   => getFromArray('rel', $oField->tip, 'tipsy-left'),
-                'title' => getFromArray('title', $oField->tip, null),
+                'class' => ArrayHelper::getFromArray('class', $oField->tip, 'fa fa-question-circle fa-lg tip'),
+                'rel'   => ArrayHelper::getFromArray('rel', $oField->tip, 'tipsy-left'),
+                'title' => ArrayHelper::getFromArray('title', $oField->tip, null),
             ];
         } elseif (is_string($oField->tip)) {
             $oTip = (object) [

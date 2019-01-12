@@ -13,11 +13,13 @@
 use Nails\Environment;
 use Nails\Factory;
 use Nails\Functions;
+use Nails\Common\Helper\ArrayHelper;
 
 if (!function_exists('dump')) {
 
     /**
      * Dumps data, similar to var_dump(), will dump each variable it is passed
+     *
      * @return void
      */
     function dump()
@@ -85,6 +87,7 @@ if (!function_exists('d')) {
 
     /**
      * Alias to dump()
+     *
      * @return void
      */
     function d()
@@ -99,6 +102,7 @@ if (!function_exists('dumpAndDie')) {
 
     /**
      * Calls dump() and immediately exits
+     *
      * @return void
      */
     function dumpAndDie()
@@ -114,6 +118,7 @@ if (!function_exists('dd')) {
 
     /**
      * Alias to dumpAndDie()
+     *
      * @return void
      */
     function dd()
@@ -216,7 +221,7 @@ if (!function_exists('depecatedError')) {
         //  Attempt to determine where the deprecation was thrown;
         //  0 is this function, 1 is where it was thrown, 2 should be the caller
         $aDebug  = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
-        $aCaller = getFromArray(2, $aDebug);
+        $aCaller = ArrayHelper::getFromArray(2, $aDebug);
         if (!empty($aCaller)) {
 
             if (!empty($aCaller['class'])) {
