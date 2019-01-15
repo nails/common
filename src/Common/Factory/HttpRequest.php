@@ -141,7 +141,7 @@ abstract class HttpRequest
      */
     public function baseUri($sBaseUri)
     {
-        $this->sBaseUri = $sBaseUri ?: site_url();
+        $this->sBaseUri = $sBaseUri ?: BASE_URL;
         return $this;
     }
 
