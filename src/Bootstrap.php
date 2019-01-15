@@ -98,11 +98,9 @@ final class Bootstrap
     private static function loadConfig($sFile)
     {
         $sPath = static::$sBaseDirectory . 'config/' . $sFile . '.php';
-        if (!file_exists($sPath)) {
-            ErrorHandler::halt('Missing <code>config/' . $sFile . '.php</code>; please <code>nails install</code>');
+        if (file_exists($sPath)) {
+            require_once $sPath;
         }
-
-        require_once $sPath;
     }
 
     // --------------------------------------------------------------------------
