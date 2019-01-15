@@ -240,9 +240,9 @@ final class Bootstrap
          * NO TRAILING SLASH!
          */
         if (empty($sApplicationPath)) {
-            $system_path = static::$sBaseDirectory . 'vendor/codeigniter/framework/application';
+            $application_folder = static::$sBaseDirectory . 'vendor/codeigniter/framework/application';
         } else {
-            $system_path = $sApplicationPath;
+            $application_folder = $sApplicationPath;
         }
 
         /*
