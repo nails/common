@@ -15,6 +15,9 @@
  * module itself is being tested.
  */
 
+use \Nails\Bootstrap;
+use \Nails\Testing;
+
 if (!empty($_ENV['ENVIRONMENT']) && $_ENV['ENVIRONMENT'] === 'TESTING') {
 
     /*
@@ -32,14 +35,14 @@ if (!empty($_ENV['ENVIRONMENT']) && $_ENV['ENVIRONMENT'] === 'TESTING') {
      * We create an object here  so that we can leverage the constructor
      * to set up the environment, and the destructor to tear it down.
      */
-    $oTesting = new \Nails\Testing($sEntryPoint);
+    $oTesting = new Testing($sEntryPoint);
 
     /*
      *---------------------------------------------------------------
      * Nails Bootstrapper
      *---------------------------------------------------------------
      */
-    \Nails\Bootstrap::run($sEntryPoint);
+    Bootstrap::run($sEntryPoint);
 
 
     /*
@@ -58,7 +61,11 @@ if (!empty($_ENV['ENVIRONMENT']) && $_ENV['ENVIRONMENT'] === 'TESTING') {
      */
     require 'vendor/autoload.php';
 
-    \Nails\Functions::define('NAILS_APP_PATH', realpath(dirname(__FILE__) . '/..') . '/');
-    \Nails\Functions::define('NAILS_CI_SYSTEM_PATH', realpath(dirname(__FILE__) . '/../vendor/codeigniter/framework/system') . '/');
-    \Nails\Functions::define('BASEPATH', NAILS_CI_SYSTEM_PATH);
+    Bootstrap::setEntryPoint(dirname(__FILE__));
+    Bootstrap::setBaseDirectory(dirname(__FILE__));
+    Bootstrap::setNailsConstants();
+    Bootstrap::setCodeIgniterConstants(
+        realpath(dirname(__FILE__) . '/../vendor/codeigniter/framework/system'),
+        realpath(dirname(__FILE__) . '/../vendor/codeigniter/framework/application')
+    );
 }
