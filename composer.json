@@ -29,15 +29,15 @@
     "prefer-stable": true,
     "require": {
         "codeigniter/framework": "3.1.9",
-        "pimple/pimple": "3.*",
-        "guzzlehttp/guzzle": "6.*",
-        "mustache/mustache": "2.*",
-        "behat/transliterator": "^1.2",
-        "ralouphie/getallheaders": "^2.0",
-        "defuse/php-encryption": "^2.1"
+        "pimple/pimple": "3.2.3",
+        "guzzlehttp/guzzle": "6.3.3",
+        "mustache/mustache": "2.12.0",
+        "behat/transliterator": "1.2.0",
+        "ralouphie/getallheaders": "2.0.5",
+        "defuse/php-encryption": "^2.2.1"
     },
     "require-dev": {
-        "phpunit/phpunit": "7.*"
+        "phpunit/phpunit": "7.5.1"
     },
     "autoload": {
         "psr-4": {
