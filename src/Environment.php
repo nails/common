@@ -123,11 +123,11 @@ class Environment
     public static function available()
     {
         return [
-            ENV_PROD,
-            ENV_STAGE,
-            ENV_DEV,
-            ENV_TEST,
-            ENV_HTTP_TEST,
+            static::ENV_PROD,
+            static::ENV_STAGE,
+            static::ENV_DEV,
+            static::ENV_TEST,
+            static::ENV_HTTP_TEST,
         ];
     }
 }
