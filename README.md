@@ -1,4 +1,4 @@
-# Nails 
+# Nails
 
 ![license](https://img.shields.io/badge/license-MIT-green.svg)
 [![CircleCI branch](https://img.shields.io/circleci/project/github/nails/common.svg)](https://circleci.com/gh/nails/common)
