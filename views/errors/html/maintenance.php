@@ -17,14 +17,12 @@ ERROR:   Maintenance
         <div id="container">
             <?php
 
-            if (defined('NAILS_APP_PATH') && defined('BASE_URL')) {
-                $aPaths = [
-                    [
-                        NAILS_APP_PATH . 'assets/img/errors/maintenance.png',
-                        BASE_URL . 'assets/img/errors/maintenance.png',
-                    ],
-                ];
-            }
+            $aPaths = [
+                [
+                    NAILS_APP_PATH . 'assets/img/errors/maintenance.png',
+                    BASE_URL . 'assets/img/errors/maintenance.png',
+                ],
+            ];
 
             include NAILS_COMMON_PATH . 'views/errors/components/header.php';
 

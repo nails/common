@@ -49,9 +49,8 @@ final class Bootstrap
      */
     public static function run($sEntryPoint)
     {
-        static::$sEntryPoint    = $sEntryPoint;
-        static::$sBaseDirectory = dirname(static::$sEntryPoint) . '/';
-
+        static::setEntryPoint($sEntryPoint);
+        static::setBaseDirectory($sEntryPoint);
         static::loadConfig('app');
         static::loadConfig('deploy');
         static::setNailsConstants();
@@ -63,6 +62,30 @@ final class Bootstrap
 
         Factory::setup();
         Factory::autoload();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Set the entry point
+     *
+     * @param string $sEntryPoint The entry point
+     */
+    public static function setEntryPoint($sEntryPoint)
+    {
+        static::$sEntryPoint = $sEntryPoint;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Set the base directory
+     *
+     * @param string $sEntryPoint The entry point
+     */
+    public static function setBaseDirectory($sEntryPoint)
+    {
+        static::$sBaseDirectory = dirname($sEntryPoint) . '/';
     }
 
     // --------------------------------------------------------------------------
@@ -87,7 +110,7 @@ final class Bootstrap
     /**
      * Set Nails constants
      */
-    private static function setNailsConstants()
+    public static function setNailsConstants()
     {
         //  Generic and branding constants
         Functions::define('NAILS_PACKAGE_NAME', 'Nails');
@@ -162,7 +185,9 @@ final class Bootstrap
 
         //  Ensure the app's constants file is also loaded
         //  @todo (Pablo - 2018-11-16) - Remove reliance on this feature
-        require_once static::$sBaseDirectory . 'application/config/constants.php';
+        if (is_file(static::$sBaseDirectory . 'application/config/constants.php')) {
+            require_once static::$sBaseDirectory . 'application/config/constants.php';
+        }
     }
 
     // --------------------------------------------------------------------------
@@ -178,8 +203,11 @@ final class Bootstrap
      * - Calls to __FILE__ have been replaced with static::$sEntryPoint
      * - Calls to define() have been replaced with calls to Functions::define()
      * - Not kicking off CodeIgniter (as it needs to be called in the global scope)
+
+     * @param string $sSystemPath      The path to the CodeIgniter system directory
+     * @param string $sApplicationPath The path to the CodeIgniter application directory
      */
-    private static function setCodeIgniterConstants()
+    public static function setCodeIgniterConstants($sSystemPath = null, $sApplicationPath = null)
     {
         /*
          *---------------------------------------------------------------
@@ -189,7 +217,12 @@ final class Bootstrap
          * This variable must contain the name of your "system" directory.
          * Set the path if it is not in the same directory as this file.
          */
-        $system_path = static::$sBaseDirectory . 'vendor/codeigniter/framework/system';
+        if (empty($sSystemPath)) {
+            $system_path = static::$sBaseDirectory . 'vendor/codeigniter/framework/system';
+        } else {
+            $system_path = $sSystemPath;
+        }
+
 
         /*
          *---------------------------------------------------------------
@@ -206,7 +239,11 @@ final class Bootstrap
          *
          * NO TRAILING SLASH!
          */
-        $application_folder = 'application';
+        if (empty($sApplicationPath)) {
+            $system_path = static::$sBaseDirectory . 'vendor/codeigniter/framework/application';
+        } else {
+            $system_path = $sApplicationPath;
+        }
 
         /*
          *---------------------------------------------------------------

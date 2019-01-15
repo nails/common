@@ -8,7 +8,7 @@ require NAILS_CI_APP_PATH . 'config/config.php';
  */
 
 //  Base Site URL
-$config['base_url'] = defined('BASE_URL') ? BASE_URL : '/';
+$config['base_url'] = BASE_URL;
 
 //  Remove index.php from URL's
 $config['index_page'] = '';
@@ -29,7 +29,7 @@ $config['log_threshold'] = 1;
 $config['cache_path'] = defined('CACHE_PATH') ? CACHE_PATH : NAILS_APP_PATH . 'cache/private/';
 
 //  The encryption key
-$config['encryption_key'] = defined('APP_PRIVATE_KEY') ? md5(APP_PRIVATE_KEY) : md5('');
+$config['encryption_key'] = md5(APP_PRIVATE_KEY);
 
 //  Session variables
 $config['sess_driver']             = 'database';
@@ -62,12 +62,13 @@ if (defined('CONF_COOKIE_DOMAIN')) {
      */
 
     $baseDomain       = \Nails\Functions::getDomainFromUrl($config['base_url']);
-    $secureBaseDomain = defined('SECURE_BASE_URL') ? \Nails\Functions::getDomainFromUrl(SECURE_BASE_URL) : $baseDomain;
+    $secureBaseDomain = \Nails\Functions::getDomainFromUrl(SECURE_BASE_URL);
 
     if ($baseDomain == $secureBaseDomain) {
 
         //  If the two match, then define it
         $config['cookie_domain'] = $baseDomain;
+
     } else {
 
         $_ERROR = 'The <code>BASE_URL</code> and <code>SECURE_BASE_URL</code> ';
