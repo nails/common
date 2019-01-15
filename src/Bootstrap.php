@@ -238,7 +238,7 @@ final class Bootstrap
          * NO TRAILING SLASH!
          */
         if (empty($sApplicationPath)) {
-            $application_folder = static::$sBaseDirectory . 'vendor/codeigniter/framework/application';
+            $application_folder = 'application';
         } else {
             $application_folder = $sApplicationPath;
         }
