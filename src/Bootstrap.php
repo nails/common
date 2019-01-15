@@ -99,7 +99,7 @@ final class Bootstrap
     {
         $sPath = static::$sBaseDirectory . 'config/' . $sFile . '.php';
         if (!file_exists($sPath)) {
-            ErrorHandler::halt('Missing config/' . $sFile . '.php; please run installer.');
+            ErrorHandler::halt('Missing <code>config/' . $sFile . '.php</code>; please <code>nails install</code>');
         }
 
         require_once $sPath;
