@@ -33,7 +33,7 @@
         "guzzlehttp/guzzle": "6.3.3",
         "mustache/mustache": "2.12.0",
         "behat/transliterator": "1.2.0",
-        "ralouphie/getallheaders": "2.0.5",
+        "ralouphie/getallheaders": "3.0.2",
         "defuse/php-encryption": "^2.2.1"
     },
     "require-dev": {
