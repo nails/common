@@ -575,8 +575,10 @@ class ErrorHandler
      */
     public static function halt($sError, $sSubject = '')
     {
-        $oInput = Factory::service('Input');
-        if ($oInput::isCli()) {
+        if (php_sapi_name() === 'cli' || defined('STDIN')) {
+
+            $sSubject = trim(strip_tags($sSubject));
+            $sError   = trim(strip_tags($sError));
 
             echo "\n";
             echo $sSubject ? 'ERROR: ' . $sSubject . ":\n" : '';
