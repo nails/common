@@ -30,7 +30,7 @@ This page summarises the module status for each official Nails component.
                 <a href="https://circleci.com/gh/nails/common"><img src="https://img.shields.io/circleci/project/github/nails/common.svg"></a>
             </td>
             <td>
-                <a href="https://scrutinizer-ci.com/g/nails/common"><img src="https://scrutinizer-ci.com/g/nails/common/common/quality-score.png"></a>
+                <a href="https://scrutinizer-ci.com/g/nails/common"><img src="https://scrutinizer-ci.com/g/nails/common/badges/quality-score.png"></a>
             </td>
         </tr>
         <tr>
@@ -580,7 +580,7 @@ This page summarises the module status for each official Nails component.
                 <a href="https://circleci.com/gh/nails/site-main"><img src="https://img.shields.io/circleci/project/github/nails/site-main.svg"></a>
             </td>
             <td>
-                <a href="https://scrutinizer-ci.com/g/nails/site-main"><img srhttps://scrutinizer-ci.com/g/nails/site-main/badges/quality-score.pngc="></a>
+                <a href="https://scrutinizer-ci.com/g/nails/site-main"><img src="https://scrutinizer-ci.com/g/nails/site-main/badges/quality-score.png"></a>
             </td>
         </tr>
         <tr>
