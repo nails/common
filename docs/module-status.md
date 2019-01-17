@@ -228,7 +228,7 @@ This page summarises the module status for each official Nails component.
                 <a href="https://circleci.com/gh/nails/module-api"><img src="https://img.shields.io/circleci/project/github/nails/module-api.svg"></a>
             </td>
             <td>
-                <a href="https://scrutinizer-ci.com/g/nails/module-api"><img srchttps://scrutinizer-ci.com/g/nails/module-api/badges/quality-score.png=""></a>
+                <a href="https://scrutinizer-ci.com/g/nails/module-api"><img src="https://scrutinizer-ci.com/g/nails/module-api/badges/quality-score.png"></a>
             </td>
         </tr>
         <tr>
@@ -316,7 +316,7 @@ This page summarises the module status for each official Nails component.
                 <a href="https://circleci.com/gh/nails/module-cdn"><img src="https://img.shields.io/circleci/project/github/nails/module-cdn.svg"></a>
             </td>
             <td>
-                <a href="https://scrutinizer-ci.com/g/nails/module-cdn"><img srchttps://scrutinizer-ci.com/g/nails/module-cdn/badges/quality-score.png=""></a>
+                <a href="https://scrutinizer-ci.com/g/nails/module-cdn"><img src="https://scrutinizer-ci.com/g/nails/module-cdn/badges/quality-score.png"></a>
             </td>
         </tr>
         <tr>
@@ -338,7 +338,7 @@ This page summarises the module status for each official Nails component.
                 <a href="https://circleci.com/gh/nails/module-cms"><img src="https://img.shields.io/circleci/project/github/nails/module-cms.svg"></a>
             </td>
             <td>
-                <a href="https://scrutinizer-ci.com/g/nails/module-cms"><img srchttps://scrutinizer-ci.com/g/nails/module-cms/badges/quality-score.png=""></a>
+                <a href="https://scrutinizer-ci.com/g/nails/module-cms"><img src="https://scrutinizer-ci.com/g/nails/module-cms/badges/quality-score.png"></a>
             </td>
         </tr>
         <tr>
@@ -448,7 +448,7 @@ This page summarises the module status for each official Nails component.
                 <a href="https://circleci.com/gh/nails/module-faq"><img src="https://img.shields.io/circleci/project/github/nails/module-faq.svg"></a>
             </td>
             <td>
-                <a href="https://scrutinizer-ci.com/g/nails/module-faq"><img srchttps://scrutinizer-ci.com/g/nails/module-faq/badges/quality-score.png=""></a>
+                <a href="https://scrutinizer-ci.com/g/nails/module-faq"><img src="https://scrutinizer-ci.com/g/nails/module-faq/badges/quality-score.png"></a>
             </td>
         </tr>
         <tr>
@@ -503,7 +503,7 @@ This page summarises the module status for each official Nails component.
                 <a href="https://circleci.com/gh/nails/module-pdf"><img src="https://img.shields.io/circleci/project/github/nails/module-pdf.svg"></a>
             </td>
             <td>
-                <a href="https://scrutinizer-ci.com/g/nails/module-pdf"><img srchttps://scrutinizer-ci.com/g/nails/module-pdf/badges/quality-score.png=""></a>
+                <a href="https://scrutinizer-ci.com/g/nails/module-pdf"><img src="https://scrutinizer-ci.com/g/nails/module-pdf/badges/quality-score.png"></a>
             </td>
         </tr>
         <tr>
