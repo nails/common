@@ -30,7 +30,7 @@ This page summarises the module status for each official Nails component.
                 <a href="https://circleci.com/gh/nails/common"><img src="https://img.shields.io/circleci/project/github/nails/common.svg"></a>
             </td>
             <td>
-                <a href="https://scrutinizer-ci.com/g/nails/common"><imghttps://scrutinizer-ci.com/g/nails/common/common/quality-score.png src=""></a>
+                <a href="https://scrutinizer-ci.com/g/nails/common"><imghttps://scrutinizer-ci.com/g/nails/common/common/quality-score.png src="></a>
             </td>
         </tr>
         <tr>
@@ -250,7 +250,7 @@ This page summarises the module status for each official Nails component.
                 <a href="https://circleci.com/gh/nails/module-auth"><img src="https://img.shields.io/circleci/project/github/nails/module-auth.svg"></a>
             </td>
             <td>
-                <a href="https://scrutinizer-ci.com/g/nails/module-auth"><img src=https://scrutinizer-ci.com/g/nails/module-auth/badges/quality-score.png""></a>
+                <a href="https://scrutinizer-ci.com/g/nails/module-auth"><img src=https://scrutinizer-ci.com/g/nails/module-auth/badges/quality-score.png"></a>
             </td>
         </tr>
         <tr>
@@ -283,7 +283,7 @@ This page summarises the module status for each official Nails component.
                 <a href="https://circleci.com/gh/nails/module-blog"><img src="https://img.shields.io/circleci/project/github/nails/module-blog.svg"></a>
             </td>
             <td>
-                <a href="https://scrutinizer-ci.com/g/nails/module-blog"><img src=https://scrutinizer-ci.com/g/nails/module-blog/badges/quality-score.png""></a>
+                <a href="https://scrutinizer-ci.com/g/nails/module-blog"><img src=https://scrutinizer-ci.com/g/nails/module-blog/badges/quality-score.png"></a>
             </td>
         </tr>
         <tr>
@@ -327,7 +327,7 @@ This page summarises the module status for each official Nails component.
                 <a href="https://circleci.com/gh/nails/module-chat"><img src="https://img.shields.io/circleci/project/github/nails/module-chat.svg"></a>
             </td>
             <td>
-                <a href="https://scrutinizer-ci.com/g/nails/module-chat"><img src=https://scrutinizer-ci.com/g/nails/module-chat/badges/quality-score.png""></a>
+                <a href="https://scrutinizer-ci.com/g/nails/module-chat"><img src=https://scrutinizer-ci.com/g/nails/module-chat/badges/quality-score.png"></a>
             </td>
         </tr>
         <tr>
@@ -371,7 +371,7 @@ This page summarises the module status for each official Nails component.
                 <a href="https://circleci.com/gh/nails/module-cron"><img src="https://img.shields.io/circleci/project/github/nails/module-cron.svg"></a>
             </td>
             <td>
-                <a href="https://scrutinizer-ci.com/g/nails/module-cron"><img src=https://scrutinizer-ci.com/g/nails/module-cron/badges/quality-score.png""></a>
+                <a href="https://scrutinizer-ci.com/g/nails/module-cron"><img src=https://scrutinizer-ci.com/g/nails/module-cron/badges/quality-score.png"></a>
             </td>
         </tr>
         <tr>
@@ -569,7 +569,7 @@ This page summarises the module status for each official Nails component.
                 <a href="https://circleci.com/gh/nails/nails"><img src="https://img.shields.io/circleci/project/github/nails/nails.svg"></a>
             </td>
             <td>
-                <a href="https://scrutinizer-ci.com/g/nails/nails"><imhttps://scrutinizer-ci.com/g/nails/common/nails/quality-score.pngg src=""></a>
+                <a href="https://scrutinizer-ci.com/g/nails/nails"><imhttps://scrutinizer-ci.com/g/nails/common/nails/quality-score.pngg src="></a>
             </td>
         </tr>
         <tr>
@@ -580,7 +580,7 @@ This page summarises the module status for each official Nails component.
                 <a href="https://circleci.com/gh/nails/site-main"><img src="https://img.shields.io/circleci/project/github/nails/site-main.svg"></a>
             </td>
             <td>
-                <a href="https://scrutinizer-ci.com/g/nails/site-main"><img srhttps://scrutinizer-ci.com/g/nails/site-main/badges/quality-score.pngc=""></a>
+                <a href="https://scrutinizer-ci.com/g/nails/site-main"><img srhttps://scrutinizer-ci.com/g/nails/site-main/badges/quality-score.pngc="></a>
             </td>
         </tr>
         <tr>
