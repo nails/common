@@ -3,15 +3,9 @@
 </p>
 <p align="center">
 	<img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License">
-	<a href="https://circleci.com/gh/nails/common">
-		<img src="https://img.shields.io/circleci/project/github/nails/common.svg" alt="Build status">
-	</a>
-	<a href="https://scrutinizer-ci.com/g/nails/common">
-		<img src="https://scrutinizer-ci.com/g/nails/common/badges/quality-score.png" alt="Quality Score">
-	</a>
-	<a href="https://nails-app.slack.com/shared_invite/MTg1NDcyNjI0ODcxLTE0OTUwMzA1NTYtYTZhZjc5YjExMQ">
-		<img src="https://now-examples-slackin-rayibnpwqe.now.sh/badge.svg" alt="Join the chat on Slack!">
-	</a>
+	<a href="https://circleci.com/gh/nails/common"><img src="https://img.shields.io/circleci/project/github/nails/common.svg" alt="Build status"></a>
+	<a href="https://scrutinizer-ci.com/g/nails/common"><img src="https://scrutinizer-ci.com/g/nails/common/badges/quality-score.png" alt="Quality Score"></a>
+	<a href="https://nails-app.slack.com/shared_invite/MTg1NDcyNjI0ODcxLTE0OTUwMzA1NTYtYTZhZjc5YjExMQ"><img src="https://now-examples-slackin-rayibnpwqe.now.sh/badge.svg" alt="Join the chat on Slack!"></a>
 </p>
 
 
