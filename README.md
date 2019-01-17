@@ -41,7 +41,7 @@ composer global require nails/command-line-tool
 nails new
 ```
 
-Further reading regarding this tool can be found at [nails/module-console](https://github.com/nails/command-line-tool).
+Further reading, the documentation regarding this tool can be found at [nails/module-command-line-tool](https://github.com/nails/command-line-tool).
 
 
 
