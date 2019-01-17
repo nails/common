@@ -569,7 +569,7 @@ This page summarises the module status for each official Nails component.
                 <a href="https://circleci.com/gh/nails/nails"><img src="https://img.shields.io/circleci/project/github/nails/nails.svg"></a>
             </td>
             <td>
-                <a href="https://scrutinizer-ci.com/g/nails/nails"><img src="https://scrutinizer-ci.com/g/nails/common/nails/quality-score.png"></a>
+                <a href="https://scrutinizer-ci.com/g/nails/nails"><img src="https://scrutinizer-ci.com/g/nails/nails/quality-score.png"></a>
             </td>
         </tr>
         <tr>
