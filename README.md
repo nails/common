@@ -1,13 +1,55 @@
-# Nails
+<p align="center">
+	<img src="https://nailsapp.co.uk/vendor/nails/module-asset/assets/img/nails/icon/icon@2x.png" width="125">
+</p>
+<p align="center">
+	<img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License">
+	<a href="https://circleci.com/gh/nails/common">
+		<img src="https://img.shields.io/circleci/project/github/nails/common.svg" alt="Build status">
+	</a>
+	<a href="https://scrutinizer-ci.com/g/nails/common">
+		<img src="https://scrutinizer-ci.com/g/nails/common/badges/quality-score.png" alt="Quality Score">
+	</a>
+	<a href="https://nails-app.slack.com/shared_invite/MTg1NDcyNjI0ODcxLTE0OTUwMzA1NTYtYTZhZjc5YjExMQ">
+		<img src="https://now-examples-slackin-rayibnpwqe.now.sh/badge.svg" alt="Join the chat on Slack!">
+	</a>
+</p>
 
-![license](https://img.shields.io/badge/license-MIT-green.svg)
-[![CircleCI branch](https://img.shields.io/circleci/project/github/nails/common.svg)](https://circleci.com/gh/nails/common)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/nails/common/badges/quality-score.png)](https://scrutinizer-ci.com/g/nails/common)
-[![Join the chat on Slack!](https://now-examples-slackin-rayibnpwqe.now.sh/badge.svg)](https://nails-app.slack.com/shared_invite/MTg1NDcyNjI0ODcxLTE0OTUwMzA1NTYtYTZhZjc5YjExMQ)
+
+## About Nails
 
 Nails is a framework to make building hand-crafted, exhilarating web apps fast & painless
 
-> It's very much a work in progress, all and any feedback to [hello@nailsapp.co.uk](hello@nailsapp.co.uk)
+
+
+## Quick start
+
+Get started quickly by installing the [Nails command line tool](https://github.com/nails/command-line-tool) and executing `nails new` in an empty directory.
+
+
+### Install the tool
+
+#### Using Homebrew
+
+```
+brew tap nails/utilities
+brew install nails
+```
+
+#### Using Composer
+
+```
+composer global require nails/command-line-tool
+```
+
+### Create a new project
+
+```
+nails new
+```
+
+Further reading regarding this tool can be found at [nails/module-console](https://github.com/nails/command-line-tool).
+
+
 
 
 ## Documentation
