@@ -171,8 +171,8 @@ abstract class HttpRequest
     public function execute()
     {
         $aClientConfig   = [
-            'base_uri' => $this->sBaseUri,
-            'verify'   => !(Environment::is(Environment::ENV_DEV) || Environment::is(Environment::ENV_TEST)),
+            'base_uri'        => $this->sBaseUri,
+            'verify'          => !(Environment::is(Environment::ENV_DEV) || Environment::is(Environment::ENV_TEST)),
             'allow_redirects' => Environment::not(Environment::ENV_TEST),
             'http_errors'     => Environment::not(Environment::ENV_TEST),
         ];
