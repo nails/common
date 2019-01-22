@@ -172,7 +172,7 @@ abstract class HttpRequest
     {
         $aClientConfig   = [
             'base_uri' => $this->sBaseUri,
-            'verify'   => Environment::not(Environment::ENV_DEV),
+            'verify'   => !(Environment::is(Environment::ENV_DEV) || Environment::is(Environment::ENV_TEST)),
         ];
         $aRequestOptions = [
             'headers' => $this->aHeaders,
