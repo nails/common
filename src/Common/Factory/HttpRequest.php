@@ -60,6 +60,14 @@ abstract class HttpRequest
      */
     public function __construct($sBaseUri = null, $sPath = null, array $aHeaders = [])
     {
+        if (Environment::is(Environment::ENV_TEST)
+            && !$sBaseUri
+            && !array_key_exists(Testing::TEST_HEADER_NAME, $aHeaders)
+        ) {
+
+            $aHeaders[Testing::TEST_HEADER_NAME] = Testing::TEST_HEADER_VALUE;
+        }
+
         $this->baseUri($sBaseUri);
         $this->path($sPath);
 
@@ -171,8 +179,10 @@ abstract class HttpRequest
     public function execute()
     {
         $aClientConfig   = [
-            'base_uri' => $this->sBaseUri,
-            'verify'   => Environment::not(Environment::ENV_DEV),
+            'base_uri'        => $this->sBaseUri,
+            'verify'          => !(Environment::is(Environment::ENV_DEV) || Environment::is(Environment::ENV_TEST)),
+            'allow_redirects' => Environment::not(Environment::ENV_TEST),
+            'http_errors'     => Environment::not(Environment::ENV_TEST),
         ];
         $aRequestOptions = [
             'headers' => $this->aHeaders,
