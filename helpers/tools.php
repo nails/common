@@ -287,3 +287,24 @@ if (!function_exists('classUses')) {
         );
     }
 }
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('classExtends')) {
+
+    /**
+     * Checks if a class extends a particular class
+     *
+     * @param object|string $mClass  The class to test, either as an object or a string
+     * @param string        $sParent The parent to look for
+     *
+     * @return bool
+     */
+    function classExtends($mClass, $sParent)
+    {
+        return in_array(
+            ltrim($sParent, '\\'),
+            class_parents($mClass)
+        );
+    }
+}
