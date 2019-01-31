@@ -97,7 +97,7 @@ class InflectorTest extends TestCase
      */
     public function test_puralise_uses_specified_plural_when_count_is_greater_than_one()
     {
-        $sPluralised = Inflector::pluralise(2, $sTestString, static::TEST_STRING_SPECIFIED_PLURAL);
+        $sPluralised = Inflector::pluralise(2, static::TEST_STRING_AEROPLANE, static::TEST_STRING_SPECIFIED_PLURAL);
         $this->assertEquals(static::TEST_STRING_SPECIFIED_PLURAL, $sPluralised);
 
     }
