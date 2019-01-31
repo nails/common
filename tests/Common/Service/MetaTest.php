@@ -8,7 +8,7 @@ use Nails\Common\Service\Meta;
 class MetaTest extends TestCase
 {
     /**
-     * @covers \Nails\Common\Meta::getEntries
+     * @covers Meta::getEntries
      */
     public function testGetEntries()
     {
@@ -19,7 +19,7 @@ class MetaTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Meta::addRaw
+     * @covers Meta::addRaw
      */
     public function testAddRaw()
     {
@@ -35,9 +35,9 @@ class MetaTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Meta::addRaw
+     * @covers Meta::addRaw
      */
-    public function testAddRawDoesRemovesDupliates()
+    public function testAddRawDoesRemovesDuplicates()
     {
         $oMeta = new Meta();
         $aData = [
@@ -52,7 +52,7 @@ class MetaTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Meta::addRaw
+     * @covers Meta::addRaw
      */
     public function testAddRawIsChainable()
     {
@@ -67,7 +67,7 @@ class MetaTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Meta::removeRaw
+     * @covers Meta::removeRaw
      */
     public function testRemoveRaw()
     {
@@ -84,7 +84,7 @@ class MetaTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Meta::add
+     * @covers Meta::add
      */
     public function testAdd()
     {
@@ -96,7 +96,7 @@ class MetaTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Meta::addRaw
+     * @covers Meta::addRaw
      */
     public function testAddIsChainable()
     {
@@ -107,7 +107,7 @@ class MetaTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Meta::remove
+     * @covers Meta::remove
      */
     public function testRemove()
     {
@@ -120,7 +120,7 @@ class MetaTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Meta::outputAr
+     * @covers Meta::outputAr
      */
     public function testOutputAr()
     {
@@ -140,7 +140,7 @@ class MetaTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Meta::outputStr
+     * @covers Meta::outputStr
      */
     public function testOutputStr()
     {

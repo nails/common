@@ -17,7 +17,7 @@ use Nails\Factory;
 abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
     /**
-     * Excuted before every test
+     * Executed before every test
      */
     public function setUp()
     {
@@ -29,7 +29,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * Excuted after every test
+     * Executed after every test
      */
     public function tearDown()
     {

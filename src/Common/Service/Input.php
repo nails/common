@@ -117,36 +117,6 @@ class Input
     // --------------------------------------------------------------------------
 
     /**
-     * Returns keys from the supplied $aArray array
-     *
-     * @param string|array $mKeys     The key(s) to return
-     * @param bool         $bXssClean Whether to run the result through the XSS filter
-     * @param array        $aArray    The array to inspect
-     *
-     * @return array|mixed
-     * @throws \Nails\Common\Exception\FactoryException
-     */
-    protected static function getItemsFromArray($mKeys = null, $bXssClean = false, $aArray = [])
-    {
-        $aOut   = [];
-        $aArray = array_change_key_case($aArray, CASE_LOWER);
-        $aKeys  = $mKeys !== null ? (array) $mKeys : array_keys($aArray);
-        $aKeys  = array_map('strtolower', $aKeys);
-
-        foreach ($aKeys as $sKey) {
-            $aOut[$sKey] = ArrayHelper::getFromArray($sKey, $aArray);
-            if ($bXssClean) {
-                $oSecurity   = Factory::service('Security');
-                $aOut[$sKey] = $oSecurity->xss_clean($aOut[$sKey]);
-            }
-        }
-
-        return is_string($mKeys) ? reset($aOut) : $aOut;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Returns the user's IP Address
      *
      * @return string
@@ -209,5 +179,40 @@ class Input
     public static function isAjax()
     {
         return static::server('HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest';
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns keys from the supplied $aArray array
+     *
+     * @param string|array $mKeys     The key(s) to return
+     * @param bool         $bXssClean Whether to run the result through the XSS filter
+     * @param array        $aArray    The array to inspect
+     *
+     * @return array|mixed
+     * @throws \Nails\Common\Exception\FactoryException
+     */
+    protected static function getItemsFromArray($mKeys = null, $bXssClean = false, $aArray = [])
+    {
+        $aArrayKeys      = array_keys($aArray);
+        $aArrayKeysLower = array_map('strtolower', $aArrayKeys);
+        $aArrayKeysMap   = array_combine($aArrayKeysLower, $aArrayKeys);
+
+        $aRequestedKeys = $mKeys !== null ? (array) $mKeys : array_keys($aArray);
+        $aRequestedKeys = array_map('strtolower', $aRequestedKeys);
+
+        $aOut = [];
+        foreach ($aRequestedKeys as $sKey) {
+            if (array_key_exists($sKey, $aArrayKeysMap)) {
+                $aOut[$aArrayKeysMap[$sKey]] = ArrayHelper::getFromArray($aArrayKeysMap[$sKey], $aArray);
+                if ($bXssClean) {
+                    $aOut[$aArrayKeysMap[$sKey]] = Factory::service('Security')
+                        ->xss_clean($aOut[$aArrayKeysMap[$sKey]]);
+                }
+            }
+        }
+
+        return is_string($mKeys) ? reset($aOut) : $aOut;
     }
 }
