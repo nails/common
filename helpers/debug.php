@@ -215,7 +215,7 @@ if (!function_exists('dumpJson')) {
 
 // --------------------------------------------------------------------------
 
-if (!function_exists('depecatedError')) {
+if (!function_exists('deprecatedError')) {
     function deprecatedError($sMethod, $sUseInstead = '')
     {
         //  Attempt to determine where the deprecation was thrown;
