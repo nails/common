@@ -458,11 +458,11 @@ class ErrorHandler
             $this->renderErrorView(
                 '401',
                 [
-                    'sSubject' => '404 Unauthorized',
+                    'sSubject' => '401 Unauthorized',
                     'sMessage' => $sMessage,
                 ]
             );
-            exit(404);
+            exit(401);
 
         } else {
 
