@@ -31,7 +31,7 @@ class InputTest extends TestCase
      * @covers Input::getItemsFromArray
      * @throws \ReflectionException
      */
-    public function test_can_fetch_single_from_array()
+    public function test_can_fetch_single_from_array(): void
     {
         $this->assertEquals(
             'bar',
@@ -45,7 +45,7 @@ class InputTest extends TestCase
      * @covers Input::getItemsFromArray
      * @throws \ReflectionException
      */
-    public function test_can_fetch_multiple_from_array()
+    public function test_can_fetch_multiple_from_array(): void
     {
         $this->assertEquals(
             ['foo' => 'bar', 'fizz' => 'buzz'],
@@ -59,7 +59,7 @@ class InputTest extends TestCase
      * @covers Input::getItemsFromArray
      * @throws \ReflectionException
      */
-    public function test_fetch_from_array_maintains_key_casing()
+    public function test_fetch_from_array_maintains_key_casing(): void
     {
         $mResult = $this->getItemsFromArray(['foo', 'FizzBuzz']);
         $this->assertEquals(true, array_key_exists('foo', $mResult));
@@ -72,7 +72,7 @@ class InputTest extends TestCase
      * @covers Input::getItemsFromArray
      * @throws \ReflectionException
      */
-    public function test_fetch_from_array_is_case_insensitive()
+    public function test_fetch_from_array_is_case_insensitive(): void
     {
         $mResult = $this->getItemsFromArray(['foo', 'fizzbuzz']);
         $this->assertEquals(true, array_key_exists('foo', $mResult));
@@ -85,7 +85,7 @@ class InputTest extends TestCase
      * @covers Input::getItemsFromArray
      * @throws \ReflectionException
      */
-    public function test_fetch_from_array_only_returns_valid_keys()
+    public function test_fetch_from_array_only_returns_valid_keys(): void
     {
         $this->assertEquals(
             ['foo' => 'bar', 'fizz' => 'buzz'],

@@ -20,7 +20,7 @@ class InflectorTest extends TestCase
     /**
      * Construct InflectorTest
      */
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         require_once dirname(__FILE__) . '/../../../helpers/inflector.php';
     }
@@ -30,7 +30,7 @@ class InflectorTest extends TestCase
     /**
      * @covers \Nails\Common\Helper\Inflector::possessive()
      */
-    public function test_possessive_appends_s_to_string()
+    public function test_possessive_appends_s_to_string(): void
     {
         $sPossessive = Inflector::possessive(static::TEST_STRING_RACHEL);
         $this->assertEquals(static::TEST_STRING_RACHEL . "'s", $sPossessive);
@@ -41,7 +41,7 @@ class InflectorTest extends TestCase
     /**
      * @covers \Nails\Common\Helper\Inflector::possessive()
      */
-    public function test_possessive_appends_s_to_string_ending_in_s()
+    public function test_possessive_appends_s_to_string_ending_in_s(): void
     {
         $sPossessive = Inflector::possessive(static::TEST_STRING_ROSS);
         $this->assertEquals(static::TEST_STRING_ROSS . "'", $sPossessive);
@@ -52,7 +52,7 @@ class InflectorTest extends TestCase
     /**
      * @covers \Nails\Common\Helper\Inflector::possessive()
      */
-    public function test_possessive_maintains_case()
+    public function test_possessive_maintains_case(): void
     {
         $sTestString = strtoupper(static::TEST_STRING_RACHEL);
         $sPossessive = Inflector::possessive($sTestString);
@@ -64,7 +64,7 @@ class InflectorTest extends TestCase
     /**
      * @covers \Nails\Common\Helper\Inflector::pluralise()
      */
-    public function test_puralise_does_not_pluralise_when_count_is_one()
+    public function test_puralise_does_not_pluralise_when_count_is_one(): void
     {
         $sPluralised = Inflector::pluralise(1, static::TEST_STRING_AEROPLANE);
         $this->assertEquals(static::TEST_STRING_AEROPLANE, $sPluralised);
@@ -75,7 +75,7 @@ class InflectorTest extends TestCase
     /**
      * @covers \Nails\Common\Helper\Inflector::pluralise()
      */
-    public function test_puralise_pluralsies_words_when_count_is_greater_than_one()
+    public function test_puralise_pluralsies_words_when_count_is_greater_than_one(): void
     {
         $sPluralised = Inflector::pluralise(2, static::TEST_STRING_AEROPLANE);
         $this->assertEquals(static::TEST_STRING_AEROPLANE . 's', $sPluralised);
@@ -95,7 +95,7 @@ class InflectorTest extends TestCase
     /**
      * @covers \Nails\Common\Helper\Inflector::pluralise()
      */
-    public function test_puralise_uses_specified_plural_when_count_is_greater_than_one()
+    public function test_puralise_uses_specified_plural_when_count_is_greater_than_one(): void
     {
         $sPluralised = Inflector::pluralise(2, static::TEST_STRING_AEROPLANE, static::TEST_STRING_SPECIFIED_PLURAL);
         $this->assertEquals(static::TEST_STRING_SPECIFIED_PLURAL, $sPluralised);

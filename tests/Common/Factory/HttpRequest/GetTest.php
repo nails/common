@@ -12,7 +12,7 @@ class GetTest extends TestCase
      * @covers \Nails\Common\Factory\HttpRequest\Get::setHeader
      * @covers \Nails\Common\Factory\HttpRequest\Get::getHeader
      */
-    public function test_http_get_request_can_set_and_get_header()
+    public function test_http_get_request_can_set_and_get_header(): void
     {
         $oRequest = new Get();
         $oRequest->setHeader('X-header', 'foo');
@@ -25,7 +25,7 @@ class GetTest extends TestCase
      * @covers \Nails\Common\Factory\HttpRequest\Get::asUser
      * @covers \Nails\Common\Factory\HttpRequest\Get::getHeader
      */
-    public function test_http_get_request_can_set_user()
+    public function test_http_get_request_can_set_user(): void
     {
         $iUserId  = 1;
         $oRequest = new Get();
