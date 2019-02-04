@@ -22,7 +22,7 @@ class GetFromArrayTest extends TestCase
     /**
      * @covers \Nails\Common\Helper\ArrayHelper::getFromArray()
      */
-    public function test_getfromarray_valid_key()
+    public function test_getfromarray_valid_key(): void
     {
         $this->assertEquals(
             $this->aTestArray['foo'],
@@ -35,7 +35,7 @@ class GetFromArrayTest extends TestCase
     /**
      * @covers \Nails\Common\Helper\ArrayHelper::getFromArray()
      */
-    public function test_getfromarray_invalid_key()
+    public function test_getfromarray_invalid_key(): void
     {
         $this->assertEquals(
             null,
@@ -48,7 +48,7 @@ class GetFromArrayTest extends TestCase
     /**
      * @covers \Nails\Common\Helper\ArrayHelper::getFromArray()
      */
-    public function test_getfromarray_cascading_keys()
+    public function test_getfromarray_cascading_keys(): void
     {
         $this->assertEquals(
             $this->aTestArray['fizz'],
@@ -61,7 +61,7 @@ class GetFromArrayTest extends TestCase
     /**
      * @covers \Nails\Common\Helper\ArrayHelper::getFromArray()
      */
-    public function test_getfromarray_default_value()
+    public function test_getfromarray_default_value(): void
     {
         $this->assertEquals(
             'default',

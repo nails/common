@@ -10,7 +10,7 @@ class MetaTest extends TestCase
     /**
      * @covers Meta::getEntries
      */
-    public function testGetEntries()
+    public function testGetEntries(): void
     {
         $oMeta = new Meta();
         $this->assertCount(0, $oMeta->getEntries());
@@ -21,7 +21,7 @@ class MetaTest extends TestCase
     /**
      * @covers Meta::addRaw
      */
-    public function testAddRaw()
+    public function testAddRaw(): void
     {
         $oMeta = new Meta();
         $aData = [
@@ -37,7 +37,7 @@ class MetaTest extends TestCase
     /**
      * @covers Meta::addRaw
      */
-    public function testAddRawDoesRemovesDuplicates()
+    public function testAddRawDoesRemovesDuplicates(): void
     {
         $oMeta = new Meta();
         $aData = [
@@ -54,7 +54,7 @@ class MetaTest extends TestCase
     /**
      * @covers Meta::addRaw
      */
-    public function testAddRawIsChainable()
+    public function testAddRawIsChainable(): void
     {
         $oMeta = new Meta();
         $aData = [
@@ -69,7 +69,7 @@ class MetaTest extends TestCase
     /**
      * @covers Meta::removeRaw
      */
-    public function testRemoveRaw()
+    public function testRemoveRaw(): void
     {
         $oMeta = new Meta();
         $aData = [
@@ -86,7 +86,7 @@ class MetaTest extends TestCase
     /**
      * @covers Meta::add
      */
-    public function testAdd()
+    public function testAdd(): void
     {
         $oMeta = new Meta();
         $oMeta->add('foo', 'bar');
@@ -98,7 +98,7 @@ class MetaTest extends TestCase
     /**
      * @covers Meta::addRaw
      */
-    public function testAddIsChainable()
+    public function testAddIsChainable(): void
     {
         $oMeta = new Meta();
         $this->assertInstanceOf('Nails\Common\Service\Meta', $oMeta->add('foo', 'bar'));
@@ -109,7 +109,7 @@ class MetaTest extends TestCase
     /**
      * @covers Meta::remove
      */
-    public function testRemove()
+    public function testRemove(): void
     {
         $oMeta = new Meta();
         $oMeta->add('foo', 'bar');
@@ -122,7 +122,7 @@ class MetaTest extends TestCase
     /**
      * @covers Meta::outputAr
      */
-    public function testOutputAr()
+    public function testOutputAr(): void
     {
         $oMeta = new Meta();
 
@@ -142,7 +142,7 @@ class MetaTest extends TestCase
     /**
      * @covers Meta::outputStr
      */
-    public function testOutputStr()
+    public function testOutputStr(): void
     {
         $oMeta = new Meta();
 
