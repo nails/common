@@ -19,7 +19,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * Executed before every test
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $oDb = Factory::service('Database');
@@ -31,7 +31,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * Executed after every test
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
         $oDb = Factory::service('Database');
