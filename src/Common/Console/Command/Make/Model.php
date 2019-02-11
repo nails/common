@@ -44,13 +44,15 @@ class Model extends BaseMaker
                 'skip-db',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Skip database table creation'
+                'Skip database table creation',
+                false
             )
             ->addOption(
                 'skip-admin',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Skip admin creation'
+                'Skip admin creation',
+                true
             )
             ->addOption(
                 'auto-detect',
@@ -285,6 +287,9 @@ class Model extends BaseMaker
                 if (!$bSkipDb) {
                     $oOutput->writeln('Table: <info>' . $oModel->table_with_prefix . '</info>');
                 }
+                if (!$bSkipAdmin) {
+                    $oOutput->writeln('Admin: <info>Controller will be created</info>');
+                }
                 $oOutput->writeln('');
             }
 
@@ -309,7 +314,7 @@ class Model extends BaseMaker
 
                     //  Create the database table
                     if (!$bSkipDb) {
-                        $oOutput->write('Adding database table...');
+                        $oOutput->write('Adding database table... ');
                         $oModel->nails_db_prefix = NAILS_DB_PREFIX;
                         $oDb                     = Factory::service('PDODatabase');
                         $oDb->query($this->getResource('template/model_table.php', (array) $oModel));
@@ -326,7 +331,7 @@ class Model extends BaseMaker
 
                     //  Create admin
                     if (!$bSkipAdmin) {
-                        $oOutput->write('Creating admin controller...');
+                        $oOutput->write('Creating admin controller... ');
                         //  Execute the create command, non-interactively and silently
                         $iExitCode = $this->callCommand(
                             'make:controller:admin',
@@ -362,6 +367,8 @@ class Model extends BaseMaker
                     fwrite($fTempHandle, $sLine);
                     $iLocation = ftell($this->fServicesHandle);
                 }
+
+                //  @todo (Pablo - 2019-02-11) - Sort the models by name
 
                 //  Move the temp services file into place
                 unlink(static::SERVICE_PATH);
