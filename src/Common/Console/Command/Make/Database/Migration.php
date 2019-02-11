@@ -21,22 +21,23 @@ class Migration extends BaseMaker
     /**
      * Configure the command
      */
-    protected function configure()
+    protected function configure(): void
     {
-        $this->setName('make:db:migration');
-        $this->setDescription('Creates a new Database Migration');
-        $this->addOption(
-            'sql-on-zero',
-            null,
-            InputOption::VALUE_OPTIONAL,
-            'Automatically populate the migration when creating the first migration, i.e. 0',
-            true
-        );
-        $this->addArgument(
-            'index',
-            InputArgument::OPTIONAL,
-            'The migration index, leave blank to auto-detect'
-        );
+        $this
+            ->setName('make:db:migration')
+            ->setDescription('Creates a new Database Migration')
+            ->addOption(
+                'sql-on-zero',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Automatically populate the migration when creating the first migration, i.e. 0',
+                true
+            )
+            ->addArgument(
+                'index',
+                InputArgument::OPTIONAL,
+                'The migration index, leave blank to auto-detect'
+            );
     }
 
     // --------------------------------------------------------------------------
@@ -49,7 +50,7 @@ class Migration extends BaseMaker
      *
      * @return int
      */
-    protected function execute(InputInterface $oInput, OutputInterface $oOutput)
+    protected function execute(InputInterface $oInput, OutputInterface $oOutput): int
     {
         parent::execute($oInput, $oOutput);
 
@@ -90,7 +91,7 @@ class Migration extends BaseMaker
      * @throws \Exception
      * @return void
      */
-    private function createMigration()
+    private function createMigration(): void
     {
         try {
 
@@ -214,7 +215,7 @@ class Migration extends BaseMaker
      *
      * @return string
      */
-    protected function tabs($iNumberTabs = 0)
+    protected function tabs(int $iNumberTabs = 0): string
     {
         return str_repeat(' ', static::TAB_WIDTH * $iNumberTabs);
     }

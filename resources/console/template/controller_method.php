@@ -6,11 +6,13 @@
  */
 
 return <<<'EOD'
-public function {{METHOD_NAME}}()
+public function {{METHOD_NAME}}(): void
 {
-    $oView = Factory::service('View');
-    $oView->load('structure/header', $this->data);
-    $oView->load('{{METHOD_VIEW}}', $this->data);
-    $oView->load('structure/footer', $this->data);
+    Factory::service('View')
+        ->load([
+            'structure/header',
+            '{{METHOD_VIEW}}',
+            'structure/footer',
+        ]);
 }
 EOD;

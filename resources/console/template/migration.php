@@ -11,7 +11,6 @@ return <<<'EOD'
 /**
  * Migration:   {{INDEX}}
  * Started:     {{DATE_START}}
- * Finalised:
  */
 
 namespace Nails\Database\Migration\App;
@@ -24,7 +23,7 @@ class Migration{{INDEX}} extends Base
      * Execute the migration
      * @return void
      */
-    public function execute()
+    public function execute(): void
     {
         {{QUERIES}}
     }

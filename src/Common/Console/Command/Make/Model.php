@@ -30,33 +30,34 @@ class Model extends BaseMaker
     /**
      * Configure the command
      */
-    protected function configure()
+    protected function configure(): void
     {
-        $this->setName('make:model');
-        $this->setDescription('Creates a new App model');
-        $this->addArgument(
-            'modelName',
-            InputArgument::OPTIONAL,
-            'Define the name of the model to create'
-        );
-        $this->addOption(
-            'skip-db',
-            null,
-            InputOption::VALUE_OPTIONAL,
-            'Skip database table creation'
-        );
-        $this->addOption(
-            'skip-admin',
-            null,
-            InputOption::VALUE_OPTIONAL,
-            'Skip admin creation'
-        );
-        $this->addOption(
-            'auto-detect',
-            null,
-            InputOption::VALUE_OPTIONAL,
-            'Automatically build models from the database'
-        );
+        $this
+            ->setName('make:model')
+            ->setDescription('Creates a new App model')
+            ->addArgument(
+                'modelName',
+                InputArgument::OPTIONAL,
+                'Define the name of the model to create'
+            )
+            ->addOption(
+                'skip-db',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Skip database table creation'
+            )
+            ->addOption(
+                'skip-admin',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Skip admin creation'
+            )
+            ->addOption(
+                'auto-detect',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Automatically build models from the database'
+            );
     }
 
     // --------------------------------------------------------------------------
@@ -69,7 +70,7 @@ class Model extends BaseMaker
      *
      * @return int
      */
-    protected function execute(InputInterface $oInput, OutputInterface $oOutput)
+    protected function execute(InputInterface $oInput, OutputInterface $oOutput): int
     {
         parent::execute($oInput, $oOutput);
 
@@ -194,7 +195,7 @@ class Model extends BaseMaker
      * @throws \Exception
      * @return void
      */
-    private function createModel()
+    private function createModel(): void
     {
         $oInput      = $this->oInput;
         $oOutput     = $this->oOutput;
@@ -396,7 +397,7 @@ class Model extends BaseMaker
      * @return \stdClass
      * @throws \Exception
      */
-    private function prepareModelName($sModelName)
+    private function prepareModelName($sModelName): \stdClass
     {
         //  Prepare the supplied model name and test
         $sModelName = preg_replace('/[^a-zA-Z\/ ]/', '', $sModelName);
@@ -447,7 +448,7 @@ class Model extends BaseMaker
      *
      * @return bool
      */
-    private function modelExists($oModel)
+    private function modelExists($oModel): bool
     {
         return file_exists($oModel->path . $oModel->filename);
     }
