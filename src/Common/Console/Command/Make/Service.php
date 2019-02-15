@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Service extends BaseMaker
 {
     const RESOURCE_PATH     = NAILS_COMMON_PATH . 'resources/console/';
-    const APP_PATH          = NAILS_APP_PATH . 'src/Services/';
+    const APP_PATH          = NAILS_APP_PATH . 'src/Service/';
     const SERVICE_PATH      = NAILS_APP_PATH . 'application/services/services.php';
     const SERVICE_TEMP_PATH = CACHE_PATH . 'services.temp.php';
     const TAB_WIDTH         = 4;
@@ -165,7 +165,7 @@ class Service extends BaseMaker
                 $sNamespace       = $this->generateNamespace($aServiceBits);
                 $sClassName       = $this->generateClassName($aServiceBits);
                 $sClassNameFull   = $sNamespace . '\\' . $sClassName;
-                $sClassNameNormal = str_replace('AppServices', '', str_replace('\\', '', $sClassNameFull));
+                $sClassNameNormal = str_replace('AppService', '', str_replace('\\', '', $sClassNameFull));
                 $sFilePath        = $this->generateFilePath($aServiceBits);
 
                 //  Test it does not already exist
@@ -295,7 +295,7 @@ class Service extends BaseMaker
     protected function generateNamespace(array $aServiceBits): string
     {
         array_pop($aServiceBits);
-        return implode('\\', array_merge(['App', 'Services'], $aServiceBits));
+        return implode('\\', array_merge(['App', 'Service'], $aServiceBits));
     }
 
     // --------------------------------------------------------------------------
