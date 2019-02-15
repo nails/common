@@ -40,7 +40,7 @@ if (isset($headerOverride)) {
 } else {
 
     //  Auto-detect header if there is a config file
-    if (file_exists(APPPATH . 'config/header_views.php')) {
+    if (file_exists(NAILS_APP_PATH . 'application/config/header_views.php')) {
 
         $oConfig->load('header_views');
         $match     = false;
@@ -73,7 +73,7 @@ if (isset($headerOverride)) {
             $oView->load($oConfig->item('default_header'));
         }
 
-    } elseif (file_exists(APPPATH . 'views/structure/header/default.php')) {
+    } elseif (file_exists(NAILS_APP_PATH . 'application/views/structure/header/default.php')) {
 
         //  No config file, but the app has a default header
         $oView->load('structure/header/default');

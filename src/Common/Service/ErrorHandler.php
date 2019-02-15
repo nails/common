@@ -530,7 +530,7 @@ class ErrorHandler
 
         //  App generic
         $aPaths[] = implode(DIRECTORY_SEPARATOR, [
-            rtrim(APPPATH, DIRECTORY_SEPARATOR),
+            NAILS_APP_PATH . 'application',
             'views',
             'errors',
             $sType,

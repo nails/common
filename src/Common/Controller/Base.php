@@ -251,9 +251,9 @@ abstract class Base extends \MX_Controller
 
                     } else {
                         //  Otherwise, render some HTML
-                        if (file_exists(APPPATH . 'views/errors/html/maintenance.php')) {
+                        if (file_exists(NAILS_APP_PATH . 'application/views/errors/html/maintenance.php')) {
                             //  Look for an app override
-                            require APPPATH . 'views/errors/html/maintenance.php';
+                            require NAILS_APP_PATH . 'application/views/errors/html/maintenance.php';
                         } else {
                             //  Fall back to the Nails maintenance page
                             require NAILS_COMMON_PATH . 'views/errors/html/maintenance.php';
@@ -261,9 +261,9 @@ abstract class Base extends \MX_Controller
                     }
 
                 } else {
-                    if (file_exists(APPPATH . 'views/errors/cli/maintenance.php')) {
+                    if (file_exists(NAILS_APP_PATH . 'application/views/errors/cli/maintenance.php')) {
                         //  Look for an app override
-                        require APPPATH . 'views/errors/cli/maintenance.php';
+                        require NAILS_APP_PATH . 'application/views/errors/cli/maintenance.php';
                     } else {
                         //  Fall back to the Nails maintenance page
                         require NAILS_COMMON_PATH . 'views/errors/cli/maintenance.php';
@@ -534,7 +534,7 @@ abstract class Base extends \MX_Controller
         }
 
         //  The Application
-        $aPaths[] = APPPATH;
+        $aPaths[] = NAILS_APP_PATH . 'application';
 
         foreach ($aPaths as $sPath) {
             $this->load->add_package_path($sPath);

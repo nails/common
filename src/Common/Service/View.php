@@ -54,8 +54,8 @@ class View
         $this->aData        = &getControllerData();
         $this->iBufferLevel = ob_get_level();
         $this->aViewPaths   = [
-            APPPATH . 'modules/',
-            APPPATH,
+            NAILS_APP_PATH . 'application/modules/',
+            NAILS_APP_PATH . 'application/',
             NAILS_COMMON_PATH,
         ];
         foreach (Components::modules() as $oModule) {

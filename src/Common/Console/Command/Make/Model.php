@@ -16,7 +16,7 @@ class Model extends BaseMaker
     const RESOURCE_PATH     = NAILS_COMMON_PATH . 'resources/console/';
     const MODEL_PATH        = NAILS_APP_PATH . 'src/Model/';
     const ADMIN_PATH        = NAILS_APP_PATH . 'application/modules/admin/controllers/';
-    const SERVICE_PATH      = APPPATH . 'services/services.php';
+    const SERVICE_PATH      = NAILS_APP_PATH . 'application/services/services.php';
     const SERVICE_TEMP_PATH = CACHE_PATH . 'services.temp.php';
 
     // --------------------------------------------------------------------------
@@ -354,7 +354,7 @@ class Model extends BaseMaker
                 $oOutput->writeln('');
                 $oOutput->write('Adding model(s) to app services...');
                 //  Create a temporary file
-                $fTempHandle = fopen(static::SERVICE_TEMP_PATH, "w+");
+                $fTempHandle = fopen(static::SERVICE_TEMP_PATH, 'w+');
                 rewind($this->fServicesHandle);
                 $iLocation = 0;
                 while (($sLine = fgets($this->fServicesHandle)) !== false) {
