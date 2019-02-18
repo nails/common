@@ -231,4 +231,16 @@ class Base
     {
         return $aItems[array_rand($aItems)];
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Generates a random email address
+     *
+     * @return string
+     */
+    protected function email($sDomain = 'example.com')
+    {
+        return str_replace(' ', '-', $this->loremWord(3)) . '@' . $sDomain;
+    }
 }
