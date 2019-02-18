@@ -48,7 +48,7 @@ class DefaultSeed extends Base
             }
         }
 
-        for ($i = 0; $i < self::CONFIG_NUM_PER_SEED; $i++) {
+        for ($i = 0; $i < static::CONFIG_NUM_PER_SEED; $i++) {
             try {
                 if (!$oModel->create($this->generate($aFields))) {
                     throw new \Exception('Failed to create item. ' . $oModel->lastError());
