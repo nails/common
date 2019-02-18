@@ -19,20 +19,19 @@ class Seed extends Base
      */
     protected function configure()
     {
-        $this->setName('db:seed');
-        $this->setDescription('Seed the database');
-
-        $this->addArgument(
-            'component',
-            InputArgument::OPTIONAL,
-            'Which component to seed from; use "list" to show all available seeders'
-        );
-
-        $this->addArgument(
-            'class',
-            InputArgument::OPTIONAL,
-            'The seed class to execute'
-        );
+        $this
+            ->setName('db:seed')
+            ->setDescription('Seed the database')
+            ->addArgument(
+                'component',
+                InputArgument::OPTIONAL,
+                'Which component to seed from; use "list" to show all available seeders'
+            )
+            ->addArgument(
+                'class',
+                InputArgument::OPTIONAL,
+                'The seed class to execute'
+            );
     }
 
     // --------------------------------------------------------------------------
@@ -211,6 +210,8 @@ class Seed extends Base
                     },
                     $aSeeds
                 );
+
+                sort($aSeeds);
 
                 if (empty($aSeeds)) {
                     continue;
