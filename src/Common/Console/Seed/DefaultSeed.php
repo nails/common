@@ -33,6 +33,7 @@ class DefaultSeed extends Base
 
     /**
      * Execute the seed
+     *
      * @return void
      */
     public function execute()
@@ -74,6 +75,9 @@ class DefaultSeed extends Base
             switch ($oField->type) {
                 case 'textarea':
                     $mValue = $this->loremParagraph();
+                    break;
+                case 'wysiwyg':
+                    $mValue = $this->loremHtml();
                     break;
                 case 'number':
                     $mValue = $this->randomInteger();

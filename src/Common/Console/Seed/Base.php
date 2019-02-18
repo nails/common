@@ -8,6 +8,7 @@ class Base
 {
     /**
      * The database object
+     *
      * @var \Nails\Console\Database;
      */
     protected $oDb;
@@ -63,11 +64,56 @@ class Base
     protected function loremWord($iNumWords = 5)
     {
         $aWords = [
-            'lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit', 'mauris', 'venenatis',
-            'metus', 'volutpat', 'hendrerit', 'interdum', 'nisi', 'odio', 'finibus', 'ex', 'eu', 'congue', 'mauris',
-            'nisi', 'in', 'magna', 'ut', 'gravida', 'neque', 'at', 'nulla', 'viverra', 'egestas', 'vel', 'et', 'ante',
-            'maecenas', 'hendrerit', 'sit', 'amet', 'urna', 'posuere', 'ultrices', 'aenean', 'quis', 'velit', 'velit',
-            'suspendisse', 'sit', 'amet', 'egestas', 'tortor',
+            'lorem',
+            'ipsum',
+            'dolor',
+            'sit',
+            'amet',
+            'consectetur',
+            'adipiscing',
+            'elit',
+            'mauris',
+            'venenatis',
+            'metus',
+            'volutpat',
+            'hendrerit',
+            'interdum',
+            'nisi',
+            'odio',
+            'finibus',
+            'ex',
+            'eu',
+            'congue',
+            'mauris',
+            'nisi',
+            'in',
+            'magna',
+            'ut',
+            'gravida',
+            'neque',
+            'at',
+            'nulla',
+            'viverra',
+            'egestas',
+            'vel',
+            'et',
+            'ante',
+            'maecenas',
+            'hendrerit',
+            'sit',
+            'amet',
+            'urna',
+            'posuere',
+            'ultrices',
+            'aenean',
+            'quis',
+            'velit',
+            'velit',
+            'suspendisse',
+            'sit',
+            'amet',
+            'egestas',
+            'tortor',
         ];
 
         $aOut = [];
@@ -121,6 +167,21 @@ class Base
         }
 
         return implode("\n\n", $aOut);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Generate some ranodm Lorem Ipsum paragraphs as HTML
+     *
+     * @param int $iNumParagraphs The number of paragraphs to generate
+     *
+     * @return string
+     */
+    protected function loremHtml($iNumParagraphs = 3)
+    {
+        $sOut = $this->loremParagraph($iNumParagraphs);
+        return '<p>' . str_replace("\n\n", "</p>\n<p>", $sOut) . '</p>';
     }
 
     // --------------------------------------------------------------------------
