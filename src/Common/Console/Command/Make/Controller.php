@@ -12,7 +12,6 @@ class Controller extends BaseMaker
 {
     const RESOURCE_PATH   = NAILS_COMMON_PATH . 'resources/console/';
     const CONTROLLER_PATH = NAILS_APP_PATH . 'application/modules/';
-    const TAB_WIDTH       = 4;
 
     // --------------------------------------------------------------------------
 
@@ -253,19 +252,5 @@ class Controller extends BaseMaker
             }
             throw new ConsoleException($e->getMessage());
         }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Generates N number of tabs
-     *
-     * @param int $iNumberTabs The number of tabs to generate
-     *
-     * @return string
-     */
-    protected function tabs($iNumberTabs = 0)
-    {
-        return str_repeat(' ', static::TAB_WIDTH * $iNumberTabs);
     }
 }
