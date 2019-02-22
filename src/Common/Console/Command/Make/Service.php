@@ -11,17 +11,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Service extends BaseMaker
 {
-    const RESOURCE_PATH     = NAILS_COMMON_PATH . 'resources/console/';
-    const APP_PATH          = NAILS_APP_PATH . 'src/Service/';
-    const SERVICE_PATH      = NAILS_APP_PATH . 'application/services/services.php';
-    const SERVICE_TEMP_PATH = CACHE_PATH . 'services.temp.php';
-    const TAB_WIDTH         = 4;
-
-    // --------------------------------------------------------------------------
-
-    private $fServicesHandle;
-    private $iServicesTokenLocation;
-    private $iServicesIndent;
+    const SERVICE_TOKEN = 'SERVICES';
+    const RESOURCE_PATH = NAILS_COMMON_PATH . 'resources/console/';
+    const APP_PATH      = NAILS_APP_PATH . 'src/Service/';
 
     // --------------------------------------------------------------------------
 
@@ -54,63 +46,11 @@ class Service extends BaseMaker
     {
         parent::execute($oInput, $oOutput);
 
-        // --------------------------------------------------------------------------
-
-        //  Detect the services file
-        if (!file_exists(static::SERVICE_PATH)) {
-            return $this->abort(
-                self::EXIT_CODE_FAILURE,
-                [
-                    'Could not detect the app\'s services.php file',
-                    static::SERVICE_PATH,
-                ]
-            );
-        }
-
-        //  Look for the generator token
-        $this->fServicesHandle = fopen(static::SERVICE_PATH, "r+");;
-        $bFound = false;
-        if ($this->fServicesHandle) {
-            $iLocation = 0;
-            while (($sLine = fgets($this->fServicesHandle)) !== false) {
-                if (preg_match('#^(\s*)// GENERATOR\[SERVICES\]#', $sLine, $aMatches)) {
-                    $bFound                       = true;
-                    $this->iServicesIndent        = strlen($aMatches[1]);
-                    $this->iServicesTokenLocation = $iLocation;
-                    break;
-                }
-                $iLocation = ftell($this->fServicesHandle);
-            }
-            if (!$bFound) {
-                fclose($this->fServicesHandle);
-
-                return $this->abort(
-                    self::EXIT_CODE_FAILURE,
-                    [
-                        'Services file does not contain the generator token (i.e // GENERATOR[SERVICES])',
-                        'This token is required so that the tool can safely insert new service definitions',
-                    ]
-                );
-            }
-        } else {
-            fclose($this->fServicesHandle);
-
-            return $this->abort(
-                self::EXIT_CODE_FAILURE,
-                [
-                    'Failed to open the services file for reading and writing.',
-                    static::SERVICE_PATH,
-                ]
-            );
-        }
-
-        // --------------------------------------------------------------------------
-
         try {
-            //  Ensure the paths exist
-            $this->createPath(self::APP_PATH);
-            //  Create the service
-            $this->createService();
+            $this
+                ->validateServiceFile()
+                ->createPath(self::APP_PATH)
+                ->createService();
         } catch (ConsoleException $e) {
             return $this->abort(
                 self::EXIT_CODE_FAILURE,
@@ -139,9 +79,9 @@ class Service extends BaseMaker
      * Create the Service
      *
      * @throws ConsoleException
-     * @return void
+     * @return$this
      */
-    private function createService(): void
+    private function createService(): self
     {
         $aFields  = $this->getArguments();
         $aCreated = [];
@@ -193,7 +133,7 @@ class Service extends BaseMaker
                 ];
             }
 
-            $this->oOutput->writeln('The following services will be created:');
+            $this->oOutput->writeln('The following service(s) will be created:');
             foreach ($aToCreate as $aConfig) {
                 $this->oOutput->writeln('');
                 $this->oOutput->writeln('Class: <info>' . $aConfig['CLASS_NAME_FULL'] . '</info>');
@@ -229,29 +169,7 @@ class Service extends BaseMaker
                 //  Add services to the app's services array
                 $this->oOutput->writeln('');
                 $this->oOutput->write('Adding service(s) to app services... ');
-                //  Create a temporary file
-                $fTempHandle = fopen(static::SERVICE_TEMP_PATH, 'w+');
-                rewind($this->fServicesHandle);
-                $iLocation = 0;
-                while (($sLine = fgets($this->fServicesHandle)) !== false) {
-                    if ($iLocation === $this->iServicesTokenLocation) {
-                        fwrite(
-                            $fTempHandle,
-                            implode("\n", $aServiceDefinitions) . "\n"
-                        );
-                    }
-                    fwrite($fTempHandle, $sLine);
-                    $iLocation = ftell($this->fServicesHandle);
-                }
-
-                //  @todo (Pablo - 2019-02-11) - Sort the services by name
-
-                //  Move the temp services file into place
-                unlink(static::SERVICE_PATH);
-                rename(static::SERVICE_TEMP_PATH, static::SERVICE_PATH);
-                fclose($fTempHandle);
-                fclose($this->fServicesHandle);
-
+                $this->writeServiceFile($aServiceDefinitions);
                 $this->oOutput->writeln('<info>done!</info>');
             }
 
@@ -266,6 +184,8 @@ class Service extends BaseMaker
             }
             throw new ConsoleException($e->getMessage());
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -301,7 +221,7 @@ class Service extends BaseMaker
     // --------------------------------------------------------------------------
 
     /**
-     * Generate the class file apth
+     * Generate the class file path
      *
      * @param array $aServiceBits The supplied classname "bits"
      *
@@ -323,19 +243,5 @@ class Service extends BaseMaker
                 )
             )
         );
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Generates N number of tabs
-     *
-     * @param int $iNumberTabs The number of tabs to generate
-     *
-     * @return string
-     */
-    protected function tabs($iNumberTabs = 0)
-    {
-        return str_repeat(' ', static::TAB_WIDTH * $iNumberTabs);
     }
 }

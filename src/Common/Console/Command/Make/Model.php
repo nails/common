@@ -13,17 +13,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Model extends BaseMaker
 {
-    const RESOURCE_PATH     = NAILS_COMMON_PATH . 'resources/console/';
-    const MODEL_PATH        = NAILS_APP_PATH . 'src/Model/';
-    const ADMIN_PATH        = NAILS_APP_PATH . 'application/modules/admin/controllers/';
-    const SERVICE_PATH      = NAILS_APP_PATH . 'application/services/services.php';
-    const SERVICE_TEMP_PATH = CACHE_PATH . 'services.temp.php';
-
-    // --------------------------------------------------------------------------
-
-    private $fServicesHandle;
-    private $iServicesTokenLocation;
-    private $iServicesIndent;
+    const SERVICE_TOKEN = 'MODELS';
+    const RESOURCE_PATH = NAILS_COMMON_PATH . 'resources/console/';
+    const MODEL_PATH    = NAILS_APP_PATH . 'src/Model/';
+    const ADMIN_PATH    = NAILS_APP_PATH . 'application/modules/admin/controllers/';
 
     // --------------------------------------------------------------------------
 
@@ -109,63 +102,13 @@ class Model extends BaseMaker
 
         // --------------------------------------------------------------------------
 
-        //  Detect the services file
-        if (!file_exists(static::SERVICE_PATH)) {
-            return $this->abort(
-                self::EXIT_CODE_FAILURE,
-                [
-                    'Could not detect the app\'s services.php file',
-                    static::SERVICE_PATH,
-                ]
-            );
-        }
-
-        //  Look for the generator token
-        $this->fServicesHandle = fopen(static::SERVICE_PATH, "r+");;
-        $bFound = false;
-        if ($this->fServicesHandle) {
-            $iLocation = 0;
-            while (($sLine = fgets($this->fServicesHandle)) !== false) {
-                if (preg_match('#^(\s*)// GENERATOR\[MODELS\]#', $sLine, $aMatches)) {
-                    $bFound                       = true;
-                    $this->iServicesIndent        = strlen($aMatches[1]);
-                    $this->iServicesTokenLocation = $iLocation;
-                    break;
-                }
-                $iLocation = ftell($this->fServicesHandle);
-            }
-            if (!$bFound) {
-                fclose($this->fServicesHandle);
-
-                return $this->abort(
-                    self::EXIT_CODE_FAILURE,
-                    [
-                        'Services file does not contain the generator token (i.e // GENERATOR[MODELS])',
-                        'This token is required so that the tool can safely insert new model definitions',
-                    ]
-                );
-            }
-        } else {
-            fclose($this->fServicesHandle);
-
-            return $this->abort(
-                self::EXIT_CODE_FAILURE,
-                [
-                    'Failed to open the services file for reading and writing.',
-                    static::SERVICE_PATH,
-                ]
-            );
-        }
-
-        // --------------------------------------------------------------------------
-
         try {
-            //  Ensure the paths exist
-            $this->createPath(self::MODEL_PATH);
+            $this
+                ->validateServiceFile()
+                ->createPath(self::MODEL_PATH);
             if (!$bSkipAdmin) {
                 $this->createPath(self::ADMIN_PATH);
             }
-            //  Create the model
             $this->createModel();
         } catch (\Exception $e) {
             return $this->abort(
@@ -195,9 +138,9 @@ class Model extends BaseMaker
      * Create the Model
      *
      * @throws \Exception
-     * @return void
+     * @return $this
      */
-    private function createModel(): void
+    private function createModel(): self
     {
         $oInput      = $this->oInput;
         $oOutput     = $this->oOutput;
@@ -279,7 +222,7 @@ class Model extends BaseMaker
             arraySortMulti($aModelData, 'class_path');
 
             //  Report to the user and get confirmation
-            $oOutput->writeln('The following models will be created:');
+            $oOutput->writeln('The following model(s) will be created:');
             $oOutput->writeln('');
             foreach ($aModelData as $oModel) {
                 $oOutput->writeln('Class: <info>\\' . $oModel->class_path . '</info>');
@@ -353,29 +296,7 @@ class Model extends BaseMaker
                 //  Add models to the app's services array
                 $oOutput->writeln('');
                 $oOutput->write('Adding model(s) to app services...');
-                //  Create a temporary file
-                $fTempHandle = fopen(static::SERVICE_TEMP_PATH, 'w+');
-                rewind($this->fServicesHandle);
-                $iLocation = 0;
-                while (($sLine = fgets($this->fServicesHandle)) !== false) {
-                    if ($iLocation === $this->iServicesTokenLocation) {
-                        fwrite(
-                            $fTempHandle,
-                            $sServiceDefinitions
-                        );
-                    }
-                    fwrite($fTempHandle, $sLine);
-                    $iLocation = ftell($this->fServicesHandle);
-                }
-
-                //  @todo (Pablo - 2019-02-11) - Sort the models by name
-
-                //  Move the temp services file into place
-                unlink(static::SERVICE_PATH);
-                rename(static::SERVICE_TEMP_PATH, static::SERVICE_PATH);
-                fclose($fTempHandle);
-                fclose($this->fServicesHandle);
-
+                $this->writeServiceFile($aServiceDefinitions);
                 $oOutput->writeln('<info>done!</info>');
             }
 
@@ -392,6 +313,8 @@ class Model extends BaseMaker
                 is_numeric($e->getCode()) ? $e->getCode() : null
             );
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------

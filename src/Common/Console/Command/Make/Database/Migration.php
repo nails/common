@@ -14,7 +14,6 @@ class Migration extends BaseMaker
 {
     const RESOURCE_PATH  = NAILS_COMMON_PATH . 'resources/console/';
     const MIGRATION_PATH = NAILS_APP_PATH . 'application/migrations/';
-    const TAB_WIDTH      = 4;
 
     // --------------------------------------------------------------------------
 
@@ -204,19 +203,5 @@ class Migration extends BaseMaker
             }
             throw new \Exception($e->getMessage());
         }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Generates N number of tabs
-     *
-     * @param int $iNumberTabs The number of tabs to generate
-     *
-     * @return string
-     */
-    protected function tabs(int $iNumberTabs = 0): string
-    {
-        return str_repeat(' ', static::TAB_WIDTH * $iNumberTabs);
     }
 }
