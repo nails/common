@@ -23,26 +23,8 @@ if (!function_exists('showFatalError')) {
      */
     function showFatalError($sSubject = '', $sMessage = '')
     {
-        $oErrorHandler = Factory::service('ErrorHandler');
-        $oErrorHandler->showFatalErrorScreen($sSubject, $sMessage);
+        Factory::service('ErrorHandler')
+            ->showFatalErrorScreen($sSubject, $sMessage);
     }
 }
 
-// --------------------------------------------------------------------------
-
-if (!function_exists('sendDeveloperMail')) {
-
-    /**
-     * Quickly send a high priority email via mail() to the APP_DEVELOPER
-     *
-     * @param  string $sSubject The email's subject
-     * @param  string $sMessage The email's body
-     *
-     * @return boolean
-     */
-    function sendDeveloperMail($sSubject, $sMessage)
-    {
-        $oErrorHandler = Factory::service('ErrorHandler');
-        $oErrorHandler->sendDeveloperMail($sSubject, $sMessage);
-    }
-}
