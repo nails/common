@@ -33,8 +33,8 @@ class AppNotification extends Base
 
         $this->table         = NAILS_DB_PREFIX . 'app_notification';
         $this->tableAlias    = 'n';
-        $this->notifications = array();
-        $this->emails        = array();
+        $this->notifications = [];
+        $this->emails        = [];
 
         // --------------------------------------------------------------------------
 
@@ -49,22 +49,18 @@ class AppNotification extends Base
     protected function setDefinitions()
     {
         //  Define where we should look
-        $definitionLocations   = array();
-        $definitionLocations[] = NAILS_COMMON_PATH . 'config/app_notifications.php';
+        $aDefinitionLocations   = [];
+        $aDefinitionLocations[] = NAILS_COMMON_PATH . 'config/app_notifications.php';
 
-        $modules = Components::modules();
-
-        foreach ($modules as $module) {
-
-            $definitionLocations[] = $module->path . $module->moduleName . '/config/app_notifications.php';
+        foreach (Components::modules() as $oModule) {
+            $aDefinitionLocations[] = $oModule->path . $oModule->moduleName . '/config/app_notifications.php';
         }
 
-        $definitionLocations[] = NAILS_APP_PATH . 'application/config/app_notifications.php';
+        $aDefinitionLocations[] = NAILS_APP_PATH . 'application/config/app_notifications.php';
 
         //  Find definitions
-        foreach ($definitionLocations as $path) {
-
-            $this->loadDefinitions($path);
+        foreach ($aDefinitionLocations as $sPath) {
+            $this->loadDefinitions($sPath);
         }
 
         //  Put into a vague order
@@ -75,7 +71,9 @@ class AppNotification extends Base
 
     /**
      * Loads definitions located at $path
+     *
      * @param  string $path The path to load
+     *
      * @return void
      */
     protected function loadDefinitions($path)
@@ -85,7 +83,6 @@ class AppNotification extends Base
             include $path;
 
             if (!empty($config['notification_definitions'])) {
-
                 $this->notifications = array_merge($this->notifications, $config['notification_definitions']);
             }
         }
@@ -95,22 +92,19 @@ class AppNotification extends Base
 
     /**
      * Returns the notification defnintions, optionally limited per group
+     *
      * @param  string $grouping The group to limit to
+     *
      * @return array
      */
     public function getDefinitions($grouping = null)
     {
         if (is_null($grouping)) {
-
             return $this->notifications;
-
         } elseif (isset($this->notifications[$grouping])) {
-
             return $this->notifications[$grouping];
-
         } else {
-
-            return array();
+            return [];
         }
     }
 
@@ -118,9 +112,11 @@ class AppNotification extends Base
 
     /**
      * Gets emails associated with a particular group/key
+     *
      * @param  string  $key           The key to retrieve
      * @param  string  $grouping      The group the key belongs to
      * @param  boolean $force_refresh Whether to force a group refresh
+     *
      * @return array
      */
     public function get($key = null, $grouping = 'app', $force_refresh = false)
@@ -139,10 +135,10 @@ class AppNotification extends Base
             $oDb->where('grouping', $grouping);
             $notifications = $oDb->get($this->table)->result();
 
-            $this->emails[$grouping] = array();
+            $this->emails[$grouping] = [];
 
             foreach ($notifications as $setting) {
-                $this->emails[$grouping][ $setting->key ] = json_decode($setting->value);
+                $this->emails[$grouping][$setting->key] = json_decode($setting->value);
             }
         }
 
@@ -151,7 +147,7 @@ class AppNotification extends Base
         if (empty($key)) {
             return $this->emails[$grouping];
         } else {
-            return isset($this->emails[$grouping][$key]) ? $this->emails[$grouping][$key] : array();
+            return isset($this->emails[$grouping][$key]) ? $this->emails[$grouping][$key] : [];
         }
     }
 
@@ -160,9 +156,11 @@ class AppNotification extends Base
     /**
      * Set a group/key either by passing an array of key=>value pairs as the $key
      * or by passing a string to $key and setting $value
+     *
      * @param mixed  $key      The key to set, or an array of key => value pairs
      * @param string $grouping The grouping to store the keys under
      * @param mixed  $value    The data to store, only used if $key is a string
+     *
      * @return boolean
      */
     public function set($key, $grouping = 'app', $value = null)
@@ -171,11 +169,9 @@ class AppNotification extends Base
         $oDb->trans_begin();
 
         if (is_array($key)) {
-
             foreach ($key as $key => $value) {
                 $this->doSet($key, $grouping, $value);
             }
-
         } else {
             $this->doSet($key, $grouping, $value);
         }
@@ -193,16 +189,17 @@ class AppNotification extends Base
 
     /**
      * Inserts/Updates a group/key value
+     *
      * @param string $key      The key to set
      * @param string $grouping The key's grouping
      * @param mixed  $value    The value of the group/key
+     *
      * @return void
      */
     protected function doSet($key, $grouping, $value)
     {
         //  Check that it's a valid key/grouping pair
         if (!isset($this->notifications[$grouping]->options[$key])) {
-
             $this->setError($grouping . '/' . $key . ' is not a valid group/key pair.');
             return false;
         }
@@ -213,14 +210,11 @@ class AppNotification extends Base
         $oDb->where('key', $key);
         $oDb->where('grouping', $grouping);
         if ($oDb->count_all_results($this->table)) {
-
             $oDb->where('grouping', $grouping);
             $oDb->where('key', $key);
             $oDb->set('value', json_encode($value));
             $oDb->update($this->table);
-
         } else {
-
             $oDb->set('grouping', $grouping);
             $oDb->set('key', $key);
             $oDb->set('value', json_encode($value));
@@ -232,17 +226,18 @@ class AppNotification extends Base
 
     /**
      * Sends a notification to the email addresses associated with a particular key/grouping
+     *
      * @param  string $key      The key to send to
      * @param  string $grouping The key's grouping
      * @param  array  $data     An array of values to pass to the email template
      * @param  array  $override Override any of the definition values (this time only). Useful for defining custom email templates etc.
+     *
      * @return boolean
      */
-    public function notify($key, $grouping = 'app', $data = array(), $override = array())
+    public function notify($key, $grouping = 'app', $data = [], $override = [])
     {
         //  Check that it's a valid key/grouping pair
         if (!isset($this->notifications[$grouping]->options[$key])) {
-
             $this->setError($grouping . '/' . $key . ' is not a valid group/key pair.');
             return false;
         }
@@ -253,7 +248,6 @@ class AppNotification extends Base
         $emails = $this->get($key, $grouping);
 
         if (empty($emails)) {
-
             //  Notification disabled, silently fail
             return true;
         }
@@ -263,18 +257,14 @@ class AppNotification extends Base
 
         //  Overriding the definition?
         if (!empty($override) && is_array($override)) {
-
             foreach ($override as $or_key => $or_value) {
-
                 if (isset($definition->{$or_key})) {
-
                     $definition->{$or_key} = $or_value;
                 }
             }
         }
 
         if (empty($definition->email_tpl)) {
-
             $this->setError('No email template defined for ' . $grouping . '/' . $key);
             return false;
         }
@@ -287,23 +277,20 @@ class AppNotification extends Base
         $email->data = $data;
 
         if (!empty($definition->email_subject)) {
-
             $email->data['email_subject'] = $definition->email_subject;
         }
 
         if (!empty($definition->email_tpl)) {
-
             $email->data['template_body'] = $definition->email_tpl;
         }
 
         foreach ($emails as $e) {
 
-            log_message('debug', 'Sending notification (' . $grouping . '/' . $key . ') to ' . $e);
+            Factory::service('Logger')->line('Sending notification (' . $grouping . '/' . $key . ') to ' . $e);
 
             $email->to_email = $e;
 
             if (!$this->emailer->send($email, true)) {
-
                 $this->setError($this->emailer->lastError());
                 return false;
             }
