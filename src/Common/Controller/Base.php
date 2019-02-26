@@ -733,10 +733,7 @@ abstract class Base extends \MX_Controller
      */
     protected function setGlobalJs()
     {
-        $oAsset = Factory::service('Asset');
-
-        // --------------------------------------------------------------------------
-
+        $oAsset    = Factory::service('Asset');
         $sCustomJs = appSetting('site_custom_js', 'site');
         if (!empty($sCustomJs)) {
             $oAsset->inline($sCustomJs, 'JS');
@@ -770,6 +767,7 @@ abstract class Base extends \MX_Controller
      */
     protected function setGlobalCss()
     {
+        $oAsset     = Factory::service('Asset');
         $sCustomCss = appSetting('site_custom_css', 'site');
         if (!empty($sCustomCss)) {
             $oAsset->inline($sCustomCss, 'CSS');
