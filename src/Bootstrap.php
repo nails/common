@@ -174,12 +174,22 @@ final class Bootstrap
         Functions::define('DEPLOY_LOG_DIR', static::$sBaseDirectory . 'application/logs/');
 
         //  Email constants
-        Functions::define('APP_DEVELOPER_EMAIL', '');
-        Functions::define('EMAIL_OVERRIDE', '');
+        //  @todo (Pablo - 2019-02-26) - Set these within the email module
         Functions::define('DEPLOY_EMAIL_HOST', '127.0.0.1');
         Functions::define('DEPLOY_EMAIL_USER', '');
         Functions::define('DEPLOY_EMAIL_PASS', '');
         Functions::define('DEPLOY_EMAIL_PORT', 25);
+
+        /**
+         * On non-production environments control how email is routed (in order of preference):
+         *
+         * - EMAIL_OVERRIDE:      send _all_ email to a single address
+         * - EMAIL_WHITELIST:     send to only certain addresses (JSON array of addresses or regexes)
+         * - APP_DEVELOPER_EMAIL: send all email to the developer
+         */
+        Functions::define('EMAIL_OVERRIDE', '');
+        Functions::define('EMAIL_WHITELIST', '');
+        Functions::define('APP_DEVELOPER_EMAIL', '');
 
         //  Ensure the app's constants file is also loaded
         //  @todo (Pablo - 2018-11-16) - Remove reliance on this feature
@@ -201,7 +211,7 @@ final class Bootstrap
      * - Calls to __FILE__ have been replaced with static::$sEntryPoint
      * - Calls to define() have been replaced with calls to Functions::define()
      * - Not kicking off CodeIgniter (as it needs to be called in the global scope)
-
+     *
      * @param string $sSystemPath      The path to the CodeIgniter system directory
      * @param string $sApplicationPath The path to the CodeIgniter application directory
      */
