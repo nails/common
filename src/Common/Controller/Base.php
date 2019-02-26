@@ -469,7 +469,7 @@ abstract class Base extends \MX_Controller
         $oDefault       = $oLanguageModel->getDefault();
 
         if (empty($oDefault)) {
-            showFatalError('No default language has been set, or it\'s been set incorrectly.');
+            throw NailsException('No default language has been set, or it\'s been set incorrectly.');
         }
 
         Functions::define('APP_DEFAULT_LANG_CODE', $oDefault->code);
