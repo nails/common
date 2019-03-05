@@ -45,7 +45,7 @@ abstract class Base
         $sDocComment = null;
         $bIsConst    = false;
         foreach ($aTokens as $aToken) {
-            if (count($aToken) <= 1) {
+            if (!is_array($aToken) || count($aToken) <= 1) {
                 continue;
             }
 

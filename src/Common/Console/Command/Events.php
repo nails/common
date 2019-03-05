@@ -2,6 +2,7 @@
 
 namespace Nails\Common\Console\Command;
 
+use Nails\Common\Exception\EventException;
 use Nails\Components;
 use Nails\Console\Command\Base;
 use Symfony\Component\Console\Input\InputInterface;
@@ -54,9 +55,16 @@ class Events extends Base
         foreach ($aComponents as $oComponent) {
             $sClass = '\\' . $oComponent->namespace . 'Events';
             if (class_exists($sClass)) {
-                $aComponentEvents = call_user_func([$sClass, 'info']);
-                if (!empty($aComponentEvents)) {
-                    $aEvents[$oComponent->slug] = $aComponentEvents;
+
+                if (!classExtends($sClass, \Nails\Common\Events\Base::class)) {
+                    throw new EventException($sClass . ' must extend ' . \Nails\Common\Events\Base::class);
+                }
+
+                if (method_exists($sClass, 'info')) {
+                    $aComponentEvents = call_user_func([$sClass, 'info']);
+                    if (!empty($aComponentEvents)) {
+                        $aEvents[$oComponent->slug] = $aComponentEvents;
+                    }
                 }
             }
         }
