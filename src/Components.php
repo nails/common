@@ -441,4 +441,36 @@ final class Components
 
         return static::$aCache['DRIVER_INSTANCE'][$oDriver->slug];
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Attempt to detect which component a class belongs to
+     *
+     * @param mixed $mClass A class as a string or an object
+     *
+     * @return Component|null
+     * @throws \ReflectionException
+     */
+    public static function detectClassComponent($mClass): ?Component
+    {
+        $oReflect  = new \ReflectionClass($mClass);
+        $sPath     = $oReflect->getFileName();
+        $bIsVendor = (bool) preg_match('/^' . preg_quote(NAILS_APP_PATH . 'vendor', '/') . '/', $sPath);
+
+        if (!$bIsVendor) {
+            return static::getApp();
+        }
+
+        foreach (static::available() as $oComponent) {
+
+            if ($oComponent->slug === 'app') {
+                continue;
+            } elseif (preg_match('/^' . preg_quote($oComponent->path, '/') . '/', $sPath)) {
+                return $oComponent;
+            }
+        }
+
+        return null;
+    }
 }

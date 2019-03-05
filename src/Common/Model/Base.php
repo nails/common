@@ -14,10 +14,12 @@ namespace Nails\Common\Model;
 
 use Behat\Transliterator\Transliterator;
 use Nails\Common\Exception\ModelException;
+use Nails\Common\Factory\Component;
 use Nails\Common\Helper\ArrayHelper;
 use Nails\Common\Traits\Caching;
 use Nails\Common\Traits\ErrorHandling;
 use Nails\Common\Traits\GetCountCommon;
+use Nails\Components;
 use Nails\Factory;
 
 abstract class Base
@@ -2436,12 +2438,19 @@ abstract class Base
     protected function triggerEvent($sEvent, array $aData)
     {
         if ($sEvent) {
-            //  @todo (Pablo - 2018-02-05) - Auto detect the namespace?
-            if (empty(static::EVENT_NAMESPACE)) {
-                throw new ModelException(get_called_class() . '::EVENT_NAMESPACE is must be defined');
+
+            $oComponent = Components::detectClassComponent(get_called_class());
+
+            if (!empty($oComponent)) {
+                $sNamespace = $oComponent->slug;
+            } elseif (!empty(static::EVENT_NAMESPACE)) {
+                $sNamespace = static::EVENT_NAMESPACE;
+            } else {
+                throw new ModelException(get_called_class() . '::EVENT_NAMESPACE must be defined');
             }
+
             $oEventService = Factory::service('Event');
-            $oEventService->trigger($sEvent, static::EVENT_NAMESPACE, $aData);
+            $oEventService->trigger($sEvent, $sNamespace, $aData);
         }
     }
 
