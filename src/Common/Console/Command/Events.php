@@ -5,6 +5,7 @@ namespace Nails\Common\Console\Command;
 use Nails\Common\Exception\EventException;
 use Nails\Components;
 use Nails\Console\Command\Base;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -17,8 +18,10 @@ class Events extends Base
      */
     protected function configure()
     {
-        $this->setName('events');
-        $this->setDescription('Lists the events which are available to subscribe to');
+        $this
+            ->setName('events')
+            ->setDescription('Lists the events which are available to subscribe to')
+            ->addArgument('component', InputArgument::OPTIONAL, 'Filter by component');
     }
 
     // --------------------------------------------------------------------------
@@ -35,6 +38,7 @@ class Events extends Base
     {
         parent::execute($oInput, $oOutput);
 
+        $sFilter     = $this->oInput->getArgument('component');
         $aEvents     = [];
         $aComponents = array_merge(
             [
@@ -43,16 +47,15 @@ class Events extends Base
                     'slug'      => 'app',
                 ],
             ],
-            [
-                (object) [
-                    'namespace' => 'Nails\\Common\\',
-                    'slug'      => 'nails/common',
-                ],
-            ],
             Components::available()
         );
 
         foreach ($aComponents as $oComponent) {
+
+            if (!empty($sFilter) && $sFilter !== $oComponent->slug) {
+                continue;
+            }
+
             $sClass = '\\' . $oComponent->namespace . 'Events';
             if (class_exists($sClass)) {
 
@@ -69,13 +72,21 @@ class Events extends Base
             }
         }
 
-        $oOutput->writeln('The following events are available in this application:');
+        $oOutput->writeln('');
+
+        if (!empty($sFilter)) {
+            $oOutput->writeln('The following events are available for <info>' . $sFilter . '</info>:');
+        } else {
+            $oOutput->writeln('The following events are available in this application:');
+        }
 
         foreach ($aEvents as $sComponent => $aComponentEvents) {
             $oOutput->writeln('');
-            $oOutput->writeln('<comment>' . $sComponent . '</comment>');
-            $oOutput->writeln('<comment>' . str_repeat('-', strlen($sComponent)) . '</comment>');
-            $oOutput->writeln('');
+            if (empty($sFilter)) {
+                $oOutput->writeln('<comment>' . $sComponent . '</comment>');
+                $oOutput->writeln('<comment>' . str_repeat('-', strlen($sComponent)) . '</comment>');
+                $oOutput->writeln('');
+            }
             foreach ($aComponentEvents as $aEvent) {
                 $oOutput->writeln('  <info>' . $aEvent->constant . '</info>');
                 $oOutput->writeln('  ' . $aEvent->description);
