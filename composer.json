@@ -47,6 +47,9 @@
     },
     "extra": {
         "nails": {
+            "moduleName": "common",
+            "type": "module",
+            "namespace": "Nails\\Common\\",
             "autoload": {
                 "services": [
                     "ErrorHandler"
