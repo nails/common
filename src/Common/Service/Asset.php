@@ -37,6 +37,7 @@ class Asset
 
     /**
      * Construct the library
+     *
      * @return  void
      **/
     public function __construct()
@@ -85,9 +86,9 @@ class Asset
      * @param  string $sAssetLocation The asset's location
      * @param  string $sForceType     The asset's file type (e.g., JS or CSS)
      *
-     * @return object
+     * @return $this
      */
-    public function load($mAssets, $sAssetLocation = 'APP', $sForceType = null)
+    public function load($mAssets, $sAssetLocation = 'APP', $sForceType = null): self
     {
         //  Cast as an array
         $aAssets = (array) $mAssets;
@@ -1003,6 +1004,7 @@ class Asset
 
     /**
      * Clears all loaded assets
+     *
      * @return object
      */
     public function clear()
@@ -1019,6 +1021,7 @@ class Asset
 
     /**
      * Returns an object containing all loaded assets, useful for debugging.
+     *
      * @return stdClass
      */
     public function getLoaded()
