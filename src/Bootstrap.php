@@ -590,4 +590,14 @@ final class Bootstrap
     {
         static::$aNailsControllerData[$sKey] = $mValue;
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Handles system shutdown
+     */
+    public static function shutdown()
+    {
+        static::$oEventService->trigger(Events::SYSTEM_SHUTOWN);
+    }
 }

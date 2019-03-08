@@ -31,4 +31,9 @@ class Events extends Base
      * Fired when the system is ready and the controller is about to be constructed
      */
     const SYSTEM_READY = 'SYSTEM:READY';
+
+    /**
+     * Fired when the systems shutsdown, this is the last event to be fired
+     */
+    const SYSTEM_SHUTOWN = 'SYSTEM:SHUTDOWN';
 }
