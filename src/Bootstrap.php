@@ -11,9 +11,11 @@
 
 namespace Nails;
 
+use Nails\Common\Events;
 use Nails\Components;
 use Nails\Environment;
 use Nails\Common\Service\ErrorHandler;
+use Nails\Common\Service\Event;
 
 final class Bootstrap
 {
@@ -42,6 +44,13 @@ final class Bootstrap
      */
     public static $aNailsControllerData = [];
 
+    /**
+     * The Event Service instance
+     *
+     * @var Event
+     */
+    public static $oEventService;
+
     // --------------------------------------------------------------------------
 
     /**
@@ -55,6 +64,7 @@ final class Bootstrap
         static::loadConfig('deploy');
         static::setNailsConstants();
         static::setCodeIgniterConstants();
+        static::setupEventService();
         static::setRuntime();
         static::loadFunctions();
         static::checkRoutes();
@@ -174,22 +184,12 @@ final class Bootstrap
         Functions::define('DEPLOY_LOG_DIR', static::$sBaseDirectory . 'application/logs/');
 
         //  Email constants
-        //  @todo (Pablo - 2019-02-26) - Set these within the email module
+        Functions::define('APP_DEVELOPER_EMAIL', '');
+        Functions::define('EMAIL_OVERRIDE', '');
         Functions::define('DEPLOY_EMAIL_HOST', '127.0.0.1');
         Functions::define('DEPLOY_EMAIL_USER', '');
         Functions::define('DEPLOY_EMAIL_PASS', '');
         Functions::define('DEPLOY_EMAIL_PORT', 25);
-
-        /**
-         * On non-production environments control how email is routed (in order of preference):
-         *
-         * - EMAIL_OVERRIDE:      send _all_ email to a single address
-         * - EMAIL_WHITELIST:     send to only certain addresses (JSON array of addresses or regexes)
-         * - APP_DEVELOPER_EMAIL: send all email to the developer
-         */
-        Functions::define('EMAIL_OVERRIDE', '');
-        Functions::define('EMAIL_WHITELIST', '');
-        Functions::define('APP_DEVELOPER_EMAIL', '');
 
         //  Ensure the app's constants file is also loaded
         //  @todo (Pablo - 2018-11-16) - Remove reliance on this feature
@@ -416,6 +416,21 @@ final class Bootstrap
         }
 
         Functions::define('VIEWPATH', $view_folder . DIRECTORY_SEPARATOR);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Set up the global Event service
+     */
+    public static function setupEventService()
+    {
+        if (class_exists('\App\Common\Service\Event')) {
+            static::$oEventService = new \App\Common\Service\Event();
+        } else {
+            static::$oEventService = new Event();
+        }
+        static::$oEventService->trigger(Events::SYSTEM_INIT);
     }
 
     // --------------------------------------------------------------------------

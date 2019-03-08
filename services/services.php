@@ -57,11 +57,7 @@ return [
             }
         },
         'Event'          => function () {
-            if (class_exists('\App\Common\Service\Event')) {
-                return new \App\Common\Service\Event();
-            } else {
-                return new \Nails\Common\Service\Event();
-            }
+            return \Nails\Bootstrap::$oEventService;
         },
         'FormValidation' => function () {
             if (class_exists('\App\Common\Service\FormValidation')) {
