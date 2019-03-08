@@ -11,6 +11,7 @@
 
 namespace Nails;
 
+use Nails\Common\Driver\Base;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Factory\Component;
 use Nails\Common\Helper\ArrayHelper;
@@ -21,7 +22,7 @@ final class Components
     /**
      * The component cache
      *
-     * @var array
+     * @var Component[]
      */
     private static $aCache = [];
 
@@ -32,9 +33,9 @@ final class Components
      *
      * @param bool $bUseCache Whether to use the cache or not
      *
-     * @return array
+     * @return Component[]
      */
-    public static function available($bUseCache = true)
+    public static function available($bUseCache = true): array
     {
         /**
          * If we already know which Nails components are available then return that, save
@@ -183,9 +184,9 @@ final class Components
      *
      * @param string $sType The type of component to return
      *
-     * @return array
+     * @return Component[]
      */
-    public static function filter($sType)
+    public static function filter($sType): array
     {
         if (!isset(static::$aCache[$sType])) {
 
@@ -209,9 +210,9 @@ final class Components
      *
      * @param string $sSlug The component's slug
      *
-     * @return array
+     * @return Component
      */
-    public static function getBySlug($sSlug)
+    public static function getBySlug($sSlug): ?Component
     {
         $aComponents = static::available();
 
@@ -233,7 +234,7 @@ final class Components
      *
      * @return Component
      */
-    public static function getApp($bUseCache = true)
+    public static function getApp($bUseCache = true): Component
     {
         //  If we have already fetched this data then don't get it again
         if ($bUseCache && isset(static::$aCache['APP'])) {
@@ -295,7 +296,7 @@ final class Components
      *
      * @return bool
      */
-    public static function exists($sSlug)
+    public static function exists($sSlug): bool
     {
         $aModules = static::modules();
 
@@ -313,9 +314,9 @@ final class Components
     /**
      * Returns all registered modules
      *
-     * @return array
+     * @return Component[]
      */
-    public static function modules()
+    public static function modules(): array
     {
         return static::filter('module');
     }
@@ -328,9 +329,9 @@ final class Components
      * @param string $sModule The module to filter for
      * @param string $sSubTyp The sub-type to filter by
      *
-     * @return array
+     * @return Component[]
      */
-    public static function skins($sModule, $sSubType = '')
+    public static function skins($sModule, $sSubType = ''): array
     {
         $aSkins = static::filter('skin');
         $aOut   = [];
@@ -364,9 +365,9 @@ final class Components
      * @param string $sModule The module to filter for
      * @param string $sSubTyp The sub-type to filter by
      *
-     * @return array
+     * @return Component[]
      */
-    public static function drivers($sModule, $sSubType = '')
+    public static function drivers($sModule, $sSubType = ''): array
     {
         $aDrivers = static::filter('driver');
         $aOut     = [];
@@ -392,9 +393,9 @@ final class Components
      * @param  object $oDriver The Driver definition
      *
      * @throws NailsException
-     * @return object
+     * @return Base
      */
-    public static function getDriverInstance($oDriver)
+    public static function getDriverInstance($oDriver): Base
     {
         //  Allow for driver requesting as a string
         if (is_string($oDriver)) {

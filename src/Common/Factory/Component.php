@@ -14,6 +14,28 @@ namespace Nails\Common\Factory;
 
 use Nails\Common\Helper\ArrayHelper;
 
+/**
+ * Class Component
+ *
+ * @package Nails\Common\Factory
+ *
+ * @property string    $slug
+ * @property string    $namespace
+ * @property string    $name
+ * @property string    $description
+ * @property string    $homepage
+ * @property array     $authors
+ * @property string    $path
+ * @property string    $relativePath
+ * @property string    $moduleName
+ * @property \stdClass $data
+ * @property string    $type
+ * @property string    $subType
+ * @property string    $forModule
+ * @property \stdClass $autoload
+ * @property \stdClass $scripts
+ * @property bool      $fromApp
+ */
 final class Component
 {
     private $slug;
