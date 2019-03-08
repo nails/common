@@ -87,13 +87,24 @@ class Events extends Base
                 $oOutput->writeln('<comment>' . str_repeat('-', strlen($sComponent)) . '</comment>');
                 $oOutput->writeln('');
             }
-            foreach ($aComponentEvents as $aEvent) {
-                $oOutput->writeln('  <info>' . $aEvent->constant . '</info>');
-                $oOutput->writeln('  ' . $aEvent->description);
+            foreach ($aComponentEvents as $oEvent) {
+                $oOutput->writeln('  <info>' . $oEvent->constant . '</info>');
 
-                if (!empty($aEvent->arguments)) {
+                if (strlen($oEvent->description) > 100) {
+                    $sDescription = wordwrap($oEvent->description, 100);
+                    $aDescription = explode("\n", $sDescription);
+                    $aDescription = array_map('trim', $aDescription);
+                } else {
+                    $aDescription = [$oEvent->description];
+                }
+
+                foreach ($aDescription as $sLine) {
+                    $oOutput->writeln('  ' . $sLine);
+                }
+
+                if (!empty($oEvent->arguments)) {
                     $sParamPrefix = '  ↳ <comment>@param</comment> ';
-                    $oOutput->writeln($sParamPrefix . implode("\n" . $sParamPrefix, $aEvent->arguments));
+                    $oOutput->writeln($sParamPrefix . implode("\n" . $sParamPrefix, $oEvent->arguments));
                 }
                 $oOutput->writeln('');
             }
