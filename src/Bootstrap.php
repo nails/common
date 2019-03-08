@@ -44,13 +44,6 @@ final class Bootstrap
      */
     public static $aNailsControllerData = [];
 
-    /**
-     * The Event Service instance
-     *
-     * @var Event
-     */
-    public static $oEventService;
-
     // --------------------------------------------------------------------------
 
     /**
@@ -64,7 +57,6 @@ final class Bootstrap
         static::loadConfig('deploy');
         static::setNailsConstants();
         static::setCodeIgniterConstants();
-        static::setupEventService();
         static::setRuntime();
         static::loadFunctions();
         static::checkRoutes();
@@ -72,6 +64,8 @@ final class Bootstrap
 
         Factory::setup();
         Factory::autoload();
+        Factory::service('Event')
+            ->trigger(Events::SYSTEM_STARTUP);
     }
 
     // --------------------------------------------------------------------------
@@ -421,21 +415,6 @@ final class Bootstrap
     // --------------------------------------------------------------------------
 
     /**
-     * Set up the global Event service
-     */
-    public static function setupEventService()
-    {
-        if (class_exists('\App\Common\Service\Event')) {
-            static::$oEventService = new \App\Common\Service\Event();
-        } else {
-            static::$oEventService = new Event();
-        }
-        static::$oEventService->trigger(Events::SYSTEM_INIT);
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Configure runtime
      */
     private static function setRuntime()
@@ -598,6 +577,7 @@ final class Bootstrap
      */
     public static function shutdown()
     {
-        static::$oEventService->trigger(Events::SYSTEM_SHUTOWN);
+        Factory::service('Event')
+            ->trigger(Events::SYSTEM_SHUTOWN);
     }
 }

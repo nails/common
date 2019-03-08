@@ -38,14 +38,6 @@ abstract class Base extends \MX_Controller
 
         // --------------------------------------------------------------------------
 
-        //  Setup Events
-        $oEventService = Factory::service('Event');
-
-        //  Call the SYSTEM:STARTUP event, the earliest event the app can bind to.
-        $oEventService->trigger(Events::SYSTEM_STARTUP, 'nails/common');
-
-        // --------------------------------------------------------------------------
-
         $this->maintenanceMode();
         $this->setErrorReporting();
         $this->setContentType();
@@ -89,7 +81,8 @@ abstract class Base extends \MX_Controller
         // --------------------------------------------------------------------------
 
         //  Call the SYSTEM:READY event, the system is all geared up and ready to go
-        $oEventService->trigger(Events::SYSTEM_READY, 'nails/common');
+        Factory::service('Event')
+            ->trigger(Events::SYSTEM_READY);
     }
 
     // --------------------------------------------------------------------------

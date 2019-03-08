@@ -57,7 +57,11 @@ return [
             }
         },
         'Event'          => function () {
-            return \Nails\Bootstrap::$oEventService;
+            if (class_exists('\App\Common\Service\Event')) {
+                return new \App\Common\Service\Event();
+            } else {
+                return new \Nails\Common\Service\Event();
+            }
         },
         'FormValidation' => function () {
             if (class_exists('\App\Common\Service\FormValidation')) {
@@ -78,6 +82,15 @@ return [
                 return new \App\Common\Service\Input();
             } else {
                 return new \Nails\Common\Service\Input();
+            }
+        },
+        'Locale'         => function (
+            \Nails\Common\Factory\Locale $oLocale = null
+        ) {
+            if (class_exists('\App\Common\Service\Locale')) {
+                return new \App\Common\Service\Locale($oLocale);
+            } else {
+                return new \Nails\Common\Service\Locale($oLocale);
             }
         },
         'Logger'         => function () {
@@ -265,6 +278,17 @@ return [
                 return new \App\Common\Factory\HttpResponse($oClient);
             } else {
                 return new \Nails\Common\Factory\HttpResponse($oClient);
+            }
+        },
+        'Locale'            => function (
+            string $sLanguage = null,
+            string $sRegion = null,
+            string $sScript = null
+        ) {
+            if (class_exists('\App\Common\Events\Subscription')) {
+                return new \App\Common\Factory\Locale($sLanguage, $sRegion, $sScript);
+            } else {
+                return new \Nails\Common\Factory\Locale($sLanguage, $sRegion, $sScript);
             }
         },
     ],

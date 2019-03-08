@@ -15,25 +15,29 @@ class Subscription
 {
     /**
      * The name of the event being subscribed to
+     *
      * @var string|array
      */
     protected $mEvent;
 
     /**
      * The namespace of the event being subscribed to
+     *
      * @var string
      */
-    protected $sNamespace;
+    protected $sNamespace = 'nails/common';
 
     /**
      * The callback to execute when triggered
+     *
      * @var callable
      */
     protected $cCallback;
 
     /**
      * Whether the subscription should only be fired once
-     * @var boolean
+     *
+     * @var bool
      */
     protected $bOnce;
 
@@ -46,7 +50,7 @@ class Subscription
      *
      * @return $this
      */
-    public function setEvent($mEvent)
+    public function setEvent($mEvent): self
     {
         $this->mEvent = $mEvent;
         return $this;
@@ -56,6 +60,7 @@ class Subscription
 
     /**
      * Get the subscription event name
+     *
      * @return mixed
      */
     public function getEvent()
@@ -72,7 +77,7 @@ class Subscription
      *
      * @return $this
      */
-    public function setNamespace($sNamespace)
+    public function setNamespace(string $sNamespace): self
     {
         $this->sNamespace = $sNamespace;
         return $this;
@@ -82,9 +87,10 @@ class Subscription
 
     /**
      * Get the subscription event namespace
-     * @return mixed
+     *
+     * @return string
      */
-    public function getNamespace()
+    public function getNamespace(): string
     {
         return $this->sNamespace;
     }
@@ -98,7 +104,7 @@ class Subscription
      *
      * @return $this
      */
-    public function setCallback($cCallback)
+    public function setCallback($cCallback): self
     {
         $this->cCallback = $cCallback;
         return $this;
@@ -108,6 +114,7 @@ class Subscription
 
     /**
      * Get the subscription event callback
+     *
      * @return mixed
      */
     public function getCallback()
@@ -120,13 +127,13 @@ class Subscription
     /**
      * Set the subscription callback
      *
-     * @param boolean $bOnce Whether the subscription should only be fired once
+     * @param bool $bOnce Whether the subscription should only be fired once
      *
      * @return $this
      */
-    public function setOnce($bOnce = true)
+    public function setOnce(bool $bOnce = true): self
     {
-        $this->bOnce = (bool) $bOnce;
+        $this->bOnce = $bOnce;
         return $this;
     }
 
@@ -134,9 +141,10 @@ class Subscription
 
     /**
      * Returns whether the subscription should be fired more than once
-     * @return boolean
+     *
+     * @return bool
      */
-    public function isOnce()
+    public function isOnce(): bool
     {
         return (bool) $this->bOnce;
     }
