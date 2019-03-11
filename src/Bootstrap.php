@@ -180,6 +180,7 @@ final class Bootstrap
         //  Email constants
         Functions::define('APP_DEVELOPER_EMAIL', '');
         Functions::define('EMAIL_OVERRIDE', '');
+        Functions::define('EMAIL_WHITELIST', '');
         Functions::define('DEPLOY_EMAIL_HOST', '127.0.0.1');
         Functions::define('DEPLOY_EMAIL_USER', '');
         Functions::define('DEPLOY_EMAIL_PASS', '');
