@@ -7,7 +7,7 @@
     "analyze": true,
     "license": "MIT",
     "devDependencies": {
-        "css-loader": "^2.1.0",
+        "css-loader": "^2.1.1",
         "autoprefixer": "^9.4.10",
         "mini-css-extract-plugin": "^0.5.0",
         "node-sass": "^4.11.0",
