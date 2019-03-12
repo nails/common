@@ -81,8 +81,8 @@ class Locale
     /**
      * Locale constructor.
      *
-     * @param Input                            $oInput  The input service
-     * @param Nails\Common\Factory\Locale|null $oLocale The locale to use, automatically detected
+     * @param Input                             $oInput  The input service
+     * @param \Nails\Common\Factory\Locale|null $oLocale The locale to use, automatically detected
      */
     public function __construct(
         Input $oInput,
