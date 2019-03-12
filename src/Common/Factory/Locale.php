@@ -2,6 +2,10 @@
 
 namespace Nails\Common\Factory;
 
+use Nails\Common\Factory\Locale\Language;
+use Nails\Common\Factory\Locale\Region;
+use Nails\Common\Factory\Locale\Script;
+
 /**
  * Class Locale
  *
@@ -12,37 +16,37 @@ class Locale
     /**
      * The locale's language
      *
-     * @var string
+     * @var Language
      */
-    protected $sLanguage;
+    protected $oLanguage;
 
     /**
      * The locale's region
      *
-     * @var string
+     * @var Region
      */
-    protected $sRegion;
+    protected $oRegion;
 
     /**
      * The locale's script
      *
-     * @var string
+     * @var Script
      */
-    protected $sScript;
+    protected $oScript;
 
     // --------------------------------------------------------------------------
 
     /**
      * Locale constructor.
      *
-     * @param string $sLanguage The language to set
+     * @param string $oLanguage The language to set
      */
-    public function __construct(string $sLanguage = null, string $sRegion = null, string $sScript = null)
+    public function __construct(Language $oLanguage = null, Region $oRegion = null, Script $oScript = null)
     {
         $this
-            ->setLanguage($sLanguage)
-            ->setRegion($sRegion)
-            ->setScript($sScript);
+            ->setLanguage($oLanguage)
+            ->setRegion($oRegion)
+            ->setScript($oScript);
     }
 
     // --------------------------------------------------------------------------
@@ -50,13 +54,13 @@ class Locale
     /**
      * Set the locale's language
      *
-     * @param string|null $sLanguage The language to set
+     * @param Language|null $oLanguage The language to set
      *
      * @return $this
      */
-    public function setLanguage(string $sLanguage = null): self
+    public function setLanguage(Language $oLanguage = null): self
     {
-        $this->sLanguage = $sLanguage;
+        $this->oLanguage = $oLanguage;
         return $this;
     }
 
@@ -65,11 +69,11 @@ class Locale
     /**
      * Returns the locale's language
      *
-     * @return string|null
+     * @return Language|null
      */
-    public function getLanguage(): ?string
+    public function getLanguage(): ?Language
     {
-        return $this->sLanguage;
+        return $this->oLanguage;
     }
 
     // --------------------------------------------------------------------------
@@ -77,13 +81,13 @@ class Locale
     /**
      * Set the locale's region
      *
-     * @param string|null $sRegion The region to set
+     * @param Region|null $oRegion The region to set
      *
      * @return $this
      */
-    public function setRegion(string $sRegion = null): self
+    public function setRegion(Region $oRegion = null): self
     {
-        $this->sRegion = $sRegion;
+        $this->oRegion = $oRegion;
         return $this;
     }
 
@@ -92,11 +96,11 @@ class Locale
     /**
      * Returns the locale's region
      *
-     * @return string|null
+     * @return Region|null
      */
-    public function getRegion(): ?string
+    public function getRegion(): ?Region
     {
-        return $this->sRegion;
+        return $this->oRegion;
     }
 
     // --------------------------------------------------------------------------
@@ -104,13 +108,13 @@ class Locale
     /**
      * Set the locale's script
      *
-     * @param string|null $sScript The script to set
+     * @param Script|null $oScript The script to set
      *
      * @return $this
      */
-    public function setScript(string $sScript = null): self
+    public function setScript(Script $oScript = null): self
     {
-        $this->sScript = $sScript;
+        $this->oScript = $oScript;
         return $this;
     }
 
@@ -119,11 +123,11 @@ class Locale
     /**
      * Returns the locale's script
      *
-     * @return string|null
+     * @return Script|null
      */
-    public function getScript(): ?string
+    public function getScript(): ?Script
     {
-        return $this->sScript;
+        return $this->oScript;
     }
 
     // --------------------------------------------------------------------------
@@ -138,9 +142,9 @@ class Locale
         return implode(
             '_',
             array_filter([
-                $this->getLanguage(),
-                $this->getRegion(),
-                $this->getScript(),
+                (string) $this->getLanguage(),
+                (string) $this->getRegion(),
+                (string) $this->getScript(),
             ])
         );
     }

@@ -85,12 +85,21 @@ return [
             }
         },
         'Locale'         => function (
-            \Nails\Common\Factory\Locale $oLocale = null
+            \Nails\Common\Factory\Locale $oLocale = null,
+            \Nails\Common\Service\Input $oInput = null
         ) {
+            $oInput = $oInput ?? \Nails\Factory::service('Input');
+
             if (class_exists('\App\Common\Service\Locale')) {
-                return new \App\Common\Service\Locale($oLocale);
+                return new \App\Common\Service\Locale(
+                    $oInput,
+                    $oLocale
+                );
             } else {
-                return new \Nails\Common\Service\Locale($oLocale);
+                return new \Nails\Common\Service\Locale(
+                    $oInput,
+                    $oLocale
+                );
             }
         },
         'Logger'         => function () {
@@ -281,14 +290,35 @@ return [
             }
         },
         'Locale'            => function (
-            string $sLanguage = null,
-            string $sRegion = null,
-            string $sScript = null
+            \Nails\Common\Factory\Locale\Language $oLanguage = null,
+            \Nails\Common\Factory\Locale\Region $oRegion = null,
+            \Nails\Common\Factory\Locale\Script $oScript = null
         ) {
-            if (class_exists('\App\Common\Events\Subscription')) {
-                return new \App\Common\Factory\Locale($sLanguage, $sRegion, $sScript);
+            if (class_exists('\App\Common\Factory\Locale')) {
+                return new \App\Common\Factory\Locale($oLanguage, $oRegion, $oScript);
             } else {
-                return new \Nails\Common\Factory\Locale($sLanguage, $sRegion, $sScript);
+                return new \Nails\Common\Factory\Locale($oLanguage, $oRegion, $oScript);
+            }
+        },
+        'LocaleLanguage'    => function (string $sLabel = '') {
+            if (class_exists('\App\Common\Factory\Locale\Language')) {
+                return new \App\Common\Factory\Locale\Language($sLabel);
+            } else {
+                return new \Nails\Common\Factory\Locale\Language($sLabel);
+            }
+        },
+        'LocaleRegion'      => function (string $sLabel = '') {
+            if (class_exists('\App\Common\Factory\Locale\Region')) {
+                return new \App\Common\Factory\Locale\Region($sLabel);
+            } else {
+                return new \Nails\Common\Factory\Locale\Region($sLabel);
+            }
+        },
+        'LocaleScript'      => function (string $sLabel = '') {
+            if (class_exists('\App\Common\Factory\Locale\Script')) {
+                return new \App\Common\Factory\Locale\Script($sLabel);
+            } else {
+                return new \Nails\Common\Factory\Locale\Script($sLabel);
             }
         },
     ],
