@@ -61,7 +61,7 @@ class Detect extends Subscription
             }
 
             //  Update the $_SERVER values so the rest of the system continues as normal
-            foreach (['PATH_INFO', 'REQUEST_URL'] as $sKey) {
+            foreach (['PATH_INFO', 'REQUEST_URI'] as $sKey) {
                 if (array_key_exists($sKey, $_SERVER)) {
                     $_SERVER[$sKey] = '/' . $oUrl->url;
                 }
