@@ -238,7 +238,7 @@ class Model extends BaseMaker
 
             if ($this->confirm('Continue?', true)) {
 
-                $sServiceDefinitions = '';
+                $aServiceDefinitions = [];
                 foreach ($aModelData as $oModel) {
 
                     $oOutput->writeln('');
@@ -270,7 +270,7 @@ class Model extends BaseMaker
                         str_repeat(' ', $this->iServicesIndent) . '    return new ' . $oModel->class_path . '();',
                         str_repeat(' ', $this->iServicesIndent) . '},',
                     ];
-                    $sServiceDefinitions .= implode("\n", $aDefinition) . "\n";
+                    $aServiceDefinitions[] = implode("\n", $aDefinition);
 
                     //  Create admin
                     if (!$bSkipAdmin) {
