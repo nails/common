@@ -47,18 +47,46 @@ class Locale
     const COOKIE_NAME = 'locale';
 
     /**
-     * The pattern used to filter out URL based locale
-     *
-     * @var string
-     */
-    const URL_REGEX = '/^([a-z]{2})(\/.*|$)/';
-
-    /**
      * The supported languages by the system
      *
-     * @var array
+     * @var string[]
      */
     const SUPPORTED_LANGUAGES = [self::DEFAULT_LANGUAGE];
+
+    /**
+     * Enable locale detection via the request header
+     *
+     * @var bool
+     */
+    const ENABLE_SNIFF_HEADER = true;
+
+    /**
+     * Enable locale detection via the active user
+     *
+     * @var bool
+     */
+    const ENABLE_SNIFF_USER = true;
+
+    /**
+     * Enable locale detection via the URL (i.e. /{language}
+     *
+     * @var bool
+     */
+    const ENABLE_SNIFF_URL = true;
+
+    /**
+     * Enable locale detection via a cookie
+     *
+     * @var bool
+     */
+    const ENABLE_SNIFF_COOKIE = true;
+
+    /**
+     * Enable locale detection via a query parameter
+     *
+     * @var bool
+     */
+    const ENABLE_SNIFF_QUERY = true;
 
     // --------------------------------------------------------------------------
 
@@ -112,11 +140,11 @@ class Locale
 
         $oLocale = $this->getDefautLocale();
         $this
-            ->detectFromHeader($oLocale)
-            ->detectFromActiveUser($oLocale)
-            ->detectFromUrl($oLocale)
-            ->detectFromCookie($oLocale)
-            ->detectFromQuery($oLocale);
+            ->sniffHeader($oLocale)
+            ->sniffActiveUser($oLocale)
+            ->sniffUrl($oLocale)
+            ->sniffCookie($oLocale)
+            ->sniffQuery($oLocale);
 
         return $this
             ->set($oLocale)
@@ -132,12 +160,14 @@ class Locale
      *
      * @return $this
      */
-    protected function detectFromHeader(\Nails\Common\Factory\Locale &$oLocale)
+    protected function sniffHeader(\Nails\Common\Factory\Locale &$oLocale)
     {
-        $this->setFromString(
-            $oLocale,
-            $this->oInput->server('HTTP_ACCEPT_LANGUAGE') ?? ''
-        );
+        if (static::ENABLE_SNIFF_HEADER) {
+            $this->setFromString(
+                $oLocale,
+                $this->oInput->server('HTTP_ACCEPT_LANGUAGE') ?? ''
+            );
+        }
 
         return $this;
     }
@@ -151,12 +181,15 @@ class Locale
      *
      * @return $this
      */
-    protected function detectFromActiveUser(\Nails\Common\Factory\Locale &$oLocale)
+    protected function sniffActiveUser(\Nails\Common\Factory\Locale &$oLocale)
     {
-        $this->setFromString(
-            $oLocale,
-            activeUser('locale') ?? ''
-        );
+        if (static::ENABLE_SNIFF_USER) {
+            $this->setFromString(
+                $oLocale,
+                activeUser('locale') ?? ''
+            );
+        }
+
         return $this;
     }
 
@@ -169,19 +202,22 @@ class Locale
      *
      * @return $this
      */
-    protected function detectFromUrl(\Nails\Common\Factory\Locale &$oLocale)
+    protected function sniffUrl(\Nails\Common\Factory\Locale &$oLocale)
     {
-        //  Manually query the URL as CI might not be available
-        $sUrl = preg_replace(
-            '/\/index\.php\/(.*)/',
-            '$1',
-            $this->oInput->server('PHP_SELF')
-        );
+        if (static::ENABLE_SNIFF_URL) {
 
-        preg_match(static::URL_REGEX, $sUrl, $aMatches);
-        $sLanguage = !empty($aMatches[1]) ? $aMatches[1] : '';
+            //  Manually query the URL as CI might not be available
+            $sUrl = preg_replace(
+                '/\/index\.php\/(.*)/',
+                '$1',
+                $this->oInput->server('PHP_SELF')
+            );
 
-        $this->setFromString($oLocale, $sLanguage);
+            preg_match($this->getUrlRegex(), $sUrl, $aMatches);
+            $sLanguage = !empty($aMatches[1]) ? $aMatches[1] : '';
+
+            $this->setFromString($oLocale, $sLanguage);
+        }
 
         return $this;
     }
@@ -195,12 +231,14 @@ class Locale
      *
      * @return $this
      */
-    protected function detectFromCookie(\Nails\Common\Factory\Locale &$oLocale)
+    protected function sniffCookie(\Nails\Common\Factory\Locale &$oLocale)
     {
-        $this->setFromString(
-            $oLocale,
-            $this->oInput->get(static::COOKIE_NAME) ?? null
-        );
+        if (static::ENABLE_SNIFF_COOKIE) {
+            $this->setFromString(
+                $oLocale,
+                $this->oInput->get(static::COOKIE_NAME) ?? null
+            );
+        }
 
         return $this;
     }
@@ -214,12 +252,14 @@ class Locale
      *
      * @return $this
      */
-    protected function detectFromQuery(\Nails\Common\Factory\Locale &$oLocale)
+    protected function sniffQuery(\Nails\Common\Factory\Locale &$oLocale)
     {
-        $this->setFromString(
-            $oLocale,
-            $this->oInput->get(static::QUERY_PARAM) ?? null
-        );
+        if (static::ENABLE_SNIFF_QUERY) {
+            $this->setFromString(
+                $oLocale,
+                $this->oInput->get(static::QUERY_PARAM) ?? null
+            );
+        }
 
         return $this;
     }
@@ -264,7 +304,7 @@ class Locale
      *
      * @param string $sLocale The string to parse
      *
-     * @return array
+     * @return string[]
      */
     protected static function parseLocaleString(?string $sLocale): array
     {
@@ -322,10 +362,22 @@ class Locale
     /**
      * Returns the supported languages for this system
      *
-     * @return array
+     * @return string[]
      */
     public function getSupportedLanguages(): array
     {
         return static::SUPPORTED_LANGUAGES;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns a regex suitable for detecting a language flag at the beginning of the URL
+     *
+     * @return string
+     */
+    public function getUrlRegex(): string
+    {
+        return '/^(' . implode('|', $this->getSupportedLanguages()) . ')(\/.*|$)/';
     }
 }
