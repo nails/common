@@ -4,6 +4,7 @@ namespace Nails\Common\Event\Listener\Locale;
 
 use Nails\Common\Events;
 use Nails\Common\Events\Subscription;
+use Nails\Factory;
 
 /**
  * Class Detect
