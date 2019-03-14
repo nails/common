@@ -322,4 +322,20 @@ return [
             }
         },
     ],
+    'resources'  => [
+        'ExpandableField' => function () {
+            if (class_exists('\App\Common\Resource\ExpandableField')) {
+                return new \App\Common\Resource\ExpandableField();
+            } else {
+                return new \Nails\Common\Resource\ExpandableField();
+            }
+        },
+        'Resource' => function (\stdClass $oObj) {
+            if (class_exists('\App\Common\Resource')) {
+                return new \App\Common\Resource($oObj);
+            } else {
+                return new \Nails\Common\Resource($oObj);
+            }
+        },
+    ],
 ];

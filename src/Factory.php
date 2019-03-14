@@ -134,6 +134,29 @@ class Factory
                         ->factory($cWrapper);
                 }
             }
+
+            // --------------------------------------------------------------------------
+
+            /**
+             * FACTORIES
+             * All factories are wrapped in a closure, this is so that on fetch we can
+             * pass in any additional arguments as parameters which can be used in the
+             * item's constructor
+             */
+            if (!empty($aComponentServices['resources'])) {
+                if (empty(self::$aContainers[$sComponentName]['resources'])) {
+                    self::$aContainers[$sComponentName]['resources'] = new Container();
+                }
+                foreach ($aComponentServices['resources'] as $sKey => $cCallable) {
+
+                    $cWrapper = function () use ($cCallable) {
+                        return $cCallable;
+                    };
+
+                    self::$aContainers[$sComponentName]['resources'][$sKey] = self::$aContainers[$sComponentName]['factories']
+                        ->factory($cWrapper);
+                }
+            }
         }
     }
 
@@ -342,6 +365,25 @@ class Factory
     // --------------------------------------------------------------------------
 
     /**
+     * Return a resource from the container.
+     *
+     * @param string $sResourceName  The resource name
+     * @param string $sComponentName The name of the component which provides the resource
+     *
+     * @return mixed
+     * @throws FactoryException
+     */
+    public static function resource($sResourceName, $sComponentName = '')
+    {
+        return call_user_func_array(
+            self::getService('resources', $sResourceName, $sComponentName),
+            array_slice(func_get_args(), 2)
+        );
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Load a helper file
      *
      * @param string $sHelperName    The helper name
@@ -418,15 +460,15 @@ class Factory
 
         if (!array_key_exists($sComponentName, self::$aContainers)) {
             throw new FactoryException(
-                'No containers registered for "' . $sComponentName . '"'
+                'No containers registered for ' . $sComponentName
             );
         } elseif (!array_key_exists($sServiceType, self::$aContainers[$sComponentName])) {
             throw new FactoryException(
-                'No "' . $sServiceType . '" containers registered for "' . $sComponentName . '"'
+                'No ' . $sServiceType . ' containers registered for ' . $sComponentName
             );
         } elseif (!self::$aContainers[$sComponentName][$sServiceType]->offsetExists($sServiceName)) {
             throw new FactoryException(
-                ucfirst($sServiceType) . ' "' . $sServiceName . '" is not provided by component "' . $sComponentName . '"'
+                ucfirst($sServiceType) . '::' . $sServiceName . ' is not provided by ' . $sComponentName
             );
         }
 

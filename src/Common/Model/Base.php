@@ -136,9 +136,23 @@ abstract class Base
     /**
      * When true, the model will not attempt to automatically generate a slug when updating
      *
-     * @var boolean
+     * @var bool
      */
     const AUTO_SET_SLUG_IMMUTABLE = true;
+
+    /**
+     * The name of the resource to use (as passed to \Nails\Factory::resource())
+     *
+     * @var string
+     */
+    const RESOURCE_NAME = 'Resource';
+
+    /**
+     * The provider of the resource to use (as passed to \Nails\Factory::resource())
+     *
+     * @var string
+     */
+    const RESOURCE_PROVIDER = null;
 
     //  Preferences
     protected $destructiveDelete;
@@ -1396,9 +1410,7 @@ abstract class Base
                 $aItemIds[] = $oItem->id;
 
                 //  Set the base property
-                $oItem->{$sItemProperty}        = new \stdClass();
-                $oItem->{$sItemProperty}->count = 0;
-                $oItem->{$sItemProperty}->data  = [];
+                $oItem->{$sItemProperty} = Factory::resource('ExpandableField');
             }
 
             if (empty($aAssociatedModelData['where_in'])) {
@@ -1519,9 +1531,7 @@ abstract class Base
                 $aItemIds[] = $oItem->id;
 
                 //  Set the base property
-                $oItem->{$sItemProperty}        = new \stdClass();
-                $oItem->{$sItemProperty}->count = 0;
-                $oItem->{$sItemProperty}->data  = [];
+                $oItem->{$sItemProperty} = Factory::resource('ExpandableField');
             }
 
             //  Get all associations for items in the resultset
@@ -1946,6 +1956,11 @@ abstract class Base
                 }
             }
         }
+
+        // --------------------------------------------------------------------------
+
+        //  Convert to a resource
+        $oObj = Factory::resource(static::RESOURCE_NAME, static::RESOURCE_PROVIDER, $oObj);
     }
 
     // --------------------------------------------------------------------------
