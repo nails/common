@@ -97,12 +97,12 @@ trait Caching
         //  Prep the key, the key should have a prefix unique to this model
         $iCacheIndex = $this->getCache($sKey, false);
         if (!is_null($iCacheIndex)) {
-            $this->aCache[$iCacheIndex]->value = serialize($mValue);
+            $this->aCache[$iCacheIndex]->value = $mValue;
         } else {
             $sCacheKey      = $this->getCachePrefix() . $sKey;
             $this->aCache[] = (object) [
                 'key'   => [$sCacheKey],
-                'value' => serialize($mValue),
+                'value' => $mValue,
             ];
         }
 
@@ -164,7 +164,7 @@ trait Caching
         $sCacheKey = $this->getCachePrefix() . $sKey;
         foreach ($this->aCache as $iIndex => $oCacheItem) {
             if (in_array($sCacheKey, $oCacheItem->key)) {
-                return $bReturnValue ? unserialize($oCacheItem->value) : $iIndex;
+                return $bReturnValue ? $oCacheItem->value : $iIndex;
             }
         }
 
