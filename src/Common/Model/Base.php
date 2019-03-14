@@ -36,6 +36,7 @@ abstract class Base
     protected $user_model;
 
     //  Data/Table structure
+    //  @deprecated use const TABLE
     protected $table;
     protected $tableAlias;
 
@@ -73,6 +74,13 @@ abstract class Base
 
     //  Expandable fields
     protected $aExpandableFields;
+
+    /**
+     * The table this model represents
+     *
+     * @var string
+     */
+    const TABLE = null;
 
     /**
      * Expandable objects of type EXPANDABLE_TYPE_MANY are a 1 to many relationship
@@ -1975,11 +1983,14 @@ abstract class Base
      */
     public function getTableName($bIncludePrefix = false)
     {
-        if (empty($this->table)) {
-            throw new ModelException(get_called_class() . ': Table variable not set', 1);
+        //  @todo (Pablo - 2019-03-14) - Phase out support for $this->table
+        if (empty($this->table) && empty(static::TABLE)) {
+            throw new ModelException(get_called_class() . '::TABLE not set', 1);
         }
 
-        return $bIncludePrefix ? trim($this->table . ' as `' . $this->getTableAlias() . '`') : $this->table;
+        $sTable = static::TABLE ?? $this->table;
+
+        return $bIncludePrefix ? trim($sTable . ' as `' . $this->getTableAlias() . '`') : $sTable;
     }
 
     // --------------------------------------------------------------------------

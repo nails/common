@@ -22,13 +22,25 @@ use Nails\Common\Model\Base;
 class {{CLASS_NAME}} extends Base
 {
     /**
-     * {{CLASS_NAME}} constructor.
+     * The table this model represents
+     *
+     * @var string
      */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->table = APP_DB_PREFIX . '{{TABLE}}';
-    }
+    const TABLE = APP_DB_PREFIX . '{{TABLE}}';
+
+    /**
+     * The name of the resource to use (as passed to \Nails\Factory::resource())
+     *
+     * @var string
+     */
+    const RESOURCE_NAME = '{{SERVICE_NAME}}';
+
+    /**
+     * The provider of the resource to use (as passed to \Nails\Factory::resource())
+     *
+     * @var string
+     */
+    const RESOURCE_PROVIDER = 'app';
 }
 
 EOD;
