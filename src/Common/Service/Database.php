@@ -113,18 +113,6 @@ class Database
     // --------------------------------------------------------------------------
 
     /**
-     * Database destructor.
-     */
-    public function __destruct()
-    {
-        if (Environment::is(Environment::ENV_HTTP_TEST)) {
-            $this->oDb->trans_rollback();
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Clears the query history and other memory hogs
      *
      * @return Database
