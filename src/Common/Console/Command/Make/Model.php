@@ -13,10 +13,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Model extends BaseMaker
 {
-    const SERVICE_TOKEN = 'MODELS';
-    const RESOURCE_PATH = NAILS_COMMON_PATH . 'resources/console/';
-    const MODEL_PATH    = NAILS_APP_PATH . 'src/Model/';
-    const ADMIN_PATH    = NAILS_APP_PATH . 'application/modules/admin/controllers/';
+    const SERVICE_TOKEN          = 'MODELS';
+    const SERVICE_RESOURCE_TOKEN = 'RESOURCES';
+    const RESOURCE_PATH          = NAILS_COMMON_PATH . 'resources/console/';
+    const MODEL_PATH             = NAILS_APP_PATH . 'src/Model/';
+    const MODEL_RESOURCE_PATH    = NAILS_APP_PATH . 'src/Resource/';
+    const ADMIN_PATH             = NAILS_APP_PATH . 'application/modules/admin/controllers/';
 
     // --------------------------------------------------------------------------
 
@@ -104,6 +106,11 @@ class Model extends BaseMaker
 
         try {
             $this
+                /**
+                 * Validate the services file for resources first, so that the corrcet
+                 * values are set on the second call.
+                 */
+                ->validateServiceFile(static::SERVICE_RESOURCE_TOKEN)
                 ->validateServiceFile()
                 ->createPath(self::MODEL_PATH);
             if (!$bSkipAdmin) {
@@ -113,7 +120,7 @@ class Model extends BaseMaker
         } catch (\Exception $e) {
             return $this->abort(
                 self::EXIT_CODE_FAILURE,
-                $e->getMessage()
+                [$e->getMessage()]
             );
         }
 
@@ -225,35 +232,48 @@ class Model extends BaseMaker
             $oOutput->writeln('The following model(s) will be created:');
             $oOutput->writeln('');
             foreach ($aModelData as $oModel) {
-                $oOutput->writeln('Class: <info>\\' . $oModel->class_path . '</info>');
-                $oOutput->writeln('Path:  <info>' . $oModel->path . $oModel->filename . '</info>');
+                $oOutput->writeln('Model Class:    <info>\\' . $oModel->class_path . '</info>');
+                $oOutput->writeln('Model Path:     <info>' . $oModel->path . $oModel->filename . '</info>');
+                $oOutput->writeln('Resource Class: <info>\\' . $oModel->resource_class_path . '</info>');
+                $oOutput->writeln('Resource Path:  <info>' . $oModel->resource_path . $oModel->resource_filename . '</info>');
                 if (!$bSkipDb) {
-                    $oOutput->writeln('Table: <info>' . $oModel->table_with_prefix . '</info>');
+                    $oOutput->writeln('Table:          <info>' . $oModel->table_with_prefix . '</info>');
                 }
                 if (!$bSkipAdmin) {
-                    $oOutput->writeln('Admin: <info>Controller will be created</info>');
+                    $oOutput->writeln('Admin:          <info>Controller will be created</info>');
                 }
                 $oOutput->writeln('');
             }
 
             if ($this->confirm('Continue?', true)) {
 
-                $aServiceDefinitions = [];
+                $aServiceModelDefinitions    = [];
+                $aServiceResourceDefinitions = [];
                 foreach ($aModelData as $oModel) {
 
                     $oOutput->writeln('');
+
+                    // --------------------------------------------------------------------------
+
                     $oOutput->write('Creating model <comment>' . $oModel->class_path . '</comment>... ');
-
-                    //  Ensure path exists
                     $this->createPath($oModel->path);
-
-                    //  Create the model file
                     $this->createFile(
                         $oModel->path . $oModel->filename,
                         $this->getResource('template/model.php', (array) $oModel)
                     );
-
                     $oOutput->writeln('<info>done!</info>');
+
+                    // --------------------------------------------------------------------------
+
+                    $oOutput->write('Creating resource <comment>' . $oModel->resource_class_path . '</comment>... ');
+                    $this->createPath($oModel->resource_path);
+                    $this->createFile(
+                        $oModel->resource_path . $oModel->resource_filename,
+                        $this->getResource('template/resource.php', (array) $oModel)
+                    );
+                    $oOutput->writeln('<info>done!</info>');
+
+                    // --------------------------------------------------------------------------
 
                     //  Create the database table
                     if (!$bSkipDb) {
@@ -264,13 +284,24 @@ class Model extends BaseMaker
                         $oOutput->writeln('<info>done!</info>');
                     }
 
+                    // --------------------------------------------------------------------------
+
                     //  Generate the service definition
-                    $aDefinition         = [
+                    $aDefinition                = [
                         str_repeat(' ', $this->iServicesIndent) . '\'' . $oModel->service_name . '\' => function () {',
                         str_repeat(' ', $this->iServicesIndent) . '    return new ' . $oModel->class_path . '();',
                         str_repeat(' ', $this->iServicesIndent) . '},',
                     ];
-                    $aServiceDefinitions[] = implode("\n", $aDefinition);
+                    $aServiceModelDefinitions[] = implode("\n", $aDefinition);
+
+                    $aDefinition                   = [
+                        str_repeat(' ', $this->iServicesIndent) . '\'' . $oModel->service_name . '\' => function () {',
+                        str_repeat(' ', $this->iServicesIndent) . '    return new ' . $oModel->resource_class_path . '();',
+                        str_repeat(' ', $this->iServicesIndent) . '},',
+                    ];
+                    $aServiceResourceDefinitions[] = implode("\n", $aDefinition);
+
+                    // --------------------------------------------------------------------------
 
                     //  Create admin
                     if (!$bSkipAdmin) {
@@ -293,10 +324,19 @@ class Model extends BaseMaker
                     }
                 }
 
+                // --------------------------------------------------------------------------
+
                 //  Add models to the app's services array
                 $oOutput->writeln('');
                 $oOutput->write('Adding model(s) to app services...');
-                $this->writeServiceFile($aServiceDefinitions);
+                $this->writeServiceFile($aServiceModelDefinitions);
+                $oOutput->writeln('<info>done!</info>');
+
+                //  Add resources to app's service array
+                $oOutput->write('Adding resource(s) to app services...');
+                //  Reset the token detials so we write to the correct part of the file
+                $this->validateServiceFile(static::SERVICE_RESOURCE_TOKEN);
+                $this->writeServiceFile($aServiceModelDefinitions);
                 $oOutput->writeln('<info>done!</info>');
             }
 
@@ -349,23 +389,36 @@ class Model extends BaseMaker
         $aNamespace = array_splice($aModelName, 0, -1);
         $sClassName = implode('', $aModelName);
         $sFilename  = $sClassName . '.php';
-        $sPath      = static::MODEL_PATH . implode('/', array_slice($aNamespace, 2));
-        $sPath      = substr($sPath, -1) !== '/' ? $sPath . '/' : $sPath;
+        $sPath      = static::MODEL_PATH . implode(DIRECTORY_SEPARATOR, array_slice($aNamespace, 2));
+        $sPath      = substr($sPath, -1) !== DIRECTORY_SEPARATOR ? $sPath . DIRECTORY_SEPARATOR : $sPath;
         $sNamespace = implode('\\', $aNamespace);
 
         //  Set the service name
         $sServiceName = str_replace('App\Model\\', '', $sModelName);
         $sServiceName = str_replace('\\', '', $sServiceName);
 
+        //  Set resource details
+        $sResourceNamespace = preg_replace('/^App\\\\Model/', 'App\\Resource', $sNamespace);
+        $sResourceClassName = $sClassName;
+        $sResourcePath      = static::MODEL_RESOURCE_PATH . implode(DIRECTORY_SEPARATOR, array_slice($aNamespace, 2));
+        $sResourcePath      = substr($sResourcePath, -1) !== DIRECTORY_SEPARATOR ? $sResourcePath . DIRECTORY_SEPARATOR : $sResourcePath;
+        $sResourceFilename  = $sFilename;
+
+
         return (object) [
-            'namespace'         => $sNamespace,
-            'class_name'        => $sClassName,
-            'class_path'        => $sNamespace . '\\' . $sClassName,
-            'path'              => $sPath,
-            'filename'          => $sFilename,
-            'table'             => $sTableName,
-            'table_with_prefix' => $sTableNameWithPrefix,
-            'service_name'      => $sServiceName,
+            'namespace'           => $sNamespace,
+            'class_name'          => $sClassName,
+            'class_path'          => $sNamespace . '\\' . $sClassName,
+            'path'                => $sPath,
+            'filename'            => $sFilename,
+            'table'               => $sTableName,
+            'table_with_prefix'   => $sTableNameWithPrefix,
+            'service_name'        => $sServiceName,
+            'resource_namespace'  => $sResourceNamespace,
+            'resource_class_name' => $sResourceClassName,
+            'resource_class_path' => $sResourceNamespace . '\\' . $sResourceClassName,
+            'resource_path'       => $sResourcePath,
+            'resource_filename'   => $sResourceFilename,
         ];
     }
 

@@ -11,7 +11,7 @@ return <<<'EOD'
 /**
  * This model handles interactions with the app's "{{TABLE_WITH_PREFIX}}" table.
  *
- * @package  App
+ * @package  App\Model
  * @category model
  */
 
