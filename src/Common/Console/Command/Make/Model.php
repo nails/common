@@ -123,7 +123,8 @@ class Model extends BaseMaker
                  */
                 ->validateServiceFile(static::SERVICE_RESOURCE_TOKEN)
                 ->validateServiceFile()
-                ->createPath(self::MODEL_PATH);
+                ->createPath(self::MODEL_PATH)
+                ->createPath(self::MODEL_RESOURCE_PATH);
             if (!$bSkipAdmin) {
                 $this->createPath(self::ADMIN_PATH);
             }
