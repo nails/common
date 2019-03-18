@@ -310,8 +310,8 @@ class Model extends BaseMaker
                     $aServiceModelDefinitions[] = implode("\n", $aDefinition);
 
                     $aDefinition                   = [
-                        str_repeat(' ', $this->iServicesIndent) . '\'' . $oModel->service_name . '\' => function () {',
-                        str_repeat(' ', $this->iServicesIndent) . '    return new ' . $oModel->resource_class_path . '();',
+                        str_repeat(' ', $this->iServicesIndent) . '\'' . $oModel->service_name . '\' => function ($oObj) {',
+                        str_repeat(' ', $this->iServicesIndent) . '    return new ' . $oModel->resource_class_path . '($oObj);',
                         str_repeat(' ', $this->iServicesIndent) . '},',
                     ];
                     $aServiceResourceDefinitions[] = implode("\n", $aDefinition);
@@ -373,7 +373,7 @@ class Model extends BaseMaker
                 $oOutput->write('Adding resource(s) to app services...');
                 //  Reset the token detials so we write to the correct part of the file
                 $this->validateServiceFile(static::SERVICE_RESOURCE_TOKEN);
-                $this->writeServiceFile($aServiceModelDefinitions);
+                $this->writeServiceFile($aServiceResourceDefinitions);
                 $oOutput->writeln('<info>done!</info>');
             }
 
