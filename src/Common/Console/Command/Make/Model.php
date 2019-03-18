@@ -44,11 +44,11 @@ class Model extends BaseMaker
                 false
             )
             ->addOption(
-                'skip-admin',
+                'skip-seeder',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Skip admin creation',
-                true
+                'Skip seeder creation',
+                false
             )
             ->addOption(
                 'auto-detect',
@@ -56,6 +56,16 @@ class Model extends BaseMaker
                 InputOption::VALUE_OPTIONAL,
                 'Automatically build models from the database'
             );
+
+        if (Components::exists('nails/module-admin')) {
+            $this->addOption(
+                'skip-admin',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Skip admin creation',
+                true
+            );
+        }
     }
 
     // --------------------------------------------------------------------------
@@ -153,6 +163,7 @@ class Model extends BaseMaker
         $oInput      = $this->oInput;
         $oOutput     = $this->oOutput;
         $bSkipDb     = stringToBoolean($oInput->getOption('skip-db'));
+        $bSkipSeeder = stringToBoolean($oInput->getOption('skip-seeder'));
         $bSkipAdmin  = !Components::exists('nails/module-admin') || stringToBoolean($oInput->getOption('skip-admin'));
         $bAutoDetect = stringToBoolean($oInput->getOption('auto-detect'));
 
@@ -243,6 +254,9 @@ class Model extends BaseMaker
                 if (!$bSkipAdmin) {
                     $oOutput->writeln('Admin:          <info>Controller will be created</info>');
                 }
+                if (!$bSkipSeeder) {
+                    $oOutput->writeln('Seeder:         <info>Seeder will be created</info>');
+                }
                 $oOutput->writeln('');
             }
 
@@ -310,6 +324,28 @@ class Model extends BaseMaker
                         //  Execute the create command, non-interactively and silently
                         $iExitCode = $this->callCommand(
                             'make:controller:admin',
+                            [
+                                'modelName'    => $oModel->service_name,
+                                '--skip-check' => true,
+                            ],
+                            false,
+                            true
+                        );
+                        if ($iExitCode === static::EXIT_CODE_FAILURE) {
+                            $oOutput->writeln('<error>failed!</error>');
+                        } else {
+                            $oOutput->writeln('<info>done!</info>');
+                        }
+                    }
+
+                    // --------------------------------------------------------------------------
+
+                    //  Create seeder
+                    if (!$bSkipSeeder) {
+                        $oOutput->write('Creating seeder... ');
+                        //  Execute the create command, non-interactively and silently
+                        $iExitCode = $this->callCommand(
+                            'make:db:seeder',
                             [
                                 'modelName'    => $oModel->service_name,
                                 '--skip-check' => true,
