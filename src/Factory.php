@@ -153,7 +153,7 @@ class Factory
                         return $cCallable;
                     };
 
-                    self::$aContainers[$sComponentName]['resources'][$sKey] = self::$aContainers[$sComponentName]['factories']
+                    self::$aContainers[$sComponentName]['resources'][$sKey] = self::$aContainers[$sComponentName]['resources']
                         ->factory($cWrapper);
                 }
             }
