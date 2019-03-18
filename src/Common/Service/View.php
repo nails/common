@@ -12,6 +12,7 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Common\Exception\NailsException;
 use Nails\Common\Exception\ViewNotFoundCaseException;
 use Nails\Common\Exception\ViewNotFoundException;
 use Nails\Common\Traits\Caching;
@@ -106,7 +107,7 @@ class View
         } elseif (is_string($mKey) || is_numeric($mKey)) {
             $this->aData[$mKey] = $mValue;
         } else {
-            throw new \Exception('Key must be a string or a numeric');
+            throw new NailsException('Key must be a string or a numeric');
         }
 
         return $this;

@@ -2,6 +2,7 @@
 
 namespace Nails\Common\Console\Command\Make\Database;
 
+use Nails\Common\Exception\NailsException;
 use Nails\Common\Exception\Console\MigrationExistsException;
 use Nails\Console\Command\BaseMaker;
 use Nails\Factory;
@@ -126,7 +127,7 @@ class Migration extends BaseMaker
                 }
 
             } elseif (!is_numeric($aFields['INDEX'])) {
-                throw new \Exception('Specified migration index is not a numeric value.');
+                throw new NailsException('Specified migration index is not a numeric value.');
             } else {
                 $aFields['INDEX'] = (int) $aFields['INDEX'];
             }
@@ -201,7 +202,7 @@ class Migration extends BaseMaker
                     @unlink($sPath);
                 }
             }
-            throw new \Exception($e->getMessage());
+            throw new NailsException($e->getMessage());
         }
     }
 }

@@ -12,6 +12,7 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Common\Exception\NailsException;
 use Nails\Common\Traits\ErrorHandling;
 use Nails\Components;
 use Nails\Factory;
@@ -113,7 +114,7 @@ class Routes
 
                 $sInterface = 'Nails\\Common\\Interfaces\\RouteGenerator';
                 if (!classImplements($sClass, $sInterface)) {
-                    throw new \Exception(
+                    throw new NailsException(
                         'Routes generator ' . $sClass . ' does not implement ' . $sInterface
                     );
                 }

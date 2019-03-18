@@ -2,6 +2,7 @@
 
 namespace Nails\Common\Console\Command\Make;
 
+use Nails\Common\Exception\NailsException;
 use Nails\Common\Exception\Database\ConnectionException;
 use Nails\Console\Command\BaseMaker;
 use Nails\Components;
@@ -171,7 +172,7 @@ class Model extends BaseMaker
                 foreach ($aModels as $sModelName) {
                     $oModel = $this->prepareModelName($sModelName);
                     if ($this->modelExists($oModel)) {
-                        throw new \Exception(
+                        throw new NailsException(
                             'A model by that path already exists "' . $oModel->path . $oModel->filename . '"'
                         );
                     }
@@ -181,7 +182,7 @@ class Model extends BaseMaker
                         $oDb     = Factory::service('PDODatabase');
                         $oResult = $oDb->query('SHOW TABLES LIKE "' . $oModel->table_with_prefix . '"');
                         if ($oResult->rowCount() > 0) {
-                            throw new \Exception(
+                            throw new NailsException(
                                 'Table "' . $oModel->table_with_prefix . '" already exists. Use option --skip-db to skip database check.'
                             );
                         }
@@ -348,7 +349,7 @@ class Model extends BaseMaker
                     @unlink($oModel->path . '/' . $oModel->filename);
                 }
             }
-            throw new \Exception(
+            throw new NailsException(
                 $e->getMessage(),
                 is_numeric($e->getCode()) ? $e->getCode() : null
             );

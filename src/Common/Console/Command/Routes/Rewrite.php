@@ -2,6 +2,7 @@
 
 namespace Nails\Common\Console\Command\Routes;
 
+use Nails\Common\Exception\NailsException;
 use Nails\Console\Command\Base;
 use Nails\Factory;
 use Symfony\Component\Console\Input\InputInterface;
@@ -41,7 +42,7 @@ class Rewrite extends Base
 
         try {
             if (!$oRoutesService->update(null, $oOutput)) {
-                throw new \Exception($oRoutesService->lastError());
+                throw new NailsException($oRoutesService->lastError());
             }
         } catch (\Exception $e) {
             $this->abort(

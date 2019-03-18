@@ -2,6 +2,7 @@
 
 namespace Nails\Common\Console\Seed;
 
+use Nails\Common\Exception\NailsException;
 use Nails\Factory;
 
 class DefaultSeed extends Base
@@ -51,7 +52,7 @@ class DefaultSeed extends Base
         for ($i = 0; $i < static::CONFIG_NUM_PER_SEED; $i++) {
             try {
                 if (!$oModel->create($this->generate($aFields))) {
-                    throw new \Exception('Failed to create item. ' . $oModel->lastError());
+                    throw new NailsException('Failed to create item. ' . $oModel->lastError());
                 }
             } catch (\Exception $e) {
                 echo "\nSEED ERROR: " . $e->getMessage();
