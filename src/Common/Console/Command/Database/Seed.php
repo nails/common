@@ -53,7 +53,7 @@ class Seed extends Base
         $oOutput->writeln('<info>----------------------</info>');
         $oOutput->writeln('<info>Nails Database Seeder </info>');
         $oOutput->writeln('<info>----------------------</info>');
-        $oOutput->writeln('Beginning...');
+        $oOutput->writeln('');
 
         // --------------------------------------------------------------------------
 

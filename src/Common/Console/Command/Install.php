@@ -72,7 +72,7 @@ class Install extends Base
         $oOutput->writeln('<info>---------------</info>');
         $oOutput->writeln('<info>Nails Installer</info>');
         $oOutput->writeln('<info>---------------</info>');
-        $oOutput->writeln('Beginning...');
+        $oOutput->writeln('');
 
         // --------------------------------------------------------------------------
 
