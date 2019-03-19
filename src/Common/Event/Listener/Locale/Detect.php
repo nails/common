@@ -78,7 +78,7 @@ class Detect extends Subscription
      */
     protected function getUrl(): string
     {
-        return ltrim(getFromArray('PATH_INFO', $_SERVER) ?? getFromArray('REQUEST_URI', $_SERVER), '/');
+        return ltrim(getFromArray('REQUEST_URI', $_SERVER) ?? getFromArray('PATH_INFO', $_SERVER), '/');
     }
 
     // --------------------------------------------------------------------------
