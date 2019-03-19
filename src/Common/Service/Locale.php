@@ -47,11 +47,18 @@ class Locale
     const COOKIE_NAME = 'locale';
 
     /**
-     * The supported languages by the system
+     * The supported locales by the system (in addition to the default locale)
      *
      * @var string[]
      */
-    const SUPPORTED_LANGUAGES = [self::DEFAULT_LANGUAGE];
+    const SUPPORTED_LOCALES = [];
+
+    /**
+     * Maps vanity URL strings to supported locales
+     *
+     * @var string[]
+     */
+    const URL_VANITY_MAP = [];
 
     /**
      * Enable locale detection via the request header
@@ -104,6 +111,13 @@ class Locale
      */
     protected $oInput;
 
+    /**
+     * The supported locales
+     *
+     * @var \Nails\Common\Factory\Locale[]
+     */
+    protected $aSupportedLocales = [];
+
     // --------------------------------------------------------------------------
 
     /**
@@ -116,7 +130,21 @@ class Locale
         Input $oInput,
         \Nails\Common\Factory\Locale $oLocale = null
     ) {
-        $this->oInput  = $oInput;
+        $this->oInput = $oInput;
+
+        $this->aSupportedLocales[] = Factory::factory('Locale')
+            ->setLanguage(Factory::factory('LocaleLanguage', null, static::DEFAULT_LANGUAGE))
+            ->setRegion(Factory::factory('LocaleRegion', null, static::DEFAULT_REGION))
+            ->setScript(Factory::factory('LocaleScript', null, static::DEFAULT_SCRIPT));
+
+        foreach (static::SUPPORTED_LOCALES as $sLocale) {
+            list($sLanguage, $sRegion, $sScript) = static::parseLocaleString($sLocale);
+            $this->aSupportedLocales[] = Factory::factory('Locale')
+                ->setLanguage(Factory::factory('LocaleLanguage', null, $sLanguage))
+                ->setRegion(Factory::factory('LocaleRegion', null, $sRegion))
+                ->setScript(Factory::factory('LocaleScript', null, $sScript));
+        }
+
         $this->oLocale = $oLocale ?? $this->detect();
     }
 
@@ -216,6 +244,10 @@ class Locale
             preg_match($this->getUrlRegex(), $sUrl, $aMatches);
             $sLanguage = !empty($aMatches[1]) ? $aMatches[1] : '';
 
+            if (array_key_exists($sLanguage, static::URL_VANITY_MAP)) {
+                $sLanguage = static::URL_VANITY_MAP[$sLanguage];
+            }
+
             $this->setFromString($oLocale, $sLanguage);
         }
 
@@ -306,7 +338,7 @@ class Locale
      *
      * @return string[]
      */
-    protected static function parseLocaleString(?string $sLocale): array
+    public static function parseLocaleString(?string $sLocale): array
     {
         return [
             \Locale::getPrimaryLanguage($sLocale),
@@ -350,7 +382,6 @@ class Locale
      */
     public function getDefautLocale(): \Nails\Common\Factory\Locale
     {
-
         return Factory::factory('Locale')
             ->setLanguage(Factory::factory('LocaleLanguage', null, static::DEFAULT_LANGUAGE))
             ->setRegion(Factory::factory('LocaleRegion', null, static::DEFAULT_REGION))
@@ -360,13 +391,13 @@ class Locale
     // --------------------------------------------------------------------------
 
     /**
-     * Returns the supported languages for this system
+     * Returns the supported locales for this system
      *
-     * @return string[]
+     * @return \Nails\Common\Factory\Locale[]
      */
-    public function getSupportedLanguages(): array
+    public function getSupportedLocales(): array
     {
-        return static::SUPPORTED_LANGUAGES;
+        return $this->aSupportedLocales;
     }
 
     // --------------------------------------------------------------------------
@@ -378,6 +409,14 @@ class Locale
      */
     public function getUrlRegex(): string
     {
-        return '/^(' . implode('|', $this->getSupportedLanguages()) . ')(\/.*|$)/';
+        $aSupportedLocales = $this->getSupportedLocales();
+        $aUrlLocales       = [];
+
+        foreach ($aSupportedLocales as $oLocale) {
+            $sVanity       = array_search($oLocale, static::URL_VANITY_MAP);
+            $aUrlLocales[] = $sVanity !== false ? $sVanity : $oLocale;
+        }
+
+        return '/^(' . implode('|', $aUrlLocales) . ')(\/.*|$)/';
     }
 }

@@ -67,6 +67,7 @@ trait GetCountCommon
         $this->getCountCommonCompileFilters($aData);
         $this->getCountCommonCompileWheres($aData);
         $this->getCountCommonCompileLikes($aData);
+        $this->getCountCommonCompileHavings($aData);
         $this->getCountCommonCompileSort($aData);
     }
 
@@ -569,6 +570,157 @@ trait GetCountCommon
             //  And reduce $aWhereStr to an actual string, like the name suggests
             $aWhereStr = implode(' AND ', $aWhereStr);
             $oDb->where($aWhereStr);
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Compiles any having's into the query
+     *
+     * @param  array &$aData The data array
+     *
+     * @return void
+     */
+    protected function getCountCommonCompileHavings(array &$aData)
+    {
+        $oDb = Factory::service('Database');
+
+        /**
+         * Handle having's
+         *
+         * This is an array of the various type of having that can be passed in via $aData.
+         * The first element is the key and the second is how multiple items within the
+         * group should be glued together.
+         *
+         * Each type of having is grouped in it's own set of parenthesis, multiple groups
+         * are glued together with ANDs
+         */
+
+        $aHavings = [
+            'having'    => 'AND',
+            'or_having' => 'OR',
+        ];
+
+        $aHavingCompiled = [];
+
+        foreach ($aHavings as $sHavingType => $sHavingGlue) {
+
+            if (!empty($aData[$sHavingType])) {
+
+                $aHavingCompiled[$sHavingType] = [];
+
+                if (is_array($aData[$sHavingType])) {
+
+                    /**
+                     * The value is an array. For each element we need to compile as appropriate
+                     * and add to $aHavingCompiled.
+                     */
+
+                    foreach ($aData[$sHavingType] as $mHaving) {
+
+                        if (is_string($mHaving)) {
+
+                            /**
+                             * The value is a straight up string, assume this is a compiled
+                             * having string,
+                             */
+
+                            $aHavingCompiled[$sHavingType][] = $mHaving;
+
+                        } else {
+
+                            /**
+                             * The value is an array, try and determine the various parts
+                             * of the query. We use strings which are unlikely to be found
+                             * as falsey values (such as null) are perfectly likely.
+                             */
+
+                            //  Work out column
+                            $mColumn = isset($mHaving['column']) ? $mHaving['column'] : '[NAILS-COL-NOT-FOUND]';
+
+                            if ($mColumn === '[NAILS-COL-NOT-FOUND]') {
+                                $mColumn = isset($mHaving[0]) && is_string($mHaving[0]) ? $mHaving[0] : null;
+                            }
+
+                            //  Work out value
+                            $mVal = isset($mHaving['value']) ? $mHaving['value'] : '[NAILS-VAL-NOT-FOUND]';
+
+                            if ($mVal === '[NAILS-VAL-NOT-FOUND]') {
+                                $mVal = isset($mHaving[1]) ? $mHaving[1] : null;
+                            }
+
+                            //  Escaped?
+                            $bEscape = isset($mHaving['escape']) ? (bool) $mHaving['escape'] : '[NAILS-ESCAPE-NOT-FOUND]';
+
+                            if ($bEscape === '[NAILS-ESCAPE-NOT-FOUND]') {
+                                $bEscape = isset($mHaving[2]) ? $mHaving[2] : true;
+                            }
+
+                            //  If the $mColumn is an array then we should concat them together
+                            if (is_array($mColumn)) {
+                                $mColumn = 'CONCAT_WS(" ", ' . implode(',', $mColumn) . ')';
+                            }
+
+                            //  Test if there's an SQL operator
+                            if (!(bool) preg_match('/(<|>|!|=|\sIS NULL|\sIS NOT NULL|\sEXISTS|\sBETWEEN|\sLIKE|\sIN\s*\(|\s)/i', trim($mColumn))) {
+                                $sOperator = is_null($mVal) ? ' IS ' : '=';
+                            } else {
+                                $sOperator = '';
+                            }
+
+                            //  Got something?
+                            if ($mColumn) {
+
+                                switch ($sHavingType) {
+
+                                    case 'having' :
+                                    case 'or_having' :
+
+                                        if ($bEscape) {
+                                            $mVal = $oDb->escape($mVal);
+                                        }
+
+                                        $aHavingCompiled[$sHavingType][] = $mColumn . $sOperator . $mVal;
+                                        break;
+                                }
+                            }
+                        }
+                    }
+
+                } elseif (is_string($aData[$sHavingType])) {
+
+                    /**
+                     * The value is a straight up string, assume this is a compiled
+                     * having string,
+                     */
+
+                    $aHavingCompiled[$sHavingType][] = $aData[$sHavingType];
+                }
+            }
+        }
+
+        /**
+         * Now we need to compile all the conditionals into one big super query.
+         * $aHavingStr is an array of the compressed having strings... will make
+         * sense shortly...
+         */
+
+        if (!empty($aHavingCompiled)) {
+
+            $aHavingStr = [];
+
+            foreach ($aHavingCompiled as $sHavingType => $sValue) {
+                if (!empty($sValue)) {
+                    $aHavingStr[] = '(' . implode(' ' . $aHavings[$sHavingType] . ' ', $sValue) . ')';
+                }
+            }
+
+            //  And reduce $aHavingStr to an actual string, like the name suggests
+            if (!empty($aHavingStr)) {
+                $aHavingStr = implode(' AND ', $aHavingStr);
+                $oDb->having($aHavingStr);
+            }
         }
     }
 

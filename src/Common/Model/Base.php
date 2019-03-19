@@ -19,6 +19,7 @@ use Nails\Common\Helper\ArrayHelper;
 use Nails\Common\Traits\Caching;
 use Nails\Common\Traits\ErrorHandling;
 use Nails\Common\Traits\GetCountCommon;
+use Nails\Common\Traits\Model\Localised;
 use Nails\Components;
 use Nails\Factory;
 
@@ -821,8 +822,7 @@ abstract class Base
      * @param int|null $iPage           The page number of the results, if null then no pagination
      * @param int|null $iPerPage        How many items per page of paginated results
      * @param mixed    $aData           Any data to pass to getCountCommon()
-     * @param bool     $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted
-     *                                  items
+     * @param bool     $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
      *
      * @return array
      */
