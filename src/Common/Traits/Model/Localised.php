@@ -44,6 +44,23 @@ trait Localised
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Enforce models implement getTableName
+     *
+     * @return string
+     */
+    abstract public function getTableName();
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Enforce models implement getTableAlias
+     *
+     * @return string
+     */
+    abstract public function getTableAlias();
+
+    // --------------------------------------------------------------------------
 
     /**
      * Overloads the getAll to add a Locale object to each resource
@@ -57,7 +74,7 @@ trait Localised
      */
     public function getAll($iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false)
     {
-        $aResult = parent::getAll($iPage, $iPage, $aData, $bIncludeDeleted);
+        $aResult = parent::getAll($iPage, $iPerPage, $aData, $bIncludeDeleted);
         $this->addLocaleToResources($aResult);
         return $aResult;
     }
@@ -105,7 +122,7 @@ trait Localised
             ];
         }
 
-        if (!array_key_exists('locale')) {
+        if (!array_key_exists('locale', $aData)) {
             $oUserLocale = $oLocale->get();
         } else {
             list($sLanguage, $sRegion) = $oLocale::parseLocaleString($aData['locale']);
@@ -166,6 +183,15 @@ trait Localised
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Generate a Locale object for a language/region
+     *
+     * @param string $sLanguage The language to set
+     * @param string $sRegion   The region to set
+     *
+     * @return \Nails\Common\Factory\Locale
+     * @throws \Nails\Common\Exception\FactoryException
+     */
     private function getLocale(string $sLanguage, string $sRegion): \Nails\Common\Factory\Locale
     {
         return Factory::factory('Locale')
