@@ -417,6 +417,6 @@ class Locale
             $aUrlLocales[] = $sVanity !== false ? $sVanity : $oLocale;
         }
 
-        return '/^(' . implode('|', $aUrlLocales) . ')(\/.*|$)/';
+        return '/^(' . implode('|', $aUrlLocales) . ')?(\/)?(.*)$/';
     }
 }

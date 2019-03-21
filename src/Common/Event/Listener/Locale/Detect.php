@@ -61,10 +61,11 @@ class Detect extends Subscription
             }
 
             //  Update the $_SERVER values so the rest of the system continues as normal
-            foreach (['PATH_INFO', 'REQUEST_URI'] as $sKey) {
-                if (array_key_exists($sKey, $_SERVER)) {
-                    $_SERVER[$sKey] = '/' . $oUrl->url;
-                }
+            if (array_key_exists('PATH_INFO', $_SERVER)) {
+                $_SERVER['PATH_INFO'] = '/' . $oUrl->path;
+            }
+            if (array_key_exists('REQUEST_URI', $_SERVER)) {
+                $_SERVER['REQUEST_URI'] = '/' . $oUrl->url;
             }
         }
     }
@@ -94,16 +95,18 @@ class Detect extends Subscription
     {
         preg_match($this->oLocaleService->getUrlRegex(), $sUrl, $aMatches);
 
-        if (!empty($aMatches)) {
-            return (object) [
-                'language' => !empty($aMatches[1]) ? $aMatches[1] : '',
-                'url'      => ltrim(!empty($aMatches[2]) ? $aMatches[2] : '', '/'),
-            ];
-        } else {
-            return (object) [
-                'language' => null,
-                'url'      => ltrim($sUrl, '/'),
-            ];
-        }
+        $sLanguage   = !empty($aMatches[1]) ? $aMatches[1] : '';
+        $sRequestUrl = !empty($aMatches[3]) ? $aMatches[3] : '';
+        $aRequestUrl = parse_url($sRequestUrl);
+
+        $sPath  = ltrim(!empty($aRequestUrl['path']) ? $aRequestUrl['path'] : '', '/');
+        $sQuery = !empty($aRequestUrl['query']) ? $aRequestUrl['query'] : '';
+
+        return (object) [
+            'language' => !empty($aMatches[1]) ? $aMatches[1] : null,
+            'path'     => $sPath,
+            'query'    => $sQuery,
+            'url'      => $sPath . ($sQuery ? '?' . $sQuery : ''),
+        ];
     }
 }
