@@ -1247,6 +1247,7 @@ EOT;
         }
 
         $sFieldAttr .= ' data-defaults="' . htmlentities(json_encode($aValues)) . '"';
+        $sFieldAttr .= ' data-label-key="' . $sFieldLabelKey . '"';
 
         // --------------------------------------------------------------------------
 
