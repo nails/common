@@ -330,7 +330,7 @@ return [
                 return new \Nails\Common\Resource\ExpandableField();
             }
         },
-        'Resource' => function (\stdClass $oObj) {
+        'Resource' => function ($oObj) {
             if (class_exists('\App\Common\Resource')) {
                 return new \App\Common\Resource($oObj);
             } else {
