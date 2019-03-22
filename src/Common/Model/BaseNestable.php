@@ -10,6 +10,7 @@
  * @todo Implement methods/mechanic for fetching siblings
  * @todo Implement methods/mechanic for fetching children
  * @todo Implement methods/mechanic for searching/saving paths
+ * @todo (Pablo - 2019-03-22) - Has this been superceded by the Nestable trait?
  */
 
 namespace Nails\Common\Model;

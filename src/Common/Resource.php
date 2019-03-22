@@ -14,7 +14,7 @@ class Resource
      *
      * @param Resource|\stdClass|array $mObj The database row
      */
-    public function __construct($mObj)
+    public function __construct($mObj = [])
     {
         foreach ($mObj as $sProperty => $mValue) {
             $this->{$sProperty} = $mValue;

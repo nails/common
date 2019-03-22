@@ -4,7 +4,7 @@ namespace Nails\Common\Resource;
 
 use Nails\Common\Resource;
 
-class ExpandableField
+class ExpandableField extends Resource
 {
     /**
      * The number of items in the ExpandableField collection

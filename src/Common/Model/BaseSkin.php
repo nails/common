@@ -8,6 +8,7 @@
  * @category    model
  * @author      Nails Dev Team
  * @link
+ * @todo (Pablo - 2019-03-22) - Skins shouldn't be in the "model" namespace
  */
 
 namespace Nails\Common\Model;

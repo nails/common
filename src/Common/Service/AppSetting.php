@@ -5,12 +5,12 @@
  *
  * @package     Nails
  * @subpackage  common
- * @category    model
+ * @category    service
  * @author      Nails Dev Team
  * @link
  */
 
-namespace Nails\Common\Model;
+namespace Nails\Common\Service;
 
 use Nails\Common\Traits\ErrorHandling;
 use Nails\Factory;

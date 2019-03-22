@@ -13,6 +13,8 @@
 namespace Nails;
 
 use Nails\Common\Exception\FactoryException;
+use Nails\Common\Model\Base;
+use Nails\Common\Resource;
 use Pimple\Container;
 
 class Factory
@@ -46,7 +48,7 @@ class Factory
      *
      * @return void
      */
-    public static function setup()
+    public static function setup(): void
     {
         $aComponents          = Components::available();
         self::$aContainers    = [];
@@ -169,7 +171,7 @@ class Factory
      *
      * @return array
      */
-    private static function findServicesForComponent($sComponentName)
+    private static function findServicesForComponent(string $sComponentName): array
     {
         return self::findServicesAtPaths([
             NAILS_APP_PATH . 'application/services/' . $sComponentName . '/services.php',
@@ -184,7 +186,7 @@ class Factory
      *
      * @return array
      */
-    private static function findServicesForApp()
+    private static function findServicesForApp(): array
     {
         return self::findServicesAtPaths([
             'application/services/services.php',
@@ -200,7 +202,7 @@ class Factory
      *
      * @return array
      */
-    private static function findServicesAtPaths($aPaths)
+    private static function findServicesAtPaths(array $aPaths): array
     {
         foreach ($aPaths as $sPath) {
             if (file_exists($sPath)) {
@@ -222,7 +224,7 @@ class Factory
      * @return mixed
      * @throws FactoryException
      */
-    public static function property($sPropertyName, $sComponentName = '')
+    public static function property(string $sPropertyName, ?string $sComponentName = '')
     {
         $mProperty = self::getService('properties', $sPropertyName, $sComponentName);
 
@@ -245,7 +247,7 @@ class Factory
      * @return void
      * @throws FactoryException
      */
-    public static function setProperty($sPropertyName, $mPropertyValue, $sComponentName = '')
+    public static function setProperty(string $sPropertyName, $mPropertyValue, ?string $sComponentName = ''): void
     {
         $sComponentName = empty($sComponentName) ? 'nails/common' : $sComponentName;
 
@@ -267,10 +269,11 @@ class Factory
      * @param string $sServiceName   The service name
      * @param string $sComponentName The name of the component which provides the service
      *
-     * @return mixed
+     * @return object
      * @throws FactoryException
+     * @todo (Pablo - 2019-03-22) - Consider forcing all servcies to extend a base class (and add a typehint)
      */
-    public static function service($sServiceName, $sComponentName = '')
+    public static function service(string $sServiceName, ?string $sComponentName = ''): object
     {
         return static::getServiceOrModel(
             static::$aLoadedItems['SERVICES'],
@@ -289,10 +292,10 @@ class Factory
      * @param string $sModelName     The model name
      * @param string $sComponentName The name of the component which provides the model
      *
-     * @return mixed
+     * @return Base
      * @throws FactoryException
      */
-    public static function model($sModelName, $sComponentName = '')
+    public static function model(string $sModelName, ?string $sComponentName = ''): Base
     {
         return static::getServiceOrModel(
             static::$aLoadedItems['MODELS'],
@@ -317,8 +320,13 @@ class Factory
      * @return object
      * @throws FactoryException
      */
-    private static function getServiceOrModel(array &$aTrackerArray, $sType, $sName, $sComponent, array $aParamaters)
-    {
+    private static function getServiceOrModel(
+        array &$aTrackerArray,
+        string $sType,
+        string $sName,
+        string $sComponent,
+        array $aParamaters
+    ): object {
         /**
          * We track them like this because we need to return the instance of the
          * item, not the closure. If we don't do this then we will always get
@@ -351,10 +359,10 @@ class Factory
      * @param string $sFactoryName   The factory name
      * @param string $sComponentName The name of the component which provides the factory
      *
-     * @return mixed
+     * @return object
      * @throws FactoryException
      */
-    public static function factory($sFactoryName, $sComponentName = '')
+    public static function factory(string $sFactoryName, ?string $sComponentName = ''): object
     {
         return call_user_func_array(
             self::getService('factories', $sFactoryName, $sComponentName),
@@ -370,10 +378,10 @@ class Factory
      * @param string $sResourceName  The resource name
      * @param string $sComponentName The name of the component which provides the resource
      *
-     * @return mixed
+     * @return Resource
      * @throws FactoryException
      */
-    public static function resource($sResourceName, $sComponentName = '')
+    public static function resource(string $sResourceName, ?string $sComponentName = ''): Resource
     {
         return call_user_func_array(
             self::getService('resources', $sResourceName, $sComponentName),
@@ -392,7 +400,7 @@ class Factory
      * @throws FactoryException
      * @return void
      */
-    public static function helper($sHelperName, $sComponentName = '')
+    public static function helper(string $sHelperName, ?string $sComponentName = ''): void
     {
         $sComponentName = empty($sComponentName) ? 'nails/common' : $sComponentName;
 
@@ -454,7 +462,7 @@ class Factory
      * @throws FactoryException
      * @return mixed
      */
-    private static function getService($sServiceType, $sServiceName, $sComponentName = '')
+    private static function getService(string $sServiceType, string $sServiceName, ?string $sComponentName = '')
     {
         $sComponentName = empty($sComponentName) ? 'nails/common' : $sComponentName;
 
@@ -480,7 +488,7 @@ class Factory
     /**
      * Auto-loads items at startup
      */
-    public static function autoload()
+    public static function autoload(): void
     {
         //  CI base helpers
         require_once BASEPATH . 'core/Common.php';
@@ -527,26 +535,26 @@ class Factory
      *
      * @param string $sPath The path to the composer.json file
      *
-     * @return object
+     * @return \stdClass
      */
-    protected static function extractAutoLoadItemsFromComposerJson($sPath)
+    protected static function extractAutoLoadItemsFromComposerJson(string $sPath): \stdClass
     {
-        $aOut = (object) ['helpers' => [], 'services' => []];
+        $oOut = (object) ['helpers' => [], 'services' => []];
         if (file_exists($sPath)) {
             $oAppComposer = json_decode(file_get_contents($sPath));
             if (!empty($oAppComposer->extra->nails->autoload->helpers)) {
                 foreach ($oAppComposer->extra->nails->autoload->helpers as $sHelper) {
-                    $aOut->helpers[] = $sHelper;
+                    $oOut->helpers[] = $sHelper;
                 }
             }
             if (!empty($oAppComposer->extra->nails->autoload->services)) {
                 foreach ($oAppComposer->extra->nails->autoload->services as $sService) {
-                    $aOut->services[] = $sService;
+                    $oOut->services[] = $sService;
                 }
             }
         }
 
-        return $aOut;
+        return $oOut;
     }
 
     // --------------------------------------------------------------------------
@@ -559,7 +567,7 @@ class Factory
      *
      * @return bool
      */
-    public static function destroyService($sServiceName, $sComponentName = '')
+    public static function destroyService(string $sServiceName, ?string $sComponentName = ''): bool
     {
         return static::destroyServiceOrModel(
             static::$aLoadedItems['SERVICES'],
@@ -579,7 +587,7 @@ class Factory
      *
      * @return bool
      */
-    public static function destroyModel($sModelName, $sComponentName = '')
+    public static function destroyModel(string $sModelName, ?string $sComponentName = ''): bool
     {
         return static::destroyServiceOrModel(
             static::$aLoadedItems['MODELS'],
@@ -598,7 +606,7 @@ class Factory
      *
      * @return bool
      */
-    public static function destroy($oInstance)
+    public static function destroy(object $oInstance): bool
     {
         foreach (static::$aLoadedItems['SERVICES'] as $sKey => $oItem) {
             if ($oItem === $oInstance) {
@@ -627,8 +635,12 @@ class Factory
      *
      * @return bool
      */
-    private static function destroyServiceOrModel(array &$aTrackerArray, $sKey, $sName = null, $sComponent = null)
-    {
+    private static function destroyServiceOrModel(
+        array &$aTrackerArray,
+        string $sKey,
+        string $sName = null,
+        string $sComponent = null
+    ): bool {
         if (!$sKey) {
             $sKey = md5($sComponent . $sName);
         }

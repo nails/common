@@ -32,12 +32,14 @@ abstract class BaseComponent
     /**
      * The name of the module loading the components; used for settings and for
      * finding components which are for the module.
+     *
      * @var string
      */
     protected $sModule = null;
 
     /**
      * The type of component to load; filter the components by their subType, if any.
+     *
      * @var string
      */
     protected $sType = null;
@@ -45,12 +47,14 @@ abstract class BaseComponent
     /**
      * Which app setting (in the $sModule grouping) defines the array of enabled
      * component slugs.
+     *
      * @var string
      */
     protected $sEnabledSetting = null;
 
     /**
      * Define whether multiple components can be enabled
+     *
      * @var boolean
      */
     protected $bEnableMultiple = true;
@@ -117,6 +121,7 @@ abstract class BaseComponent
 
     /**
      * Whether the model supports enabling multiple components.
+     *
      * @return boolean
      */
     public function isMultiple()
@@ -128,6 +133,7 @@ abstract class BaseComponent
 
     /**
      * Fetches all available components
+     *
      * @return array
      */
     public function getAll()
@@ -139,6 +145,7 @@ abstract class BaseComponent
 
     /**
      * Fetches the enabled component, or array of components if bEnableMultiple is true
+     *
      * @return array|\stdClass
      */
     public function getEnabled()
@@ -150,6 +157,7 @@ abstract class BaseComponent
 
     /**
      * Fetches the slug of the enabled components, or array of slugs if bEnableMultiple is true
+     *
      * @return array|string
      */
     public function getEnabledSlug()
@@ -192,6 +200,7 @@ abstract class BaseComponent
 
     /**
      * Returns the setting key for this component
+     *
      * @return string
      */
     public function getSettingKey()
@@ -211,7 +220,7 @@ abstract class BaseComponent
      */
     public function saveEnabled($mSlug)
     {
-        $oAppSettingModel = Factory::model('AppSetting');
+        $oAppSettingService = Factory::service('AppSetting');
 
         if ($this->bEnableMultiple) {
 
@@ -228,8 +237,8 @@ abstract class BaseComponent
             $this->sEnabledSetting => $mSlug,
         ];
 
-        if (!$oAppSettingModel->set($aSetting, $this->sModule)) {
-            throw new NailsException($oAppSettingModel->lastError(), 1);
+        if (!$oAppSettingService->set($aSetting, $this->sModule)) {
+            throw new NailsException($oAppSettingService->lastError(), 1);
         }
 
         return $this;

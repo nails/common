@@ -20,8 +20,8 @@ if (!function_exists('appSetting')) {
      */
     function appSetting($key = null, $grouping = 'app', $force_refresh = false)
     {
-        $oAppSettingModel = Factory::model('AppSetting');
-        return $oAppSettingModel->get($key, $grouping, $force_refresh);
+        $oAppSettingService = Factory::service('AppSetting');
+        return $oAppSettingService->get($key, $grouping, $force_refresh);
     }
 }
 
@@ -35,7 +35,7 @@ if (!function_exists('setAppSetting')) {
      */
     function setAppSetting($key, $grouping = 'app', $value = null, $encrypt = false)
     {
-        $oAppSettingModel = Factory::model('AppSetting');
-        return $oAppSettingModel->set($key, $grouping, $value, $encrypt);
+        $oAppSettingService = Factory::service('AppSetting');
+        return $oAppSettingService->set($key, $grouping, $value, $encrypt);
     }
 }

@@ -8,6 +8,7 @@
  * @category    model
  * @author      Nails Dev Team
  * @link
+ * @todo (Pablo - 2019-03-22) - Enforce this as an interface
  */
 
 namespace Nails\Common\Model;

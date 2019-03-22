@@ -17,6 +17,13 @@ return [
         },
     ],
     'services'   => [
+        'AppSetting'      => function () {
+            if (class_exists('\App\Common\Service\AppSetting')) {
+                return new \App\Common\Service\AppSetting();
+            } else {
+                return new \Nails\Common\Service\AppSetting();
+            }
+        },
         'Asset'          => function () {
             if (class_exists('\App\Common\Service\Asset')) {
                 return new \App\Common\Service\Asset();
@@ -39,6 +46,13 @@ return [
                 return new \App\Common\Service\Database();
             } else {
                 return new \Nails\Common\Service\Database();
+            }
+        },
+        'DateTime'       => function () {
+            if (class_exists('\App\Common\Service\DateTime')) {
+                return new \App\Common\Service\DateTime();
+            } else {
+                return new \Nails\Common\Service\DateTime();
             }
         },
         'Encrypt'        => function () {
@@ -82,6 +96,13 @@ return [
                 return new \App\Common\Service\Input();
             } else {
                 return new \Nails\Common\Service\Input();
+            }
+        },
+        'Language'       => function () {
+            if (class_exists('\App\Common\Service\Language')) {
+                return new \App\Common\Service\Language();
+            } else {
+                return new \Nails\Common\Service\Language();
             }
         },
         'Locale'         => function (
@@ -200,32 +221,11 @@ return [
                 return new \Nails\Common\Model\AppNotification();
             }
         },
-        'AppSetting'      => function () {
-            if (class_exists('\App\Common\Model\AppSetting')) {
-                return new \App\Common\Model\AppSetting();
-            } else {
-                return new \Nails\Common\Model\AppSetting();
-            }
-        },
         'Country'         => function () {
             if (class_exists('\App\Common\Model\Country')) {
                 return new \App\Common\Model\Country();
             } else {
                 return new \Nails\Common\Model\Country();
-            }
-        },
-        'DateTime'        => function () {
-            if (class_exists('\App\Common\Model\DateTime')) {
-                return new \App\Common\Model\DateTime();
-            } else {
-                return new \Nails\Common\Model\DateTime();
-            }
-        },
-        'Language'        => function () {
-            if (class_exists('\App\Common\Model\Language')) {
-                return new \App\Common\Model\Language();
-            } else {
-                return new \Nails\Common\Model\Language();
             }
         },
     ],
@@ -330,7 +330,7 @@ return [
                 return new \Nails\Common\Resource\ExpandableField();
             }
         },
-        'Resource' => function ($oObj) {
+        'Resource'        => function ($oObj) {
             if (class_exists('\App\Common\Resource')) {
                 return new \App\Common\Resource($oObj);
             } else {

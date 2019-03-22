@@ -458,8 +458,8 @@ abstract class Base extends \MX_Controller
     protected function instantiateLanguages()
     {
         //  Define default language
-        $oLanguageModel = Factory::model('Language');
-        $oDefault       = $oLanguageModel->getDefault();
+        $oLanguageService = Factory::service('Language');
+        $oDefault         = $oLanguageService->getDefault();
 
         if (empty($oDefault)) {
             throw new NailsException('No default language has been set, or it\'s been set incorrectly.');
