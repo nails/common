@@ -11,6 +11,7 @@
  */
 
 use Nails\Factory;
+use Nails\Common\Model\AppNotification;
 
 if (!function_exists('appNotification')) {
 
@@ -23,6 +24,7 @@ if (!function_exists('appNotification')) {
      */
     function appNotification($key = null, $grouping = 'app', $forceRefresh = false)
     {
+        /** @var AppNotification $oAppNotificationModel */
         $oAppNotificationModel = Factory::model('AppNotification');
         return $oAppNotificationModel->get($key, $grouping, $forceRefresh);
     }
@@ -42,6 +44,7 @@ if (!function_exists('appNotificationNotify')) {
      */
     function appNotificationNotify($key = null, $grouping = 'app', $data = array(), $override = array())
     {
+        /** @var AppNotification $oAppNotificationModel */
         $oAppNotificationModel = Factory::model('AppNotification');
         return $oAppNotificationModel->notify($key, $grouping, $data, $override);
     }
