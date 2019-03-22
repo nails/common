@@ -2,10 +2,12 @@
 
 namespace Nails\Common\Traits\Model;
 
+use Nails\Common\Service\Database;
 use Nails\Factory;
 
 /**
  * Trait Nestable
+ *
  * @package Nails\Common\Traits\Model
  */
 trait Nestable
@@ -47,6 +49,7 @@ trait Nestable
 
     /**
      * Returns the column to save breadcrumbs
+     *
      * @return string
      */
     public function getBreadcrumbsColumn()
@@ -57,7 +60,20 @@ trait Nestable
     // --------------------------------------------------------------------------
 
     /**
+     * Returns the column to save the hierarchy
+     *
+     * @return string
+     */
+    public function getOrderColumn()
+    {
+        return $this->getColumn('order', 'order');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Returns the column to save the parent ID
+     *
      * @return string
      */
     public function getParentIdColumn()
@@ -80,6 +96,7 @@ trait Nestable
         $mResult = parent::create($aData, $bReturnObject);
         if ($mResult) {
             $this->saveBreadcrumbs($bReturnObject ? $mResult->id : $mResult);
+            $this->saveOrder();
             //  Refresh object to get updated breadcrumbs/URL
             if ($bReturnObject) {
                 $mResult = $this->getById($mResult->id);
@@ -106,6 +123,7 @@ trait Nestable
             foreach ($aIds as $iId) {
                 $this->saveBreadcrumbs($iId);
             }
+            $this->saveOrder();
         }
         return $mResult;
     }
@@ -161,6 +179,80 @@ trait Nestable
                 $this->saveBreadcrumbs($oItem->id);
             }
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    protected function saveOrder()
+    {
+        /** @var Database $oDb */
+        $oDb = Factory::service('Database');
+        $oDb->select([
+            $this->getColumn('id'),
+            $this->getColumn('parent_id', 'parent_id'),
+        ]);
+        if (!$this->isDestructiveDelete()) {
+            $oDb->where($this->getColumn('deleted'), false);
+        }
+        $oDb->order_by($this->getColumn('label'));
+        $aItems = $oDb->get($this->getTableName())->result();
+
+        $iIndex = 0;
+        $aItems = $this->flattenTree(
+            $this->buildTree($aItems)
+        );
+
+        foreach ($aItems as $oItem) {
+            $oDb->set($this->getOrderColumn(), ++$iIndex);
+            $oDb->where($this->getColumn('id'), $oItem->id);
+            $oDb->update($this->getTableName());
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Builds a tree of objects
+     *
+     * @param array $aItems    The items to sort
+     * @param int   $iParentId The parent ID to sort on
+     *
+     * @return array
+     */
+    protected function buildTree(array &$aItems, int $iParentId = null): array
+    {
+        $aTemp         = [];
+        $sIdColumn     = $this->getColumn('id');
+        $sParentColumn = $this->getColumn('parent_id', 'parent_id');
+        foreach ($aItems as $oItem) {
+            if ($oItem->{$sParentColumn} == $iParentId) {
+                $oItem->children = $this->buildTree($aItems, $oItem->{$sIdColumn});
+                $aTemp[]         = $oItem;
+            }
+        }
+
+        return $aTemp;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Flattens a tree of objects
+     *
+     * @param array $aItems  The items to flatten
+     * @param array $aOutput The array to write to
+     *
+     * @return array
+     */
+    protected function flattenTree(array $aItems, &$aOutput = []): array
+    {
+        foreach ($aItems as $oItem) {
+            $aOutput[] = $oItem;
+            $this->flattenTree($oItem->children, $aOutput);
+            unset($oItem->children);
+        }
+
+        return $aOutput;
     }
 
     // --------------------------------------------------------------------------
