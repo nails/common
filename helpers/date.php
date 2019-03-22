@@ -25,8 +25,8 @@ if (!function_exists('convertDateTime')) {
      */
     function convertDateTime($mTimestamp, $sToTz, $sFromTz = 'UTC')
     {
-        $oDateTimeModel = Factory::model('DateTime');
-        return $oDateTimeModel->convert($mTimestamp, $sToTz, $sFromTz);
+        $oDateTimeService = Factory::service('DateTime');
+        return $oDateTimeService->convert($mTimestamp, $sToTz, $sFromTz);
     }
 }
 
@@ -44,8 +44,8 @@ if (!function_exists('toUserDate')) {
      */
     function toUserDate($mTimestamp = null, $sFormat = null)
     {
-        $oDateTimeModel = Factory::model('DateTime');
-        return $oDateTimeModel->toUserDate($mTimestamp, $sFormat);
+        $oDateTimeService = Factory::service('DateTime');
+        return $oDateTimeService->toUserDate($mTimestamp, $sFormat);
     }
 }
 
@@ -62,8 +62,8 @@ if (!function_exists('toNailsDate')) {
      */
     function toNailsDate($mTimestamp = null)
     {
-        $oDateTimeModel = Factory::model('DateTime');
-        return $oDateTimeModel->toNailsDate($mTimestamp);
+        $oDateTimeService = Factory::service('DateTime');
+        return $oDateTimeService->toNailsDate($mTimestamp);
     }
 }
 
@@ -81,8 +81,8 @@ if (!function_exists('toUserDatetime')) {
      */
     function toUserDatetime($mTimestamp = null, $sFormat = null)
     {
-        $oDateTimeModel = Factory::model('DateTime');
-        return $oDateTimeModel->toUserDatetime($mTimestamp, $sFormat);
+        $oDateTimeService = Factory::service('DateTime');
+        return $oDateTimeService->toUserDatetime($mTimestamp, $sFormat);
     }
 }
 
@@ -99,8 +99,8 @@ if (!function_exists('toNailsDatetime')) {
      */
     function toNailsDatetime($mTimestamp = null)
     {
-        $oDateTimeModel = Factory::model('DateTime');
-        return $oDateTimeModel->toNailsDatetime($mTimestamp);
+        $oDateTimeService = Factory::service('DateTime');
+        return $oDateTimeService->toNailsDatetime($mTimestamp);
     }
 }
 
@@ -126,8 +126,8 @@ if (!function_exists('niceTime')) {
         $sMessageGreaterOneWeek = null,
         $sMessageLessTenMinutes = null
     ) {
-        $oDateTimeModel = Factory::model('DateTime');
-        return $oDateTimeModel->niceTime(
+        $oDateTimeService = Factory::service('DateTime');
+        return $oDateTimeService->niceTime(
             $mDate,
             $bIncludeTense,
             $sMessageBadDate,
@@ -154,8 +154,8 @@ if (!function_exists('calculateAge')) {
      */
     function calculateAge($birthYear, $birthMonth, $birthDay, $deathYear = null, $deathMonth = null, $deathDay = null)
     {
-        $oDateTimeModel = Factory::model('DateTime');
-        return $oDateTimeModel->calculateAge($birthYear, $birthMonth, $birthDay, $deathYear, $deathMonth, $deathDay);
+        $oDateTimeService = Factory::service('DateTime');
+        return $oDateTimeService->calculateAge($birthYear, $birthMonth, $birthDay, $deathYear, $deathMonth, $deathDay);
     }
 }
 

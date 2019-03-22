@@ -363,10 +363,10 @@ abstract class Base extends \MX_Controller
      */
     protected function instantiateDateTime()
     {
-        $oDateTimeModel = Factory::model('DateTime');
+        $oDateTimeService = Factory::service('DateTime');
 
         //  Define default date format
-        $oDefaultDateFormat = $oDateTimeModel->getDateFormatDefault();
+        $oDefaultDateFormat = $oDateTimeService->getDateFormatDefault();
 
         if (empty($oDefaultDateFormat)) {
             throw new NailsException(
@@ -380,7 +380,7 @@ abstract class Base extends \MX_Controller
         Functions::define('APP_DEFAULT_DATETIME_FORMAT_DATE_FORMAT', $oDefaultDateFormat->format);
 
         //  Define default time format
-        $oDefaultTimeFormat = $oDateTimeModel->getTimeFormatDefault();
+        $oDefaultTimeFormat = $oDateTimeService->getTimeFormatDefault();
 
         if (empty($oDefaultTimeFormat)) {
             throw new NailsException(
@@ -404,10 +404,10 @@ abstract class Base extends \MX_Controller
         if (activeUser('timezone')) {
             $sTimezoneUser = activeUser('timezone');
         } else {
-            $sTimezoneUser = $oDateTimeModel->getTimezoneDefault();
+            $sTimezoneUser = $oDateTimeService->getTimezoneDefault();
         }
 
-        $oDateTimeModel->setTimezones('UTC', $sTimezoneUser);
+        $oDateTimeService->setTimezones('UTC', $sTimezoneUser);
 
         // --------------------------------------------------------------------------
 
@@ -418,7 +418,7 @@ abstract class Base extends \MX_Controller
         $sFormatTime = activeUser('datetime_format_time');
         $sFormatTime = $sFormatTime ? $sFormatTime : APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG;
 
-        $oDateTimeModel->setFormats($sFormatDate, $sFormatTime);
+        $oDateTimeService->setFormats($sFormatDate, $sFormatTime);
 
         // --------------------------------------------------------------------------
 

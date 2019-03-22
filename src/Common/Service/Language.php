@@ -10,7 +10,7 @@
  * @link
  */
 
-namespace Nails\Common\Model;
+namespace Nails\Common\Service;
 
 class Language
 {
@@ -31,6 +31,7 @@ class Language
 
     /**
      * Retursn the default language object
+     *
      * @return mixed stdClass on success, false on failure
      */
     public function getDefault()
@@ -45,6 +46,7 @@ class Language
 
     /**
      * Returns the default language's code
+     *
      * @return mixed stdClass on success, false on failure
      */
     public function getDefaultCode()
@@ -57,6 +59,7 @@ class Language
 
     /**
      * Returns the default language's label
+     *
      * @return mixed stdClass on success, false on failure
      */
     public function getDefaultLabel()
@@ -69,6 +72,7 @@ class Language
 
     /**
      * Returns all defined languages
+     *
      * @return array
      */
     public function getAll()
@@ -80,11 +84,12 @@ class Language
 
     /**
      * Returns all defined languages as a flat array
+     *
      * @return array
      */
     public function getAllFlat()
     {
-        $aOut       = array();
+        $aOut       = [];
         $aLanguages = $this->getAll();
 
         foreach ($aLanguages as $oLanguage) {
@@ -98,12 +103,13 @@ class Language
 
     /**
      * Returns all the enabled languages
+     *
      * @return array
      */
     public function getAllEnabled()
     {
         $aEnabled = $this->oCi->config->item('languages_enabled');
-        $aOut     = array();
+        $aOut     = [];
 
         foreach ($aEnabled as $sCode) {
             $aOut[] = $this->getByCode($sCode);
@@ -116,11 +122,12 @@ class Language
 
     /**
      * Returns all the enabled languages as a flat array
+     *
      * @return array
      */
     public function getAllEnabledFlat()
     {
-        $aOut       = array();
+        $aOut       = [];
         $aLanguages = $this->getAllEnabled();
 
         foreach ($aLanguages as $oLanguage) {
@@ -134,7 +141,9 @@ class Language
 
     /**
      * Returns a language by it's code
+     *
      * @param  string $sCode The language code
+     *
      * @return mixed         stdClass on success, false on failure
      */
     public function getByCode($sCode)

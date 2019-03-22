@@ -17,7 +17,7 @@ return [
         },
     ],
     'services'   => [
-        'AppSetting'      => function () {
+        'AppSetting'     => function () {
             if (class_exists('\App\Common\Service\AppSetting')) {
                 return new \App\Common\Service\AppSetting();
             } else {
