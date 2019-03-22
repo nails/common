@@ -32,7 +32,7 @@ if (!function_exists('show_error')) {
 
     function show_error($sMessage = '', $sSubject = '', $iStatusCode = 500)
     {
-        Functions::showError($$sMessage, $sSubject, $iStatusCode);
+        Functions::showError($sMessage, $sSubject, $iStatusCode);
     }
 }
 
