@@ -185,27 +185,32 @@ trait Nestable
 
     protected function saveOrder()
     {
-        /** @var Database $oDb */
-        $oDb = Factory::service('Database');
-        $oDb->select([
-            $this->getColumn('id'),
-            $this->getColumn('parent_id', 'parent_id'),
-        ]);
-        if (!$this->isDestructiveDelete()) {
-            $oDb->where($this->getColumn('deleted'), false);
-        }
-        $oDb->order_by($this->getColumn('label'));
-        $aItems = $oDb->get($this->getTableName())->result();
+        /**
+         * If the model also uses the Sortable trait then  let that handle sorting
+         */
+        if (!classUses($this, Sortable::class)) {
+            /** @var Database $oDb */
+            $oDb = Factory::service('Database');
+            $oDb->select([
+                $this->getColumn('id'),
+                $this->getColumn('parent_id', 'parent_id'),
+            ]);
+            if (!$this->isDestructiveDelete()) {
+                $oDb->where($this->getColumn('deleted'), false);
+            }
+            $oDb->order_by($this->getColumn('label'));
+            $aItems = $oDb->get($this->getTableName())->result();
 
-        $iIndex = 0;
-        $aItems = $this->flattenTree(
-            $this->buildTree($aItems)
-        );
+            $iIndex = 0;
+            $aItems = $this->flattenTree(
+                $this->buildTree($aItems)
+            );
 
-        foreach ($aItems as $oItem) {
-            $oDb->set($this->getOrderColumn(), ++$iIndex);
-            $oDb->where($this->getColumn('id'), $oItem->id);
-            $oDb->update($this->getTableName());
+            foreach ($aItems as $oItem) {
+                $oDb->set($this->getOrderColumn(), ++$iIndex);
+                $oDb->where($this->getColumn('id'), $oItem->id);
+                $oDb->update($this->getTableName());
+            }
         }
     }
 
