@@ -45,7 +45,7 @@ class Mime
     // --------------------------------------------------------------------------
 
     /**
-     * Detect a file's mimetype
+     * Detect a file's mimetype, first using the system, followed by the detector
      *
      * @param string $sFile The path to the file to detect
      *
@@ -54,7 +54,18 @@ class Mime
      */
     public function detectFromFile(string $sFile): string
     {
-        return $this->oDetector->getType($sFile);
+        if (!file_exists($sFile)) {
+            return '';
+        }
+
+        $rHandle = finfo_open(FILEINFO_MIME_TYPE);
+        $sMime   = finfo_file($rHandle, $sFile);
+
+        if ($sMime === 'application/octet-stream' || empty($sMime)) {
+            $sMime = $this->oDetector->getType($sFile);
+        }
+
+        return $sMime;
     }
 
     // --------------------------------------------------------------------------
