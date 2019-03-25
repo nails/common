@@ -2,6 +2,8 @@
 
 use Nails\Environment;
 use Nails\Testing;
+use MimeTyper\Repository\MimeDbRepository;
+use MimeType\MimeType;
 
 return [
     'properties' => [
@@ -135,6 +137,22 @@ return [
                 return new \App\Common\Service\Meta();
             } else {
                 return new \Nails\Common\Service\Meta();
+            }
+        },
+        'Mime'           => function ($oDatabase = null, $oDetector = null) {
+
+            if (!$oDatabase) {
+                $oDatabase = new MimeDbRepository();
+            }
+
+            if (!$oDetector) {
+                $oDetector = new MimeType();
+            }
+
+            if (class_exists('\App\Common\Service\Mime')) {
+                return new \App\Common\Service\Mime($oDatabase, $oDetector);
+            } else {
+                return new \Nails\Common\Service\Mime($oDatabase, $oDetector);
             }
         },
         'Mustache'       => function () {
