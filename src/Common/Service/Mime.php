@@ -111,7 +111,7 @@ class Mime
             $sMime = $this->oDetector->getType($sFile);
         }
 
-        return $sMime;
+        return $sMime ?? 'application/octet-stream';
     }
 
     // --------------------------------------------------------------------------
