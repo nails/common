@@ -49,6 +49,13 @@ abstract class HttpRequest
      */
     protected $sPath;
 
+    /**
+     * The UserAgent to use for the request
+     *
+     * @var string
+     */
+    protected $sUserAgent = 'Nails';
+
     // --------------------------------------------------------------------------
 
     /**
@@ -70,6 +77,7 @@ abstract class HttpRequest
 
         $this->baseUri($sBaseUri);
         $this->path($sPath);
+        $this->userAgent($this->sUserAgent);
 
         foreach ($aHeaders as $sHeader => $mValue) {
             $this->setHeader($sHeader, $mValue);
@@ -166,6 +174,20 @@ abstract class HttpRequest
     {
         $this->sPath = $sPath;
         return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Populates the UserAgent property of the request
+     *
+     * @param string $sUserAgent The UserAgentfor the request
+     *
+     * @return $this
+     */
+    public function userAgent($sUserAgent)
+    {
+        return $this->setHeader('User-Agent', $sUserAgent);
     }
 
     // --------------------------------------------------------------------------
