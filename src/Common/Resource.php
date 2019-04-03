@@ -12,7 +12,7 @@ class Resource
     /**
      * Resource constructor.
      *
-     * @param Resource|\stdClass|array $mObj The database row
+     * @param self|\stdClass|array $mObj The database row
      */
     public function __construct($mObj = [])
     {
