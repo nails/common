@@ -219,6 +219,54 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Return a random datetime, optionally restricted between bounds
+     *
+     * @param string $sLow    The lowest possible datetime to return
+     * @param string $sHigh   The highest possible datetime to return
+     * @param string $sFormat The format to return the datetime value in
+     *
+     * @return string
+     */
+    protected function randomDateTime($sLow = null, $sHigh = null, $sFormat = 'Y-m-d H:i:s')
+    {
+        $iLow  = $sLow ? strtotime($sLow) : strtotime('last year');
+        $iHigh = $sHigh ? strtotime($sHigh) : strtotime('next year');
+        return date($sFormat, rand($iLow, $iHigh));
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Return a random datetime from the future, optionally restricted to a upper bound
+     *
+     * @param string $sHigh The highest possible datetime to return
+     *
+     * @return string
+     */
+    protected function randomFutureDateTime($sHigh = null)
+    {
+        $oNow = Factory::factory('DateTime');
+        return $this->randomDateTime($oNow->format('Y-m-d H:i:s'), $sHigh);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Return a random datetime from the past, optionally restricted to a lower bound
+     *
+     * @param string $sLow The lowest possible datetime to return
+     *
+     * @return string
+     */
+    protected function randomPastDateTime($sLow = null)
+    {
+        $oNow = Factory::factory('DateTime');
+        return $this->randomDateTime($sLow, $oNow->format('Y-m-d H:i:s'));
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Return a random date, optionally restricted between bounds
      *
      * @param string $sLow    The lowest possible date to return
@@ -227,7 +275,7 @@ class Base
      *
      * @return string
      */
-    protected function randomDateTime($sLow = null, $sHigh = null, $sFormat = 'Y-m-d H:i:s')
+    protected function randomDate($sLow = null, $sHigh = null, $sFormat = 'Y-m-d')
     {
         $iLow  = $sLow ? strtotime($sLow) : strtotime('last year');
         $iHigh = $sHigh ? strtotime($sHigh) : strtotime('next year');
@@ -243,10 +291,10 @@ class Base
      *
      * @return string
      */
-    protected function randomFutureDateTime($sHigh = null)
+    protected function randomFutureDate($sHigh = null)
     {
         $oNow = Factory::factory('DateTime');
-        return $this->randomDateTime($oNow->format('Y-m-d H:i:s'), $sHigh);
+        return $this->randomDateTime($oNow->format('Y-m-d'), $sHigh);
     }
 
     // --------------------------------------------------------------------------
@@ -258,10 +306,10 @@ class Base
      *
      * @return string
      */
-    protected function randomPastDateTime($sLow = null)
+    protected function randomPastDate($sLow = null)
     {
         $oNow = Factory::factory('DateTime');
-        return $this->randomDateTime($sLow, $oNow->format('Y-m-d H:i:s'));
+        return $this->randomDateTime($sLow, $oNow->format('Y-m-d'));
     }
 
     // --------------------------------------------------------------------------
