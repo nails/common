@@ -64,7 +64,7 @@ class Migration extends BaseMaker
         } catch (\Exception $e) {
             return $this->abort(
                 self::EXIT_CODE_FAILURE,
-                $e->getMessage()
+                [$e->getMessage()]
             );
         }
 
