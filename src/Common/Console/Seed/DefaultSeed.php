@@ -92,6 +92,9 @@ class DefaultSeed extends Base
                 case 'date':
                     $mValue = $this->randomDateTime(null, null, 'Y-m-d');
                     break;
+                case 'time':
+                    $mValue = $this->randomDateTime(null, null, 'H:i:s');
+                    break;
                 case 'dropdown':
                     $mValue = $this->randomItem(array_keys($oField->options));
                     break;

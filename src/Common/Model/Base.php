@@ -290,8 +290,8 @@ abstract class Base
     /**
      * Creates a new object
      *
-     * @param  array   $aData         The data to create the object with
-     * @param  boolean $bReturnObject Whether to return just the new ID or the full object
+     * @param array   $aData         The data to create the object with
+     * @param boolean $bReturnObject Whether to return just the new ID or the full object
      *
      * @return mixed
      * @throws ModelException
@@ -434,8 +434,8 @@ abstract class Base
     /**
      * Updates an existing object
      *
-     * @param  integer|array $mIds  The ID (or array of IDs) of the object(s) to update
-     * @param  array         $aData The data to update the object(s) with
+     * @param integer|array $mIds  The ID (or array of IDs) of the object(s) to update
+     * @param array         $aData The data to update the object(s) with
      *
      * @return boolean
      * @throws ModelException
@@ -580,7 +580,7 @@ abstract class Base
      * destroy the object. If Non-destructive deletion is enabled then the
      * $this->tableDeletedColumn field will be set to true.
      *
-     * @param  integer|array $mIds The ID (or an array of IDs) of the object(s) to mark as deleted
+     * @param integer|array $mIds The ID (or an array of IDs) of the object(s) to mark as deleted
      *
      * @return boolean
      * @throws ModelException
@@ -623,7 +623,7 @@ abstract class Base
      * If Non-destructive deletion is enabled then the $this->tableDeletedColumn
      * field will be set to false.
      *
-     * @param  int $iId The ID of the object to restore
+     * @param int $iId The ID of the object to restore
      *
      * @return boolean
      * @throws ModelException
@@ -662,7 +662,7 @@ abstract class Base
      * This method will attempt to delete the row from the table, regardless of whether
      * destructive deletion is enabled or not.
      *
-     * @param  integer|array $mIds The ID (or array of IDs) of the object to destroy
+     * @param integer|array $mIds The ID (or array of IDs) of the object to destroy
      *
      * @return boolean
      * @throws ModelException
@@ -719,10 +719,10 @@ abstract class Base
     /**
      * Fetches all objects, optionally paginated. Returns the basic query object with no formatting.
      *
-     * @param  int|null $iPage           The page number of the results, if null then no pagination
-     * @param  int|null $iPerPage        How many items per page of paginated results
-     * @param  array    $aData           Any data to pass to getCountCommon()
-     * @param  bool     $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted
+     * @param int|null $iPage            The page number of the results, if null then no pagination
+     * @param int|null $iPerPage         How many items per page of paginated results
+     * @param array    $aData            Any data to pass to getCountCommon()
+     * @param bool     $bIncludeDeleted  If non-destructive delete is enabled then this flag allows you to include deleted
      *                                   items
      *
      * @return object
@@ -961,10 +961,10 @@ abstract class Base
     /**
      * Fetches all objects as a flat array
      *
-     * @param  int|null $iPage           The page number of the results
-     * @param  int|null $iPerPage        The number of items per page
-     * @param  array    $aData           Any data to pass to getCountCommon()
-     * @param  boolean  $bIncludeDeleted Whether or not to include deleted items
+     * @param int|null $iPage           The page number of the results
+     * @param int|null $iPerPage        The number of items per page
+     * @param array    $aData           Any data to pass to getCountCommon()
+     * @param boolean  $bIncludeDeleted Whether or not to include deleted items
      *
      * @return array
      * @throws ModelException
@@ -1139,8 +1139,8 @@ abstract class Base
     /**
      * Fetch an object by it's ID
      *
-     * @param  int   $iId   The ID of the object to fetch
-     * @param  mixed $aData Any data to pass to getCountCommon()
+     * @param int   $iId   The ID of the object to fetch
+     * @param mixed $aData Any data to pass to getCountCommon()
      *
      * @return \stdClass|false
      * @throws ModelException
@@ -1159,8 +1159,8 @@ abstract class Base
     /**
      * Fetch objects by their IDs
      *
-     * @param  array  $aIds                An array of IDs to fetch
-     * @param  mixed  $aData               Any data to pass to getCountCommon()
+     * @param array   $aIds                An array of IDs to fetch
+     * @param mixed   $aData               Any data to pass to getCountCommon()
      * @param boolean $bMaintainInputOrder Whether to maintain the input order
      *
      * @return array
@@ -1185,8 +1185,8 @@ abstract class Base
     /**
      * Fetch an object by it's slug
      *
-     * @param  string $sSlug The slug of the object to fetch
-     * @param  array  $aData Any data to pass to getCountCommon()
+     * @param string $sSlug The slug of the object to fetch
+     * @param array  $aData Any data to pass to getCountCommon()
      *
      * @return \stdClass
      * @throws ModelException
@@ -1205,8 +1205,8 @@ abstract class Base
     /**
      * Fetch objects by their slugs
      *
-     * @param  array  $aSlugs              An array of slugs to fetch
-     * @param  array  $aData               Any data to pass to getCountCommon()
+     * @param array   $aSlugs              An array of slugs to fetch
+     * @param array   $aData               Any data to pass to getCountCommon()
      * @param boolean $bMaintainInputOrder Whether to maintain the input order
      *
      * @return array
@@ -1236,8 +1236,8 @@ abstract class Base
      * an ID or a slug has been passed, thus numeric slugs (which are against
      * Nails style guidelines) will be interpreted incorrectly.
      *
-     * @param  mixed $mIdSlug The ID or slug of the object to fetch
-     * @param  array $aData   Any data to pass to getCountCommon()
+     * @param mixed $mIdSlug The ID or slug of the object to fetch
+     * @param array $aData   Any data to pass to getCountCommon()
      *
      * @return \stdClass
      */
@@ -1255,8 +1255,8 @@ abstract class Base
     /**
      * Fetch an object by its token
      *
-     * @param  string $sToken The token of the object to fetch
-     * @param  array  $aData  Any data to pass to getCountCommon()
+     * @param string $sToken The token of the object to fetch
+     * @param array  $aData  Any data to pass to getCountCommon()
      *
      * @return \stdClass|null
      * @throws ModelException if object property tableTokenColumn is not set
@@ -1275,8 +1275,8 @@ abstract class Base
     /**
      * Fetch objects by an array of tokens
      *
-     * @param  array  $aTokens             An array of tokens to fetch
-     * @param  array  $aData               Any data to pass to getCountCommon()
+     * @param array   $aTokens             An array of tokens to fetch
+     * @param array   $aData               Any data to pass to getCountCommon()
      * @param boolean $bMaintainInputOrder Whether to maintain the input order
      *
      * @return array
@@ -1326,13 +1326,13 @@ abstract class Base
      * Get associated content for the items in the result set where the the relationship is 1 to 1 and the binding
      * is made in the item object (i.e current item contains the associated item's ID)
      *
-     * @param  array   &$aItems                   The result set of items
-     * @param  string   $sAssociatedItemIdColumn  Which property in the result set contains the associated content's ID
-     * @param  string   $sItemProperty            What property of each item to assign the associated content
-     * @param  string   $sAssociatedModel         The name of the model which handles the associated content
-     * @param  string   $sAssociatedModelProvider Which module provides the associated model
-     * @param  array    $aAssociatedModelData     Data to pass to the associated model's getByIds method()
-     * @param  boolean  $bUnsetOriginalProperty   Whether to remove the original property (i.e the property defined by
+     * @param array   &$aItems                    The result set of items
+     * @param string   $sAssociatedItemIdColumn   Which property in the result set contains the associated content's ID
+     * @param string   $sItemProperty             What property of each item to assign the associated content
+     * @param string   $sAssociatedModel          The name of the model which handles the associated content
+     * @param string   $sAssociatedModelProvider  Which module provides the associated model
+     * @param array    $aAssociatedModelData      Data to pass to the associated model's getByIds method()
+     * @param boolean  $bUnsetOriginalProperty    Whether to remove the original property (i.e the property defined by
      *                                            $sAssociatedItemIdColumn)
      *
      * @return void
@@ -1390,12 +1390,12 @@ abstract class Base
     /**
      * Get associated content for the items in the result set where the the relationship is 1 to many
      *
-     * @param  array  &$aItems                   The result set of items
-     * @param  string  $sItemProperty            What property of each item to assign the associated content
-     * @param  string  $sAssociatedItemIdColumn  Which property in the associated content which contains the item's ID
-     * @param  string  $sAssociatedModel         The name of the model which handles the associated content
-     * @param  string  $sAssociatedModelProvider Which module provides the associated model
-     * @param  array   $aAssociatedModelData     Data to pass to the associated model's getByIds method()
+     * @param array  &$aItems                   The result set of items
+     * @param string  $sItemProperty            What property of each item to assign the associated content
+     * @param string  $sAssociatedItemIdColumn  Which property in the associated content which contains the item's ID
+     * @param string  $sAssociatedModel         The name of the model which handles the associated content
+     * @param string  $sAssociatedModelProvider Which module provides the associated model
+     * @param array   $aAssociatedModelData     Data to pass to the associated model's getByIds method()
      *
      * @return void
      */
@@ -1448,12 +1448,12 @@ abstract class Base
     /**
      * Count associated content for the items in the result set where the the relationship is 1 to many
      *
-     * @param  array  &$aItems                   The result set of items
-     * @param  string  $sItemProperty            What property of each item to assign the associated content
-     * @param  string  $sAssociatedItemIdColumn  Which property in the associated content which contains the item's ID
-     * @param  string  $sAssociatedModel         The name of the model which handles the associated content
-     * @param  string  $sAssociatedModelProvider Which module provides the associated model
-     * @param  array   $aAssociatedModelData     Data to pass to the associated model's getByIds method()
+     * @param array  &$aItems                   The result set of items
+     * @param string  $sItemProperty            What property of each item to assign the associated content
+     * @param string  $sAssociatedItemIdColumn  Which property in the associated content which contains the item's ID
+     * @param string  $sAssociatedModel         The name of the model which handles the associated content
+     * @param string  $sAssociatedModelProvider Which module provides the associated model
+     * @param array   $aAssociatedModelData     Data to pass to the associated model's getByIds method()
      *
      * @return void
      */
@@ -1502,15 +1502,15 @@ abstract class Base
     /**
      * Get associated content for the items in the result set using a taxonomy table
      *
-     * @param  array  &$aItems                      The result set of items
-     * @param  string  $sItemProperty               What property of each item to assign the associated content
-     * @param  string  $sTaxonomyModel              The name of the model which handles the taxonomy relationships
-     * @param  string  $sTaxonomyModelProvider      Which module provides the taxonomy model
-     * @param  string  $sAssociatedModel            The name of the model which handles the associated content
-     * @param  string  $sAssociatedModelProvider    Which module provides the associated model
-     * @param  array   $aAssociatedModelData        Data to pass to the associated model's getByIds method()
-     * @param  string  $sTaxonomyItemIdColumn       The name of the column in the taxonomy table for the item ID
-     * @param  string  $sTaxonomyAssociatedIdColumn The name of the column in the taxonomy table for the associated ID
+     * @param array  &$aItems                      The result set of items
+     * @param string  $sItemProperty               What property of each item to assign the associated content
+     * @param string  $sTaxonomyModel              The name of the model which handles the taxonomy relationships
+     * @param string  $sTaxonomyModelProvider      Which module provides the taxonomy model
+     * @param string  $sAssociatedModel            The name of the model which handles the associated content
+     * @param string  $sAssociatedModelProvider    Which module provides the associated model
+     * @param array   $aAssociatedModelData        Data to pass to the associated model's getByIds method()
+     * @param string  $sTaxonomyItemIdColumn       The name of the column in the taxonomy table for the item ID
+     * @param string  $sTaxonomyAssociatedIdColumn The name of the column in the taxonomy table for the associated ID
      *
      * @return void
      */
@@ -1593,11 +1593,11 @@ abstract class Base
     /**
      * Save associated items for an object
      *
-     * @param  integer $iItemId                  The ID of the main item
-     * @param  array   $aAssociatedItems         The data to save, multi-dimensional array of data
-     * @param  string  $sAssociatedItemIdColumn  The name of the ID column in the associated table
-     * @param  string  $sAssociatedModel         The name of the model which is responsible for associated items
-     * @param  string  $sAssociatedModelProvider What module provide the associated item model
+     * @param integer $iItemId                  The ID of the main item
+     * @param array   $aAssociatedItems         The data to save, multi-dimensional array of data
+     * @param string  $sAssociatedItemIdColumn  The name of the ID column in the associated table
+     * @param string  $sAssociatedModel         The name of the model which is responsible for associated items
+     * @param string  $sAssociatedModelProvider What module provide the associated item model
      *
      * @return boolean
      * @throws ModelException
@@ -1689,8 +1689,8 @@ abstract class Base
     /**
      * Counts all objects
      *
-     * @param  array   $aData           An array of data to pass to getCountCommon()
-     * @param  boolean $bIncludeDeleted Whether to include deleted objects or not
+     * @param array   $aData           An array of data to pass to getCountCommon()
+     * @param boolean $bIncludeDeleted Whether to include deleted objects or not
      *
      * @return integer
      * @throws ModelException
@@ -1722,11 +1722,11 @@ abstract class Base
     /**
      * Searches for objects, optionally paginated.
      *
-     * @param  string   $sKeywords       The search term
-     * @param  int|null $iPage           The page number of the results, if null then no pagination
-     * @param  int|null $iPerPage        How many items per page of paginated results
-     * @param  mixed    $aData           Any data to pass to getCountCommon()
-     * @param  bool     $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include
+     * @param string   $sKeywords        The search term
+     * @param int|null $iPage            The page number of the results, if null then no pagination
+     * @param int|null $iPerPage         How many items per page of paginated results
+     * @param mixed    $aData            Any data to pass to getCountCommon()
+     * @param bool     $bIncludeDeleted  If non-destructive delete is enabled then this flag allows you to include
      *                                   deleted items
      *
      * @return \stdClass
@@ -1906,11 +1906,11 @@ abstract class Base
      * The getAll() method iterates over each returned item with this method so as to
      * correctly format the output. Use this to cast integers and booleans and/or organise data into objects.
      *
-     * @param  object $oObj      A reference to the object being formatted.
-     * @param  array  $aData     The same data array which is passed to _getCountCommon, for reference if needed
-     * @param  array  $aIntegers Fields which should be cast as integers if numerical and not null
-     * @param  array  $aBools    Fields which should be cast as booleans if not null
-     * @param  array  $aFloats   Fields which should be cast as floats if not null
+     * @param object $oObj      A reference to the object being formatted.
+     * @param array  $aData     The same data array which is passed to _getCountCommon, for reference if needed
+     * @param array  $aIntegers Fields which should be cast as integers if numerical and not null
+     * @param array  $aBools    Fields which should be cast as booleans if not null
+     * @param array  $aFloats   Fields which should be cast as floats if not null
      *
      * @return void
      */
@@ -2129,7 +2129,7 @@ abstract class Base
     /**
      * Extracts any autosaveable expandable fields and unsets them from the main array
      *
-     * @param  array $aData The data passed to create() or update()
+     * @param array $aData The data passed to create() or update()
      *
      * @return array
      */
@@ -2239,7 +2239,7 @@ abstract class Base
      * Describes the fields for this model automatically and with some guesswork;
      * for more fine grained control models should overload this method.
      *
-     * @param  string|null $sTable The database table to query
+     * @param string|null $sTable The database table to query
      *
      * @return array
      */
@@ -2353,6 +2353,9 @@ abstract class Base
                 break;
             case 'datetime':
                 $oField->type = 'datetime';
+                break;
+            case 'time':
+                $oField->type = 'time';
                 break;
 
             /**
