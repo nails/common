@@ -27,6 +27,7 @@ class View
 
     /**
      * An array of data which is passed to the views
+     *
      * @var array
      */
     protected $aData = [];
@@ -35,15 +36,24 @@ class View
 
     /**
      * The paths to look for views in
+     *
      * @var array
      */
     protected $aViewPaths = [];
 
     /**
      * Stores the current buffer level
+     *
      * @var int
      */
     protected $iBufferLevel;
+
+    /**
+     * Tracks which views have been loaded, and how many times
+     *
+     * @var string[]
+     */
+    protected $aLoadedViews = [];
 
     // --------------------------------------------------------------------------
 
@@ -175,6 +185,12 @@ class View
             extract($aData);
             include $sResolvedPath;
 
+            if (!array_key_exists($sResolvedPath, $this->aLoadedViews)) {
+                $this->aLoadedViews[$sResolvedPath] = 0;
+            }
+
+            $this->aLoadedViews[$sResolvedPath]++;
+
             if ($bReturn) {
                 $sBuffer = ob_get_contents();
                 @ob_end_clean();
@@ -200,9 +216,9 @@ class View
      *
      * @param stirng $sView The view to resolve
      *
-     * @throws ViewNotFoundCaseException
-     * @throws ViewNotFoundException
      * @return bool|string
+     * @throws ViewNotFoundException
+     * @throws ViewNotFoundCaseException
      */
     protected function resolvePath($sView)
     {
@@ -276,5 +292,26 @@ class View
     public function __get($sProperty)
     {
         return function_exists('get_instance') ? get_instance()->{$sProperty} : null;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Determines if a view has previous been loaded or not
+     *
+     * @param string $sView The view to checl
+     *
+     * @return bool
+     */
+    public function isLoaded(string $sView): bool
+    {
+        try {
+            return array_key_exists(
+                $this->resolvePath($sView),
+                $this->aLoadedViews
+            );
+        } catch (ViewNotFoundException $e) {
+            return false;
+        }
     }
 }
