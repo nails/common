@@ -39,7 +39,8 @@
         "ralouphie/getallheaders": "3.*",
         "defuse/php-encryption": "2.*",
         "adrienrn/php-mimetyper": "^0.2.2",
-        "katzien/php-mime-type": "^2.1"
+        "katzien/php-mime-type": "^2.1",
+        "axisofstevil/stop-words": "^0.1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "8.*"
