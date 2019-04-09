@@ -41,8 +41,8 @@ class Controller extends BaseMaker
     /**
      * Executes the app
      *
-     * @param  InputInterface  $oInput  The Input Interface provided by Symfony
-     * @param  OutputInterface $oOutput The Output Interface provided by Symfony
+     * @param InputInterface  $oInput  The Input Interface provided by Symfony
+     * @param OutputInterface $oOutput The Output Interface provided by Symfony
      *
      * @return int
      */
@@ -84,8 +84,8 @@ class Controller extends BaseMaker
     /**
      * Create the Model
      *
-     * @throws ConsoleException
      * @return void
+     * @throws ConsoleException
      */
     private function createController(): void
     {
@@ -167,22 +167,22 @@ class Controller extends BaseMaker
                     $sViewPrefix     = lcfirst($aFields['MODULE_NAME']) . '/' . $aFields['CONTROLLER_NAME'] . '/';
                 }
 
-                $aMethodStrings   = [];
-                $aFields['VIEWS'] = [];
+                $aMethodStrings = [];
+                $aViews         = [];
                 reset($aMethods);
                 foreach ($aMethods as $sMethod) {
 
-                    $aFields['VIEWS'][] = $sViewPathPrefix . $sMethod;
-                    $aMethodStrings[]   = '';
-                    $aMethodStrings[]   = $this->getResource(
+                    $aViews[]         = $sViewPathPrefix . $sMethod;
+                    $aMethodStrings[] = '';
+                    $aMethodStrings[] = $this->getResource(
                         'template/controller_method.php',
                         [
                             'METHOD_NAME' => $sMethod,
                             'METHOD_VIEW' => $sViewPrefix . $sMethod,
                         ]
                     );
-                    $aMethodStrings[]   = '';
-                    $aMethodStrings[]   = '// --------------------------------------------------------------------------';
+                    $aMethodStrings[] = '';
+                    $aMethodStrings[] = '// --------------------------------------------------------------------------';
                 }
 
                 //  Remove the first item (blank string) and the last two (separators)
@@ -220,7 +220,7 @@ class Controller extends BaseMaker
                 $this->oOutput->write('Creating views for controller <comment>' . $sController . '</comment>... ');
                 $this->createPath($aFields['VIEW_PATH']);
 
-                foreach ($aFields['VIEWS'] as $sView) {
+                foreach ($aViews as $sView) {
                     $sViewPath    = $aFields['VIEW_PATH'] . $sView . '.php';
                     $sViewSubPath = dirname($sView);
                     if ($sViewSubPath !== '.') {
