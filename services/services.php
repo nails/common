@@ -1,9 +1,8 @@
 <?php
 
-use Nails\Environment;
-use Nails\Testing;
-use MimeTyper\Repository\MimeDbRepository;
 use MimeType\MimeType;
+use MimeTyper\Repository\MimeDbRepository;
+use Nails\Environment;
 
 return [
     'properties' => [
@@ -337,6 +336,13 @@ return [
                 return new \App\Common\Factory\Locale\Script($sLabel);
             } else {
                 return new \Nails\Common\Factory\Locale\Script($sLabel);
+            }
+        },
+        'Pagination'        => function () {
+            if (class_exists('\App\Common\Factory\Pagination')) {
+                return new \App\Common\Factory\Pagination();
+            } else {
+                return new \Nails\Common\Factory\Pagination();
             }
         },
     ],
