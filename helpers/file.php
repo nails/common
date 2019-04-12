@@ -37,4 +37,6 @@ if (!function_exists('isDirCS')) {
     }
 }
 
+// --------------------------------------------------------------------------
+
 include NAILS_CI_SYSTEM_PATH . 'helpers/file_helper.php';

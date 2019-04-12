@@ -16,6 +16,7 @@ class File
 {
     /**
      * Caches the results of static::fileExistsCS()
+     *
      * @var array
      */
     protected static $aFileExistsCache = [];
@@ -24,6 +25,7 @@ class File
 
     /**
      * Caches the results of static::isDirCS()
+     *
      * @var array
      */
     protected static $aIsDirCache = [];
@@ -34,8 +36,8 @@ class File
      * Outputs a file in bytesized chunks.
      * http://teddy.fr/2007/11/28/how-serve-big-files-through-php/
      *
-     * @param  string  $sFilename  The file to output
-     * @param  integer $iChunkSize The chunk size, in bytes
+     * @param string  $sFilename  The file to output
+     * @param integer $iChunkSize The chunk size, in bytes
      *
      * @return bool|int
      */
