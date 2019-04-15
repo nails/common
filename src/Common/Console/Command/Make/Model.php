@@ -5,6 +5,7 @@ namespace Nails\Common\Console\Command\Make;
 use Nails\Common\Exception\Database\ConnectionException;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
+use Nails\Common\Service\Database;
 use Nails\Common\Traits\Model\Localised;
 use Nails\Components;
 use Nails\Console\Command\BaseMaker;
@@ -730,7 +731,61 @@ class Model extends BaseMaker
      */
     private function addLocalisedUseStatement(\stdClass $oModel): self
     {
-        //  @todo (Pablo - 2019-04-15) - Add the `use` statement to the model
+        $sFile = file_get_contents($oModel->path . $oModel->filename);
+
+        // --------------------------------------------------------------------------
+
+        //  Add the imports
+        $aClasses = [];
+        if (preg_match_all('/^use (.+);$/m', $sFile, $aMatches)) {
+            if (!empty($aMatches[1])) {
+                $aClasses = $aMatches[1];
+            }
+        }
+
+        $aClasses[] = Localised::class;
+        $aClasses   = array_unique($aClasses);
+        $aClasses   = array_filter($aClasses);
+        sort($aClasses);
+        $aClasses    = array_values($aClasses);
+        $sStatements = implode("\n", array_map(function ($sClass) {
+            return 'use ' . $sClass . ';';
+        }, $aClasses));
+
+        //  Write the imports after `namespace`
+        $sFile = preg_replace('/^use.+?;(\n\n|\nclass)/sm', '', $sFile);
+        $sFile = preg_replace('/^(namespace .+)$\n/m', "$1\n\n" . $sStatements . "\n", $sFile);
+
+        // --------------------------------------------------------------------------
+
+        $aClasses = [];
+        if (preg_match_all('/^    use (.+);$/m', $sFile, $aMatches)) {
+            if (!empty($aMatches[1])) {
+                $aClasses = $aMatches[1];
+            }
+        }
+
+        $aTraitBits = explode('\\', Localised::class);
+        $aClasses[] = end($aTraitBits);
+        $aClasses   = array_unique($aClasses);
+        $aClasses   = array_filter($aClasses);
+        sort($aClasses);
+        $aClasses    = array_values($aClasses);
+        $sStatements = implode("\n", array_map(function ($sClass) {
+            return '    use ' . $sClass . ';';
+        }, $aClasses));
+
+        //  Write the statements after the class definition
+        $sFile = preg_replace('/^    use.+?;(\n\n|\nclass)/sm', '', $sFile);
+        $sFile = preg_replace('/^(class .+)$\n^{$/m', "$1\n{\n" . $sStatements . "\n", $sFile);
+
+        // --------------------------------------------------------------------------
+
+        file_put_contents(
+            $oModel->path . $oModel->filename,
+            $sFile
+        );
+
         return $this;
     }
 
@@ -745,7 +800,48 @@ class Model extends BaseMaker
      */
     private function convertTablesToLocalised(\stdClass $oModel): self
     {
-        //  @todo (Pablo - 2019-04-15) - Convert the tables to the localised format
+        /** @var Database $oDb */
+        $oDb = Factory::service('Database');
+        /** @var \Nails\Common\Service\Locale $locale */
+        $oLocale = Factory::service('Locale');
+
+        $aQueries = [
+            //  Disable foreign key checks so we can shift the tables about
+            'SET FOREIGN_KEY_CHECKS = 0;',
+
+            //  Rename the existing table (and data)
+            'RENAME TABLE `' . $oModel->table_with_prefix . '` TO `' . $oModel->table_with_prefix . '_localised`;',
+
+            //  Drop the AUTO_INCREMENT key
+            'ALTER TABLE `' . $oModel->table_with_prefix . '_localised` CHANGE `id` `id` INT(11) UNSIGNED NOT NULL;',
+
+            //  Create the new top-level table
+            'CREATE TABLE `' . $oModel->table_with_prefix . '` (id INT(11) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT) DEFAULT CHARACTER SET `utf8`;',
+
+            //  Add a foreign key to the localised table
+            'ALTER TABLE `' . $oModel->table_with_prefix . '_localised` ADD FOREIGN KEY (`id`) REFERENCES `' . $oModel->table_with_prefix . '` (`id`) ON DELETE CASCADE;',
+
+            //  Add the locale columns
+            'ALTER TABLE `' . $oModel->table_with_prefix . '_localised` ADD `language` VARCHAR(5) NULL DEFAULT NULL AFTER `id`;',
+            'ALTER TABLE `' . $oModel->table_with_prefix . '_localised` ADD `region` VARCHAR(5) NULL DEFAULT NULL AFTER `language`;',
+
+            //  Populate the top-level table
+            'INSERT INTO ' . $oModel->table_with_prefix . ' SELECT id FROM ' . $oModel->table_with_prefix . '_localised;',
+
+            //  @todo (Pablo - 2019-04-15) - Update the columns with the default language
+            'UPDATE `' . $oModel->table_with_prefix . '_localised` SET `language` = "' . $oLocale->get()->getLanguage() . '"',
+            'UPDATE `' . $oModel->table_with_prefix . '_localised` SET `region` = "' . $oLocale->get()->getRegion() . '"',
+
+            //  Re-enable foreign key checks
+            'SET FOREIGN_KEY_CHECKS = 1;',
+        ];
+
+        array_walk($aQueries, function ($sQuery) use ($oDb) {
+            $oDb->query($sQuery);
+        });
+
+        $this->warning(array_merge(['Remember to add migrations!', ''], $aQueries));
+
         return $this;
     }
 }
