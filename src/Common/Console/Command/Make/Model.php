@@ -270,19 +270,20 @@ class Model extends BaseMaker
             foreach ($aModelData as $oModel) {
                 $oOutput->writeln('Model Class:    <info>\\' . $oModel->class_path . '</info>');
                 $oOutput->writeln('Model Path:     <info>' . $oModel->path . $oModel->filename . '</info>');
-                $oOutput->writeln('Resource Class: <info>\\' . $oModel->resource_class_path . '</info>');
-                $oOutput->writeln('Resource Path:  <info>' . $oModel->resource_path . $oModel->resource_filename . '</info>');
-                if (!$bSkipDb) {
-                    $oOutput->writeln('Table:          <info>' . $oModel->table_with_prefix . '</info>');
-                }
-                if ($bAdmin) {
-                    $oOutput->writeln('Admin:          <info>Controller will be created</info>');
-                }
-                if (!$bSkipSeeder) {
-                    $oOutput->writeln('Seeder:         <info>Seeder will be created</info>');
-                }
                 if ($bLocalised && $this->modelExists($oModel)) {
                     $oOutput->writeln('Localised:      <info>Model will be converted</info>');
+                } else {
+                    $oOutput->writeln('Resource Class: <info>\\' . $oModel->resource_class_path . '</info>');
+                    $oOutput->writeln('Resource Path:  <info>' . $oModel->resource_path . $oModel->resource_filename . '</info>');
+                    if (!$bSkipDb) {
+                        $oOutput->writeln('Table:          <info>' . $oModel->table_with_prefix . '</info>');
+                    }
+                    if ($bAdmin) {
+                        $oOutput->writeln('Admin:          <info>Controller will be created</info>');
+                    }
+                    if (!$bSkipSeeder) {
+                        $oOutput->writeln('Seeder:         <info>Seeder will be created</info>');
+                    }
                 }
                 $oOutput->writeln('');
             }
