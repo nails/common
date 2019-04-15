@@ -2,10 +2,13 @@
 
 namespace Nails\Common\Console\Command\Make;
 
-use Nails\Common\Exception\NailsException;
 use Nails\Common\Exception\Database\ConnectionException;
-use Nails\Console\Command\BaseMaker;
+use Nails\Common\Exception\FactoryException;
+use Nails\Common\Exception\NailsException;
+use Nails\Common\Traits\Model\Localised;
 use Nails\Components;
+use Nails\Console\Command\BaseMaker;
+use Nails\Console\Exception\Path;
 use Nails\Factory;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -39,31 +42,34 @@ class Model extends BaseMaker
             ->addOption(
                 'skip-db',
                 null,
-                InputOption::VALUE_OPTIONAL,
-                'Skip database table creation',
-                false
+                InputOption::VALUE_NONE,
+                'Skip database table creation'
             )
             ->addOption(
                 'skip-seeder',
                 null,
-                InputOption::VALUE_OPTIONAL,
-                'Skip seeder creation',
-                false
+                InputOption::VALUE_NONE,
+                'Skip seeder creation'
             )
             ->addOption(
                 'auto-detect',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_NONE,
                 'Automatically build models from the database'
+            )
+            ->addOption(
+                'localised',
+                null,
+                InputOption::VALUE_NONE,
+                'Create a localised model (or convert an existing model)'
             );
 
         if (Components::exists('nails/module-admin')) {
             $this->addOption(
-                'skip-admin',
+                'admin',
                 null,
-                InputOption::VALUE_OPTIONAL,
-                'Skip admin creation',
-                true
+                InputOption::VALUE_NONE,
+                'Create an admin controller'
             );
         }
     }
@@ -73,8 +79,8 @@ class Model extends BaseMaker
     /**
      * Executes the app
      *
-     * @param  InputInterface  $oInput  The Input Interface provided by Symfony
-     * @param  OutputInterface $oOutput The Output Interface provided by Symfony
+     * @param InputInterface  $oInput  The Input Interface provided by Symfony
+     * @param OutputInterface $oOutput The Output Interface provided by Symfony
      *
      * @return int
      */
@@ -84,9 +90,8 @@ class Model extends BaseMaker
 
         // --------------------------------------------------------------------------
 
-        //  Get options
-        $bSkipDb    = stringToBoolean($oInput->getOption('skip-db'));
-        $bSkipAdmin = !Components::exists('nails/module-admin') || stringToBoolean($oInput->getOption('skip-admin'));
+        $bSkipDb = $oInput->getOption('skip-db');
+        $bAdmin  = Components::exists('nails/module-admin') && $oInput->getOption('admin');
 
         // --------------------------------------------------------------------------
 
@@ -125,7 +130,7 @@ class Model extends BaseMaker
                 ->validateServiceFile()
                 ->createPath(self::MODEL_PATH)
                 ->createPath(self::MODEL_RESOURCE_PATH);
-            if (!$bSkipAdmin) {
+            if ($bAdmin) {
                 $this->createPath(self::ADMIN_PATH);
             }
             $this->createModel();
@@ -156,17 +161,18 @@ class Model extends BaseMaker
     /**
      * Create the Model
      *
-     * @throws \Exception
      * @return $this
+     * @throws \Exception
      */
     private function createModel(): self
     {
         $oInput      = $this->oInput;
         $oOutput     = $this->oOutput;
-        $bSkipDb     = stringToBoolean($oInput->getOption('skip-db'));
-        $bSkipSeeder = stringToBoolean($oInput->getOption('skip-seeder'));
-        $bSkipAdmin  = !Components::exists('nails/module-admin') || stringToBoolean($oInput->getOption('skip-admin'));
-        $bAutoDetect = stringToBoolean($oInput->getOption('auto-detect'));
+        $bSkipDb     = $oInput->getOption('skip-db');
+        $bSkipSeeder = $oInput->getOption('skip-seeder');
+        $bAutoDetect = $oInput->getOption('auto-detect');
+        $bLocalised  = $oInput->getOption('localised');
+        $bAdmin      = Components::exists('nails/module-admin') && $oInput->getOption('admin');
 
         //  If auto-detecting models using the database then skip cresting database tables
         if ($bAutoDetect) {
@@ -183,17 +189,33 @@ class Model extends BaseMaker
                 sort($aModels);
                 foreach ($aModels as $sModelName) {
                     $oModel = $this->prepareModelName($sModelName);
+
+                    /**
+                     * Test whether the model exists already
+                     *
+                     * Alter our behaviour slightly depending if we're localising or not. An existing model, which
+                     * is not-localised is OK as we'll convert it to be localised (assuming the --localised flag
+                     * is passed).
+                     */
+
                     if ($this->modelExists($oModel)) {
-                        throw new NailsException(
-                            'A model by that path already exists "' . $oModel->path . $oModel->filename . '"'
-                        );
+                        if ($bLocalised && classUses($oModel->class_path, Localised::class)) {
+                            throw new NailsException(
+                                'A localised model by that path already exists "' . $oModel->path . $oModel->filename . '"'
+                            );
+                        } elseif (!$bLocalised) {
+                            throw new NailsException(
+                                'A model by that path already exists "' . $oModel->path . $oModel->filename . '"'
+                            );
+                        }
                     }
 
-                    //  Test to see if the database table exists already
-                    if (!$bSkipDb) {
-                        $oDb     = Factory::service('PDODatabase');
-                        $oResult = $oDb->query('SHOW TABLES LIKE "' . $oModel->table_with_prefix . '"');
-                        if ($oResult->rowCount() > 0) {
+                    if (!$bSkipDb && $this->tableExists($oModel)) {
+                        if ($bLocalised && classUses($oModel->class_path, Localised::class)) {
+                            throw new NailsException(
+                                'Localised table "' . $oModel->table_with_prefix . '" already exists. Use option --skip-db to skip database check.'
+                            );
+                        } elseif (!$bLocalised) {
                             throw new NailsException(
                                 'Table "' . $oModel->table_with_prefix . '" already exists. Use option --skip-db to skip database check.'
                             );
@@ -252,11 +274,14 @@ class Model extends BaseMaker
                 if (!$bSkipDb) {
                     $oOutput->writeln('Table:          <info>' . $oModel->table_with_prefix . '</info>');
                 }
-                if (!$bSkipAdmin) {
+                if ($bAdmin) {
                     $oOutput->writeln('Admin:          <info>Controller will be created</info>');
                 }
                 if (!$bSkipSeeder) {
                     $oOutput->writeln('Seeder:         <info>Seeder will be created</info>');
+                }
+                if ($bLocalised && $this->modelExists($oModel)) {
+                    $oOutput->writeln('Localised:      <info>Model will be converted</info>');
                 }
                 $oOutput->writeln('');
             }
@@ -265,122 +290,62 @@ class Model extends BaseMaker
 
                 $aServiceModelDefinitions    = [];
                 $aServiceResourceDefinitions = [];
+
                 foreach ($aModelData as $oModel) {
-
                     $oOutput->writeln('');
-
-                    // --------------------------------------------------------------------------
-
-                    $oOutput->write('Creating model <comment>' . $oModel->class_path . '</comment>... ');
-                    $this->createPath($oModel->path);
-                    $this->createFile(
-                        $oModel->path . $oModel->filename,
-                        $this->getResource('template/model.php', (array) $oModel)
-                    );
-                    $oOutput->writeln('<info>done!</info>');
-
-                    // --------------------------------------------------------------------------
-
-                    $oOutput->write('Creating resource <comment>' . $oModel->resource_class_path . '</comment>... ');
-                    $this->createPath($oModel->resource_path);
-                    $this->createFile(
-                        $oModel->resource_path . $oModel->resource_filename,
-                        $this->getResource('template/resource.php', (array) $oModel)
-                    );
-                    $oOutput->writeln('<info>done!</info>');
-
-                    // --------------------------------------------------------------------------
-
-                    //  Create the database table
-                    if (!$bSkipDb) {
-                        $oOutput->write('Adding database table... ');
-                        $oModel->nails_db_prefix = NAILS_DB_PREFIX;
-                        $oDb                     = Factory::service('PDODatabase');
-                        $oDb->query($this->getResource('template/model_table.php', (array) $oModel));
-                        $oOutput->writeln('<info>done!</info>');
+                    if ($bLocalised && $this->modelExists($oModel)) {
+                        $this->convertExistingModelToLocalised(
+                            $oModel,
+                            $bSkipDb,
+                            $bAdmin,
+                            $bSkipSeeder
+                        );
+                    } elseif ($bLocalised && !$this->modelExists($oModel)) {
+                        list($sServiceDefinition, $sResourceDefinition) = $this->createLocalisedModel(
+                            $oModel,
+                            $bSkipDb,
+                            $bAdmin,
+                            $bSkipSeeder
+                        );
+                    } else {
+                        list($sServiceDefinition, $sResourceDefinition) = $this->createNormalModel(
+                            $oModel,
+                            $bSkipDb,
+                            $bAdmin,
+                            $bSkipSeeder
+                        );
                     }
 
-                    // --------------------------------------------------------------------------
-
-                    //  Generate the service definition
-                    $aDefinition                = [
-                        str_repeat(' ', $this->iServicesIndent) . '\'' . $oModel->service_name . '\' => function () {',
-                        str_repeat(' ', $this->iServicesIndent) . '    return new ' . $oModel->class_path . '();',
-                        str_repeat(' ', $this->iServicesIndent) . '},',
-                    ];
-                    $aServiceModelDefinitions[] = implode("\n", $aDefinition);
-
-                    $aDefinition                   = [
-                        str_repeat(' ', $this->iServicesIndent) . '\'' . $oModel->service_name . '\' => function ($oObj) {',
-                        str_repeat(' ', $this->iServicesIndent) . '    return new ' . $oModel->resource_class_path . '($oObj);',
-                        str_repeat(' ', $this->iServicesIndent) . '},',
-                    ];
-                    $aServiceResourceDefinitions[] = implode("\n", $aDefinition);
-
-                    // --------------------------------------------------------------------------
-
-                    //  Create admin
-                    if (!$bSkipAdmin) {
-                        $oOutput->write('Creating admin controller... ');
-                        //  Execute the create command, non-interactively and silently
-                        $iExitCode = $this->callCommand(
-                            'make:controller:admin',
-                            [
-                                'modelName'    => $oModel->service_name,
-                                '--skip-check' => true,
-                            ],
-                            false,
-                            true
-                        );
-                        if ($iExitCode === static::EXIT_CODE_FAILURE) {
-                            $oOutput->writeln('<error>failed!</error>');
-                        } else {
-                            $oOutput->writeln('<info>done!</info>');
-                        }
+                    if (!empty($sServiceDefinition)) {
+                        $aServiceModelDefinitions[] = $sServiceDefinition;
                     }
 
-                    // --------------------------------------------------------------------------
-
-                    //  Create seeder
-                    if (!$bSkipSeeder) {
-                        $oOutput->write('Creating seeder... ');
-                        //  Execute the create command, non-interactively and silently
-                        $iExitCode = $this->callCommand(
-                            'make:db:seeder',
-                            [
-                                'modelName'    => $oModel->service_name,
-                                '--skip-check' => true,
-                            ],
-                            false,
-                            true
-                        );
-                        if ($iExitCode === static::EXIT_CODE_FAILURE) {
-                            $oOutput->writeln('<error>failed!</error>');
-                        } else {
-                            $oOutput->writeln('<info>done!</info>');
-                        }
+                    if (!empty($sResourceDefinition)) {
+                        $aServiceResourceDefinitions[] = $sResourceDefinition;
                     }
                 }
 
                 // --------------------------------------------------------------------------
 
                 //  Add models to the app's services array
-                $oOutput->writeln('');
-                $oOutput->write('Adding model(s) to app services...');
-                $this->writeServiceFile($aServiceModelDefinitions);
-                $oOutput->writeln('<info>done!</info>');
+                if (!empty($aServiceModelDefinitions)) {
+                    $this->oOutput->writeln('');
+                    $this->oOutput->write('Adding model(s) to app services...');
+                    $this->writeServiceFile($aServiceModelDefinitions);
+                    $this->oOutput->writeln('<info>done!</info>');
+                }
 
                 //  Add resources to app's service array
-                $oOutput->write('Adding resource(s) to app services...');
-                //  Reset the token detials so we write to the correct part of the file
-                $this->validateServiceFile(static::SERVICE_RESOURCE_TOKEN);
-                $this->writeServiceFile($aServiceResourceDefinitions);
-                $oOutput->writeln('<info>done!</info>');
+                if (!empty($aServiceResourceDefinitions)) {
+                    $this->oOutput->write('Adding resource(s) to app services...');
+                    //  Reset the token detials so we write to the correct part of the file
+                    $this->validateServiceFile(static::SERVICE_RESOURCE_TOKEN);
+                    $this->writeServiceFile($aServiceResourceDefinitions);
+                    $this->oOutput->writeln('<info>done!</info>');
+                }
             }
 
         } catch (\Exception $e) {
-
-            //  Clean up
             if (!empty($aModelData)) {
                 foreach ($aModelData as $oModel) {
                     @unlink($oModel->path . '/' . $oModel->filename);
@@ -469,8 +434,318 @@ class Model extends BaseMaker
      *
      * @return bool
      */
-    private function modelExists($oModel): bool
+    private function modelExists(\stdClass $oModel): bool
     {
         return file_exists($oModel->path . $oModel->filename);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Detemine whether a particular table exists already
+     *
+     * @param \stdClass $oModel The model definition
+     *
+     * @return bool
+     * @throws \Nails\Common\Exception\FactoryException
+     */
+    private function tableExists(\stdClass $oModel): bool
+    {
+        $oDb     = Factory::service('PDODatabase');
+        $oResult = $oDb->query('SHOW TABLES LIKE "' . $oModel->table_with_prefix . '"');
+        return $oResult->rowCount() > 0;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Orchestrates the conversion of a normal model to a localised model
+     *
+     * @param \stdClass $oModel      The model being converted
+     * @param bool      $bSkipDb     Whether to skip table creation
+     * @param bool      $bAdmin      Whether to create an admin controller or not
+     * @param bool      $bSkipSeeder Whether to skip seeder creation
+     */
+    private function convertExistingModelToLocalised(
+        \stdClass $oModel,
+        bool $bSkipDb,
+        bool $bAdmin,
+        bool $bSkipSeeder
+    ): void {
+        $this
+            ->addLocalisedUseStatement($oModel)
+            ->convertTablesToLocalised($oModel);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Orchestrates the creation of a localised model
+     *
+     * @param \stdClass $oModel      The model being created
+     * @param bool      $bSkipDb     Whether to skip table creation
+     * @param bool      $bAdmin      Whether to create an admin controller or not
+     * @param bool      $bSkipSeeder Whether to skip seeder creation
+     *
+     * @return array
+     */
+    private function createLocalisedModel(
+        \stdClass $oModel,
+        bool $bSkipDb,
+        bool $bAdmin,
+        bool $bSkipSeeder
+    ): array {
+        $this
+            ->createModelFile($oModel, 'model_localised')
+            ->createResource($oModel, 'resource');
+
+        if (!$bSkipDb) {
+            $this->createDatabaseTable($oModel, 'model_table_localised');
+        }
+
+        if ($bAdmin) {
+            $this->createAdminController($oModel);
+        }
+
+        if (!$bSkipSeeder) {
+            $this->createSeeder($oModel);
+        }
+
+        return $this->generateServiceDefinitions($oModel);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Orchestrates the creation of a  model
+     *
+     * @param \stdClass $oModel      The model being created
+     * @param bool      $bSkipDb     Whether to skip table creation
+     * @param bool      $bAdmin      Whether to create an admin controller or not
+     * @param bool      $bSkipSeeder Whether to skip seeder creation
+     *
+     * @return array
+     */
+    private function createNormalModel(
+        \stdClass $oModel,
+        bool $bSkipDb,
+        bool $bAdmin,
+        bool $bSkipSeeder
+    ): array {
+
+        $this
+            ->createModelFile($oModel, 'model')
+            ->createResource($oModel, 'resource');
+
+        if (!$bSkipDb) {
+            $this->createDatabaseTable($oModel, 'model_table');
+        }
+
+        if ($bAdmin) {
+            $this->createAdminController($oModel);
+        }
+
+        if (!$bSkipSeeder) {
+            $this->createSeeder($oModel);
+        }
+
+        return $this->generateServiceDefinitions($oModel);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Creates the model file
+     *
+     * @param \stdClass $oModel    The model being created
+     * @param string    $sTemplate The template to use
+     *
+     * @return $this
+     * @throws NailsException
+     * @throws Path\DoesNotExistException
+     * @throws Path\IsNotWritableException
+     */
+    private function createModelFile(\stdClass $oModel, string $sTemplate): self
+    {
+        $this->oOutput->write('Creating model <comment>' . $oModel->class_path . '</comment>... ');
+        $this->createPath($oModel->path);
+        $this->createFile(
+            $oModel->path . $oModel->filename,
+            $this->getResource('template/' . $sTemplate . '.php', (array) $oModel)
+        );
+        $this->oOutput->writeln('<info>done!</info>');
+
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Creates the resource file
+     *
+     * @param \stdClass $oModel    The model being created
+     * @param string    $sTemplate The template to use
+     *
+     * @return $this
+     * @throws NailsException
+     * @throws Path\DoesNotExistException
+     * @throws Path\IsNotWritableException
+     */
+    private function createResource(\stdClass $oModel, string $sTemplate): self
+    {
+        $this->oOutput->write('Creating resource <comment>' . $oModel->resource_class_path . '</comment>... ');
+        $this->createPath($oModel->resource_path);
+        $this->createFile(
+            $oModel->resource_path . $oModel->resource_filename,
+            $this->getResource('template/' . $sTemplate . '.php', (array) $oModel)
+        );
+        $this->oOutput->writeln('<info>done!</info>');
+
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Creates the database table
+     *
+     * @param \stdClass $oModel    The model being created
+     * @param string    $sTemplate The template to use
+     *
+     * @return $this
+     * @throws NailsException
+     * @throws FactoryException
+     */
+    private function createDatabaseTable(\stdClass $oModel, string $sTemplate): self
+    {
+        $this->oOutput->write('Adding database table... ');
+        $oModel->nails_db_prefix = NAILS_DB_PREFIX;
+        $oDb                     = Factory::service('PDODatabase');
+        $oDb->query($this->getResource('template/' . $sTemplate . '.php', (array) $oModel));
+        $this->oOutput->writeln('<info>done!</info>');
+
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Creates an admin controller
+     *
+     * @param \stdClass $oModel The model being created
+     *
+     * @return $this
+     * @throws \Exception
+     */
+    private function createAdminController(\stdClass $oModel): self
+    {
+        $this->oOutput->write('Creating admin controller... ');
+        //  Execute the create command, non-interactively and silently
+        $iExitCode = $this->callCommand(
+            'make:controller:admin',
+            [
+                'modelName'    => $oModel->service_name,
+                '--skip-check' => true,
+            ],
+            false,
+            true
+        );
+        if ($iExitCode === static::EXIT_CODE_FAILURE) {
+            $this->oOutput->writeln('<error>failed!</error>');
+        } else {
+            $this->oOutput->writeln('<info>done!</info>');
+        }
+
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Creates a seeder
+     *
+     * @param \stdClass $oModel The model being created
+     *
+     * @return $this
+     * @throws \Exception
+     */
+    private function createSeeder(\stdClass $oModel)
+    {
+        $this->oOutput->write('Creating seeder... ');
+        //  Execute the create command, non-interactively and silently
+        $iExitCode = $this->callCommand(
+            'make:db:seeder',
+            [
+                'modelName'    => $oModel->service_name,
+                '--skip-check' => true,
+            ],
+            false,
+            true
+        );
+        if ($iExitCode === static::EXIT_CODE_FAILURE) {
+            $this->oOutput->writeln('<error>failed!</error>');
+        } else {
+            $this->oOutput->writeln('<info>done!</info>');
+        }
+
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Genenrates the service file definitions for a model
+     *
+     * @param \stdClass $oModel The model being created
+     *
+     * @return string[]
+     */
+    private function generateServiceDefinitions(\stdClass $oModel): array
+    {
+        return [
+            //  Service definition
+            implode("\n", [
+                str_repeat(' ', $this->iServicesIndent) . '\'' . $oModel->service_name . '\' => function () {',
+                str_repeat(' ', $this->iServicesIndent) . '    return new ' . $oModel->class_path . '();',
+                str_repeat(' ', $this->iServicesIndent) . '},',
+            ]),
+
+            //  Resource definition
+            implode("\n", [
+                str_repeat(' ', $this->iServicesIndent) . '\'' . $oModel->service_name . '\' => function ($oObj) {',
+                str_repeat(' ', $this->iServicesIndent) . '    return new ' . $oModel->resource_class_path . '($oObj);',
+                str_repeat(' ', $this->iServicesIndent) . '},',
+            ]),
+        ];
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Adds a `use Localised` statement to a model
+     *
+     * @param \stdClass $oModel The model being converted
+     *
+     * @return $this
+     */
+    private function addLocalisedUseStatement(\stdClass $oModel): self
+    {
+        //  @todo (Pablo - 2019-04-15) - Add the `use` statement to the model
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Converts existing non-localised model tables to a localised version
+     *
+     * @param \stdClass $oModel The model being converted
+     *
+     * @return $this
+     */
+    private function convertTablesToLocalised(\stdClass $oModel): self
+    {
+        //  @todo (Pablo - 2019-04-15) - Convert the tables to the localised format
+        return $this;
     }
 }
