@@ -14,15 +14,18 @@ namespace Nails\Common\Model;
 
 use Behat\Transliterator\Transliterator;
 use Nails\Common\Exception\ModelException;
-use Nails\Common\Factory\Component;
 use Nails\Common\Helper\ArrayHelper;
 use Nails\Common\Traits\Caching;
 use Nails\Common\Traits\ErrorHandling;
 use Nails\Common\Traits\GetCountCommon;
-use Nails\Common\Traits\Model\Localised;
 use Nails\Components;
 use Nails\Factory;
 
+/**
+ * Class Base
+ *
+ * @package Nails\Common\Model
+ */
 abstract class Base
 {
     use ErrorHandling;
@@ -31,57 +34,26 @@ abstract class Base
 
     // --------------------------------------------------------------------------
 
-    //  Common data
-    protected $data;
-    protected $user;
-    protected $user_model;
-
-    //  Data/Table structure
-    //  @deprecated use const TABLE
-    protected $table;
-    protected $tableAlias;
-
-    //  Column names
-    protected $tableIdColumn;
-    protected $tableSlugColumn;
-    protected $tableTokenColumn;
-    protected $tableLabelColumn;
-    protected $tableCreatedColumn;
-    protected $tableCreatedByColumn;
-    protected $tableModifiedColumn;
-    protected $tableModifiedByColumn;
-    protected $tableDeletedColumn;
-    protected $searchableFields;
-
-    //  Model options
-    protected $tableAutoSetTimestamps;
-    protected $tableAutoSetSlugs;
-    protected $tableAutoSetTokens;
-
-    /**
-     * Keeps a track of the columns which have been used by getByColumn(); allows
-     * for us to more easily invalidate caches
-     *
-     * @var array
-     */
-    protected $aCacheColumns = [];
-
-    /**
-     * Override the default token mask when automatically generating tokens for items
-     *
-     * @var string
-     */
-    protected $sTokenMask;
-
-    //  Expandable fields
-    protected $aExpandableFields;
-
     /**
      * The table this model represents
      *
      * @var string
      */
     const TABLE = null;
+
+    /**
+     * The alias to give the table
+     *
+     * @var string
+     */
+    const TABLE_ALIAS = null;
+
+    /**
+     * Whetehr this model sues destructive delete or not
+     *
+     * @var bool
+     */
+    const DESTRUCTIVE_DELETE = true;
 
     /**
      * Expandable objects of type EXPANDABLE_TYPE_MANY are a 1 to many relationship
@@ -143,6 +115,34 @@ abstract class Base
     const EVENT_RESTORED = null;
 
     /**
+     * Whether to automatically set timestamps or not
+     *
+     * @var bool
+     */
+    const AUTO_SET_TIMESTAMP = true;
+
+    /**
+     * Whether to automatically set created/modified users or not
+     *
+     * @var bool
+     */
+    const AUTO_SET_USER = true;
+
+    /**
+     * Whether to automatically set tokens or not
+     *
+     * @var bool
+     */
+    const AUTO_SET_TOKEN = false;
+
+    /**
+     * Whether to automatically set slugs or not
+     *
+     * @var bool
+     */
+    const AUTO_SET_SLUG = false;
+
+    /**
      * When true, the model will not attempt to automatically generate a slug when updating
      *
      * @var bool
@@ -162,6 +162,48 @@ abstract class Base
      * @var string
      */
     const RESOURCE_PROVIDER = null;
+
+    // --------------------------------------------------------------------------
+
+    //  Data/Table structure
+    //  @deprecated use const TABLE
+    protected $table;
+    protected $tableAlias;
+
+    //  Column names
+    protected $tableIdColumn;
+    protected $tableSlugColumn;
+    protected $tableTokenColumn;
+    protected $tableLabelColumn;
+    protected $tableCreatedColumn;
+    protected $tableCreatedByColumn;
+    protected $tableModifiedColumn;
+    protected $tableModifiedByColumn;
+    protected $tableDeletedColumn;
+    protected $searchableFields;
+
+    //  Model options
+    protected $tableAutoSetTimestamps;
+    protected $tableAutoSetSlugs;
+    protected $tableAutoSetTokens;
+
+    /**
+     * Keeps a track of the columns which have been used by getByColumn(); allows
+     * for us to more easily invalidate caches
+     *
+     * @var array
+     */
+    protected $aCacheColumns = [];
+
+    /**
+     * Override the default token mask when automatically generating tokens for items
+     *
+     * @var string
+     */
+    protected $sTokenMask;
+
+    //  Expandable fields
+    protected $aExpandableFields;
 
     //  Preferences
     protected $destructiveDelete;
@@ -184,7 +226,6 @@ abstract class Base
     {
         //  Define defaults
         $this->clearErrors();
-        $this->destructiveDelete      = true;
         $this->tableIdColumn          = 'id';
         $this->tableSlugColumn        = 'slug';
         $this->tableTokenColumn       = 'token';
@@ -194,13 +235,14 @@ abstract class Base
         $this->tableModifiedColumn    = 'modified';
         $this->tableModifiedByColumn  = 'modified_by';
         $this->tableDeletedColumn     = 'is_deleted';
-        $this->tableAutoSetTimestamps = true;
-        $this->tableAutoSetSlugs      = false;
-        $this->tableAutoSetTokens     = false;
+        $this->destructiveDelete      = null;   //  @todo (Pablo - 2019-04-15) - Deprecated in favour of constant
+        $this->tableAutoSetTimestamps = null;   //  @todo (Pablo - 2019-04-15) - Deprecated in favour of constant
+        $this->tableAutoSetSlugs      = null;   //  @todo (Pablo - 2019-04-15) - Deprecated in favour of constant
+        $this->tableAutoSetTokens     = null;   //  @todo (Pablo - 2019-04-15) - Deprecated in favour of constant
         $this->perPage                = 50;
         $this->searchableFields       = [];
 
-        if (classUses(get_called_class(), 'Nails\Common\Traits\Model\Sortable')) {
+        if (classUses(static::class, 'Nails\Common\Traits\Model\Sortable')) {
             $this->defaultSortColumn = $this->getSortableColumn();
             $this->defaultSortOrder  = 'ASC';
         } else {
@@ -309,19 +351,20 @@ abstract class Base
 
         // --------------------------------------------------------------------------
 
-        if ($this->tableAutoSetTimestamps) {
-
+        if ($this->isAutoSetTimestamps()) {
             $oDate = Factory::factory('DateTime');
-
             if (empty($aData[$this->tableCreatedColumn])) {
                 $aData[$this->tableCreatedColumn] = $oDate->format('Y-m-d H:i:s');
             }
             if (empty($aData[$this->tableModifiedColumn])) {
                 $aData[$this->tableModifiedColumn] = $oDate->format('Y-m-d H:i:s');
             }
+        }
 
+        // --------------------------------------------------------------------------
+
+        if ($this->isAutoSetUsers()) {
             if (isLoggedIn()) {
-
                 if (empty($aData[$this->tableCreatedByColumn])) {
                     $aData[$this->tableCreatedByColumn] = activeUser('id');
                 }
@@ -329,7 +372,6 @@ abstract class Base
                     $aData[$this->tableModifiedByColumn] = activeUser('id');
                 }
             } else {
-
                 if (empty($aData[$this->tableCreatedByColumn])) {
                     $oDb->set($this->tableCreatedByColumn, null);
                     $aData[$this->tableCreatedByColumn] = null;
@@ -340,20 +382,21 @@ abstract class Base
             }
         }
 
-        if (!empty($this->tableAutoSetSlugs) && empty($aData[$this->tableSlugColumn])) {
+        // --------------------------------------------------------------------------
+
+        if ($this->isAutoSetSlugs() && empty($aData[$this->tableSlugColumn])) {
 
             if (empty($this->tableSlugColumn)) {
-                throw new ModelException(get_called_class() . '::create() Slug column variable not set', 1);
+                throw new ModelException(static::class . '::create() Slug column variable not set', 1);
             }
 
             if (empty($this->tableLabelColumn)) {
-                throw new ModelException(get_called_class() . '::create() Label column variable not set', 1);
+                throw new ModelException(static::class . '::create() Label column variable not set', 1);
             }
 
             if (empty($aData[$this->tableLabelColumn])) {
-
                 throw new ModelException(
-                    get_called_class() . '::create() "' . $this->tableLabelColumn .
+                    static::class . '::create() "' . $this->tableLabelColumn .
                     '" is required when automatically generating slugs.',
                     1
                 );
@@ -362,25 +405,25 @@ abstract class Base
             $aData[$this->tableSlugColumn] = $this->generateSlug($aData[$this->tableLabelColumn]);
         }
 
-        if (!empty($this->tableAutoSetTokens) && empty($aData[$this->tableTokenColumn])) {
+        // --------------------------------------------------------------------------
+
+        if ($this->isAutoSetTokens() && empty($aData[$this->tableTokenColumn])) {
             if (empty($this->tableTokenColumn)) {
-                throw new ModelException(get_called_class() . '::create() Token column variable not set', 1);
+                throw new ModelException(static::class . '::create() Token column variable not set', 1);
             }
             $aData[$this->tableTokenColumn] = $this->generateToken();
         }
 
-        if (!empty($aData)) {
+        // --------------------------------------------------------------------------
 
+        if (!empty($aData)) {
             unset($aData['id']);
             foreach ($aData as $sColumn => $mValue) {
                 if (is_array($mValue)) {
-
                     $mSetValue = isset($mValue[0]) ? $mValue[0] : null;
                     $bEscape   = isset($mValue[1]) ? (bool) $mValue[1] : true;
-
                     $oDb->set($sColumn, $mSetValue, $bEscape);
                 } else {
-
                     $oDb->set($sColumn, $mValue);
                 }
             }
@@ -454,7 +497,7 @@ abstract class Base
 
         // --------------------------------------------------------------------------
 
-        if ($this->tableAutoSetTimestamps) {
+        if ($this->isAutoSetTimestamps()) {
             if (empty($aData[$this->tableModifiedColumn])) {
                 $oDate                                       = Factory::factory('DateTime');
                 $aData[$sAlias . $this->tableModifiedColumn] = $oDate->format('Y-m-d H:i:s');
@@ -471,18 +514,18 @@ abstract class Base
             }
         }
 
-        if (!empty($this->tableAutoSetSlugs) && empty($aData[$this->tableSlugColumn]) && !static::AUTO_SET_SLUG_IMMUTABLE) {
+        if ($this->isAutoSetSlugs() && empty($aData[$this->tableSlugColumn]) && !static::AUTO_SET_SLUG_IMMUTABLE) {
 
             if (is_array($mIds)) {
                 throw new ModelException('Cannot auto generate slugs when updating multiple items.', 1);
             }
 
             if (empty($this->tableSlugColumn)) {
-                throw new ModelException(get_called_class() . '::update() Slug column variable not set', 1);
+                throw new ModelException(static::class . '::update() Slug column variable not set', 1);
             }
 
             if (empty($this->tableLabelColumn)) {
-                throw new ModelException(get_called_class() . '::update() Label column variable not set', 1);
+                throw new ModelException(static::class . '::update() Label column variable not set', 1);
             }
 
             /**
@@ -502,7 +545,7 @@ abstract class Base
         }
 
         //  Automatically set tokens are permanent and immutable
-        if (!empty($this->tableAutoSetTokens) && empty($aData[$this->tableTokenColumn])) {
+        if ($this->isAutoSetTokens() && empty($aData[$this->tableTokenColumn])) {
             unset($aData[$this->tableTokenColumn]);
         }
 
@@ -587,7 +630,7 @@ abstract class Base
      */
     public function delete($mIds)
     {
-        if ($this->destructiveDelete) {
+        if ($this->isDestructiveDelete()) {
 
             //  Destructive delete; nuke that row.
             $bResult = $this->destroy($mIds);
@@ -630,7 +673,7 @@ abstract class Base
      */
     public function restore($iId)
     {
-        if ($this->destructiveDelete) {
+        if ($this->isDestructiveDelete()) {
 
             //  Destructive delete; can't be resurrecting the dead.
             return null;
@@ -799,7 +842,7 @@ abstract class Base
         // --------------------------------------------------------------------------
 
         //  If non-destructive delete is enabled then apply the delete query
-        if (!$this->destructiveDelete && !$bIncludeDeleted) {
+        if (!$this->isDestructiveDelete() && !$bIncludeDeleted) {
             $oDb->where($this->getTableAlias(true) . $this->tableDeletedColumn, false);
         }
 
@@ -986,14 +1029,14 @@ abstract class Base
 
         if (!property_exists($oTest, $this->tableLabelColumn)) {
             throw new ModelException(
-                get_called_class() . '::getAllFlat() "' . $this->tableLabelColumn . '" is not a valid column.',
+                static::class . '::getAllFlat() "' . $this->tableLabelColumn . '" is not a valid column.',
                 1
             );
         }
 
         if (!property_exists($oTest, $this->tableLabelColumn)) {
             throw new ModelException(
-                get_called_class() . '::getAllFlat() "' . $this->tableIdColumn . '" is not a valid column.',
+                static::class . '::getAllFlat() "' . $this->tableIdColumn . '" is not a valid column.',
                 1
             );
         }
@@ -1148,7 +1191,7 @@ abstract class Base
     public function getById($iId, array $aData = [])
     {
         if (!$this->tableIdColumn) {
-            throw new ModelException(get_called_class() . '::getById() Column variable not set.', 1);
+            throw new ModelException(static::class . '::getById() Column variable not set.', 1);
         }
 
         return $this->getByColumn($this->tableIdColumn, $iId, $aData);
@@ -1169,7 +1212,7 @@ abstract class Base
     public function getByIds($aIds, array $aData = [], $bMaintainInputOrder = false)
     {
         if (!$this->tableIdColumn) {
-            throw new ModelException(get_called_class() . '::getByIds() Column variable not set.', 1);
+            throw new ModelException(static::class . '::getByIds() Column variable not set.', 1);
         }
 
         $aItems = $this->getByColumn($this->tableIdColumn, $aIds, $aData, true);
@@ -1194,7 +1237,7 @@ abstract class Base
     public function getBySlug($sSlug, array $aData = [])
     {
         if (!$this->tableSlugColumn) {
-            throw new ModelException(get_called_class() . '::getBySlug() Column variable not set.', 1);
+            throw new ModelException(static::class . '::getBySlug() Column variable not set.', 1);
         }
 
         return $this->getByColumn($this->tableSlugColumn, $sSlug, $aData);
@@ -1215,7 +1258,7 @@ abstract class Base
     public function getBySlugs($aSlugs, array $aData = [], $bMaintainInputOrder = false)
     {
         if (!$this->tableSlugColumn) {
-            throw new ModelException(get_called_class() . '::getBySlugs() Column variable not set.', 1);
+            throw new ModelException(static::class . '::getBySlugs() Column variable not set.', 1);
         }
 
         $aItems = $this->getByColumn($this->tableSlugColumn, $aSlugs, $aData, true);
@@ -1264,7 +1307,7 @@ abstract class Base
     public function getByToken($sToken, array $aData = [])
     {
         if (!$this->tableTokenColumn) {
-            throw new ModelException(get_called_class() . '::getByToken() Column variable not set.', 1);
+            throw new ModelException(static::class . '::getByToken() Column variable not set.', 1);
         }
 
         return $this->getByColumn($this->tableTokenColumn, $sToken, $aData);
@@ -1285,7 +1328,7 @@ abstract class Base
     public function getByTokens($aTokens, array $aData = [], $bMaintainInputOrder = false)
     {
         if (!$this->tableTokenColumn) {
-            throw new ModelException(get_called_class() . '::getByTokens() Column variable not set.', 1);
+            throw new ModelException(static::class . '::getByTokens() Column variable not set.', 1);
         }
 
         $aItems = $this->getByColumn($this->tableTokenColumn, $aTokens, $aData, true);
@@ -1708,7 +1751,7 @@ abstract class Base
         // --------------------------------------------------------------------------
 
         //  If non-destructive delete is enabled then apply the delete query
-        if (!$this->destructiveDelete && !$bIncludeDeleted) {
+        if (!$this->isDestructiveDelete() && !$bIncludeDeleted) {
             $oDb->where($this->getTableAlias(true) . $this->tableDeletedColumn, false);
         }
 
@@ -1828,7 +1871,7 @@ abstract class Base
 
         if (is_null($sColumn)) {
             if (!$this->tableSlugColumn) {
-                throw new ModelException(get_called_class() . '::generateSlug() Column variable not set', 1);
+                throw new ModelException(static::class . '::generateSlug() Column variable not set', 1);
             }
             $sColumn = $this->tableSlugColumn;
         }
@@ -1883,7 +1926,7 @@ abstract class Base
 
         if (is_null($sColumn)) {
             if (!$this->tableTokenColumn) {
-                throw new ModelException(get_called_class() . '::generateToken() Token variable not set', 1);
+                throw new ModelException(static::class . '::generateToken() Token variable not set', 1);
             }
             $sColumn = $this->tableTokenColumn;
         }
@@ -1985,7 +2028,7 @@ abstract class Base
     {
         //  @todo (Pablo - 2019-03-14) - Phase out support for $this->table
         if (empty($this->table) && empty(static::TABLE)) {
-            throw new ModelException(get_called_class() . '::TABLE not set', 1);
+            throw new ModelException(static::class . '::TABLE not set', 1);
         }
 
         $sTable = static::TABLE ?? $this->table;
@@ -2004,7 +2047,8 @@ abstract class Base
      */
     public function getTableAlias($bIncludeSeparator = false)
     {
-        $sOut = $this->tableAlias ? $this->tableAlias : '';
+        //  @todo (Pablo - 2019-04-15) - Deprecate $this->>tableAlias
+        $sOut = static::TABLE_ALIAS ?? $this->tableAlias ?? '';
 
         if (empty($sOut)) {
 
@@ -2187,7 +2231,33 @@ abstract class Base
      */
     public function isDestructiveDelete()
     {
-        return $this->destructiveDelete;
+        //  @todo (Pablo - 2019-04-15) - Phase out support for $this->destructiveDelete
+        return $this->destructiveDelete ?? static::DESTRUCTIVE_DELETE;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns whether this model automatically generates timestamps or not
+     *
+     * @return bool
+     */
+    public function isAutoSetTimestamps()
+    {
+        //  @todo (Pablo - 2019-04-15) - Phase out support for $this->tableAutoSetTimestamps
+        return $this->tableAutoSetTimestamps ?? static::AUTO_SET_TIMESTAMP;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns whether this model automatically sets created/modified users or not
+     *
+     * @return bool
+     */
+    public function isAutoSetUsers()
+    {
+        return static::AUTO_SET_USER;
     }
 
     // --------------------------------------------------------------------------
@@ -2199,7 +2269,8 @@ abstract class Base
      */
     public function isAutoSetSlugs()
     {
-        return $this->tableAutoSetSlugs;
+        //  @todo (Pablo - 2019-04-15) - Phase out support for $this->tableAutoSetSlugs
+        return $this->tableAutoSetSlugs ?? static::AUTO_SET_SLUG;
     }
 
     // --------------------------------------------------------------------------
@@ -2211,7 +2282,8 @@ abstract class Base
      */
     public function isAutoSetTokens()
     {
-        return $this->tableAutoSetTokens;
+        //  @todo (Pablo - 2019-04-15) - Phase out support for $this->tableAutoSetTokens
+        return $this->tableAutoSetTokens ?? static::AUTO_SET_TOKEN;
     }
 
     // --------------------------------------------------------------------------
@@ -2468,14 +2540,14 @@ abstract class Base
     {
         if ($sEvent) {
 
-            $oComponent = Components::detectClassComponent(get_called_class());
+            $oComponent = Components::detectClassComponent(static::class);
 
             if (!empty($oComponent)) {
                 $sNamespace = $oComponent->slug;
             } elseif (!empty(static::EVENT_NAMESPACE)) {
                 $sNamespace = static::EVENT_NAMESPACE;
             } else {
-                throw new ModelException(get_called_class() . '::EVENT_NAMESPACE must be defined');
+                throw new ModelException(static::class . '::EVENT_NAMESPACE must be defined');
             }
 
             $oEventService = Factory::service('Event');
