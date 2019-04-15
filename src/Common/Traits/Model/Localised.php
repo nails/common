@@ -179,6 +179,8 @@ trait Localised
         );
         unset($oResource->{static::$sColumnLanguage});
         unset($oResource->{static::$sColumnRegion});
+        unset($oResource->exists_exact);
+        unset($oResource->exists_language);
     }
 
     // --------------------------------------------------------------------------
