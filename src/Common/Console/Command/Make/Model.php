@@ -829,7 +829,7 @@ class Model extends BaseMaker
             //  Populate the top-level table
             'INSERT INTO ' . $oModel->table_with_prefix . ' SELECT id FROM ' . $oModel->table_with_prefix . '_localised;',
 
-            //  @todo (Pablo - 2019-04-15) - Update the columns with the default language
+            //  Update the columns with the default language
             'UPDATE `' . $oModel->table_with_prefix . '_localised` SET `language` = "' . $oLocale->get()->getLanguage() . '"',
             'UPDATE `' . $oModel->table_with_prefix . '_localised` SET `region` = "' . $oLocale->get()->getRegion() . '"',
 
