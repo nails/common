@@ -4,7 +4,6 @@ namespace Nails\Common\Traits\Model;
 
 use Nails\Common\Resource;
 use Nails\Common\Service\Locale;
-use Nails\Common\Traits\GetCountCommon;
 use Nails\Factory;
 
 /**
@@ -45,24 +44,6 @@ trait Localised
     // --------------------------------------------------------------------------
 
     /**
-     * Enforce models implement getTableName
-     *
-     * @return string
-     */
-    abstract public function getTableName();
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Enforce models implement getTableAlias
-     *
-     * @return string
-     */
-    abstract public function getTableAlias();
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Overloads the getAll to add a Locale object to each resource
      *
      * @param int|null $iPage           The page number of the results, if null then no pagination
@@ -97,6 +78,18 @@ trait Localised
     // --------------------------------------------------------------------------
 
     /**
+     * Formats the input data into a method suitable for
+     *
+     * @param array $aData The data being passed
+     */
+    protected function prepareWriteData(array &$aData): parent
+    {
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Injects localisation modifiers
      *
      * @param array $aData The data passed to getCountCommon()
@@ -107,45 +100,48 @@ trait Localised
     {
         /** @var Locale $oLocale */
         $oLocale = Factory::service('Locale');
-        $sTable  = $this->getLocalisedTableName();
-        $sAlias  = $this->getLocalisedTableAlias();
+        $sTable  = $this->getTableName();
+        $sAlias  = $this->getTableAlias();
 
-        $oDb = Factory::service('Database');
-        $oDb->join(
-            $sTable . ' ' . $sAlias,
-            $sAlias . '.' . $this->tableIdColumn . ' = ' . $this->getTableAlias() . '.' . $this->tableIdColumn
-        );
+        /**
+         * By passing in NO_LOCALISE_FILTER to the data array the developer can return items for all locales
+         */
+        if (empty($aData['NO_LOCALISE_FILTER'])) {
 
-        if (!array_key_exists('select', $aData)) {
-            $aData['select'] = [
-                $sAlias . '.*',
+            if (!array_key_exists('select', $aData)) {
+                $aData['select'] = [
+                    $sAlias . '.*',
+                ];
+            }
+
+            if (!array_key_exists('locale', $aData)) {
+                $oUserLocale = $oLocale->get();
+            } else {
+                list($sLanguage, $sRegion) = $oLocale::parseLocaleString($aData['locale']);
+                $oUserLocale = $this->getLocale($sLanguage, $sRegion);
+            }
+
+            $sUserLanguage    = $oUserLocale->getLanguage();
+            $sUserRegion      = $oUserLocale->getRegion();
+            $oDefaultLocale   = $oLocale->getDefautLocale();
+            $sDefaultLanguage = $oDefaultLocale->getLanguage();
+            $sDefaultRegion   = $oDefaultLocale->getRegion();
+
+            $sQueryExact    = 'SELECT COUNT(*) FROM ' . $sTable . ' sub_1 WHERE sub_1.id = ' . $sAlias . '.id AND sub_1.' . static::$sColumnLanguage . ' = "' . $sUserLanguage . '" AND sub_1.' . static::$sColumnRegion . ' = "' . $sUserRegion . '"';
+            $sQueryLanguage = 'SELECT COUNT(*) FROM ' . $sTable . ' sub_2 WHERE sub_2.id = ' . $sAlias . '.id AND sub_2.' . static::$sColumnLanguage . ' = "' . $sUserLanguage . '" AND sub_2.' . static::$sColumnRegion . ' != "' . $sUserRegion . '"';
+
+            $aConditionals = [
+                '((' . $sQueryExact . ') = 1 AND ' . static::$sColumnLanguage . ' = "' . $sUserLanguage . '" AND ' . static::$sColumnRegion . ' = "' . $sUserRegion . '")',
+                '((' . $sQueryExact . ') = 0 AND ' . static::$sColumnLanguage . ' = "' . $sUserLanguage . '")',
+                '((' . $sQueryExact . ') = 0 AND (' . $sQueryLanguage . ') = 0 AND ' . static::$sColumnLanguage . ' = "' . $sDefaultLanguage . '" AND ' . static::$sColumnRegion . ' = "' . $sDefaultRegion . '")',
             ];
+
+            if (!array_key_exists('where', $aData)) {
+                $aData['where'] = [];
+            }
+
+            $aData['where'] = implode(' OR ', $aConditionals);
         }
-
-        if (!array_key_exists('locale', $aData)) {
-            $oUserLocale = $oLocale->get();
-        } else {
-            list($sLanguage, $sRegion) = $oLocale::parseLocaleString($aData['locale']);
-            $oUserLocale = $this->getLocale($sLanguage, $sRegion);
-        }
-
-        $sUserLanguage = $oUserLocale->getLanguage();
-        $sUserRegion   = $oUserLocale->getRegion();
-
-        $oDefaultLocale   = $oLocale->getDefautLocale();
-        $sDefaultLanguage = $oDefaultLocale->getLanguage();
-        $sDefaultRegion   = $oDefaultLocale->getRegion();
-
-        $aData['select'][] = '(SELECT COUNT(*) FROM ' . $sTable . ' sub_1 WHERE sub_1.id = ' . $sAlias . '.id AND sub_1.' . static::$sColumnLanguage . ' = "' . $sUserLanguage . '" AND sub_1.' . static::$sColumnRegion . ' = "' . $sUserRegion . '") exists_exact';
-        $aData['select'][] = '(SELECT COUNT(*) FROM ' . $sTable . ' sub_2 WHERE sub_2.id = ' . $sAlias . '.id AND sub_2.' . static::$sColumnLanguage . ' = "' . $sUserLanguage . '" AND sub_2.' . static::$sColumnRegion . ' != "' . $sUserRegion . '") exists_language';
-
-        if (!array_key_exists('or_having', $aData)) {
-            $aData['or_having'] = [];
-        }
-
-        $aData['or_having'][] = '(exists_exact = 1 AND ' . static::$sColumnLanguage . ' = "' . $sUserLanguage . '" AND ' . static::$sColumnRegion . ' = "' . $sUserRegion . '")';
-        $aData['or_having'][] = '(exists_exact = 0 AND ' . static::$sColumnLanguage . ' = "' . $sUserLanguage . '")';
-        $aData['or_having'][] = '(exists_exact = 0 AND exists_language = 0 AND ' . static::$sColumnLanguage . ' = "' . $sDefaultLanguage . '" AND ' . static::$sColumnRegion . ' = "' . $sDefaultRegion . '")';
     }
 
     // --------------------------------------------------------------------------
@@ -179,8 +175,6 @@ trait Localised
         );
         unset($oResource->{static::$sColumnLanguage});
         unset($oResource->{static::$sColumnRegion});
-        unset($oResource->exists_exact);
-        unset($oResource->exists_language);
     }
 
     // --------------------------------------------------------------------------
@@ -208,20 +202,9 @@ trait Localised
      *
      * @return string
      */
-    public function getLocalisedTableName(): string
+    public function getTableName($bIncludeAlias = false): string
     {
-        return $this->getTableName() . static::$sLocalisedTableSuffix;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Returns the localised table alias
-     *
-     * @return string
-     */
-    public function getLocalisedTableAlias(): string
-    {
-        return $this->getTableAlias() . static::$sLocalisedTableAliasSuffix;
+        $sTable = parent::getTableName() . static::$sLocalisedTableSuffix;
+        return $bIncludeAlias ? trim($sTable . ' as `' . $this->getTableAlias() . '`') : $sTable;
     }
 }
