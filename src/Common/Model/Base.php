@@ -1522,7 +1522,6 @@ abstract class Base
                 $oItem->{$sItemProperty} = $oAssociatedModel->countAll($aQueryData);
             }
         }
-        }
     }
 
     // --------------------------------------------------------------------------
