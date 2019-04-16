@@ -345,111 +345,40 @@ abstract class Base
 
         // --------------------------------------------------------------------------
 
+        //  Execute the data pre-write hooks
+        $this
+            ->prepareCreateData($aData)
+            ->prepareWriteData($aData);
+
+        // --------------------------------------------------------------------------
+
         //  If there are any expandable fields which should automatically save,
         //  then separate them out now
         $aAutoSaveExpandableFields = $this->autoSaveExpandableFieldsExtract($aData);
 
         // --------------------------------------------------------------------------
 
-        if ($this->isAutoSetTimestamps()) {
-            $oDate = Factory::factory('DateTime');
-            if (empty($aData[$this->tableCreatedColumn])) {
-                $aData[$this->tableCreatedColumn] = $oDate->format('Y-m-d H:i:s');
-            }
-            if (empty($aData[$this->tableModifiedColumn])) {
-                $aData[$this->tableModifiedColumn] = $oDate->format('Y-m-d H:i:s');
-            }
-        }
+        $this
+            ->setDataTimestamps($aData)
+            ->setDataUsers($aData)
+            ->setDataSlug($aData)
+            ->setDataToken($aData);
 
         // --------------------------------------------------------------------------
 
-        if ($this->isAutoSetUsers()) {
-            if (isLoggedIn()) {
-                if (empty($aData[$this->tableCreatedByColumn])) {
-                    $aData[$this->tableCreatedByColumn] = activeUser('id');
-                }
-                if (empty($aData[$this->tableModifiedByColumn])) {
-                    $aData[$this->tableModifiedByColumn] = activeUser('id');
-                }
-            } else {
-                if (empty($aData[$this->tableCreatedByColumn])) {
-                    $oDb->set($this->tableCreatedByColumn, null);
-                    $aData[$this->tableCreatedByColumn] = null;
-                }
-                if (empty($aData[$this->tableModifiedByColumn])) {
-                    $aData[$this->tableModifiedByColumn] = null;
-                }
-            }
-        }
-
-        // --------------------------------------------------------------------------
-
-        if ($this->isAutoSetSlugs() && empty($aData[$this->tableSlugColumn])) {
-
-            if (empty($this->tableSlugColumn)) {
-                throw new ModelException(static::class . '::create() Slug column variable not set', 1);
-            }
-
-            if (empty($this->tableLabelColumn)) {
-                throw new ModelException(static::class . '::create() Label column variable not set', 1);
-            }
-
-            if (empty($aData[$this->tableLabelColumn])) {
-                throw new ModelException(
-                    static::class . '::create() "' . $this->tableLabelColumn .
-                    '" is required when automatically generating slugs.',
-                    1
-                );
-            }
-
-            $aData[$this->tableSlugColumn] = $this->generateSlug($aData[$this->tableLabelColumn]);
-        }
-
-        // --------------------------------------------------------------------------
-
-        if ($this->isAutoSetTokens() && empty($aData[$this->tableTokenColumn])) {
-            if (empty($this->tableTokenColumn)) {
-                throw new ModelException(static::class . '::create() Token column variable not set', 1);
-            }
-            $aData[$this->tableTokenColumn] = $this->generateToken();
-        }
-
-        // --------------------------------------------------------------------------
-
-        if (!empty($aData)) {
-            unset($aData['id']);
-            foreach ($aData as $sColumn => $mValue) {
-                if (is_array($mValue)) {
-                    $mSetValue = isset($mValue[0]) ? $mValue[0] : null;
-                    $bEscape   = isset($mValue[1]) ? (bool) $mValue[1] : true;
-                    $oDb->set($sColumn, $mSetValue, $bEscape);
-                } else {
-                    $oDb->set($sColumn, $mValue);
-                }
-            }
-        }
-
-        $oDb->insert($sTable);
-
-        if ($oDb->affected_rows()) {
+        if ($this->saveToDb($aData)) {
 
             $iId = $oDb->insert_id();
-
-            // --------------------------------------------------------------------------
 
             //  Save any expandable objects
             $this->autoSaveExpandableFieldsSave($iId, $aAutoSaveExpandableFields);
 
-            // --------------------------------------------------------------------------
-
             //  Fire the static::EVENT_CREATED event
             $this->triggerEvent(static::EVENT_CREATED, [$iId]);
 
-            // --------------------------------------------------------------------------
-
             return $bReturnObject ? $this->getById($iId) : $iId;
-        } else {
 
+        } else {
             return null;
         }
     }
@@ -477,17 +406,24 @@ abstract class Base
     /**
      * Updates an existing object
      *
-     * @param integer|array $mIds  The ID (or array of IDs) of the object(s) to update
-     * @param array         $aData The data to update the object(s) with
+     * @param integer $iId   The ID of the object to update
+     * @param array   $aData The data to update the object with
      *
      * @return boolean
      * @throws ModelException
      */
-    public function update($mIds, array $aData = [])
+    public function update($iId, array $aData = [])
     {
         $sAlias = $this->getTableAlias(true);
         $sTable = $this->getTableName(true);
         $oDb    = Factory::service('Database');
+
+        // --------------------------------------------------------------------------
+
+        //  Execute the data pre-write hooks
+        $this
+            ->prepareUpdateData($aData)
+            ->prepareWriteData($aData);
 
         // --------------------------------------------------------------------------
 
@@ -497,60 +433,218 @@ abstract class Base
 
         // --------------------------------------------------------------------------
 
-        if ($this->isAutoSetTimestamps()) {
-            if (empty($aData[$this->tableModifiedColumn])) {
-                $oDate                                       = Factory::factory('DateTime');
-                $aData[$sAlias . $this->tableModifiedColumn] = $oDate->format('Y-m-d H:i:s');
+        $this
+            ->setDataTimestamps($aData, false)
+            ->setDataUsers($aData, false)
+            ->setDataSlug($aData, false)
+            ->setDataToken($aData, false);
+
+        // --------------------------------------------------------------------------
+
+        if ($this->saveToDb($aData, $iId)) {
+
+            //  Save any expandable objects
+            $this->autoSaveExpandableFieldsSave($iId, $aAutoSaveExpandableFields);
+
+            //  Clear the cache
+            foreach ($this->aCacheColumns as $sColumn) {
+                $sKey = strtoupper($sColumn) . ':' . json_encode($iId);
+                $this->unsetCachePrefix($sKey);
             }
 
+            //  Fire the static::EVENT_CREATED event
+            $this->triggerEvent(static::EVENT_UPDATED, [$iId]);
+
+            return true;
+
+        } else {
+            return false;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Provides an opportunity for models to manipulate the data passed to create()
+     * before it is processed
+     *
+     * @param array $aData The data being passed
+     *
+     * @return $this
+     */
+    protected function prepareCreateData(array &$aData): Base
+    {
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Provides an opportunity for models to manipulate the data passed to update()
+     * before it is processed
+     *
+     * @param array $aData The data being passed
+     *
+     * @return $this
+     */
+    protected function prepareUpdateData(array &$aData): Base
+    {
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Provides an opportunity for models to manipulate the data passed to create()
+     * or update() before it is processed
+     *
+     * @param array $aData The data being passed
+     *
+     * @return $this
+     */
+    protected function prepareWriteData(array &$aData): Base
+    {
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets the timestamps on the $aData array
+     *
+     * @param array $aData       The data being passed to the model
+     * @param bool  $bSetCreated Whether to set the created timestamp or not
+     *
+     * @return $this
+     * @throws \Nails\Common\Exception\FactoryException
+     */
+    protected function setDataTimestamps(array &$aData, bool $bSetCreated = true): Base
+    {
+        if ($this->isAutoSetTimestamps()) {
+
+            $oDate = Factory::factory('DateTime');
+
+            if ($bSetCreated && empty($aData[$this->tableCreatedColumn])) {
+                $aData[$this->tableCreatedColumn] = $oDate->format('Y-m-d H:i:s');
+            }
+            if (empty($aData[$this->tableModifiedColumn])) {
+                $aData[$this->tableModifiedColumn] = $oDate->format('Y-m-d H:i:s');
+            }
+        }
+
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Set the created/modified user IDs on the $aData array
+     *
+     * @param array $aData       The data being passed to the model
+     * @param bool  $bSetCreated Whether to set the created user or not
+     *
+     * @return $this
+     */
+    protected function setDataUsers(array &$aData, bool $bSetCreated = true): Base
+    {
+        if ($this->isAutoSetUsers()) {
             if (isLoggedIn()) {
+                if ($bSetCreated && empty($aData[$this->tableCreatedByColumn])) {
+                    $aData[$this->tableCreatedByColumn] = activeUser('id');
+                }
                 if (empty($aData[$this->tableModifiedByColumn])) {
-                    $aData[$sAlias . $this->tableModifiedByColumn] = activeUser('id');
+                    $aData[$this->tableModifiedByColumn] = activeUser('id');
                 }
             } else {
+                if ($bSetCreated && empty($aData[$this->tableCreatedByColumn])) {
+                    $oDb->set($this->tableCreatedByColumn, null);
+                    $aData[$this->tableCreatedByColumn] = null;
+                }
                 if (empty($aData[$this->tableModifiedByColumn])) {
-                    $aData[$sAlias . $this->tableModifiedByColumn] = null;
+                    $aData[$this->tableModifiedByColumn] = null;
                 }
             }
         }
 
-        if ($this->isAutoSetSlugs() && empty($aData[$this->tableSlugColumn]) && !static::AUTO_SET_SLUG_IMMUTABLE) {
+        return $this;
+    }
 
-            if (is_array($mIds)) {
-                throw new ModelException('Cannot auto generate slugs when updating multiple items.', 1);
-            }
+    // --------------------------------------------------------------------------
+
+    /**
+     * Set the slug on the $aData array
+     *
+     * @param array $aData The data being passed to the model
+     *
+     * @return $this
+     */
+    protected function setDataSlug(array &$aData, $bIsCreate = true): Base
+    {
+        if ($this->isAutoSetSlugs() &&
+            empty($aData[$this->tableSlugColumn]) &&
+            ($bIsCreate || !static::AUTO_SET_SLUG_IMMUTABLE)
+        ) {
 
             if (empty($this->tableSlugColumn)) {
-                throw new ModelException(static::class . '::update() Slug column variable not set', 1);
+                throw new ModelException(static::class . '::create() Slug column variable not set', 1);
             }
 
             if (empty($this->tableLabelColumn)) {
-                throw new ModelException(static::class . '::update() Label column variable not set', 1);
+                throw new ModelException(static::class . '::create() Label column variable not set', 1);
             }
 
-            /**
-             *  We only need to re-generate the slug field if there's a label being passed. If
-             *  no label, assume slug is unchanged.
-             */
-            if (!empty($aData[$this->tableLabelColumn])) {
-                $aData[$sAlias . $this->tableSlugColumn] = $this->generateSlug(
-                    $aData[$this->tableLabelColumn],
-                    '',
-                    '',
-                    null,
-                    null,
-                    $mIds
+            if (empty($aData[$this->tableLabelColumn])) {
+                throw new ModelException(
+                    static::class . '::create() "' . $this->tableLabelColumn .
+                    '" is required when automatically generating slugs.',
+                    1
                 );
             }
+
+            $aData[$this->tableSlugColumn] = $this->generateSlug($aData[$this->tableLabelColumn]);
         }
 
-        //  Automatically set tokens are permanent and immutable
-        if ($this->isAutoSetTokens() && empty($aData[$this->tableTokenColumn])) {
-            unset($aData[$this->tableTokenColumn]);
+        return $this;
+    }
+
+    /**
+     * Set the token on the $aData array
+     *
+     * @param array $aData The data being passed to the model
+     *
+     * @return $this
+     */
+    protected function setDataToken(array &$aData, $bIsCreate = true): Base
+    {
+        if ($bIsCreate && $this->isAutoSetTokens() && empty($aData[$this->tableTokenColumn])) {
+            if (empty($this->tableTokenColumn)) {
+                throw new ModelException(static::class . '::create() Token column variable not set', 1);
+            }
+            $aData[$this->tableTokenColumn] = $this->generateToken();
+        } elseif (!$bIsCreate) {
+            //  Automatically set tokens are permanent and immutable
+            if ($this->isAutoSetTokens() && !empty($aData[$this->tableTokenColumn])) {
+                unset($aData[$this->tableTokenColumn]);
+            }
         }
+
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Commits $aData to the database
+     *
+     * @param array $aData the data array
+     *
+     * @return bool
+     */
+    protected function saveToDb(array $aData, int $iId = null): bool
+    {
+        $oDb = Factory::service('Database');
 
         if (!empty($aData)) {
-
             unset($aData['id']);
             foreach ($aData as $sColumn => $mValue) {
                 if (is_array($mValue)) {
@@ -563,55 +657,13 @@ abstract class Base
             }
         }
 
-        // --------------------------------------------------------------------------
-
-        if (is_array($mIds)) {
-            $oDb->where_in($sAlias . 'id', $mIds);
+        if (!$iId) {
+            $oDb->insert($this->getTableName());
+            return (bool) $oDb->affected_rows();
         } else {
-            $oDb->where($sAlias . 'id', $mIds);
+            $oDb->where('id', $iId);
+            return $oDb->update($this->getTableName());
         }
-
-        $bResult = $oDb->update($sTable);
-
-        // --------------------------------------------------------------------------
-
-        //  Save any expandable objects
-        if (is_array($mIds)) {
-            foreach ($mIds as $iId) {
-                $this->autoSaveExpandableFieldsSave($iId, $aAutoSaveExpandableFields);
-            }
-        } else {
-            $this->autoSaveExpandableFieldsSave($mIds, $aAutoSaveExpandableFields);
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Clear the cache
-        if (is_array($mIds)) {
-            foreach ($mIds as $iId) {
-                foreach ($this->aCacheColumns as $sColumn) {
-                    $sKey = strtoupper($sColumn) . ':' . json_encode($iId);
-                    $this->unsetCachePrefix($sKey);
-                }
-            }
-        } else {
-            foreach ($this->aCacheColumns as $sColumn) {
-                $sKey = strtoupper($sColumn) . ':' . json_encode($mIds);
-                $this->unsetCachePrefix($sKey);
-            }
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Fire the static::EVENT_UPDATED event
-        $aIds = (array) $mIds;
-        foreach ($aIds as $iId) {
-            $this->triggerEvent(static::EVENT_UPDATED, [$iId]);
-        }
-
-        // --------------------------------------------------------------------------
-
-        return $bResult;
     }
 
     // --------------------------------------------------------------------------
@@ -2003,12 +2055,12 @@ abstract class Base
     /**
      * Returns protected property $table
      *
-     * @param bool $bIncludePrefix Whether to include the table's alias
+     * @param bool $bIncludeAlias Whether to include the table's alias
      *
      * @throws ModelException
      * @return string
      */
-    public function getTableName($bIncludePrefix = false)
+    public function getTableName($bIncludeAlias = false)
     {
         //  @todo (Pablo - 2019-03-14) - Phase out support for $this->table
         if (empty($this->table) && empty(static::TABLE)) {
@@ -2017,7 +2069,7 @@ abstract class Base
 
         $sTable = static::TABLE ?? $this->table;
 
-        return $bIncludePrefix ? trim($sTable . ' as `' . $this->getTableAlias() . '`') : $sTable;
+        return $bIncludeAlias ? trim($sTable . ' as `' . $this->getTableAlias() . '`') : $sTable;
     }
 
     // --------------------------------------------------------------------------
