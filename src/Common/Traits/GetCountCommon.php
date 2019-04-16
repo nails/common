@@ -21,7 +21,7 @@ trait GetCountCommon
      * This method applies the conditionals which are common across the get_*()
      * methods and the count() method.
      *
-     * @param  array $aData Data passed from the calling method
+     * @param array $aData Data passed from the calling method
      *
      * @return void
      **/
@@ -76,7 +76,7 @@ trait GetCountCommon
     /**
      * Compiles the select statement
      *
-     * @param  array &$aData The data array
+     * @param array &$aData The data array
      *
      * @return void
      */
@@ -93,7 +93,7 @@ trait GetCountCommon
     /**
      * Compiles any active filters back into the $aData array
      *
-     * @param  array &$aData The data array
+     * @param array &$aData The data array
      *
      * @return void
      */
@@ -213,9 +213,9 @@ trait GetCountCommon
     /**
      * Compile the filter string
      *
-     * @param  string  $sColumn  The column
-     * @param  mixed   $mValue   The value
-     * @param  boolean $bIsQuery Whether the value is an SQL wuery or not
+     * @param string  $sColumn  The column
+     * @param mixed   $mValue   The value
+     * @param boolean $bIsQuery Whether the value is an SQL wuery or not
      *
      * @return string
      */
@@ -230,7 +230,7 @@ trait GetCountCommon
             $aBits = [$mValue];
         } elseif (!is_array($mValue)) {
             $aBits = [
-                $oDb->escape_str($sColumn, false),
+                strpos($sColumn, '`') === false ? $oDb->escape_str($sColumn, false) : $sColumn,
                 '=',
                 $oDb->escape($mValue),
             ];
@@ -253,7 +253,7 @@ trait GetCountCommon
     /**
      * Compiles any where's into the query
      *
-     * @param  array &$aData The data array
+     * @param array &$aData The data array
      *
      * @return void
      */
@@ -444,7 +444,7 @@ trait GetCountCommon
     /**
      * Compiles any like's into the query
      *
-     * @param  array &$aData The data array
+     * @param array &$aData The data array
      *
      * @return void
      */
@@ -578,7 +578,7 @@ trait GetCountCommon
     /**
      * Compiles any having's into the query
      *
-     * @param  array &$aData The data array
+     * @param array &$aData The data array
      *
      * @return void
      */
@@ -729,7 +729,7 @@ trait GetCountCommon
     /**
      * Compiles the sort element into the query
      *
-     * @param  array &$aData The data array
+     * @param array &$aData The data array
      *
      * @return void
      */
@@ -791,7 +791,7 @@ trait GetCountCommon
     /**
      * Parse the sort variable
      *
-     * @param  string|array $mSort The sort variable
+     * @param string|array $mSort The sort variable
      *
      * @return array
      */
