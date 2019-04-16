@@ -1512,31 +1512,16 @@ abstract class Base
 
             $oAssociatedModel = Factory::model($sAssociatedModel, $sAssociatedModelProvider);
 
-            $aItemIds = [];
             foreach ($aItems as $oItem) {
-
-                //  Note the ID
-                $aItemIds[] = $oItem->id;
-
-                //  Set the base property
-                $oItem->{$sItemProperty} = 0;
-            }
-
-            if (empty($aAssociatedModelData['where_in'])) {
-                $aAssociatedModelData['where_in'] = [];
-            }
-
-            $aAssociatedModelData['where_in'][] = [$sAssociatedItemIdColumn, $aItemIds];
-
-            $aAssociatedItems = $oAssociatedModel->getAll(null, null, $aAssociatedModelData);
-
-            foreach ($aItems as $oItem) {
-                foreach ($aAssociatedItems as $oAssociatedItem) {
-                    if ($oItem->id == $oAssociatedItem->{$sAssociatedItemIdColumn}) {
-                        $oItem->{$sItemProperty}++;
-                    }
+                //  Use a new array so as not to impact the original request
+                $aQueryData = $aAssociatedModelData;
+                if (empty($aQueryData['where'])) {
+                    $aQueryData['where'] = [];
                 }
+                $aQueryData['where'][]   = [$sAssociatedItemIdColumn, $oItem->id];
+                $oItem->{$sItemProperty} = $oAssociatedModel->countAll($aQueryData);
             }
+        }
         }
     }
 
