@@ -816,6 +816,10 @@ class Model extends BaseMaker
             //  Drop the AUTO_INCREMENT key
             'ALTER TABLE `' . $oModel->table_with_prefix . '_localised` CHANGE `id` `id` INT(11) UNSIGNED NOT NULL;',
 
+            //  Change the primary key
+            'ALTER TABLE  `' . $oModel->table_with_prefix . '_localised` DROP PRIMARY KEY, ADD PRIMARY KEY (`id`, `language`, `region`)',
+
+
             //  Create the new top-level table
             'CREATE TABLE `' . $oModel->table_with_prefix . '` (id INT(11) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT) DEFAULT CHARACTER SET `utf8`;',
 
