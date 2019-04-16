@@ -419,4 +419,25 @@ class Locale
 
         return '/^(' . implode('|', $aUrlLocales) . ')?(\/)?(.*)$/';
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns an emoji flag for a locale
+     *
+     * @param \Nails\Common\Factory\Locale $oLocale The locale to query
+     *
+     * @return string
+     */
+    public static function flagEmoji(\Nails\Common\Factory\Locale $oLocale): string
+    {
+        $sRegion    = $oLocale->getRegion();
+        $aCountries = json_decode(
+            file_get_contents(
+                NAILS_APP_PATH . 'vendor/annexare/countries-list/dist/countries.emoji.json'
+            )
+        );
+
+        return !empty($aCountries->{$sRegion}->emoji) ? $aCountries->{$sRegion}->emoji : '';
+    }
 }
