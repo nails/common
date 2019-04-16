@@ -304,9 +304,10 @@ class Locale
      * @param \Nails\Common\Factory\Locale $oLocale The Locale object to update
      * @param string                       $sLocale The string to parse
      *
+     * @return \Nails\Common\Factory\Locale
      * @throws \Nails\Common\Exception\FactoryException
      */
-    protected function setFromString(\Nails\Common\Factory\Locale &$oLocale, string $sLocale): void
+    public function setFromString(\Nails\Common\Factory\Locale &$oLocale, string $sLocale): ?\Nails\Common\Factory\Locale
     {
         if (!empty($sLocale)) {
 
@@ -327,6 +328,8 @@ class Locale
                     ->setScript(Factory::factory('LocaleScript', null, $sScript));
             }
         }
+
+        return $oLocale;
     }
 
     // --------------------------------------------------------------------------

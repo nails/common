@@ -14,6 +14,7 @@ namespace Nails\Common\CodeIgniter\Libraries;
 
 use CI_Form_validation;
 use Nails\Common\Helper\ArrayHelper;
+use Nails\Common\Service\Locale;
 use Nails\Factory;
 
 class FormValidation extends CI_Form_validation
@@ -66,8 +67,8 @@ class FormValidation extends CI_Form_validation
      * Checks if a certain value is unique in a specified table if different
      * from current value.
      *
-     * @param  string $new    The form value
-     * @param  string $params Parameters passed from set_rules() method
+     * @param string $new    The form value
+     * @param string $params Parameters passed from set_rules() method
      *
      * @return boolean
      */
@@ -101,7 +102,7 @@ class FormValidation extends CI_Form_validation
     /**
      * Checks if a string is in a valid UK post code format.
      *
-     * @param  string $str The form value
+     * @param string $str The form value
      *
      * @return boolean
      */
@@ -120,8 +121,8 @@ class FormValidation extends CI_Form_validation
     /**
      * Checks if an array satisfies specified count restrictions.
      *
-     * @param  array  $aArray The value to check
-     * @param  string $sParam The parameter to check against
+     * @param array  $aArray The value to check
+     * @param string $sParam The parameter to check against
      *
      * @return boolean
      */
@@ -152,8 +153,8 @@ class FormValidation extends CI_Form_validation
     /**
      * Check if a date is valid
      *
-     * @param  string $sDate   The date string to check
-     * @param  string $sFormat The format the string is in
+     * @param string $sDate   The date string to check
+     * @param string $sFormat The format the string is in
      *
      * @return boolean
      */
@@ -193,8 +194,8 @@ class FormValidation extends CI_Form_validation
     /**
      * Checks if a date is in the future
      *
-     * @param  string $sDate   The date string to check
-     * @param  string $sFormat The format the string is in
+     * @param string $sDate   The date string to check
+     * @param string $sFormat The format the string is in
      *
      * @return boolean
      */
@@ -238,8 +239,8 @@ class FormValidation extends CI_Form_validation
     /**
      * Checks if a date is in the past
      *
-     * @param  string $sDate   The date string to check
-     * @param  string $sFormat The format the string is in
+     * @param string $sDate   The date string to check
+     * @param string $sFormat The format the string is in
      *
      * @return boolean
      */
@@ -283,8 +284,8 @@ class FormValidation extends CI_Form_validation
     /**
      * Checks if a date is today
      *
-     * @param  string $sDate   The date string to check
-     * @param  string $sFormat The format the string is in
+     * @param string $sDate   The date string to check
+     * @param string $sFormat The format the string is in
      *
      * @return boolean
      */
@@ -328,8 +329,8 @@ class FormValidation extends CI_Form_validation
     /**
      * Checks if a date is before another date field
      *
-     * @param  string $sDate   The date string to check
-     * @param  string $sParams The other field name, and the date format (optional), separated with a period.
+     * @param string $sDate   The date string to check
+     * @param string $sParams The other field name, and the date format (optional), separated with a period.
      *
      * @return boolean
      */
@@ -388,8 +389,8 @@ class FormValidation extends CI_Form_validation
     /**
      * Checks if a date is after another date field
      *
-     * @param  string $sDate   The date string to check
-     * @param  string $sParams The other field name, and the date format (optional), separated with a period.
+     * @param string $sDate   The date string to check
+     * @param string $sParams The other field name, and the date format (optional), separated with a period.
      *
      * @return boolean
      */
@@ -448,8 +449,8 @@ class FormValidation extends CI_Form_validation
     /**
      * Checks if a datetime string is valid
      *
-     * @param  string $sDateTime The datetime string to check
-     * @param  string $sFormat   The format the string is in
+     * @param string $sDateTime The datetime string to check
+     * @param string $sFormat   The format the string is in
      *
      * @return boolean
      */
@@ -489,8 +490,8 @@ class FormValidation extends CI_Form_validation
     /**
      * Checks if a datetime string is in the future
      *
-     * @param  string $sDateTime The datetime string to check
-     * @param  string $sFormat   The format the string is in
+     * @param string $sDateTime The datetime string to check
+     * @param string $sFormat   The format the string is in
      *
      * @return boolean
      */
@@ -531,8 +532,8 @@ class FormValidation extends CI_Form_validation
     /**
      * Checks if a datetime string is in the past
      *
-     * @param  string $sDateTime The datetime string to check
-     * @param  string $sFormat   The format the string is in
+     * @param string $sDateTime The datetime string to check
+     * @param string $sFormat   The format the string is in
      *
      * @return boolean
      */
@@ -573,8 +574,8 @@ class FormValidation extends CI_Form_validation
     /**
      * Checks if a datetime is before another date field
      *
-     * @param  string $sDateTime The datetime string to check
-     * @param  string $sParams   The other field name, and the datetime format (optional), separated with a period.
+     * @param string $sDateTime The datetime string to check
+     * @param string $sParams   The other field name, and the datetime format (optional), separated with a period.
      *
      * @return boolean
      */
@@ -630,8 +631,8 @@ class FormValidation extends CI_Form_validation
     /**
      * Checks if a datetime is after another date field
      *
-     * @param  string $sDateTime The datetime string to check
-     * @param  string $sParams   The other field name, and the datetime format (optional), separated with a period.
+     * @param string $sDateTime The datetime string to check
+     * @param string $sParams   The other field name, and the datetime format (optional), separated with a period.
      *
      * @return boolean
      */
@@ -687,8 +688,8 @@ class FormValidation extends CI_Form_validation
     /**
      * Checks if a time string is valid
      *
-     * @param  string $sTime   The time string to check
-     * @param  string $sFormat The format the string is in
+     * @param string $sTime   The time string to check
+     * @param string $sFormat The format the string is in
      *
      * @return boolean
      */
@@ -728,8 +729,8 @@ class FormValidation extends CI_Form_validation
     /**
      * Checks if a time string is in the future relative to right now (assumes date is today)
      *
-     * @param  string $sTime   The time string to check
-     * @param  string $sFormat The format the string is in
+     * @param string $sTime   The time string to check
+     * @param string $sFormat The format the string is in
      *
      * @return boolean
      */
@@ -770,8 +771,8 @@ class FormValidation extends CI_Form_validation
     /**
      * Checks if a time string is in the past relative to right now (assumes date is today)
      *
-     * @param  string $sTime   The time string to check
-     * @param  string $sFormat The format the string is in
+     * @param string $sTime   The time string to check
+     * @param string $sFormat The format the string is in
      *
      * @return boolean
      */
@@ -812,8 +813,8 @@ class FormValidation extends CI_Form_validation
     /**
      * Checks if a time string is before another time field
      *
-     * @param  string $sTime   The time string to check
-     * @param  string $sParams The other field name, and the time format (optional), separated with a period.
+     * @param string $sTime   The time string to check
+     * @param string $sParams The other field name, and the time format (optional), separated with a period.
      *
      * @return boolean
      */
@@ -869,8 +870,8 @@ class FormValidation extends CI_Form_validation
     /**
      * Checks if a time string is after another time field
      *
-     * @param  string $sTime   The time string to check
-     * @param  string $sParams The other field name, and the time format (optional), separated with a period.
+     * @param string $sTime   The time string to check
+     * @param string $sParams The other field name, and the time format (optional), separated with a period.
      *
      * @return boolean
      */
@@ -926,8 +927,8 @@ class FormValidation extends CI_Form_validation
     /**
      * Checks if a value is within a range as defined in $field
      *
-     * @param  string $str   The form value
-     * @param  string $field The range, e.g., 0-10
+     * @param string $str   The form value
+     * @param string $field The range, e.g., 0-10
      *
      * @return boolean
      */
@@ -962,7 +963,7 @@ class FormValidation extends CI_Form_validation
      *
      * @access  public
      *
-     * @param   string
+     * @param string
      *
      * @return  bool
      */
@@ -983,7 +984,7 @@ class FormValidation extends CI_Form_validation
     /**
      * Same as alpha_dash, but includes periods
      *
-     * @param  string $str The string to test
+     * @param string $str The string to test
      *
      * @return boolean
      */
@@ -997,11 +998,11 @@ class FormValidation extends CI_Form_validation
     /**
      * Validates that all items within a CDN Object Multi Picker have a label set
      *
-     * @todo  provide this from within the CDN module
-     *
-     * @param  array $aValues The values from the picker
+     * @param array $aValues The values from the picker
      *
      * @return boolean
+     * @todo  provide this from within the CDN module
+     *
      */
     public function cdnObjectPickerMultiObjectRequired($aValues)
     {
@@ -1024,11 +1025,11 @@ class FormValidation extends CI_Form_validation
     /**
      * Validates that all items within a CDN Object Multi Picker have an object set
      *
-     * @todo  provide this from within the CDN module
-     *
-     * @param  array $aValues The values from the picker
+     * @param array $aValues The values from the picker
      *
      * @return boolean
+     * @todo  provide this from within the CDN module
+     *
      */
     public function cdnObjectPickerMultiLabelRequired($aValues)
     {
@@ -1051,11 +1052,11 @@ class FormValidation extends CI_Form_validation
     /**
      * Validates that all items within a CDN Object Multi Picker have both an object and a label set
      *
-     * @todo  provide this from within the CDN module
-     *
-     * @param  array $aValues The values from the picker
+     * @param array $aValues The values from the picker
      *
      * @return boolean
+     * @todo  provide this from within the CDN module
+     *
      */
     public function cdnObjectPickerMultiAllRequired($aValues)
     {
@@ -1112,5 +1113,48 @@ class FormValidation extends CI_Form_validation
     {
         $this->set_message('is_bool', lang('fv_is_bool_field'));
         return is_bool($bValue) || $bValue === '1' || $bValue === '0' || $bValue === 1 || $bValue === 0;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Determines whether the vlaue is a supported locale
+     *
+     * @param string $sValue The vaue to check
+     *
+     * @return bool
+     * @throws \Nails\Common\Exception\FactoryException
+     */
+    public function supportedLocale($sValue)
+    {
+        /** @var Locale $oLocale */
+        $oLocale           = Factory::service('Locale');
+        $aSupportedLocales = $oLocale->getSupportedLocales();
+        if (!in_array($sValue, $aSupportedLocales)) {
+            $this->set_message('supportedLocale', 'This is not a supported locale');
+            return false;
+        }
+
+        return true;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Determines whether a value is specifically something
+     *
+     * @param string $sValue    The value to check
+     * @param string $sExpected The expected value
+     *
+     * @return bool
+     */
+    public function is($sValue, $sExpected)
+    {
+        if ($sValue !== $sExpected) {
+            $this->set_message('is', 'This field must be exactly "' . $sExpected . '"');
+            return false;
+        }
+
+        return true;
     }
 }

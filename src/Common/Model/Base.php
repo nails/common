@@ -15,9 +15,11 @@ namespace Nails\Common\Model;
 use Behat\Transliterator\Transliterator;
 use Nails\Common\Exception\ModelException;
 use Nails\Common\Helper\ArrayHelper;
+use Nails\Common\Service\Locale;
 use Nails\Common\Traits\Caching;
 use Nails\Common\Traits\ErrorHandling;
 use Nails\Common\Traits\GetCountCommon;
+use Nails\Common\Traits\Model\Localised;
 use Nails\Components;
 use Nails\Factory;
 
@@ -368,7 +370,11 @@ abstract class Base
 
         if ($this->saveToDb($aData)) {
 
-            $iId = $oDb->insert_id();
+            if (classUses($this, Localised::class)) {
+                $iId = $aData['id'];
+            } else {
+                $iId = $oDb->insert_id();
+            }
 
             //  Save any expandable objects
             $this->autoSaveExpandableFieldsSave($iId, $aAutoSaveExpandableFields);
@@ -645,7 +651,9 @@ abstract class Base
         $oDb = Factory::service('Database');
 
         if (!empty($aData)) {
-            unset($aData['id']);
+            if (!classUses($this, Localised::class)) {
+                unset($aData['id']);
+            }
             foreach ($aData as $sColumn => $mValue) {
                 if (is_array($mValue)) {
                     $mSetValue = isset($mValue[0]) ? $mValue[0] : null;
@@ -662,6 +670,10 @@ abstract class Base
             return (bool) $oDb->affected_rows();
         } else {
             $oDb->where('id', $iId);
+            if (classUses($this, Localised::class)) {
+                $oDb->where('language', $aData['language']);
+                $oDb->where('region', $aData['region']);
+            }
             return $oDb->update($this->getTableName());
         }
     }
@@ -2358,6 +2370,31 @@ abstract class Base
         $aResult = $oDb->query('DESCRIBE `' . $sTable . '`;')->result();
         $aFields = [];
 
+        if (classUses($this, Localised::class)) {
+
+            /** @var Locale $oLocale */
+            $oLocale           = Factory::service('Locale');
+            $aSupportedLocales = $oLocale->getSupportedLocales();
+            $aOptions          = array_combine(
+                $aSupportedLocales,
+                array_map(function ($oLocale) {
+                    return \Locale::getDisplayLanguage($oLocale) . ' (' . $oLocale->getRegion() . ')';
+                }, $aSupportedLocales)
+            );
+
+            $aFields[] = (object) [
+                'key'        => 'locale',
+                'label'      => 'Locale',
+                'type'       => 'dropdown',
+                'allow_null' => false,
+                'validation' => ['required', 'supportedLocale'],
+                'options'    => $aOptions,
+                'class'      => 'select2',
+                'info'       => 'This field specifies what language the item is written in.',
+                'default'    => $oLocale->getDefautLocale(),
+            ];
+        }
+
         foreach ($aResult as $oField) {
 
             $oTemp = (object) [
@@ -2366,6 +2403,7 @@ abstract class Base
                 'type'       => null,
                 'allow_null' => $oField->Null === 'YES',
                 'validation' => [],
+                'default'    => null,
             ];
 
             //  Guess the field's type and some basic validation
@@ -2373,6 +2411,11 @@ abstract class Base
             $this->describeFieldsGuessValidation($oTemp, $oField->Type);
 
             $aFields[$oTemp->key] = $oTemp;
+        }
+
+        if (classUses($this, Localised::class)) {
+            unset($aFields['language']);
+            unset($aFields['region']);
         }
 
         return $aFields;

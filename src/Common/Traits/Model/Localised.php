@@ -2,7 +2,9 @@
 
 namespace Nails\Common\Traits\Model;
 
+use Nails\Common\Exception\ModelException;
 use Nails\Common\Resource;
+use Nails\Common\Service\Database;
 use Nails\Common\Service\Locale;
 use Nails\Factory;
 
@@ -104,9 +106,25 @@ trait Localised
         $sAlias  = $this->getTableAlias();
 
         /**
-         * By passing in NO_LOCALISE_FILTER to the data array the developer can return items for all locales
+         * Restrict to a specific locale by passing in USE_LOCALE to the data array
+         * Pass NO_LOCALISE_FILTER to the data array the developer can return items for all locales
          */
-        if (empty($aData['NO_LOCALISE_FILTER'])) {
+        if (array_key_exists('USE_LOCALE', $aData)) {
+            if ($aData['USE_LOCALE'] instanceof \Nails\Common\Factory\Locale) {
+                $oUserLocale = $aData['USE_LOCALE'];
+            } else {
+                list($sLanguage, $sRegion) = $oLocale::parseLocaleString($aData['USE_LOCALE']);
+                $oUserLocale = $this->getLocale($sLanguage, $sRegion);
+            }
+
+            if (!array_key_exists('where', $aData)) {
+                $aData['where'] = [];
+            }
+
+            $aData['where'][] = ['language', $oUserLocale->getLanguage()];
+            $aData['where'][] = ['region', $oUserLocale->getRegion()];
+
+        } elseif (!array_key_exists('NO_LOCALISE_FILTER', $aData)) {
 
             if (!array_key_exists('select', $aData)) {
                 $aData['select'] = [
@@ -114,13 +132,7 @@ trait Localised
                 ];
             }
 
-            if (!array_key_exists('locale', $aData)) {
-                $oUserLocale = $oLocale->get();
-            } else {
-                list($sLanguage, $sRegion) = $oLocale::parseLocaleString($aData['locale']);
-                $oUserLocale = $this->getLocale($sLanguage, $sRegion);
-            }
-
+            $oUserLocale      = $oLocale->get();
             $sUserLanguage    = $oUserLocale->getLanguage();
             $sUserRegion      = $oUserLocale->getRegion();
             $oDefaultLocale   = $oLocale->getDefautLocale();
@@ -140,7 +152,7 @@ trait Localised
                 $aData['where'] = [];
             }
 
-            $aData['where'] = implode(' OR ', $aConditionals);
+            $aData['where'][] = implode(' OR ', $aConditionals);
         }
     }
 
@@ -206,5 +218,89 @@ trait Localised
     {
         $sTable = parent::getTableName() . static::$sLocalisedTableSuffix;
         return $bIncludeAlias ? trim($sTable . ' as `' . $this->getTableAlias() . '`') : $sTable;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Create a new localised item
+     *
+     * @param array $aData         The data array
+     * @param bool  $bReturnObject Whetehr to return the item's ID or the object on success
+     *
+     * @return mixed|null
+     * @throws ModelException
+     * @throws \Nails\Common\Exception\FactoryException
+     */
+    public function create(array $aData = [], $bReturnObject = false)
+    {
+        if (!array_key_exists('locale', $aData)) {
+            throw new ModelException(
+                'Localised item must define a "locale" property when creating'
+            );
+        } elseif (!($aData['locale'] instanceof \Nails\Common\Factory\Locale)) {
+            throw new ModelException(
+                '"locale" must be an instance of \Nails\Common\Factory\Locale'
+            );
+        }
+
+        $oItemLocale = $aData['locale'];
+        unset($aData['locale']);
+
+        /** @var Database $oDb */
+        $oDb = Factory::service('Database');
+
+        if (empty($aData['id'])) {
+            $oDb->set('id', null);
+            $oDb->insert(parent::getTableName());
+            $aData['id'] = $oDb->insert_id();
+        }
+
+        $aData['language'] = $oItemLocale->getLanguage();
+        $aData['region']   = $oItemLocale->getRegion();
+
+        $iItemId = parent::create($aData, false);
+
+        if (empty($iItemId)) {
+            return null;
+        }
+
+        if (!$bReturnObject) {
+            return $iItemId;
+        }
+
+        return $this->getById($iItemId, ['USE_LOCALE' => $oItemLocale]);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Update a localised item
+     *
+     * @param int   $iId   The ID of the item being updated
+     * @param array $aData The data array
+     *
+     * @return bool
+     * @throws ModelException
+     */
+    public function update($iId, array $aData = [])
+    {
+        if (!array_key_exists('locale', $aData)) {
+            throw new ModelException(
+                'Localised item must define a "locale" property when creating'
+            );
+        } elseif (!($aData['locale'] instanceof \Nails\Common\Factory\Locale)) {
+            throw new ModelException(
+                '"locale" must be an instance of \Nails\Common\Factory\Locale'
+            );
+        }
+
+        $oItemLocale = $aData['locale'];
+        unset($aData['locale']);
+
+        $aData['language'] = $oItemLocale->getLanguage();
+        $aData['region']   = $oItemLocale->getRegion();
+
+        return parent::update($iId, $aData);
     }
 }
