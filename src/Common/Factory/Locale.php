@@ -2,9 +2,11 @@
 
 namespace Nails\Common\Factory;
 
+use Nails\Common\Exception\FactoryException;
 use Nails\Common\Factory\Locale\Language;
 use Nails\Common\Factory\Locale\Region;
 use Nails\Common\Factory\Locale\Script;
+use Nails\Factory;
 
 /**
  * Class Locale
@@ -171,5 +173,18 @@ class Locale
     public function getDisplayLanguage(): string
     {
         return \Locale::getDisplayLanguage($this->getAsString()) . ' (' . $this->getRegion() . ')';
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the flag emoji for this locale
+     *
+     * @return string
+     * @throws FactoryException
+     */
+    public function getFlagEmoji(): string
+    {
+        return Factory::service('Locale')::flagEmoji($this);
     }
 }
