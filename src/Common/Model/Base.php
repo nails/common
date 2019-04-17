@@ -563,7 +563,6 @@ abstract class Base
                 }
             } else {
                 if ($bSetCreated && empty($aData[$this->tableCreatedByColumn])) {
-                    $oDb->set($this->tableCreatedByColumn, null);
                     $aData[$this->tableCreatedByColumn] = null;
                 }
                 if (empty($aData[$this->tableModifiedByColumn])) {
