@@ -2,6 +2,7 @@
 
 namespace Nails\Common\Traits\Model;
 
+use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\ModelException;
 use Nails\Common\Resource;
 use Nails\Common\Service\Database;
@@ -48,14 +49,15 @@ trait Localised
     /**
      * Overloads the getAll to add a Locale object to each resource
      *
-     * @param int|null $iPage           The page number of the results, if null then no pagination
-     * @param int|null $iPerPage        How many items per page of paginated results
-     * @param array    $aData           Any data to pass to getCountCommon()
-     * @param bool     $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
+     * @param int|null|array $iPage           The page number of the results, if null then no pagination; also accepts an $aData array
+     * @param int|null       $iPerPage        How many items per page of paginated results
+     * @param array          $aData           Any data to pass to getCountCommon()
+     * @param bool           $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
      *
-     * @return array
+     * @return Resource[]
+     * @throws FactoryException
      */
-    public function getAll($iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false)
+    public function getAll($iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false): array
     {
         $aResult = parent::getAll($iPage, $iPerPage, $aData, $bIncludeDeleted);
         $this->addLocaleToResources($aResult);
@@ -69,7 +71,8 @@ trait Localised
      *
      * @param array $aData Any data to pass to parent::getCountCommon()
      *
-     * @throws \Nails\Common\Exception\FactoryException
+     * @throws FactoryException
+     * @throws ModelException
      */
     protected function getCountCommon(array $aData = [])
     {
@@ -80,23 +83,12 @@ trait Localised
     // --------------------------------------------------------------------------
 
     /**
-     * Formats the input data into a method suitable for
-     *
-     * @param array $aData The data being passed
-     */
-    protected function prepareWriteData(array &$aData): parent
-    {
-        return $this;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Injects localisation modifiers
      *
      * @param array $aData The data passed to getCountCommon()
      *
-     * @throws \Nails\Common\Exception\FactoryException
+     * @throws FactoryException
+     * @throws ModelException
      */
     protected function injectLocalisationQuery(array &$aData): void
     {
@@ -109,6 +101,13 @@ trait Localised
          * Restrict to a specific locale by passing in USE_LOCALE to the data array
          * Pass NO_LOCALISE_FILTER to the data array the developer can return items for all locales
          */
+
+        if (!array_key_exists('select', $aData)) {
+            $aData['select'] = [
+                $sAlias . '.*',
+            ];
+        }
+
         if (array_key_exists('USE_LOCALE', $aData)) {
             if ($aData['USE_LOCALE'] instanceof \Nails\Common\Factory\Locale) {
                 $oUserLocale = $aData['USE_LOCALE'];
@@ -125,12 +124,6 @@ trait Localised
             $aData['where'][] = ['region', $oUserLocale->getRegion()];
 
         } elseif (!array_key_exists('NO_LOCALISE_FILTER', $aData)) {
-
-            if (!array_key_exists('select', $aData)) {
-                $aData['select'] = [
-                    $sAlias . '.*',
-                ];
-            }
 
             $oUserLocale      = $oLocale->get();
             $sUserLanguage    = $oUserLocale->getLanguage();
@@ -154,6 +147,13 @@ trait Localised
 
             $aData['where'][] = implode(' OR ', $aConditionals);
         }
+
+        //  Ensure each row knows about the other items available
+        $sQuery = 'SELECT GROUP_CONCAT(CONCAT(`others`.`language`, \'_\', `others`.`region`)) FROM ' . $sTable . ' `others` WHERE `others`.`id` = `' . $sAlias . '`.`id`';
+        if (!$this->isDestructiveDelete()) {
+            $sQuery .= ' AND `others`.`' . $this->getColumn('deleted') . '` = 0';
+        }
+        $aData['select'][] = '(' . $sQuery . ') available_locales';
     }
 
     // --------------------------------------------------------------------------
@@ -162,6 +162,8 @@ trait Localised
      * Adds a locale object to an array of Resources
      *
      * @param array $aResources The array of Resources
+     *
+     * @throws FactoryException
      */
     protected function addLocaleToResources(array $aResources): void
     {
@@ -173,18 +175,36 @@ trait Localised
     // --------------------------------------------------------------------------
 
     /**
-     * Adds a locale object to a Resource, and removes the language and region properties
+     * Adds a Locale object to a Resource, and removes the language and region properties
      *
      * @param Resource $oResource The resource to modify
      *
-     * @throws \Nails\Common\Exception\FactoryException
+     * @throws FactoryException
      */
     protected function addLocaleToResource(Resource $oResource): void
     {
+        /** @var Locale $oLocale */
+        $oLocale = Factory::service('Locale');
+
+        //  Add the locale for _this_ item
         $oResource->locale = $this->getLocale(
             $oResource->{static::$sColumnLanguage},
             $oResource->{static::$sColumnRegion}
         );
+
+        //  Set the locales for all _available_ items
+        $oResource->available_locales = array_map(function ($sLocale) use ($oLocale) {
+            list($sLanguage, $sRegion) = $oLocale::parseLocaleString($sLocale);
+            return $this->getLocale($sLanguage, $sRegion);
+        }, explode(',', $oResource->available_locales));
+
+        //  Specify which locales are missing
+        $oResource->missing_locales = array_diff(
+            $oLocale->getSupportedLocales(),
+            $oResource->available_locales
+        );
+
+        //  Remove internal fields
         unset($oResource->{static::$sColumnLanguage});
         unset($oResource->{static::$sColumnRegion});
     }
@@ -198,13 +218,14 @@ trait Localised
      * @param string $sRegion   The region to set
      *
      * @return \Nails\Common\Factory\Locale
-     * @throws \Nails\Common\Exception\FactoryException
+     * @throws FactoryException
      */
     private function getLocale(string $sLanguage, string $sRegion): \Nails\Common\Factory\Locale
     {
         return Factory::factory('Locale')
             ->setLanguage(Factory::factory('LocaleLanguage', null, $sLanguage))
-            ->setRegion(Factory::factory('LocaleRegion', null, $sRegion));
+            ->setRegion(Factory::factory('LocaleRegion', null, $sRegion))
+            ->setScript(Factory::factory('LocaleScript'));
     }
 
     // --------------------------------------------------------------------------
@@ -212,7 +233,10 @@ trait Localised
     /**
      * Returns the localised table name
      *
+     * @param bool $bIncludeAlias Whether to include the table alias or not
+     *
      * @return string
+     * @throws ModelException
      */
     public function getTableName($bIncludeAlias = false): string
     {
@@ -225,82 +249,204 @@ trait Localised
     /**
      * Create a new localised item
      *
-     * @param array $aData         The data array
-     * @param bool  $bReturnObject Whetehr to return the item's ID or the object on success
+     * @param array                             $aData         The data array
+     * @param bool                              $bReturnObject Whether to return the item's ID or the object on success
+     * @param \Nails\Common\Factory\Locale|null $oLocale       The locale to create the item in
      *
-     * @return mixed|null
+     * @return null|int|Resource
+     * @throws FactoryException
      * @throws ModelException
-     * @throws \Nails\Common\Exception\FactoryException
      */
-    public function create(array $aData = [], $bReturnObject = false)
+    public function create(array $aData = [], $bReturnObject = false, \Nails\Common\Factory\Locale $oLocale = null)
     {
-        if (!array_key_exists('locale', $aData)) {
+        /** @var Database $oDb */
+        $oDb = Factory::service('Database');
+
+        if (empty($oLocale)) {
             throw new ModelException(
-                'Localised item must define a "locale" property when creating'
-            );
-        } elseif (!($aData['locale'] instanceof \Nails\Common\Factory\Locale)) {
-            throw new ModelException(
-                '"locale" must be an instance of \Nails\Common\Factory\Locale'
+                'A locale must be defined when creating a localised item'
             );
         }
 
-        $oItemLocale = $aData['locale'];
-        unset($aData['locale']);
-
-        /** @var Database $oDb */
-        $oDb = Factory::service('Database');
+        $aData['language'] = $oLocale->getLanguage();
+        $aData['region']   = $oLocale->getRegion();
 
         if (empty($aData['id'])) {
             $oDb->set('id', null);
             $oDb->insert(parent::getTableName());
             $aData['id'] = $oDb->insert_id();
+            if (empty($aData['id'])) {
+                throw new ModelException(
+                    'Failed to generate parent item for localised object'
+                );
+            }
+            $bCreatedItem = true;
         }
 
-        $aData['language'] = $oItemLocale->getLanguage();
-        $aData['region']   = $oItemLocale->getRegion();
+        if (!$this->isDestructiveDelete()) {
+            /**
+             * This is to prevent primary key conflicts if a previously deleted item still exists in the table
+             */
+            $this->destroy($aData['id'], $oLocale);
+        }
 
         $iItemId = parent::create($aData, false);
 
         if (empty($iItemId)) {
+            if (!empty($bCreatedItem)) {
+                $oDb->where('id', $aData['id']);
+                $oDb->delete(parent::getTableName());
+            }
             return null;
-        }
-
-        if (!$bReturnObject) {
+        } elseif (!$bReturnObject) {
             return $iItemId;
         }
 
-        return $this->getById($iItemId, ['USE_LOCALE' => $oItemLocale]);
+        return $this->getById($iItemId, ['USE_LOCALE' => $oLocale]);
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Update a localised item
+     * Updates an existing object
      *
-     * @param int   $iId   The ID of the item being updated
-     * @param array $aData The data array
+     * @param int                               $iId     The ID of the object to update
+     * @param array                             $aData   The data to update the object with
+     * @param \Nails\Common\Factory\Locale|null $oLocale The locale of the object being updated
      *
      * @return bool
+     * @throws FactoryException
      * @throws ModelException
      */
-    public function update($iId, array $aData = [])
+    public function update($iId, array $aData = [], \Nails\Common\Factory\Locale $oLocale = null): bool
     {
-        if (!array_key_exists('locale', $aData)) {
+        if (empty($oLocale)) {
             throw new ModelException(
-                'Localised item must define a "locale" property when creating'
-            );
-        } elseif (!($aData['locale'] instanceof \Nails\Common\Factory\Locale)) {
-            throw new ModelException(
-                '"locale" must be an instance of \Nails\Common\Factory\Locale'
+                'A locale must be defined when updating a localised item'
             );
         }
 
-        $oItemLocale = $aData['locale'];
-        unset($aData['locale']);
-
-        $aData['language'] = $oItemLocale->getLanguage();
-        $aData['region']   = $oItemLocale->getRegion();
+        $oDb = Factory::service('Database');
+        $oDb->where('language', $oLocale->getLanguage());
+        $oDb->where('region', $oLocale->getRegion());
 
         return parent::update($iId, $aData);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Marks an object as deleted
+     *
+     * @param int                               $iId     The ID of the object to mark as deleted
+     * @param \Nails\Common\Factory\Locale|null $oLocale The locale of the object being deleted
+     *
+     * @return bool
+     * @throws FactoryException
+     * @throws ModelException
+     */
+    public function delete($iId, \Nails\Common\Factory\Locale $oLocale = null): bool
+    {
+        if (empty($oLocale)) {
+            throw new ModelException(
+                'A locale must be defined when deleting a localised item'
+            );
+        }
+
+        /**
+         * An item can be deleted if any of the following are true:
+         * - It is the only item
+         * - It is not the default locale
+         */
+
+        /** @var Locale $oLocale */
+        $oLocaleService = Factory::service('Locale');
+        $oItem          = $this->getById($iId, ['USE_LOCALE' => $oLocale]);
+
+        if (count($oItem->available_locales) === 1 || $oLocaleService->getDefautLocale() !== $oLocale) {
+
+            if ($this->isDestructiveDelete()) {
+                $bResult = $this->destroy($iId, $oLocale);
+            } else {
+                $bResult = $this->update(
+                    $iId,
+                    [$this->tableDeletedColumn => true],
+                    $oLocale
+                );
+            }
+
+            if ($bResult) {
+                $this->triggerEvent(static::EVENT_DELETED, [$iId, $oLocale]);
+                return true;
+            }
+
+            return false;
+
+        } elseif (count($oItem->available_locales) > 1 && $oLocaleService->getDefautLocale() === $oLocale) {
+            throw new ModelException(
+                'Item cannot be deleted as it is the default item and other items still exist.'
+            );
+        } else {
+            throw new ModelException(
+                'Item cannot be deleted'
+            );
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Permanently deletes an object
+     *
+     * @param int                               $iId     The ID  of the object to destroy
+     * @param \Nails\Common\Factory\Locale|null $oLocale The locale of the item being destroyed
+     *
+     * @return bool
+     * @throws FactoryException
+     * @throws ModelException
+     */
+    public function destroy($iId, \Nails\Common\Factory\Locale $oLocale = null): bool
+    {
+        if (empty($oLocale)) {
+            throw new ModelException(
+                'A locale must be defined when deleting a localised item'
+            );
+        }
+
+        $oDb = Factory::service('Database');
+        $oDb->where('language', $oLocale->getLanguage());
+        $oDb->where('region', $oLocale->getRegion());
+
+        return parent::destroy($iId);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Unmarks an object as deleted
+     *
+     * @param int                               $iId     The ID of the object to restore
+     * @param \Nails\Common\Factory\Locale|null $oLocale The locale of the item being restored
+     *
+     * @return bool
+     * @throws FactoryException
+     * @throws ModelException
+     */
+    public function restore($iId, \Nails\Common\Factory\Locale $oLocale = null): bool
+    {
+        if (empty($oLocale)) {
+            throw new ModelException(
+                'A locale must be defined when restoring a localised item'
+            );
+        }
+
+        if ($this->isDestructiveDelete()) {
+            return null;
+        } elseif ($this->update($iId, [$this->tableDeletedColumn => false], $oLocale)) {
+            $this->triggerEvent(static::EVENT_RESTORED, [$iId]);
+            return true;
+        }
+
+        return false;
     }
 }

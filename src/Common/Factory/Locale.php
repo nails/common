@@ -160,4 +160,16 @@ class Locale
     {
         return $this->getAsString();
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the locale's display language
+     *
+     * @return string
+     */
+    public function getDisplayLanguage(): string
+    {
+        return \Locale::getDisplayLanguage($this->getAsString()) . ' (' . $this->getRegion() . ')';
+    }
 }

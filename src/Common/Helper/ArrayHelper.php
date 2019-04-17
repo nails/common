@@ -17,9 +17,9 @@ class ArrayHelper
     /**
      * Retrieve a value from $sArray at $sKey, if it exists
      *
-     * @param  string|array $mKey     The key to get, if an array is passed the first valid key will be returned
-     * @param  array        $aArray   The array to look in
-     * @param  mixed        $mDefault What to return if $sKey doesn't exist in $aArray
+     * @param string|array $mKey     The key to get, if an array is passed the first valid key will be returned
+     * @param array        $aArray   The array to look in
+     * @param mixed        $mDefault What to return if $sKey doesn't exist in $aArray
      *
      * @return mixed
      */
@@ -41,7 +41,7 @@ class ArrayHelper
      * Removes duplicate items from a multi-dimensional array
      * Hat-tip: http://phpdevblog.niknovo.com/2009/01/using-array-unique-with-multidimensional-arrays.html
      *
-     * @param  array $aArray The array to filter
+     * @param array $aArray The array to filter
      *
      * @return array
      */
@@ -86,8 +86,8 @@ class ArrayHelper
     /**
      * Sorts a multi dimensional array
      *
-     * @param  array  &$aArray The array to sort
-     * @param  string  $sField The key to sort on
+     * @param array  &$aArray The array to sort
+     * @param string  $sField The key to sort on
      */
     public static function arraySortMulti(array &$aArray, $sField)
     {
@@ -122,9 +122,9 @@ class ArrayHelper
     /**
      * Searches a multi-dimensional array
      *
-     * @param  string $sValue Search value
-     * @param  string $sKey   Key to search
-     * @param  array  $aArray The array to search
+     * @param string $sValue Search value
+     * @param string $sKey   Key to search
+     * @param array  $aArray The array to search
      *
      * @return mixed         The array key on success, false on failure
      */
@@ -150,17 +150,41 @@ class ArrayHelper
     // --------------------------------------------------------------------------
 
     /**
+     * Test if an array contains value(s)
+     *
+     * @param string|array $aValues The values to check for
+     * @param array        $aArray  The array to search
+     *
+     * @return bool
+     */
+    public static function inArray($aValues, array $aArray): bool
+    {
+        if (is_string($aValues)) {
+            $aValues = (array) $aValues;
+        }
+
+        foreach ($aValues as $sValue) {
+            if (in_array($sValue, $aArray)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Reports whether a value exists in a multi dimensional array
      *
-     * @param  string $sValue The value to search for
-     * @param  string $sKey   The key to search on
-     * @param  array  $aArray The array to search
+     * @param string $sValue The value to search for
+     * @param string $sKey   The key to search on
+     * @param array  $aArray The array to search
      *
      * @return boolean
      */
-    public static function inArrayMulti($sValue, $sKey, array $aArray)
+    public static function inArrayMulti($sValue, $sKey, array $aArray): bool
     {
-        return arraySearchMulti($sValue, $sKey, $aArray) !== false;
+        return static::arraySearchMulti($sValue, $sKey, $aArray) !== false;
     }
 
     // --------------------------------------------------------------------------

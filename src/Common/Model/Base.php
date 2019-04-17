@@ -13,8 +13,10 @@
 namespace Nails\Common\Model;
 
 use Behat\Transliterator\Transliterator;
+use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\ModelException;
 use Nails\Common\Helper\ArrayHelper;
+use Nails\Common\Resource;
 use Nails\Common\Service\Locale;
 use Nails\Common\Traits\Caching;
 use Nails\Common\Traits\ErrorHandling;
@@ -334,8 +336,8 @@ abstract class Base
     /**
      * Creates a new object
      *
-     * @param array   $aData         The data to create the object with
-     * @param boolean $bReturnObject Whether to return just the new ID or the full object
+     * @param array $aData         The data to create the object with
+     * @param bool  $bReturnObject Whether to return just the new ID or the full object
      *
      * @return mixed
      * @throws ModelException
@@ -376,10 +378,7 @@ abstract class Base
                 $iId = $oDb->insert_id();
             }
 
-            //  Save any expandable objects
             $this->autoSaveExpandableFieldsSave($iId, $aAutoSaveExpandableFields);
-
-            //  Fire the static::EVENT_CREATED event
             $this->triggerEvent(static::EVENT_CREATED, [$iId]);
 
             return $bReturnObject ? $this->getById($iId) : $iId;
@@ -396,7 +395,7 @@ abstract class Base
      *
      * @param array $aData The data to insert
      *
-     * @return boolean
+     * @return bool
      */
     public function createBatch(array $aData)
     {
@@ -412,13 +411,14 @@ abstract class Base
     /**
      * Updates an existing object
      *
-     * @param integer $iId   The ID of the object to update
-     * @param array   $aData The data to update the object with
+     * @param int   $iId   The ID of the object to update
+     * @param array $aData The data to update the object with
      *
-     * @return boolean
+     * @return bool
+     * @throws FactoryException
      * @throws ModelException
      */
-    public function update($iId, array $aData = [])
+    public function update($iId, array $aData = []): bool
     {
         $sAlias = $this->getTableAlias(true);
         $sTable = $this->getTableName(true);
@@ -458,7 +458,6 @@ abstract class Base
                 $this->unsetCachePrefix($sKey);
             }
 
-            //  Fire the static::EVENT_CREATED event
             $this->triggerEvent(static::EVENT_UPDATED, [$iId]);
 
             return true;
@@ -522,7 +521,7 @@ abstract class Base
      * @param bool  $bSetCreated Whether to set the created timestamp or not
      *
      * @return $this
-     * @throws \Nails\Common\Exception\FactoryException
+     * @throws FactoryException
      */
     protected function setDataTimestamps(array &$aData, bool $bSetCreated = true): Base
     {
@@ -618,6 +617,7 @@ abstract class Base
      * @param array $aData The data being passed to the model
      *
      * @return $this
+     * @throws ModelException
      */
     protected function setDataToken(array &$aData, $bIsCreate = true): Base
     {
@@ -644,6 +644,8 @@ abstract class Base
      * @param array $aData the data array
      *
      * @return bool
+     * @throws FactoryException
+     * @throws ModelException
      */
     protected function saveToDb(array $aData, int $iId = null): bool
     {
@@ -669,10 +671,6 @@ abstract class Base
             return (bool) $oDb->affected_rows();
         } else {
             $oDb->where('id', $iId);
-            if (classUses($this, Localised::class)) {
-                $oDb->where('language', $aData['language']);
-                $oDb->where('region', $aData['region']);
-            }
             return $oDb->update($this->getTableName());
         }
     }
@@ -686,36 +684,23 @@ abstract class Base
      * destroy the object. If Non-destructive deletion is enabled then the
      * $this->tableDeletedColumn field will be set to true.
      *
-     * @param integer|array $mIds The ID (or an array of IDs) of the object(s) to mark as deleted
+     * @param int $iId The ID of the object to mark as deleted
      *
-     * @return boolean
+     * @return bool
+     * @throws FactoryException
      * @throws ModelException
      */
-    public function delete($mIds)
+    public function delete($iId): bool
     {
         if ($this->isDestructiveDelete()) {
-
-            //  Destructive delete; nuke that row.
-            $bResult = $this->destroy($mIds);
+            $bResult = $this->destroy($iId);
         } else {
-
-            //  Non-destructive delete, update the flag
-            $aData = [
-                $this->tableDeletedColumn => true,
-            ];
-
-            $bResult = $this->update($mIds, $aData);
+            $bResult = $this->update($iId, [$this->tableDeletedColumn => true]);
         }
 
-        // --------------------------------------------------------------------------
-
-        //  Fire the static::EVENT_DELETED event
-        $aIds = (array) $mIds;
-        foreach ($aIds as $iId) {
+        if ($bResult) {
             $this->triggerEvent(static::EVENT_DELETED, [$iId]);
         }
-
-        // --------------------------------------------------------------------------
 
         return $bResult;
     }
@@ -731,33 +716,20 @@ abstract class Base
      *
      * @param int $iId The ID of the object to restore
      *
-     * @return boolean
+     * @return bool
+     * @throws FactoryException
      * @throws ModelException
      */
-    public function restore($iId)
+    public function restore($iId): bool
     {
         if ($this->isDestructiveDelete()) {
-
-            //  Destructive delete; can't be resurrecting the dead.
             return null;
-        } else {
-
-            //  Non-destructive delete, update the flag
-            $aData = [
-                $this->tableDeletedColumn => false,
-            ];
-
-            $bResult = $this->update($iId, $aData);
-
-            // --------------------------------------------------------------------------
-
-            //  Fire the static::EVENT_RESTORED event
+        } elseif ($this->update($iId, [$this->tableDeletedColumn => false])) {
             $this->triggerEvent(static::EVENT_RESTORED, [$iId]);
-
-            // --------------------------------------------------------------------------
-
-            return $bResult;
+            return true;
         }
+
+        return false;
     }
 
     // --------------------------------------------------------------------------
@@ -768,44 +740,34 @@ abstract class Base
      * This method will attempt to delete the row from the table, regardless of whether
      * destructive deletion is enabled or not.
      *
-     * @param integer|array $mIds The ID (or array of IDs) of the object to destroy
+     * @param int $iId The ID  of the object to destroy
      *
-     * @return boolean
+     * @return bool
+     * @throws FactoryException
      * @throws ModelException
      */
-    public function destroy($mIds)
+    public function destroy($iId): bool
     {
         $oDb    = Factory::service('Database');
         $sTable = $this->getTableName();
 
         // --------------------------------------------------------------------------
 
-        if (is_array($mIds)) {
-            $oDb->where_in('id', $mIds);
-        } else {
-            $oDb->where('id', $mIds);
-        }
-
-        $bResult = $oDb->delete($sTable);
-
-        // --------------------------------------------------------------------------
-
-        //  Fire the static::EVENT_DESTROYED event
-        $aIds = (array) $mIds;
-        foreach ($aIds as $iId) {
+        $oDb->where('id', $iId);
+        if ($oDb->delete($sTable)) {
             $this->triggerEvent(static::EVENT_DESTROYED, [$iId]);
+            return true;
         }
 
-        // --------------------------------------------------------------------------
-
-        return $bResult;
+        return false;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Truncates the entire table
-     * return boolean
+     *
+     * @return bool
      */
     public function truncate()
     {
@@ -825,16 +787,17 @@ abstract class Base
     /**
      * Fetches all objects, optionally paginated. Returns the basic query object with no formatting.
      *
-     * @param int|null $iPage            The page number of the results, if null then no pagination
-     * @param int|null $iPerPage         How many items per page of paginated results
-     * @param array    $aData            Any data to pass to getCountCommon()
-     * @param bool     $bIncludeDeleted  If non-destructive delete is enabled then this flag allows you to include deleted
-     *                                   items
+     * @param int|null|array $iPage           The page number of the results, if null then no pagination; also accepts an $aData array
+     * @param int|null       $iPerPage        How many items per page of paginated results
+     * @param array          $aData           Any data to pass to getCountCommon()
+     * @param bool           $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted
+     *                                        items
      *
-     * @return object
+     * @return \CI_DB_mysqli_result
      * @throws ModelException
+     * @throws FactoryException
      */
-    public function getAllRawQuery($iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false)
+    public function getAllRawQuery($iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false): \CI_DB_mysqli_result
     {
         //  If the first value is an array then treat as if called with getAll(null, null, $aData);
         if (is_array($iPage)) {
@@ -925,14 +888,15 @@ abstract class Base
     /**
      * Fetches all objects and formats them, optionally paginated
      *
-     * @param int|null $iPage           The page number of the results, if null then no pagination
-     * @param int|null $iPerPage        How many items per page of paginated results
-     * @param mixed    $aData           Any data to pass to getCountCommon()
-     * @param bool     $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
+     * @param int|null|array $iPage           The page number of the results, if null then no pagination; also accepts an $aData array
+     * @param int|null       $iPerPage        How many items per page of paginated results
+     * @param mixed          $aData           Any data to pass to getCountCommon()
+     * @param bool           $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
      *
-     * @return array
+     * @return Resource[]
+     * @throws ModelException
      */
-    public function getAll($iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false)
+    public function getAll($iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false): array
     {
         //  If the first value is an array then treat as if called with getAll(null, null, $aData);
         if (is_array($iPage)) {
@@ -1070,7 +1034,7 @@ abstract class Base
      * @param int|null $iPage           The page number of the results
      * @param int|null $iPerPage        The number of items per page
      * @param array    $aData           Any data to pass to getCountCommon()
-     * @param boolean  $bIncludeDeleted Whether or not to include deleted items
+     * @param bool     $bIncludeDeleted Whether or not to include deleted items
      *
      * @return array
      * @throws ModelException
@@ -1265,9 +1229,9 @@ abstract class Base
     /**
      * Fetch objects by their IDs
      *
-     * @param array   $aIds                An array of IDs to fetch
-     * @param mixed   $aData               Any data to pass to getCountCommon()
-     * @param boolean $bMaintainInputOrder Whether to maintain the input order
+     * @param array $aIds                An array of IDs to fetch
+     * @param mixed $aData               Any data to pass to getCountCommon()
+     * @param bool  $bMaintainInputOrder Whether to maintain the input order
      *
      * @return array
      * @throws ModelException
@@ -1311,9 +1275,9 @@ abstract class Base
     /**
      * Fetch objects by their slugs
      *
-     * @param array   $aSlugs              An array of slugs to fetch
-     * @param array   $aData               Any data to pass to getCountCommon()
-     * @param boolean $bMaintainInputOrder Whether to maintain the input order
+     * @param array $aSlugs              An array of slugs to fetch
+     * @param array $aData               Any data to pass to getCountCommon()
+     * @param bool  $bMaintainInputOrder Whether to maintain the input order
      *
      * @return array
      * @throws ModelException
@@ -1381,9 +1345,9 @@ abstract class Base
     /**
      * Fetch objects by an array of tokens
      *
-     * @param array   $aTokens             An array of tokens to fetch
-     * @param array   $aData               Any data to pass to getCountCommon()
-     * @param boolean $bMaintainInputOrder Whether to maintain the input order
+     * @param array $aTokens             An array of tokens to fetch
+     * @param array $aData               Any data to pass to getCountCommon()
+     * @param bool  $bMaintainInputOrder Whether to maintain the input order
      *
      * @return array
      * @throws ModelException if object property tableTokenColumn is not set
@@ -1438,7 +1402,7 @@ abstract class Base
      * @param string   $sAssociatedModel          The name of the model which handles the associated content
      * @param string   $sAssociatedModelProvider  Which module provides the associated model
      * @param array    $aAssociatedModelData      Data to pass to the associated model's getByIds method()
-     * @param boolean  $bUnsetOriginalProperty    Whether to remove the original property (i.e the property defined by
+     * @param bool     $bUnsetOriginalProperty    Whether to remove the original property (i.e the property defined by
      *                                            $sAssociatedItemIdColumn)
      *
      * @return void
@@ -1683,13 +1647,13 @@ abstract class Base
     /**
      * Save associated items for an object
      *
-     * @param integer $iItemId                  The ID of the main item
-     * @param array   $aAssociatedItems         The data to save, multi-dimensional array of data
-     * @param string  $sAssociatedItemIdColumn  The name of the ID column in the associated table
-     * @param string  $sAssociatedModel         The name of the model which is responsible for associated items
-     * @param string  $sAssociatedModelProvider What module provide the associated item model
+     * @param int    $iItemId                  The ID of the main item
+     * @param array  $aAssociatedItems         The data to save, multi-dimensional array of data
+     * @param string $sAssociatedItemIdColumn  The name of the ID column in the associated table
+     * @param string $sAssociatedModel         The name of the model which is responsible for associated items
+     * @param string $sAssociatedModelProvider What module provide the associated item model
      *
-     * @return boolean
+     * @return bool
      * @throws ModelException
      */
     protected function saveAssociatedItems(
@@ -1779,10 +1743,10 @@ abstract class Base
     /**
      * Counts all objects
      *
-     * @param array   $aData           An array of data to pass to getCountCommon()
-     * @param boolean $bIncludeDeleted Whether to include deleted objects or not
+     * @param array $aData           An array of data to pass to getCountCommon()
+     * @param bool  $bIncludeDeleted Whether to include deleted objects or not
      *
-     * @return integer
+     * @return int
      * @throws ModelException
      */
     public function countAll(array $aData = [], $bIncludeDeleted = false)
@@ -2252,8 +2216,8 @@ abstract class Base
     /**
      * Saves extracted expandable fields
      *
-     * @param integer $iId
-     * @param array   $aExpandableFields
+     * @param int   $iId
+     * @param array $aExpandableFields
      */
     protected function autoSaveExpandableFieldsSave($iId, array $aExpandableFields)
     {
@@ -2376,8 +2340,8 @@ abstract class Base
             $aSupportedLocales = $oLocale->getSupportedLocales();
             $aOptions          = array_combine(
                 $aSupportedLocales,
-                array_map(function ($oLocale) {
-                    return \Locale::getDisplayLanguage($oLocale) . ' (' . $oLocale->getRegion() . ')';
+                array_map(function (\Nails\Common\Factory\Locale $oLocale) {
+                    return $oLocale->getDisplayLanguage();
                 }, $aSupportedLocales)
             );
 

@@ -115,7 +115,7 @@ trait Nestable
      *
      * @return mixed
      */
-    public function update($mIds, array $aData = [])
+    public function update($mIds, array $aData = []): bool
     {
         $mResult = parent::update($mIds, $aData);
         if ($mResult) {
