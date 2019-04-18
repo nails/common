@@ -270,6 +270,7 @@ trait Localised
 
         $aData['language'] = $oLocale->getLanguage();
         $aData['region']   = $oLocale->getRegion();
+        unset($aData['locale']);
 
         if (empty($aData['id'])) {
             $oDb->set('id', null);
@@ -325,6 +326,8 @@ trait Localised
                 'A locale must be defined when updating a localised item'
             );
         }
+
+        unset($aData['locale']);
 
         $oDb = Factory::service('Database');
         $oDb->where('language', $oLocale->getLanguage());
