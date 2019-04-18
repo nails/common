@@ -442,7 +442,7 @@ abstract class Base
         $this
             ->setDataTimestamps($aData, false)
             ->setDataUsers($aData, false)
-            ->setDataSlug($aData, false)
+            ->setDataSlug($aData, false, $iId)
             ->setDataToken($aData, false);
 
         // --------------------------------------------------------------------------
@@ -578,11 +578,13 @@ abstract class Base
     /**
      * Set the slug on the $aData array
      *
-     * @param array $aData The data being passed to the model
+     * @param array $aData     The data being passed to the model
+     * @param bool  $bIsCreate Whether the method is being called in a create context or not
+     * @param int   $iIgnoreId The ID of an item to ignore
      *
      * @return $this
      */
-    protected function setDataSlug(array &$aData, $bIsCreate = true): Base
+    protected function setDataSlug(array &$aData, bool $bIsCreate = true, int $iIgnoreId = null): Base
     {
         if ($this->isAutoSetSlugs() &&
             empty($aData[$this->tableSlugColumn]) &&
@@ -605,7 +607,10 @@ abstract class Base
                 );
             }
 
-            $aData[$this->tableSlugColumn] = $this->generateSlug($aData[$this->tableLabelColumn]);
+            $aData[$this->tableSlugColumn] = $this->generateSlug(
+                $aData[$this->tableLabelColumn],
+                $iIgnoreId
+            );
         }
 
         return $this;
@@ -1853,42 +1858,16 @@ abstract class Base
      */
 
     /**
-     * This method provides the functionality to generate a unique slug for an item in the database.
+     * Generates a unique slug
      *
-     * @param string      $sLabel    The label from which to generate a slug
-     * @param string      $sPrefix   Any prefix to add to the slug
-     * @param string      $sSuffix   Any suffix to add to the slug
-     * @param string|null $sTable    The table to use defaults to $this->table
-     * @param string|null $sColumn   The column to use, defaults to $this->tableSlugColumn
-     * @param int|null    $iIgnoreId An ID to ignore when searching
-     * @param string|null $sIdColumn The column to use for the ID, defaults to $this->tableIdColumn
+     * @param string $sLabel    The label from which to generate a slug
+     * @param int    $iIgnoreId The ID of an item to ignore
      *
      * @return string
      * @throws ModelException
      */
-    protected function generateSlug(
-        $sLabel,
-        $sPrefix = '',
-        $sSuffix = '',
-        $sTable = null,
-        $sColumn = null,
-        $iIgnoreId = null,
-        $sIdColumn = null
-    ) {
-        //  Perform this check here so the error message is more easily traced.
-        if (is_null($sTable)) {
-            $sTable = $this->getTableName();
-        }
-
-        if (is_null($sColumn)) {
-            if (!$this->tableSlugColumn) {
-                throw new ModelException(static::class . '::generateSlug() Column variable not set', 1);
-            }
-            $sColumn = $this->tableSlugColumn;
-        }
-
-        // --------------------------------------------------------------------------
-
+    protected function generateSlug(string $sLabel, int $iIgnoreId = null)
+    {
         $iCounter = 0;
         $oDb      = Factory::service('Database');
         $sSlug    = Transliterator::transliterate($sLabel);
@@ -1896,19 +1875,19 @@ abstract class Base
         do {
 
             if ($iCounter) {
-                $sSlugTest = $sPrefix . $sSlug . $sSuffix . '-' . $iCounter;
+                $sSlugTest = $sSlug . '-' . $iCounter;
             } else {
-                $sSlugTest = $sPrefix . $sSlug . $sSuffix;
+                $sSlugTest = $sSlug;
             }
 
             if ($iIgnoreId) {
-                $sIdColumn = $sIdColumn ? $sIdColumn : $this->tableIdColumn;
-                $oDb->where($sIdColumn . ' !=', $iIgnoreId);
+                $oDb->where($this->tableIdColumn . ' !=', $iIgnoreId);
             }
 
-            $oDb->where($sColumn, $sSlugTest);
+            $oDb->where($this->tableSlugColumn, $sSlugTest);
             $iCounter++;
-        } while ($oDb->count_all_results($sTable));
+
+        } while ($oDb->count_all_results($this->getTableName()));
 
         return $sSlugTest;
     }
