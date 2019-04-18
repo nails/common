@@ -95,6 +95,15 @@ class Locale
      */
     const ENABLE_SNIFF_QUERY = true;
 
+    /**
+     * In models which use the Localised trait, if an exact match cannot be
+     * found, fallback to the default locale rather than attempt to find a
+     * similar item with the same language, but a different region
+     *
+     * @var bool
+     */
+    const MODEL_FALLBACK_TO_DEFAULT_LOCALE = false;
+
     // --------------------------------------------------------------------------
 
     /**
@@ -242,13 +251,14 @@ class Locale
             );
 
             preg_match($this->getUrlRegex(), $sUrl, $aMatches);
-            $sLanguage = !empty($aMatches[1]) ? $aMatches[1] : '';
+            $sLocale = !empty($aMatches[1]) ? $aMatches[1] : '';
 
-            if (array_key_exists($sLanguage, static::URL_VANITY_MAP)) {
-                $sLanguage = static::URL_VANITY_MAP[$sLanguage];
+            //  If it's a vanity locale, then convert to the full locale
+            if (array_search($sLocale, static::URL_VANITY_MAP) !== false) {
+                $sLocale = array_search($sLocale, static::URL_VANITY_MAP);
             }
 
-            $this->setFromString($oLocale, $sLanguage);
+            $this->setFromString($oLocale, $sLocale);
         }
 
         return $this;
@@ -416,11 +426,11 @@ class Locale
         $aUrlLocales       = [];
 
         foreach ($aSupportedLocales as $oLocale) {
-            $sVanity       = array_search($oLocale, static::URL_VANITY_MAP);
-            $aUrlLocales[] = $sVanity !== false ? $sVanity : $oLocale;
+            $sVanity       = $this->getUrlSegment($oLocale);
+            $aUrlLocales[] = $sVanity;
         }
 
-        return '/^(' . implode('|', $aUrlLocales) . ')?(\/)?(.*)$/';
+        return '/^(' . implode('|', array_filter($aUrlLocales)) . ')?(\/)?(.*)$/';
     }
 
     // --------------------------------------------------------------------------
@@ -442,5 +452,25 @@ class Locale
         );
 
         return !empty($aCountries->{$sRegion}->emoji) ? $aCountries->{$sRegion}->emoji : '';
+    }
+
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the URL prefix for a given locale, considering any vanity preferences
+     *
+     * @param \Nails\Common\Factory\Locale $oLocale The locale to query
+     *
+     * @return string
+     * @throws \Nails\Common\Exception\FactoryException
+     */
+    public function getUrlSegment(\Nails\Common\Factory\Locale $oLocale): string
+    {
+        if ($oLocale == $this->getDefautLocale()) {
+            return '';
+        } else {
+            return getFromArray((string) $oLocale, static::URL_VANITY_MAP, (string) $oLocale);
+        }
     }
 }

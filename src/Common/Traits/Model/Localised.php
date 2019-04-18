@@ -135,11 +135,19 @@ trait Localised
             $sQueryExact    = 'SELECT COUNT(*) FROM ' . $sTable . ' sub_1 WHERE sub_1.id = ' . $sAlias . '.id AND sub_1.' . static::$sColumnLanguage . ' = "' . $sUserLanguage . '" AND sub_1.' . static::$sColumnRegion . ' = "' . $sUserRegion . '"';
             $sQueryLanguage = 'SELECT COUNT(*) FROM ' . $sTable . ' sub_2 WHERE sub_2.id = ' . $sAlias . '.id AND sub_2.' . static::$sColumnLanguage . ' = "' . $sUserLanguage . '" AND sub_2.' . static::$sColumnRegion . ' != "' . $sUserRegion . '"';
 
-            $aConditionals = [
-                '((' . $sQueryExact . ') = 1 AND ' . static::$sColumnLanguage . ' = "' . $sUserLanguage . '" AND ' . static::$sColumnRegion . ' = "' . $sUserRegion . '")',
-                '((' . $sQueryExact . ') = 0 AND ' . static::$sColumnLanguage . ' = "' . $sUserLanguage . '")',
-                '((' . $sQueryExact . ') = 0 AND (' . $sQueryLanguage . ') = 0 AND ' . static::$sColumnLanguage . ' = "' . $sDefaultLanguage . '" AND ' . static::$sColumnRegion . ' = "' . $sDefaultRegion . '")',
-            ];
+
+            if ($oLocale::MODEL_FALLBACK_TO_DEFAULT_LOCALE) {
+                $aConditionals = [
+                    '((' . $sQueryExact . ') = 1 AND ' . static::$sColumnLanguage . ' = "' . $sUserLanguage . '" AND ' . static::$sColumnRegion . ' = "' . $sUserRegion . '")',
+                    '((' . $sQueryExact . ') = 0 AND ' . static::$sColumnLanguage . ' = "' . $sDefaultLanguage . '" AND ' . static::$sColumnRegion . ' = "' . $sDefaultRegion . '")',
+                ];
+            } else {
+                $aConditionals = [
+                    '((' . $sQueryExact . ') = 1 AND ' . static::$sColumnLanguage . ' = "' . $sUserLanguage . '" AND ' . static::$sColumnRegion . ' = "' . $sUserRegion . '")',
+                    '((' . $sQueryExact . ') = 0 AND ' . static::$sColumnLanguage . ' = "' . $sUserLanguage . '")',
+                    '((' . $sQueryExact . ') = 0 AND (' . $sQueryLanguage . ') = 0 AND ' . static::$sColumnLanguage . ' = "' . $sDefaultLanguage . '" AND ' . static::$sColumnRegion . ' = "' . $sDefaultRegion . '")',
+                ];
+            }
 
             if (!array_key_exists('where', $aData)) {
                 $aData['where'] = [];
@@ -264,7 +272,7 @@ trait Localised
 
         if (empty($oLocale)) {
             throw new ModelException(
-                'A locale must be defined when creating a localised item'
+                self::class . ': A locale must be defined when creating a localised item'
             );
         }
 
@@ -323,7 +331,7 @@ trait Localised
     {
         if (empty($oLocale)) {
             throw new ModelException(
-                'A locale must be defined when updating a localised item'
+                self::class . ': A locale must be defined when updating a localised item'
             );
         }
 
@@ -352,7 +360,7 @@ trait Localised
     {
         if (empty($oLocale)) {
             throw new ModelException(
-                'A locale must be defined when deleting a localised item'
+                self::class . ': A locale must be defined when deleting a localised item'
             );
         }
 
@@ -412,7 +420,7 @@ trait Localised
     {
         if (empty($oLocale)) {
             throw new ModelException(
-                'A locale must be defined when deleting a localised item'
+                self::class . ': A locale must be defined when deleting a localised item'
             );
         }
 

@@ -21,7 +21,7 @@ CREATE TABLE `{{TABLE_WITH_PREFIX}}_localised` (
     `created_by` int(11) unsigned DEFAULT NULL,
     `modified` datetime NOT NULL,
     `modified_by` int(11) unsigned DEFAULT NULL,
-    PRIMARY KEY (`id`),
+    PRIMARY KEY (`id`, `language`, `region`),
     KEY `created_by` (`created_by`),
     KEY `modified_by` (`modified_by`),
     CONSTRAINT `{{TABLE_WITH_PREFIX}}_localised_ibfk_1` FOREIGN KEY (`id`) REFERENCES `{{TABLE_WITH_PREFIX}}` (`id`) ON DELETE CASCADE,
