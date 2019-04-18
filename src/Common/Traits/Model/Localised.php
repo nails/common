@@ -255,6 +255,40 @@ trait Localised
     // --------------------------------------------------------------------------
 
     /**
+     * Generates a unique slug
+     *
+     * @param string                       $sLabel    The label from which to generate a slug
+     * @param int                          $iIgnoreId The ID of an item to ignore
+     * @param \Nails\Common\Factory\Locale $oLocale   The locale to restrict the tests against
+     *
+     * @return string
+     * @throws ModelException
+     */
+    protected function generateSlug(string $sLabel, int $iIgnoreId = null, \Nails\Common\Factory\Locale $oLocale = null)
+    {
+        if (empty($oLocale)) {
+            throw new ModelException(
+                self::class . ': A locale must be defined when generating slugs for a localised item'
+            );
+        }
+
+        $oDb = Factory::service('Database');
+
+        $oDb->start_cache();
+        $oDb->where('language', $oLocale->getLanguage());
+        $oDb->where('region', $oLocale->getRegion());
+        $oDb->stop_cache();
+
+        $sSlug = parent::generateSlug($sLabel, $iIgnoreId);
+
+        $oDb->flush_cache();
+
+        return $sSlug;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Create a new localised item
      *
      * @param array                             $aData         The data array
@@ -280,11 +314,11 @@ trait Localised
         $aData['region']   = $oLocale->getRegion();
         unset($aData['locale']);
 
-        if (empty($aData['id'])) {
-            $oDb->set('id', null);
+        if (empty($aData[$this->tableIdColumn])) {
+            $oDb->set($this->tableIdColumn, null);
             $oDb->insert(parent::getTableName());
-            $aData['id'] = $oDb->insert_id();
-            if (empty($aData['id'])) {
+            $aData[$this->tableIdColumn] = $oDb->insert_id();
+            if (empty($aData[$this->tableIdColumn])) {
                 throw new ModelException(
                     'Failed to generate parent item for localised object'
                 );
@@ -292,18 +326,30 @@ trait Localised
             $bCreatedItem = true;
         }
 
+        /**
+         * This is to prevent primary key conflicts if a previously deleted item still
+         * exists in the table
+         */
         if (!$this->isDestructiveDelete()) {
-            /**
-             * This is to prevent primary key conflicts if a previously deleted item still exists in the table
-             */
-            $this->destroy($aData['id'], $oLocale);
+            $this->destroy($aData[$this->tableIdColumn], $oLocale);
+        }
+
+        /**
+         * Ensure automatic slug generation takes into account locale
+         */
+        if ($this->isAutoSetSlugs() && empty($aData[$this->tableSlugColumn])) {
+            $aData[$this->tableSlugColumn] = $this->generateSlug(
+                getFromArray($this->tableLabelColumn, $aData),
+                null,
+                $oLocale
+            );
         }
 
         $iItemId = parent::create($aData, false);
 
         if (empty($iItemId)) {
             if (!empty($bCreatedItem)) {
-                $oDb->where('id', $aData['id']);
+                $oDb->where($this->tableIdColumn, $aData[$this->tableIdColumn]);
                 $oDb->delete(parent::getTableName());
             }
             return null;
@@ -336,6 +382,17 @@ trait Localised
         }
 
         unset($aData['locale']);
+
+        /**
+         * Ensure automatic slug generation takes into account locale
+         */
+        if ($this->isAutoSetSlugs() && empty($aData[$this->tableSlugColumn]) && !static::AUTO_SET_SLUG_IMMUTABLE) {
+            $aData[$this->tableSlugColumn] = $this->generateSlug(
+                getFromArray($this->tableLabelColumn, $aData),
+                $iId,
+                $oLocale
+            );
+        }
 
         $oDb = Factory::service('Database');
         $oDb->where('language', $oLocale->getLanguage());
