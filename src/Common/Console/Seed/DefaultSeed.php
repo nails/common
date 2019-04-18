@@ -3,6 +3,8 @@
 namespace Nails\Common\Console\Seed;
 
 use Nails\Common\Exception\NailsException;
+use Nails\Common\Service\Locale;
+use Nails\Common\Traits\Model\Localised;
 use Nails\Factory;
 
 class DefaultSeed extends Base
@@ -39,7 +41,12 @@ class DefaultSeed extends Base
      */
     public function execute()
     {
-        $oModel           = Factory::model(static::CONFIG_MODEL_NAME, static::CONFIG_MODEL_PROVIDER);
+        $oModel = Factory::model(static::CONFIG_MODEL_NAME, static::CONFIG_MODEL_PROVIDER);
+
+        /** @var Locale $oLocale */
+        $oLocale        = Factory::service('Locale');
+        $oDefaultLocale = $oLocale->getDefautLocale();
+
         $aFieldsDescribed = $oModel->describeFields();
         $aFields          = [];
 
@@ -51,7 +58,12 @@ class DefaultSeed extends Base
 
         for ($i = 0; $i < static::CONFIG_NUM_PER_SEED; $i++) {
             try {
-                if (!$oModel->create($this->generate($aFields))) {
+                $aData = $this->generate($aFields);
+                if (classUses($oModel, Localised::class)) {
+                    if (!$oModel->create($aData, false, $oDefaultLocale)) {
+                        throw new NailsException('Failed to create item. ' . $oModel->lastError());
+                    }
+                } elseif (!$oModel->create($aData)) {
                     throw new NailsException('Failed to create item. ' . $oModel->lastError());
                 }
             } catch (\Exception $e) {
