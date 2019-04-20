@@ -42,6 +42,13 @@ return [
                 return new \Nails\Common\Service\Config();
             }
         },
+        'Cookie'         => function () {
+            if (class_exists('\App\Common\Service\Cookie')) {
+                return new \App\Common\Service\Cookie();
+            } else {
+                return new \Nails\Common\Service\Cookie();
+            }
+        },
         'Database'       => function () {
             if (class_exists('\App\Common\Service\Database')) {
                 return new \App\Common\Service\Database();
@@ -347,6 +354,13 @@ return [
         },
     ],
     'resources'  => [
+        'Cookie'          => function ($oObj) {
+            if (class_exists('\App\Common\Resource\Cookie')) {
+                return new \App\Common\Resource\Cookie($oObj);
+            } else {
+                return new \Nails\Common\Resource\Cookie($oObj);
+            }
+        },
         'ExpandableField' => function () {
             if (class_exists('\App\Common\Resource\ExpandableField')) {
                 return new \App\Common\Resource\ExpandableField();
