@@ -14,10 +14,13 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Factory;
+
 class Config
 {
     /**
      * The database object
+     *
      * @var \CI_Config
      */
     private $oConfig;
@@ -27,8 +30,8 @@ class Config
     /**
      * Route calls to the CodeIgniter Config class
      *
-     * @param  string $sMethod    The method being called
-     * @param  array  $aArguments Any arguments being passed
+     * @param string $sMethod    The method being called
+     * @param array  $aArguments Any arguments being passed
      *
      * @return mixed
      */
@@ -50,7 +53,7 @@ class Config
     /**
      * Pass any property "gets" to the CodeIgniter Config class
      *
-     * @param  string $sProperty The property to get
+     * @param string $sProperty The property to get
      *
      * @return mixed
      */
@@ -65,8 +68,8 @@ class Config
     /**
      * Pass any property "sets" to the CodeIgniter Config class
      *
-     * @param  string $sProperty The property to set
-     * @param  mixed  $mValue    The value to set
+     * @param string $sProperty The property to set
+     * @param mixed  $mValue    The value to set
      *
      * @return void
      */
@@ -111,7 +114,17 @@ class Config
                 $sBaseUrl = rtrim(BASE_URL, '/') . '/';
             }
 
-            return $sBaseUrl . ltrim($sUri, '/');
+            if (is_file($sUri) || is_dir($sUri)) {
+                return $sBaseUrl . ltrim($sUri, '/');
+            }
+
+            /** @var Locale $oLocale */
+            $oLocale = Factory::service('Locale');
+            $sLocale = $oLocale->getUrlSegment($oLocale->get());
+            $sLocale = $sLocale && $sUri ? $sLocale . '/' : $sLocale;
+
+            return $sBaseUrl . $sLocale . ltrim($sUri, '/');
+
         }
     }
 
