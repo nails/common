@@ -153,7 +153,7 @@ trait Localised
                 $aData['where'] = [];
             }
 
-            $aData['where'][] = implode(' OR ', $aConditionals);
+            $aData['where'][] = '(' . implode(' OR ', $aConditionals) . ')';
         }
 
         //  Ensure each row knows about the other items available
