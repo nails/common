@@ -61,6 +61,13 @@ class Locale
     const URL_VANITY_MAP = [];
 
     /**
+     * Whetehr to enable locale sniffs
+     *
+     * @var bool
+     */
+    const ENABLE_SNIFF = true;
+
+    /**
      * Enable locale detection via the request header
      *
      * @var bool
@@ -176,6 +183,50 @@ class Locale
          */
 
         $oLocale = $this->getDefautLocale();
+        if (static::ENABLE_SNIFF) {
+
+            if (static::ENABLE_SNIFF_HEADER) {
+                $this->sniffHeader($oLocale);
+            }
+            if (static::ENABLE_SNIFF_USER) {
+                $this->sniffActiveUser($oLocale);
+            }
+            if (static::ENABLE_SNIFF_URL) {
+                $this->sniffUrl($oLocale);
+            }
+            if (static::ENABLE_SNIFF_COOKIE) {
+                $this->sniffCookie($oLocale);
+            }
+            if (static::ENABLE_SNIFF_QUERY) {
+                $this->sniffQuery($oLocale);
+            }
+
+            if (!$this->isSupportedLocale($oLocale)) {
+                $oLocale = $this->getDefautLocale();
+            }
+
+        }
+
+        return $this
+            ->set($oLocale)
+            ->get();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sniff various items to determine the user's locale
+     *
+     * @param \Nails\Common\Factory\Locale $oLocale The locale to set
+     *
+     * @return \Nails\Common\Factory\Locale
+     */
+    public function sniffLocale(\Nails\Common\Factory\Locale $oLocale = null): \Nails\Common\Factory\Locale
+    {
+        if (!$oLocale) {
+            $oLocale = $this->getDefautLocale();
+        }
+
         $this
             ->sniffHeader($oLocale)
             ->sniffActiveUser($oLocale)
@@ -183,9 +234,7 @@ class Locale
             ->sniffCookie($oLocale)
             ->sniffQuery($oLocale);
 
-        return $this
-            ->set($oLocale)
-            ->get();
+        return $oLocale;
     }
 
     // --------------------------------------------------------------------------
@@ -197,14 +246,12 @@ class Locale
      *
      * @return $this
      */
-    protected function sniffHeader(\Nails\Common\Factory\Locale &$oLocale)
+    public function sniffHeader(\Nails\Common\Factory\Locale &$oLocale)
     {
-        if (static::ENABLE_SNIFF_HEADER) {
-            $this->setFromString(
-                $oLocale,
-                $this->oInput->server('HTTP_ACCEPT_LANGUAGE') ?? ''
-            );
-        }
+        $this->setFromString(
+            $oLocale,
+            $this->oInput->server('HTTP_ACCEPT_LANGUAGE') ?? ''
+        );
 
         return $this;
     }
@@ -218,14 +265,12 @@ class Locale
      *
      * @return $this
      */
-    protected function sniffActiveUser(\Nails\Common\Factory\Locale &$oLocale)
+    public function sniffActiveUser(\Nails\Common\Factory\Locale &$oLocale)
     {
-        if (static::ENABLE_SNIFF_USER) {
-            $this->setFromString(
-                $oLocale,
-                activeUser('locale') ?? ''
-            );
-        }
+        $this->setFromString(
+            $oLocale,
+            activeUser('locale') ?? ''
+        );
 
         return $this;
     }
@@ -239,27 +284,24 @@ class Locale
      *
      * @return $this
      */
-    protected function sniffUrl(\Nails\Common\Factory\Locale &$oLocale)
+    public function sniffUrl(\Nails\Common\Factory\Locale &$oLocale)
     {
-        if (static::ENABLE_SNIFF_URL) {
+        //  Manually query the URL as CI might not be available
+        $sUrl = preg_replace(
+            '/\/index\.php\/(.*)/',
+            '$1',
+            $this->oInput->server('PHP_SELF')
+        );
 
-            //  Manually query the URL as CI might not be available
-            $sUrl = preg_replace(
-                '/\/index\.php\/(.*)/',
-                '$1',
-                $this->oInput->server('PHP_SELF')
-            );
+        preg_match($this->getUrlRegex(), $sUrl, $aMatches);
+        $sLocale = !empty($aMatches[1]) ? $aMatches[1] : '';
 
-            preg_match($this->getUrlRegex(), $sUrl, $aMatches);
-            $sLocale = !empty($aMatches[1]) ? $aMatches[1] : '';
-
-            //  If it's a vanity locale, then convert to the full locale
-            if (array_search($sLocale, static::URL_VANITY_MAP) !== false) {
-                $sLocale = array_search($sLocale, static::URL_VANITY_MAP);
-            }
-
-            $this->setFromString($oLocale, $sLocale);
+        //  If it's a vanity locale, then convert to the full locale
+        if (array_search($sLocale, static::URL_VANITY_MAP) !== false) {
+            $sLocale = array_search($sLocale, static::URL_VANITY_MAP);
         }
+
+        $this->setFromString($oLocale, $sLocale);
 
         return $this;
     }
@@ -273,14 +315,12 @@ class Locale
      *
      * @return $this
      */
-    protected function sniffCookie(\Nails\Common\Factory\Locale &$oLocale)
+    public function sniffCookie(\Nails\Common\Factory\Locale &$oLocale)
     {
-        if (static::ENABLE_SNIFF_COOKIE) {
-            $this->setFromString(
-                $oLocale,
-                $this->oInput->get(static::COOKIE_NAME) ?? null
-            );
-        }
+        $this->setFromString(
+            $oLocale,
+            $this->oInput->get(static::COOKIE_NAME) ?? null
+        );
 
         return $this;
     }
@@ -294,14 +334,12 @@ class Locale
      *
      * @return $this
      */
-    protected function sniffQuery(\Nails\Common\Factory\Locale &$oLocale)
+    public function sniffQuery(\Nails\Common\Factory\Locale &$oLocale)
     {
-        if (static::ENABLE_SNIFF_QUERY) {
-            $this->setFromString(
-                $oLocale,
-                $this->oInput->get(static::QUERY_PARAM) ?? null
-            );
-        }
+        $this->setFromString(
+            $oLocale,
+            $this->oInput->get(static::QUERY_PARAM) ?? null
+        );
 
         return $this;
     }
@@ -411,6 +449,20 @@ class Locale
     public function getSupportedLocales(): array
     {
         return $this->aSupportedLocales;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns whetehr the supplied locale is supported or not
+     *
+     * @param \Nails\Common\Factory\Locale $oLocale The locale to test
+     *
+     * @return bool
+     */
+    public function isSupportedLocale(\Nails\Common\Factory\Locale $oLocale): bool
+    {
+        return in_array($oLocale, $this->getSupportedLocales());
     }
 
     // --------------------------------------------------------------------------
