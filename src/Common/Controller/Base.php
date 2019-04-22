@@ -15,6 +15,7 @@ namespace Nails\Common\Controller;
 
 use Nails\Common\Events;
 use Nails\Common\Exception\NailsException;
+use Nails\Common\Service\Locale;
 use Nails\Components;
 use Nails\Environment;
 use Nails\Factory;
@@ -177,9 +178,9 @@ abstract class Base extends \MX_Controller
     /**
      * Checks if Maintenance Mode is enabled, shows the holding page if so.
      *
-     * @param  boolean $force  Force maintenance mode on
-     * @param  string  $sTitle Override the page title
-     * @param  string  $sBody  Override the page body
+     * @param boolean $force  Force maintenance mode on
+     * @param string  $sTitle Override the page title
+     * @param string  $sBody  Override the page body
      *
      * @return void
      */
@@ -652,9 +653,12 @@ abstract class Base extends \MX_Controller
      */
     public static function populatePageData(array &$aData)
     {
+        /** @var Locale $oLocale */
+        $oLocale       = Factory::service('Locale');
         $aData['page'] = (object) [
-            'title' => '',
-            'seo'   => (object) [
+            'title'     => '',
+            'html_lang' => $oLocale->get()->getLanguage(),
+            'seo'       => (object) [
                 'title'       => '',
                 'description' => '',
                 'keywords'    => '',
