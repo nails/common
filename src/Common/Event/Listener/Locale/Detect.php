@@ -60,6 +60,9 @@ class Detect extends Subscription
                 exit(0);
             }
 
+            //  Save the original URL, should it be needed
+            $_SERVER['ORIGINAL_URL'] = $this->getUrl();
+
             //  Update the $_SERVER values so the rest of the system continues as normal
             if (array_key_exists('PATH_INFO', $_SERVER)) {
                 $_SERVER['PATH_INFO'] = '/' . $oUrl->path;
