@@ -397,13 +397,23 @@ abstract class Base
      *
      * @return bool
      */
-    public function createBatch(array $aData)
+    public function createMany(array $aData)
     {
-        //  @todo (Pablo - 2018-02-23) - events
-        //  @todo (Pablo - 2018-02-23) - validate things
-        //  @todo (Pablo - 2018-02-23) - behave like the create
         $oDb = Factory::service('Database');
-        return $oDb->insert_batch($this->getTableName(), $aData);
+        try {
+            $oDb->trans_begin();
+            foreach ($aData as $aDatum) {
+                if (!$this->create($aDatum)) {
+                    throw new ModelException('Failed to create item with data: ' . json_encode($aDatum));
+                }
+            }
+            $oDb->trans_commit();
+            return true;
+        } catch (\Exception $e) {
+            $oDb->trans_rollback();
+            $this->setError($e->getMessage());
+            return false;
+        }
     }
 
     // --------------------------------------------------------------------------
@@ -463,6 +473,37 @@ abstract class Base
             return true;
 
         } else {
+            return false;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Update many items with the same data
+     *
+     * @param array $aIds  An array of IDs to update
+     * @param array $aData The data to set
+     *
+     * @return bool
+     * @throws FactoryException
+     * @throws ModelException
+     */
+    public function updateMany(array $aIds, array $aData = []): bool
+    {
+        $oDb = Factory::service('Database');
+        try {
+            $oDb->trans_begin();
+            foreach ($aIds as $iId) {
+                if (!$this->update($iId, $aData)) {
+                    throw new ModelException('Failed to update item with ID ' . $iId);
+                }
+            }
+            $oDb->trans_commit();
+            return true;
+        } catch (\Exception $e) {
+            $oDb->trans_rollback();
+            $this->setError($e->getMessage());
             return false;
         }
     }
@@ -713,6 +754,36 @@ abstract class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Deletes many items
+     *
+     * @param array $aIds An array of item IDs to delete
+     *
+     * @return bool
+     * @throws FactoryException
+     * @throws ModelException
+     */
+    public function deleteMany(array $aIds): bool
+    {
+        $oDb = Factory::service('Database');
+        try {
+            $oDb->trans_begin();
+            foreach ($aIds as $iId) {
+                if (!$this->delete($iId)) {
+                    throw new ModelException('Failed to delete item with ID ' . $iId);
+                }
+            }
+            $oDb->trans_commit();
+            return true;
+        } catch (\Exception $e) {
+            $oDb->trans_rollback();
+            $this->setError($e->getMessage());
+            return false;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Unmarks an object as deleted
      *
      * If destructive deletion is enabled then this method will return null.
@@ -765,6 +836,36 @@ abstract class Base
         }
 
         return false;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Desrtroys multiple items
+     *
+     * @param array $aIds An array of item IDs to destroy
+     *
+     * @return bool
+     * @throws FactoryException
+     * @throws ModelException
+     */
+    public function destroyMany(array $aIds): bool
+    {
+        $oDb = Factory::service('Database');
+        try {
+            $oDb->trans_begin();
+            foreach ($aIds as $iId) {
+                if (!$this->destroy($iId)) {
+                    throw new ModelException('Failed to destroy item with ID ' . $iId);
+                }
+            }
+            $oDb->trans_commit();
+            return true;
+        } catch (\Exception $e) {
+            $oDb->trans_rollback();
+            $this->setError($e->getMessage());
+            return false;
+        }
     }
 
     // --------------------------------------------------------------------------
@@ -1733,7 +1834,7 @@ abstract class Base
 
         //  Delete those we no longer require
         if (!empty($aIdDiff)) {
-            if (!$oAssociatedItemModel->delete($aIdDiff)) {
+            if (!$oAssociatedItemModel->deleteMany($aIdDiff)) {
                 throw new ModelException(
                     'Failed to delete old associated items (' . $sAssociatedModelProvider . ':' . $sAssociatedModel . ') ' . $oAssociatedItemModel->lastError()
                 );
