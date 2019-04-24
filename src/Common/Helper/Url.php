@@ -23,7 +23,7 @@ class Url
      *
      * @return string
      */
-    public static function siteUrl(string $sUrl = '', bool $bForceSecure = false): string
+    public static function siteUrl(string $sUrl = null, bool $bForceSecure = false): string
     {
         $oConfig = \Nails\Factory::service('Config');
         return $oConfig::siteUrl($sUrl, $bForceSecure);
@@ -46,7 +46,7 @@ class Url
      *
      * @return void
      */
-    public static function redirect(string $sUrl = '', string $sMethod = 'location', int $iHttpResponseCode = 302): void
+    public static function redirect(string $sUrl = null, string $sMethod = 'location', int $iHttpResponseCode = 302): void
     {
         /**
          * Call the post_system hook, the system will be killed in approximately 13
@@ -85,7 +85,7 @@ class Url
      *
      * @return string
      */
-    public static function tel(string $sUrl = '', string $sTitle = '', string $sAttributes = ''): string
+    public static function tel(string $sUrl = null, string $sTitle = '', string $sAttributes = ''): string
     {
         $sTitle = empty($sTitle) ? $sUrl : $sTitle;
         $sUrl   = preg_replace('/[^\+0-9]/', '', $sUrl);

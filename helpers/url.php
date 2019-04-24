@@ -13,35 +13,35 @@
 use Nails\Common\Helper\Url;
 
 if (!function_exists('siteUrl')) {
-    function siteUrl(string $sUrl = '', bool $bForceSecure = false): string
+    function siteUrl(string $sUrl = null, bool $bForceSecure = false): string
     {
         return Url::siteUrl($sUrl, $bForceSecure);
     }
 }
 
 if (!function_exists('site_url')) {
-    function site_url(string $sUrl = '', bool $bForceSecure = false): string
+    function site_url(string $sUrl = null, bool $bForceSecure = false): string
     {
         return siteUrl($sUrl, $bForceSecure);
     }
 }
 
 if (!function_exists('secure_site_url')) {
-    function secure_site_url(string $sUrl = ''): string
+    function secure_site_url(string $sUrl = null): string
     {
         return siteUrl($sUrl, true);
     }
 }
 
 if (!function_exists('redirect')) {
-    function redirect(string $sUrl = '', string $sMethod = 'location', int $iHttpResponseCode = 302): void
+    function redirect(string $sUrl = null, string $sMethod = 'location', int $iHttpResponseCode = 302): void
     {
         Url::redirect($sUrl, $sMethod, $iHttpResponseCode);
     }
 }
 
 if (!function_exists('tel')) {
-    function tel(string $sUrl = '', string $sTitle = '', string $sAttributes = ''): string
+    function tel(string $sUrl = null, string $sTitle = '', string $sAttributes = ''): string
     {
         return Url::tel($sUrl, $sTitle, $sAttributes);
     }
