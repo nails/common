@@ -191,8 +191,12 @@ return [
         },
         'Router'         => function () {
             //  @todo - remove dependency on CI
-            $oCi = get_instance();
-            return $oCi->router;
+            if (class_exists('CI_Router')) {
+                $oCi = get_instance();
+                return $oCi->router;
+            } else {
+                return new \Nails\Common\CodeIgniter\Core\Router\Dummy();
+            }
         },
         'Security'       => function () {
             if (class_exists('\App\Common\Service\Security')) {

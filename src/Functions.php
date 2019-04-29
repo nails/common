@@ -60,11 +60,11 @@ class Functions
      * Hat tip: http://uk1.php.net/parse_url#104874
      * BUG: 2 character TLD's break this
      *
-     * @todo: Try and fix this bug
-     *
-     * @param  string $sUrl The URL to analyse
+     * @param string $sUrl The URL to analyse
      *
      * @return mixed        string on success, false on failure
+     * @todo: Try and fix this bug
+     *
      */
     public static function getDomainFromUrl($sUrl)
     {
@@ -117,8 +117,8 @@ class Functions
      * Fetches the relative path between two directories
      * Hat tip: Thanks to Gordon for this one; http://stackoverflow.com/a/2638272/789224
      *
-     * @param  string $sFrom Path 1
-     * @param  string $sTo   Path 2
+     * @param string $sFrom Path 1
+     * @param string $sTo   Path 2
      *
      * @return string
      */
@@ -176,7 +176,7 @@ class Functions
      * Renders the 401 page, optionally logging the error to the database.
      * If a user is not logged in they are directed to the login page.
      *
-     * @param  boolean $bLogError Whether to log the error or not
+     * @param boolean $bLogError Whether to log the error or not
      *
      * @return void
      */
@@ -195,7 +195,7 @@ class Functions
      * a result of some other checking and not technically a 404 so should not be
      * logged as one. _Actual_ 404's should continue to be logged however.
      *
-     * @param  boolean $bLogError Whether to log the error or not
+     * @param boolean $bLogError Whether to log the error or not
      *
      * @return void
      */

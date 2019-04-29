@@ -12,10 +12,7 @@
 namespace Nails;
 
 use Nails\Common\Events;
-use Nails\Components;
-use Nails\Environment;
 use Nails\Common\Service\ErrorHandler;
-use Nails\Common\Service\Event;
 
 final class Bootstrap
 {
@@ -57,6 +54,7 @@ final class Bootstrap
         static::loadConfig('deploy');
         static::setNailsConstants();
         static::setCodeIgniterConstants();
+        static::setErrorHandling();
         static::setRuntime();
         static::loadFunctions();
         static::checkRoutes();
@@ -226,7 +224,6 @@ final class Bootstrap
             $system_path = $sSystemPath;
         }
 
-
         /*
          *---------------------------------------------------------------
          * APPLICATION DIRECTORY NAME
@@ -292,7 +289,6 @@ final class Bootstrap
         // The controller function you wish to be called.
         // $routing['function'] = '';
 
-
         /*
          * -------------------------------------------------------------------
          *  CUSTOM CONFIG VALUES
@@ -308,7 +304,6 @@ final class Bootstrap
          * Un-comment the $assign_to_config array below to use this feature
          */
         // $assign_to_config['name_of_config_item'] = 'value of config item';
-
 
         // --------------------------------------------------------------------
         // END OF USER CONFIGURABLE SETTINGS.  DO NOT EDIT BELOW THIS LINE
@@ -411,6 +406,16 @@ final class Bootstrap
         }
 
         Functions::define('VIEWPATH', $view_folder . DIRECTORY_SEPARATOR);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Configures the error handler
+     */
+    private static function setErrorHandling()
+    {
+        ErrorHandler::init();
     }
 
     // --------------------------------------------------------------------------

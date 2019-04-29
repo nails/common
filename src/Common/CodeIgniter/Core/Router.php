@@ -32,7 +32,7 @@ class Router extends MX_Router
      * found. These errors should be logged, however show404() by default doesn't
      * log errors, hence the override.
      *
-     * @param  array $segments The URI segments
+     * @param array $segments The URI segments
      *
      * @return array
      */

@@ -16,7 +16,6 @@ use Nails\Common\Controller\Nails404Controller;
 use Nails\Common\Events;
 use Nails\Common\Helper\ArrayHelper;
 use Nails\Components;
-use Nails\Environment;
 use Nails\Factory;
 use Nails\Functions;
 
@@ -79,7 +78,7 @@ class ErrorHandler
     /**
      * Sets up the appropriate error handling driver
      */
-    public function init()
+    public static function init()
     {
         if (static::$bIsReady) {
             return;
@@ -121,13 +120,36 @@ class ErrorHandler
 
         $sClassName::init();
 
-        set_error_handler($sClassName . '::error');
-        set_exception_handler($sClassName . '::exception');
-        register_shutdown_function($sClassName . '::fatal');
-
         static::$sDriverClass   = $sClassName;
         static::$oDefaultDriver = $oDefaultDriver;
-        static::$bIsReady       = true;
+
+        static::setHandlers();
+
+        static::$bIsReady = true;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets the error handlers
+     */
+    public static function setHandlers(): void
+    {
+        set_error_handler(static::getDriverClass() . '::error');
+        set_exception_handler(static::getDriverClass() . '::exception');
+        register_shutdown_function(static::getDriverClass() . '::fatal');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the configured driver
+     *
+     * @return string
+     */
+    public static function getDriverClass(): string
+    {
+        return static::$sDriverClass;
     }
 
     // --------------------------------------------------------------------------
@@ -139,7 +161,6 @@ class ErrorHandler
      */
     public function getDefaultDriver()
     {
-        $this->init();
         return static::$oDefaultDriver;
     }
 
@@ -152,7 +173,6 @@ class ErrorHandler
      */
     public function getDefaultDriverClass()
     {
-        $this->init();
         $oDriver          = $this->getDefaultDriver();
         $sDriverNamespace = ArrayHelper::getFromArray('namespace', (array) $oDriver->data);
         $sDriverClass     = ArrayHelper::getFromArray('class', (array) $oDriver->data);
@@ -171,7 +191,6 @@ class ErrorHandler
      */
     public function triggerError($iErrorNumber = 0, $sErrorString = '', $sErrorFile = '', $iErrorLine = 0)
     {
-        $this->init();
         //  PHP5.6 doesn't like $this->sDriverClass::error()
         $sDriverClass = static::$sDriverClass;
         $sDriverClass::error($iErrorNumber, $sErrorString, $sErrorFile, $iErrorLine);
@@ -183,16 +202,14 @@ class ErrorHandler
      * Shows the fatal error screen. A diagnostic screen is shown on non-production
      * environments
      *
-     * @param  string    $sSubject The error subject
-     * @param  string    $sMessage The error message
-     * @param  \stdClass $oDetails Breakdown of the error which occurred
+     * @param string    $sSubject The error subject
+     * @param string    $sMessage The error message
+     * @param \stdClass $oDetails Breakdown of the error which occurred
      *
      * @return void
      */
     public function showFatalErrorScreen($sSubject = '', $sMessage = '', $oDetails = null)
     {
-        $this->init();
-
         if (is_array($sMessage)) {
             $sMessage = implode("\n", $sMessage);
         }
@@ -236,7 +253,6 @@ class ErrorHandler
      */
     public function show404($bLogError = true)
     {
-        $this->init();
 
         $sPage = ArrayHelper::getFromArray('REQUEST_URI', $_SERVER);
 
@@ -309,7 +325,6 @@ class ErrorHandler
      */
     public function show401($bLogError = true)
     {
-        $this->init();
 
         if (function_exists('isLoggedIn') && isLoggedIn()) {
 
@@ -389,11 +404,11 @@ class ErrorHandler
             }
         }
 
-        $oRouter = Factory::service('Router');
-        $oInput  = Factory::service('Input');
-        $sType   = $oInput::isCli() ? 'cli' : 'html';
+        $oInput = Factory::service('Input');
+        $sType  = $oInput::isCli() ? 'cli' : 'html';
+        $aPaths = [];
 
-        $aPaths      = [];
+        $oRouter     = Factory::service('Router');
         $sController = ucfirst($oRouter->fetch_class());
 
         if (class_exists($sController)) {

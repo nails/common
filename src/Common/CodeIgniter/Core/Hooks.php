@@ -13,6 +13,7 @@
 namespace Nails\Common\CodeIgniter\Core;
 
 use CI_Hooks;
+use Nails\Factory;
 
 class Hooks extends CI_Hooks
 {
@@ -29,6 +30,32 @@ class Hooks extends CI_Hooks
      * @var bool
      */
     public $bCustomHooksInProgress = false;
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Construct Hooks
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        /**
+         * Add a pre-system hook which reverts the erorr handlers back to the Nails ones.
+         * CodeIgniter sets it's own error handlers, with no option for disabling that behaviour,
+         * this is the soonest Nails is able to intervene.
+         */
+
+        $oErrorHandler = Factory::service('ErrorHandler');
+        $this->addHook(
+            'pre_system',
+            [
+                'classref' => $oErrorHandler,
+                'method'   => 'setHandlers',
+                'params'   => $oErrorHandler::getDriverClass(),
+            ]
+        );
+    }
 
     // --------------------------------------------------------------------------
 

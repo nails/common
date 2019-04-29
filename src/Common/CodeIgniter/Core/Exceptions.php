@@ -21,8 +21,8 @@ class Exceptions extends CI_Exceptions
     /**
      * Override the show_error method and pass to the Nails ErrorHandler
      *
-     * @param  string $sSubject      The error's subject
-     * @param  string $sMessage      The error message
+     * @param string  $sSubject      The error's subject
+     * @param string  $sMessage      The error message
      * @param string  $sTemplate     Unused; only there to suppress compatibility notification
      * @param int     $iStatusCode   Unused; only there to suppress compatibility notification
      * @param boolean $bUseException Whether to use an exception

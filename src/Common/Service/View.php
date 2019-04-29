@@ -69,11 +69,11 @@ class View
             NAILS_APP_PATH . 'application/',
             NAILS_COMMON_PATH,
         ];
+
         foreach (Components::modules() as $oModule) {
             $this->aViewPaths[] = $oModule->path;
         }
 
-        $oRouter = Factory::service('Router');
         Factory::helper('file');
     }
 

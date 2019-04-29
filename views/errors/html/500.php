@@ -13,16 +13,17 @@ if (Environment::not(Environment::ENV_PROD)) {
      *
      * @return string
      */
-    function keyValueSection($title, $data)
-    {
-        ob_start();
+    if (!function_exists('keyValueSection')) {
+        function keyValueSection($title, $data)
+        {
+            ob_start();
 
-        ?>
-        <section class="data-section">
-            <h3><?=$title?></h3>
-            <div class="table-responsive">
-                <table>
-                    <tbody>
+            ?>
+            <section class="data-section">
+                <h3><?=$title?></h3>
+                <div class="table-responsive">
+                    <table>
+                        <tbody>
                         <?php
 
                         if (!empty($data)) {
@@ -61,16 +62,17 @@ if (Environment::not(Environment::ENV_PROD)) {
                         }
 
                         ?>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-        <?php
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            <?php
 
-        $out = ob_get_contents();
-        ob_end_clean();
+            $out = ob_get_contents();
+            ob_end_clean();
 
-        return $out;
+            return $out;
+        }
     }
 
     ?>

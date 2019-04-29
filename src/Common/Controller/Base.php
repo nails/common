@@ -15,7 +15,6 @@ namespace Nails\Common\Controller;
 
 use Nails\Common\Events;
 use Nails\Common\Exception\NailsException;
-use Nails\Common\Service\Locale;
 use Nails\Components;
 use Nails\Environment;
 use Nails\Factory;
@@ -97,7 +96,7 @@ abstract class Base extends \MX_Controller
     {
         /**
          * Configure how verbose PHP is; Everything except E_STRICT and E_ERROR;
-         * we'll let the errorHandler pickup fatal errors
+         * we'll let the errorHandler pick up fatal errors
          */
 
         error_reporting(E_ALL ^ E_STRICT ^ E_ERROR);
@@ -115,9 +114,6 @@ abstract class Base extends \MX_Controller
                     break;
             }
         }
-
-        $oErrorHandler = Factory::service('ErrorHandler');
-        $oErrorHandler->init();
     }
 
     // --------------------------------------------------------------------------
