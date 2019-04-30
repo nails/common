@@ -76,12 +76,6 @@ abstract class Base
      */
     const EXPAND_ALL = 'ALL';
 
-    /**
-     * The event namespace to use when firing events
-     *
-     * @var string
-     */
-    const EVENT_NAMESPACE = null;
 
     /**
      * The trigger to fire when an item is created
@@ -2657,6 +2651,19 @@ abstract class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Genenrates the event namespace for this class
+     *
+     * @return string
+     * @throws \ReflectionException
+     */
+    public static function getEventNamespace(): string
+    {
+        return Components::detectClassComponent(static::class)->slug . ':' . static::class;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Triggers an event
      *
      * @param string $sEvent The event to trigger
@@ -2667,19 +2674,12 @@ abstract class Base
     protected function triggerEvent($sEvent, array $aData)
     {
         if ($sEvent) {
-
-            $oComponent = Components::detectClassComponent(static::class);
-
-            if (!empty($oComponent)) {
-                $sNamespace = $oComponent->slug;
-            } elseif (!empty(static::EVENT_NAMESPACE)) {
-                $sNamespace = static::EVENT_NAMESPACE;
-            } else {
-                throw new ModelException(static::class . '::EVENT_NAMESPACE must be defined');
-            }
-
-            $oEventService = Factory::service('Event');
-            $oEventService->trigger($sEvent, $sNamespace, $aData);
+            Factory::service('Event')
+                ->trigger(
+                    $sEvent,
+                    static::getEventNamespace(),
+                    $aData
+                );
         }
     }
 
