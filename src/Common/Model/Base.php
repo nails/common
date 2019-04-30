@@ -738,6 +738,12 @@ abstract class Base
      */
     public function delete($iId): bool
     {
+        $oItem = $this->getById($iId);
+        if (empty($oItem)) {
+            $this->setError('Item does not exist');
+            return false;
+        }
+
         if ($this->isDestructiveDelete()) {
             $bResult = $this->destroy($iId);
         } else {
@@ -745,7 +751,7 @@ abstract class Base
         }
 
         if ($bResult) {
-            $this->triggerEvent(static::EVENT_DELETED, [$iId]);
+            $this->triggerEvent(static::EVENT_DELETED, [$oItem]);
         }
 
         return $bResult;
