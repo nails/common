@@ -88,35 +88,35 @@ abstract class Base
      *
      * @var string
      */
-    const EVENT_CREATED = null;
+    const EVENT_CREATED = 'CREATED';
 
     /**
      * The trigger to fire when an item is updated
      *
      * @var string
      */
-    const EVENT_UPDATED = null;
+    const EVENT_UPDATED = 'UPDATED';
 
     /**
      * The trigger to fire when an item is deleted
      *
      * @var string
      */
-    const EVENT_DELETED = null;
+    const EVENT_DELETED = 'DELETED';
 
     /**
      * The trigger to fire when an item is destroyed
      *
      * @var string
      */
-    const EVENT_DESTROYED = null;
+    const EVENT_DESTROYED = 'DESTROYED';
 
     /**
      * The trigger to fire when an item is restored
      *
      * @var string
      */
-    const EVENT_RESTORED = null;
+    const EVENT_RESTORED = 'RESTORED';
 
     /**
      * Whether to automatically set timestamps or not
