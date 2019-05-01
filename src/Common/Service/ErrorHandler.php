@@ -232,7 +232,7 @@ class ErrorHandler
             $oDetails->backtrace = [];
         }
 
-        set_status_header(500);
+        set_status_header(HttpCodes::STATUS_INTERNAL_SERVER_ERROR);
         $this->renderErrorView(
             '500',
             [
@@ -241,7 +241,7 @@ class ErrorHandler
                 'oDetails' => $oDetails,
             ]
         );
-        exit(500);
+        exit(HttpCodes::STATUS_INTERNAL_SERVER_ERROR);
     }
 
     // --------------------------------------------------------------------------
@@ -305,7 +305,7 @@ class ErrorHandler
 
         // --------------------------------------------------------------------------
 
-        set_status_header(404);
+        set_status_header(HttpCodes::STATUS_NOT_FOUND);
         $this->renderErrorView(
             '404',
             [
@@ -313,7 +313,7 @@ class ErrorHandler
                 'sMessage' => '',
             ]
         );
-        exit(404);
+        exit(HttpCodes::STATUS_NOT_FOUND);
     }
 
     // --------------------------------------------------------------------------
@@ -456,7 +456,7 @@ class ErrorHandler
             echo $oView->load($sValidPath, [], true);
 
         } else {
-            static::halt('404 Page Not Found');
+            static::halt('404 Page Not Found', '', HttpCodes::STATUS_NOT_FOUND);
         }
     }
 
@@ -467,8 +467,9 @@ class ErrorHandler
      *
      * @param string $sError   The error to show
      * @param string $sSubject An optional subject line
+     * @param int    $iCode    The status code to send
      */
-    public static function halt($sError, $sSubject = '')
+    public static function halt($sError, $sSubject = '', int $iCode = HttpCodes::STATUS_INTERNAL_SERVER_ERROR)
     {
         if (php_sapi_name() === 'cli' || defined('STDIN')) {
 
@@ -481,6 +482,7 @@ class ErrorHandler
             echo "\n\n";
 
         } else {
+            set_status_header($iCode);
             ?>
             <style type="text/css">
                 p {
