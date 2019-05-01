@@ -2,6 +2,9 @@
 
 use MimeType\MimeType;
 use MimeTyper\Repository\MimeDbRepository;
+use Nails\Common\Interfaces\Service\Cache;
+use Nails\Common\Service\Cache\CachePrivate;
+use Nails\Common\Service\Cache\CachePublic;
 use Nails\Environment;
 
 return [
@@ -34,6 +37,23 @@ return [
         },
         'CodeIgniter'    => function () {
             return get_instance();
+        },
+        'Cache'          => function (
+            Cache $oPrivate = null,
+            Cache $oPublic = null
+        ) {
+            //  @todo (Pablo - 2019-05-01) - Use the factory to laod cache drivers?
+            if (class_exists('\App\Common\Service\Cache')) {
+                return new \App\Common\Service\Cache(
+                    $oPrivate ?? new CachePrivate(),
+                    $oPublic ?? new CachePublic(),
+                );
+            } else {
+                return new \Nails\Common\Service\Cache(
+                    $oPrivate ?? new CachePrivate(),
+                    $oPublic ?? new CachePublic(),
+                );
+            }
         },
         'Config'         => function () {
             if (class_exists('\App\Common\Service\Config')) {
