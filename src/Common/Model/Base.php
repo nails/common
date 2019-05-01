@@ -745,7 +745,7 @@ abstract class Base
         }
 
         if ($bResult) {
-            $this->triggerEvent(static::EVENT_DELETED, [$oItem]);
+            $this->triggerEvent(static::EVENT_DELETED, [$iId, $oItem]);
         }
 
         return $bResult;
