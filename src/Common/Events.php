@@ -30,7 +30,7 @@ class Events extends Base
     const SYSTEM_READY = 'SYSTEM:READY';
 
     /**
-     * Fired when the systems shutsdown, this is the last event to be fired
+     * Fired when the system shutsdown, this is the last event to be fired
      */
     const SYSTEM_SHUTOWN = 'SYSTEM:SHUTDOWN';
 
