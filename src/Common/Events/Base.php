@@ -12,7 +12,9 @@
 
 namespace Nails\Common\Events;
 
+use Nails\Common\Exception\NailsException;
 use Nails\Common\Helper\ArrayHelper;
+use Nails\Components;
 
 abstract class Base
 {
@@ -143,6 +145,24 @@ abstract class Base
             $aOut[] = $sLine;
         }
         return $aOut;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Calculates the event's namespace
+     *
+     * @return string
+     * @throws NailsException
+     * @throws \ReflectionException
+     */
+    public static function getEventNamespace()
+    {
+        $oComponent = Components::detectClassComponent(get_called_class());
+        if (empty($oComponent)) {
+            throw new NailsException('Could not detect class\' component');
+        }
+        return $oComponent->slug;
     }
 
     // --------------------------------------------------------------------------

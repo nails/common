@@ -214,7 +214,7 @@ class View
     /**
      * Attempts to resolve the view path
      *
-     * @param stirng $sView The view to resolve
+     * @param string $sView The view to resolve
      *
      * @return bool|string
      * @throws ViewNotFoundException
