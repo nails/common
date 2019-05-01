@@ -181,6 +181,7 @@ abstract class Base
         foreach ($oReflectionClass->getConstants() as $sConstant => $sValue) {
             $aOut[$sConstant] = (object) [
                 'constant'    => get_called_class() . '::' . $sConstant,
+                'namespace'   => static::getEventNamespace(),
                 'value'       => $sValue,
                 'description' => ArrayHelper::getFromArray($sConstant, static::$aDescriptions),
                 'arguments'   => ArrayHelper::getFromArray($sConstant, static::$aArguments),

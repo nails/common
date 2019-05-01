@@ -29,8 +29,8 @@ class Events extends Base
     /**
      * Executes the app
      *
-     * @param  InputInterface  $oInput  The Input Interface provided by Symfony
-     * @param  OutputInterface $oOutput The Output Interface provided by Symfony
+     * @param InputInterface  $oInput  The Input Interface provided by Symfony
+     * @param OutputInterface $oOutput The Output Interface provided by Symfony
      *
      * @return int
      */
@@ -52,7 +52,8 @@ class Events extends Base
 
         foreach ($aComponents as $oComponent) {
 
-            if (!empty($sFilter) && $sFilter !== $oComponent->slug) {
+            $sPattern = '/' . str_replace('/', '\/', $sFilter) . '/';
+            if (!empty($sFilter) && !preg_match($sPattern, $oComponent->slug)) {
                 continue;
             }
 
@@ -82,11 +83,9 @@ class Events extends Base
 
         foreach ($aEvents as $sComponent => $aComponentEvents) {
             $oOutput->writeln('');
-            if (empty($sFilter)) {
-                $oOutput->writeln('<comment>' . $sComponent . '</comment>');
-                $oOutput->writeln('<comment>' . str_repeat('-', strlen($sComponent)) . '</comment>');
-                $oOutput->writeln('');
-            }
+            $oOutput->writeln('<comment>' . $sComponent . '</comment>');
+            $oOutput->writeln('<comment>' . str_repeat('-', strlen($sComponent)) . '</comment>');
+            $oOutput->writeln('');
             foreach ($aComponentEvents as $oEvent) {
                 $oOutput->writeln('  <info>' . $oEvent->constant . '</info>');
 
@@ -102,8 +101,10 @@ class Events extends Base
                     $oOutput->writeln('  ' . $sLine);
                 }
 
+                $oOutput->writeln('  <comment>@namespace</comment> ' . $oEvent->namespace);
+
                 if (!empty($oEvent->arguments)) {
-                    $sParamPrefix = '  ↳ <comment>@param</comment> ';
+                    $sParamPrefix = '  <comment>@param</comment> ';
                     $oOutput->writeln($sParamPrefix . implode("\n" . $sParamPrefix, $oEvent->arguments));
                 }
                 $oOutput->writeln('');
