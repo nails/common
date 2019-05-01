@@ -42,7 +42,7 @@ class Uri extends CI_Uri
              */
             $sMessage = 'The URI you submitted has disallowed characters.';
             if (Environment::is(Environment::ENV_PROD) && $e->getMessage() === $sMessage) {
-                ErrorHandler::halt($sMessage, '', HttpCodes::STATUS_NOT_ACCEPTABLE);
+                ErrorHandler::halt($sMessage, '', HttpCodes::STATUS_NOT_FOUND);
             } else {
                 throw $e;
             }
