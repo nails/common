@@ -224,7 +224,7 @@ class DateTime
     /**
      * Looks for a date format by it's slug
      *
-     * @param  string $sSlug The slug to search for
+     * @param string $sSlug The slug to search for
      *
      * @return \stdClass|null
      */
@@ -304,7 +304,7 @@ class DateTime
 
         foreach ($aFormats as &$aFormat) {
             $aFormat          = (object) $aFormat;
-            $oDateTimeObject  = $this->convert(time(), $this->sTimezoneUser);
+            $oDateTimeObject  = static::convert(time(), $this->sTimezoneUser);
             $aFormat->example = $oDateTimeObject->format($aFormat->format);
         }
 
@@ -335,7 +335,7 @@ class DateTime
     /**
      * Looks for a time format by it's slug
      *
-     * @param  string $sSlug The slug to search for
+     * @param string $sSlug The slug to search for
      *
      * @return \stdClass|null
      */
@@ -405,14 +405,14 @@ class DateTime
     /**
      * Convert a date timestamp to the User's timezone from the Nails timezone
      *
-     * @param  mixed  $mTimestamp The timestamp to convert
-     * @param  string $sFormat    The format of the timestamp to return, defaults to User's date preference
+     * @param mixed  $mTimestamp The timestamp to convert
+     * @param string $sFormat    The format of the timestamp to return, defaults to User's date preference
      *
      * @return string
      */
     public function toUserDate($mTimestamp = null, $sFormat = null)
     {
-        $oConverted = $this->convert($mTimestamp, $this->sTimezoneUser, $this->sTimezoneNails);
+        $oConverted = static::convert($mTimestamp, $this->sTimezoneUser, $this->sTimezoneNails);
 
         if (is_null($oConverted)) {
             return null;
@@ -430,13 +430,13 @@ class DateTime
     /**
      * Convert a date timestamp to the Nails timezone from the User's timezone, formatted as Y-m-d
      *
-     * @param  mixed $mTimestamp The timestamp to convert
+     * @param mixed $mTimestamp The timestamp to convert
      *
      * @return string|null
      */
     public function toNailsDate($mTimestamp = null)
     {
-        $oConverted = $this->convert($mTimestamp, $this->sTimezoneNails, $this->sTimezoneUser);
+        $oConverted = static::convert($mTimestamp, $this->sTimezoneNails, $this->sTimezoneUser);
 
         if (is_null($oConverted)) {
             return null;
@@ -450,14 +450,14 @@ class DateTime
     /**
      * Convert a datetime timestamp to the user's timezone from the Nails timezone
      *
-     * @param  mixed  $mTimestamp The timestamp to convert
-     * @param  string $sFormat    The format of the timestamp to return, defaults to User's dateTime preference
+     * @param mixed  $mTimestamp The timestamp to convert
+     * @param string $sFormat    The format of the timestamp to return, defaults to User's dateTime preference
      *
      * @return string|null
      */
     public function toUserDatetime($mTimestamp = null, $sFormat = null)
     {
-        $oConverted = $this->convert($mTimestamp, $this->sTimezoneUser, $this->sTimezoneNails);
+        $oConverted = static::convert($mTimestamp, $this->sTimezoneUser, $this->sTimezoneNails);
 
         if (is_null($oConverted)) {
             return null;
@@ -475,14 +475,13 @@ class DateTime
     /**
      * Convert a datetime timestamp to the Nails timezone from the User's timezone
      *
-     * @param  mixed $mTimestamp The timestamp to convert
+     * @param mixed $mTimestamp The timestamp to convert
      *
      * @return string|null
      */
     public function toNailsDatetime($mTimestamp = null)
     {
-        $oConverted = $this->convert($mTimestamp, $this->sTimezoneNails, $this->sTimezoneUser);
-
+        $oConverted = static::convert($mTimestamp, $this->sTimezoneNails, $this->sTimezoneUser);
         if (is_null($oConverted)) {
             return null;
         }
@@ -645,11 +644,11 @@ class DateTime
     /**
      * Converts a datetime into a human friendly relative string
      *
-     * @param  mixed   $mDate                  The timestamp to convert
-     * @param  boolean $bIncludeTense          Whether or not to append the tense (e.g, X minutes _ago_)
-     * @param  string  $sMessageBadDate        The message to show if a bad timestamp is supplied
-     * @param  string  $sMessageGreaterOneWeek The message to show if the timestamp is greater than one week away
-     * @param  string  $sMessageLessTenMinutes The message to show if the timestamp is less than ten minutes away
+     * @param mixed   $mDate                  The timestamp to convert
+     * @param boolean $bIncludeTense          Whether or not to append the tense (e.g, X minutes _ago_)
+     * @param string  $sMessageBadDate        The message to show if a bad timestamp is supplied
+     * @param string  $sMessageGreaterOneWeek The message to show if the timestamp is greater than one week away
+     * @param string  $sMessageLessTenMinutes The message to show if the timestamp is less than ten minutes away
      *
      * @return string
      */
@@ -754,7 +753,7 @@ class DateTime
     /**
      * Get the timezone code from the timezone string
      *
-     * @param  string $sTimezone The timezone, e.g. Europe/London
+     * @param string $sTimezone The timezone, e.g. Europe/London
      *
      * @return string|false
      */
@@ -799,9 +798,9 @@ class DateTime
     /**
      * Arbitrarily convert a timestamp between timezones
      *
-     * @param  mixed  $mTimestamp The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
-     * @param  string $sToTz      The timezone to convert to
-     * @param  string $sFromTz    The timezone to convert from
+     * @param mixed  $mTimestamp The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * @param string $sToTz      The timezone to convert to
+     * @param string $sFromTz    The timezone to convert from
      *
      * @return \DateTime|null
      */
