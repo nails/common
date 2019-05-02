@@ -3,9 +3,8 @@
 use MimeType\MimeType;
 use MimeTyper\Repository\MimeDbRepository;
 use Nails\Common\Interfaces\Service\Cache;
-use Nails\Common\Service\Cache\CachePrivate;
-use Nails\Common\Service\Cache\CachePublic;
 use Nails\Environment;
+use Nails\Factory;
 
 return [
     'properties' => [
@@ -42,17 +41,30 @@ return [
             Cache $oPrivate = null,
             Cache $oPublic = null
         ) {
-            //  @todo (Pablo - 2019-05-01) - Use the factory to laod cache drivers?
             if (class_exists('\App\Common\Service\Cache')) {
                 return new \App\Common\Service\Cache(
-                    $oPrivate ?? new CachePrivate(),
-                    $oPublic ?? new CachePublic(),
+                    $oPrivate ?? Factory::service('CachePrivate'),
+                    $oPublic ?? Factory::service('CachePublic')
                 );
             } else {
                 return new \Nails\Common\Service\Cache(
-                    $oPrivate ?? new CachePrivate(),
-                    $oPublic ?? new CachePublic(),
+                    $oPrivate ?? Factory::service('CachePrivate'),
+                    $oPublic ?? Factory::service('CachePublic')
                 );
+            }
+        },
+        'CachePrivate'   => function (string $sDir = null) {
+            if (class_exists('\App\Common\Service\Cache\CachePrivate')) {
+                return new \App\Common\Service\Cache\CachePrivate($sDir);
+            } else {
+                return new \Nails\Common\Service\Cache\CachePrivate($sDir);
+            }
+        },
+        'CachePublic'    => function (string $sDir = null) {
+            if (class_exists('\App\Common\Service\Cache\CachePublic')) {
+                return new \App\Common\Service\Cache\CachePublic($sDir);
+            } else {
+                return new \Nails\Common\Service\Cache\CachePublic($sDir);
             }
         },
         'Config'         => function () {
@@ -378,6 +390,13 @@ return [
         },
     ],
     'resources'  => [
+        'CacheItem'       => function ($oObj) {
+            if (class_exists('\App\Common\Resource\Cache\Item')) {
+                return new \App\Common\Resource\Cache\Item($oObj);
+            } else {
+                return new \Nails\Common\Resource\Cache\Item($oObj);
+            }
+        },
         'Cookie'          => function ($oObj) {
             if (class_exists('\App\Common\Resource\Cookie')) {
                 return new \App\Common\Resource\Cookie($oObj);

@@ -2,22 +2,25 @@
 
 namespace Nails\Common\Service\Cache;
 
-use Nails\Common\Interfaces\Service\Cache;
-
 /**
  * Class CachePublic
  *
  * @package Nails\Common\Service\Cache
  */
-class CachePublic implements Cache
+class CachePublic extends CachePrivate
 {
+    const DIR = 'public';
+
+    // --------------------------------------------------------------------------
+
     /**
-     * Return the absolute path for the cache
+     * Returns the public URL to access the cache
      *
-     * @return string
+     * @return string|null
      */
-    public function getDir(): string
+    public function getUrl(): ?string
     {
-        return NAILS_APP_PATH . 'cache' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR;
+        //  @todo (Pablo - 2019-05-02) - comile this
+        return siteUrl();
     }
 }
