@@ -1,6 +1,6 @@
 <?php
 
-namespace Nails\Common\Interfaces\Service;
+namespace Nails\Common\Interfaces\Service\Cache\Driver;
 
 use Nails\Common\Resource\Cache\Item;
 

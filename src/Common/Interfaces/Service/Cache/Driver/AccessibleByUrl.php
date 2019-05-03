@@ -1,8 +1,6 @@
 <?php
 
-namespace Nails\Common\Interfaces\Service\Cache;
-
-use Nails\Common\Interfaces\Service\Cache;
+namespace Nails\Common\Interfaces\Service\Cache\Driver;
 
 /**
  * Interface Cache

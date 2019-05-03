@@ -1,6 +1,6 @@
 <?php
 
-namespace Nails\Common\Service\Cache;
+namespace Nails\Common\Service\Cache\Driver;
 
 use Nails\Common\Exception\Directory\DirectoryIsNotWritableException;
 use Nails\Common\Exception\FactoryException;
@@ -14,7 +14,7 @@ use Nails\Factory;
  *
  * @package Nails\Common\Service\Cache
  */
-class Cache implements Interfaces\Service\Cache
+class Cache implements Interfaces\Service\Cache\Driver\Cache
 {
     /**
      * The directory to use for the cache

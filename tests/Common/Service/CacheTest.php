@@ -6,6 +6,7 @@ use Nails\Common\Exception;
 use Nails\Common\Helper\Directory;
 use Nails\Common\Resource\Cache\Item;
 use Nails\Common\Service\Cache;
+use Nails\Common\Service\Cache\Driver;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -59,10 +60,10 @@ class CacheTest extends TestCase
         file_put_contents(static::$sDirPrivate . 'existing-file.txt', 'Some data');
         file_put_contents(static::$sDirPublic . 'existing-file.txt', 'Some data');
 
-        static::$oCachePrivate = new Cache\Cache(
+        static::$oCachePrivate = new Driver\Cache(
             static::$sDirPrivate
         );
-        static::$oCachePublic  = new Cache\AccessibleByUrl(
+        static::$oCachePublic  = new Driver\AccessibleByUrl(
             static::$sDirPublic
         );
 

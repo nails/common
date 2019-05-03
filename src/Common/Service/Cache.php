@@ -32,31 +32,31 @@ class Cache
     /**
      * The Private cache driver
      *
-     * @var Interfaces\Service\Cache
+     * @var Interfaces\Service\Cache\Driver\Cache
      */
-    protected $oPrivate;
+    protected $oDriver;
 
     /**
      * The Public cache driver
      *
-     * @var Interfaces\Service\Cache\AccessibleByUrl
+     * @var Interfaces\Service\Cache\Driver\AccessibleByUrl
      */
-    protected $oPublic;
+    protected $oAccessibleDriver;
 
     // --------------------------------------------------------------------------
 
     /**
      * Cache constructor.
      *
-     * @param Interfaces\Service\Cache                 $oPrivate The private cache
-     * @param Interfaces\Service\Cache\AccessibleByUrl $oPublic  The public cache
+     * @param Interfaces\Service\Cache\Driver\Cache           $oDriver           The private cache
+     * @param Interfaces\Service\Cache\Driver\AccessibleByUrl $oAccessibleDriver The public cache
      */
     public function __construct(
-        Interfaces\Service\Cache $oPrivate,
-        Interfaces\Service\Cache\AccessibleByUrl $oPublic
+        Interfaces\Service\Cache\Driver\Cache $oDriver,
+        Interfaces\Service\Cache\Driver\AccessibleByUrl $oAccessibleDriver
     ) {
-        $this->oPrivate = $oPrivate;
-        $this->oPublic  = $oPublic;
+        $this->oDriver           = $oDriver;
+        $this->oAccessibleDriver = $oAccessibleDriver;
     }
 
     // --------------------------------------------------------------------------
@@ -72,8 +72,8 @@ class Cache
      */
     public function __call(string $sMethod, array $aArguments)
     {
-        if (method_exists($this->oPrivate, $sMethod)) {
-            return call_user_func_array([$this->oPrivate, $sMethod], $aArguments);
+        if (method_exists($this->oDriver, $sMethod)) {
+            return call_user_func_array([$this->oDriver, $sMethod], $aArguments);
         } else {
             throw new CacheException('"' . static::class . ':' . $sMethod . '" is not a valid method');
         }
@@ -84,10 +84,10 @@ class Cache
     /**
      * Returns an interface to the public cache
      *
-     * @return Interfaces\Service\Cache\AccessibleByUrl
+     * @return Interfaces\Service\Cache\Driver\AccessibleByUrl
      */
-    public function public(): Interfaces\Service\Cache\AccessibleByUrl
+    public function public(): Interfaces\Service\Cache\Driver\AccessibleByUrl
     {
-        return $this->oPublic;
+        return $this->oAccessibleDriver;
     }
 }
