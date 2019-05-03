@@ -12,8 +12,8 @@
 
 namespace Nails\Common\Exception\Directory;
 
-use Nails\Common\Exception\NailsException;
+use Nails\Common\Exception\DirectoryException;
 
-class DirectoryNameException extends NailsException
+class DirectoryNameException extends DirectoryException
 {
 }
