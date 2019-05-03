@@ -70,6 +70,11 @@ class CachePrivate implements Cache\CachePrivate
      */
     public function write($mData, string $sKey = null): Item
     {
+        //  Generate a key if one isn't explicitly specified
+        if (is_null($sKey)) {
+            $sKey = md5(microtime(true));
+        }
+
         $sPath = $this->prepKey($sKey);
 
         file_put_contents($sPath, $mData);

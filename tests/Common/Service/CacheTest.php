@@ -108,6 +108,22 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
+     * @covers \Nails\Common\Service\Cache\CachePrivate::write
+     */
+    public function testCanWriteToPrivateCacheWithoutKey()
+    {
+        $sData = 'Some test data';
+
+        $oItem = static::$oCache->write($sData);
+
+        $this->assertInstanceOf(Item::class, $oItem);
+        $this->assertEquals($sData, (string) $oItem);
+        $this->assertFileExists(static::$sDirPrivate . $oItem->getKey());
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * @covers \Nails\Common\Service\Cache\CachePrivate::read
      */
     public function testCanReadFromPrivateCache()
@@ -207,6 +223,22 @@ class CacheTest extends TestCase
         $this->assertEquals($sKey, $oItem->getKey());
         $this->assertEquals($sData, (string) $oItem);
         $this->assertFileExists(static::$sDirPublic . $sKey);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * @covers \Nails\Common\Service\Cache\CachePublic::write
+     */
+    public function testCanWriteToPublicCacheWithoutKey()
+    {
+        $sData = 'Some test data';
+
+        $oItem = static::$oCache->public()->write($sData);
+
+        $this->assertInstanceOf(Item::class, $oItem);
+        $this->assertEquals($sData, (string) $oItem);
+        $this->assertFileExists(static::$sDirPublic . $oItem->getKey());
     }
 
     // --------------------------------------------------------------------------
