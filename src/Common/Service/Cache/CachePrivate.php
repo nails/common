@@ -2,7 +2,7 @@
 
 namespace Nails\Common\Service\Cache;
 
-use Nails\Common\Exception\CacheException;
+use Nails\Common\Exception\Directory\DirectoryIsNotWritableException;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Helper\Strings;
 use Nails\Common\Interfaces\Service\Cache;
@@ -30,7 +30,7 @@ class CachePrivate implements Cache\CachePrivate
      *
      * @param string|null $sDir
      *
-     * @throws CacheException
+     * @throws DirectoryIsNotWritableException
      */
     public function __construct(string $sDir = null)
     {
@@ -39,7 +39,7 @@ class CachePrivate implements Cache\CachePrivate
         }
 
         if (!is_writable($this->getDir())) {
-            throw new CacheException(
+            throw new DirectoryIsNotWritableException(
                 'Cache directory "' . $this->getDir() . '" is not writable'
             );
         }
