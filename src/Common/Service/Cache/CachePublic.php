@@ -13,6 +13,7 @@ use Nails\Common\Service\Config;
 class CachePublic extends CachePrivate implements Cache\CachePublic
 {
     const DIR = 'public';
+    const URL = '';
 
     // --------------------------------------------------------------------------
 
@@ -25,7 +26,11 @@ class CachePublic extends CachePrivate implements Cache\CachePublic
      */
     public function getUrl(string $sKey = null): string
     {
-        $sUrl = Config::siteUrl('cache/' . static::DIR);
+        if (static::URL) {
+            $sUrl = rtrim(static::URL, '/');
+        } else {
+            $sUrl = Config::siteUrl('cache/' . static::DIR);
+        }
         $sUrl .= $sKey ? '/' . $sKey : '';
         return $sUrl;
     }
