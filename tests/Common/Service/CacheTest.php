@@ -4,8 +4,6 @@ namespace Tests\Common\Service;
 
 use Nails\Common\Exception;
 use Nails\Common\Helper\Directory;
-use Nails\Common\Interfaces\Service\Cache\CachePrivate;
-use Nails\Common\Interfaces\Service\Cache\CachePublic;
 use Nails\Common\Resource\Cache\Item;
 use Nails\Common\Service\Cache;
 use PHPUnit\Framework\TestCase;
@@ -29,12 +27,12 @@ class CacheTest extends TestCase
 
 
     /**
-     * @var CachePrivate
+     * @var Cache\Cache
      */
     protected static $oCachePrivate;
 
     /**
-     * @var CachePublic
+     * @var Cache\AccessibleByUrl
      */
     protected static $oCachePublic;
 
@@ -61,10 +59,10 @@ class CacheTest extends TestCase
         file_put_contents(static::$sDirPrivate . 'existing-file.txt', 'Some data');
         file_put_contents(static::$sDirPublic . 'existing-file.txt', 'Some data');
 
-        static::$oCachePrivate = new Cache\CachePrivate(
+        static::$oCachePrivate = new Cache\Cache(
             static::$sDirPrivate
         );
-        static::$oCachePublic  = new Cache\CachePublic(
+        static::$oCachePublic  = new Cache\AccessibleByUrl(
             static::$sDirPublic
         );
 
@@ -77,7 +75,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\CachePrivate::getDir
+     * @covers \Nails\Common\Service\Cache\Cache::getDir
      */
     public function testPrivateCacheDirIsValid()
     {
@@ -90,7 +88,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\CachePrivate::write
+     * @covers \Nails\Common\Service\Cache\Cache::write
      */
     public function testCanWriteToPrivateCache()
     {
@@ -108,7 +106,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\CachePrivate::write
+     * @covers \Nails\Common\Service\Cache\Cache::write
      */
     public function testCanWriteToPrivateCacheWithoutKey()
     {
@@ -124,7 +122,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\CachePrivate::read
+     * @covers \Nails\Common\Service\Cache\Cache::read
      */
     public function testCanReadFromPrivateCache()
     {
@@ -139,7 +137,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\CachePrivate::exists
+     * @covers \Nails\Common\Service\Cache\Cache::exists
      */
     public function testCheckValidItemExistsInPrivateCache()
     {
@@ -149,7 +147,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\CachePrivate::exists
+     * @covers \Nails\Common\Service\Cache\Cache::exists
      */
     public function testCheckInvalidItemExistsInPrivateCache()
     {
@@ -159,7 +157,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\CachePrivate::delete
+     * @covers \Nails\Common\Service\Cache\Cache::delete
      */
     public function testCanDeleteValidItemFromPrivateCache()
     {
@@ -172,7 +170,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\CachePrivate::delete
+     * @covers \Nails\Common\Service\Cache\Cache::delete
      */
     public function testCanDeleteInvalidItemFromPrivateCache()
     {
@@ -197,7 +195,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\CachePublic::getDir
+     * @covers \Nails\Common\Service\Cache\AccessibleByUrl::getDir
      */
     public function testPublicCacheDirIsValid()
     {
@@ -210,7 +208,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\CachePublic::write
+     * @covers \Nails\Common\Service\Cache\AccessibleByUrl::write
      */
     public function testCanWriteToPublicCache()
     {
@@ -228,7 +226,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\CachePublic::write
+     * @covers \Nails\Common\Service\Cache\AccessibleByUrl::write
      */
     public function testCanWriteToPublicCacheWithoutKey()
     {
@@ -244,7 +242,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\CachePublic::read
+     * @covers \Nails\Common\Service\Cache\AccessibleByUrl::read
      */
     public function testCanReadFromPublicCache()
     {
@@ -259,7 +257,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\CachePublic::exists
+     * @covers \Nails\Common\Service\Cache\AccessibleByUrl::exists
      */
     public function testCheckValidItemExistsInPublicCache()
     {
@@ -269,7 +267,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\CachePublic::exists
+     * @covers \Nails\Common\Service\Cache\AccessibleByUrl::exists
      */
     public function testCheckInvalidItemExistsInPublicCache()
     {
@@ -279,7 +277,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\CachePublic::delete
+     * @covers \Nails\Common\Service\Cache\AccessibleByUrl::delete
      */
     public function testCanDeleteValidItemFromPublicCache()
     {
@@ -291,7 +289,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\CachePublic::delete
+     * @covers \Nails\Common\Service\Cache\AccessibleByUrl::delete
      */
     public function testCanDeleteInvalidItemFromPublicCache()
     {
@@ -304,7 +302,7 @@ class CacheTest extends TestCase
 
 
     /**
-     * @covers \Nails\Common\Service\Cache\CachePublic::getUrl
+     * @covers \Nails\Common\Service\Cache\AccessibleByUrl::getUrl
      */
     public function testPublicCacheReturnsValidUrl()
     {

@@ -5,16 +5,16 @@ namespace Nails\Common\Service\Cache;
 use Nails\Common\Exception\Directory\DirectoryIsNotWritableException;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Helper\Strings;
-use Nails\Common\Interfaces\Service\Cache;
+use Nails\Common\Interfaces;
 use Nails\Common\Resource\Cache\Item;
 use Nails\Factory;
 
 /**
- * Class CachePrivate
+ * Class Cache
  *
  * @package Nails\Common\Service\Cache
  */
-class CachePrivate implements Cache\CachePrivate
+class Cache implements Interfaces\Service\Cache
 {
     /**
      * The directory to use for the cache
@@ -26,7 +26,7 @@ class CachePrivate implements Cache\CachePrivate
     // --------------------------------------------------------------------------
 
     /**
-     * CachePrivate constructor.
+     * Cache constructor.
      *
      * @param string|null $sDir
      *

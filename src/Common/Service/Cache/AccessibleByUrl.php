@@ -2,14 +2,14 @@
 
 namespace Nails\Common\Service\Cache;
 
-use Nails\Common\Interfaces\Service\Cache;
+use Nails\Common\Interfaces;
 
 /**
- * Class CachePublic
+ * Class AccessibleByUrl
  *
  * @package Nails\Common\Service\Cache
  */
-class CachePublic extends CachePrivate implements Cache\CachePublic
+class AccessibleByUrl extends Cache implements Interfaces\Service\Cache\AccessibleByUrl
 {
     /**
      * The directory to use for the cache

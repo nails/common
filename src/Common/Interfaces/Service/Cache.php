@@ -1,6 +1,6 @@
 <?php
 
-namespace Nails\Common\Interfaces\Service\Cache;
+namespace Nails\Common\Interfaces\Service;
 
 use Nails\Common\Resource\Cache\Item;
 
@@ -9,7 +9,7 @@ use Nails\Common\Resource\Cache\Item;
  *
  * @package Nails\Common\Interfaces\Service
  */
-interface CachePrivate
+interface Cache
 {
     /**
      * Return the absolute path for the cache
