@@ -143,8 +143,7 @@ class CachePrivate implements Cache\CachePrivate
     /**
      * Configures a new item object
      *
-     * @param string $sKey  the item's key
-     * @param string $sPath the item's path
+     * @param string $sKey The item's key
      *
      * @return Item
      * @throws FactoryException
