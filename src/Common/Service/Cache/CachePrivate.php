@@ -14,7 +14,7 @@ use Nails\Factory;
  *
  * @package Nails\Common\Service\Cache
  */
-class CachePrivate implements Cache
+class CachePrivate implements Cache\CachePrivate
 {
     /**
      * The directory to use for the cache
@@ -74,7 +74,7 @@ class CachePrivate implements Cache
 
         file_put_contents($sPath, $mData);
 
-        return $this->newItem($sKey, $sPath);
+        return $this->newItem($sKey);
     }
 
     // --------------------------------------------------------------------------
@@ -85,10 +85,11 @@ class CachePrivate implements Cache
      * @param string $sKey The key of the item
      *
      * @return Item
+     * @throws FactoryException
      */
     public function read(string $sKey): Item
     {
-
+        return $this->exists($sKey) ? $this->newItem($sKey) : null;
     }
 
     // --------------------------------------------------------------------------
@@ -102,7 +103,11 @@ class CachePrivate implements Cache
      */
     public function delete(string $sKey): bool
     {
-
+        if ($this->exists($sKey)) {
+            return @unlink($this->prepKey($sKey));
+        } else {
+            return false;
+        }
     }
 
     // --------------------------------------------------------------------------
@@ -116,7 +121,7 @@ class CachePrivate implements Cache
      */
     public function exists(string $sKey): bool
     {
-
+        return file_exists($this->prepKey($sKey));
     }
 
     // --------------------------------------------------------------------------
@@ -144,11 +149,11 @@ class CachePrivate implements Cache
      * @return Item
      * @throws FactoryException
      */
-    protected function newItem(string $sKey, string $sPath): Item
+    protected function newItem(string $sKey): Item
     {
         $oObj = (object) [
             'sKey'  => $sKey,
-            'sPath' => $sPath,
+            'sPath' => $this->prepKey($sKey),
         ];
 
         //  When testing the Factory isn't available

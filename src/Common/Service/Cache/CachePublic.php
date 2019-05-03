@@ -2,25 +2,30 @@
 
 namespace Nails\Common\Service\Cache;
 
+use Nails\Common\Interfaces\Service\Cache;
+use Nails\Common\Service\Config;
+
 /**
  * Class CachePublic
  *
  * @package Nails\Common\Service\Cache
  */
-class CachePublic extends CachePrivate
+class CachePublic extends CachePrivate implements Cache\CachePublic
 {
     const DIR = 'public';
 
     // --------------------------------------------------------------------------
 
     /**
-     * Returns the public URL to access the cache
+     * Return the URL for the public cache
      *
-     * @return string|null
+     * @param string|null $sKey The cache key
+     *
+     * @return string
      */
-    public function getUrl(): ?string
+    public function getUrl(string $sKey = null): string
     {
-        //  @todo (Pablo - 2019-05-02) - comile this
-        return siteUrl();
+        $sUrl = Config::siteUrl('cache/' . static::DIR);
+        return $sUrl;
     }
 }

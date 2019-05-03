@@ -4,8 +4,11 @@ namespace Tests\Common\Service;
 
 use Nails\Common\Exception;
 use Nails\Common\Helper\Directory;
+use Nails\Common\Interfaces\Service\Cache\CachePrivate;
+use Nails\Common\Interfaces\Service\Cache\CachePublic;
 use Nails\Common\Resource\Cache\Item;
 use Nails\Common\Service\Cache;
+use Nails\Common\Service\Config;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -27,12 +30,12 @@ class CacheTest extends TestCase
 
 
     /**
-     * @var \Nails\Common\Interfaces\Service\Cache
+     * @var CachePrivate
      */
     protected static $oCachePrivate;
 
     /**
-     * @var \Nails\Common\Interfaces\Service\Cache
+     * @var CachePublic
      */
     protected static $oCachePublic;
 
@@ -53,9 +56,12 @@ class CacheTest extends TestCase
     {
         parent::setUpBeforeClass();
 
-
         static::$sDirPrivate = Directory::tempdir();
         static::$sDirPublic  = Directory::tempdir();
+
+        //  Place a existing-file file in the cache
+        file_put_contents(static::$sDirPrivate . 'existing-file.txt', 'Some data');
+        file_put_contents(static::$sDirPublic . 'existing-file.txt', 'Some data');
 
         static::$oCachePrivate = new Cache\CachePrivate(
             static::$sDirPrivate
@@ -72,6 +78,9 @@ class CacheTest extends TestCase
 
     // --------------------------------------------------------------------------
 
+    /**
+     * @covers \Nails\Common\Service\Cache\CachePrivate::getDir
+     */
     public function testPrivateCacheDirIsValid()
     {
         $this->assertEquals(
@@ -82,6 +91,9 @@ class CacheTest extends TestCase
 
     // --------------------------------------------------------------------------
 
+    /**
+     * @covers \Nails\Common\Service\Cache\CachePrivate::write
+     */
     public function testCanWriteToPrivateCache()
     {
         $sData = 'Some test data';
@@ -97,34 +109,69 @@ class CacheTest extends TestCase
 
     // --------------------------------------------------------------------------
 
-//    public function testCanReadFromPrivateCache()
-//    {
-//        //  @todo (Pablo - 2019-05-02) - test the private cache can be read
-//    }
+    /**
+     * @covers \Nails\Common\Service\Cache\CachePrivate::read
+     */
+    public function testCanReadFromPrivateCache()
+    {
+        $oItem = static::$oCache->read('existing-file.txt');
+
+        $this->assertInstanceOf(Item::class, $oItem);
+        $this->assertEquals('existing-file.txt', $oItem->getKey());
+        $this->assertEquals(static::$sDirPrivate . 'existing-file.txt', $oItem->getPath());
+        $this->assertEquals('Some data', (string) $oItem);
+    }
 
     // --------------------------------------------------------------------------
 
-//    public function testCanDeleteFromPrivateCache()
-//    {
-//        //  @todo (Pablo - 2019-05-02) - test items can be deleted from the private cache
-//    }
+    /**
+     * @covers \Nails\Common\Service\Cache\CachePrivate::exists
+     */
+    public function testCheckValidItemExistsInPrivateCache()
+    {
+        $this->assertTrue(static::$oCache->exists('existing-file.txt'));
+    }
 
     // --------------------------------------------------------------------------
 
-//    public function testCheckValidItemExistsInPrivateCache()
-//    {
-//        //  @todo (Pablo - 2019-05-02) - test that a valid item exists in the private cache
-//    }
+    /**
+     * @covers \Nails\Common\Service\Cache\CachePrivate::exists
+     */
+    public function testCheckInvalidItemExistsInPrivateCache()
+    {
+        $this->assertFalse(static::$oCache->exists('non-existing-file.txt'));
+    }
 
     // --------------------------------------------------------------------------
 
-//    public function testCheckInvalidItemExistsInPrivateCache()
-//    {
-//        //  @todo (Pablo - 2019-05-02) - test that an item does not exist in the private cache
-//    }
+    /**
+     * @covers \Nails\Common\Service\Cache\CachePrivate::delete
+     */
+    public function testCanDeleteValidItemFromPrivateCache()
+    {
+        $this->assertFileExists(static::$sDirPrivate . 'existing-file.txt');
+        $bResult = static::$oCache->delete('existing-file.txt');
+        $this->assertTrue($bResult);
+        $this->assertFileNotExists(static::$sDirPrivate . 'existing-file.txt');
+    }
 
     // --------------------------------------------------------------------------
 
+    /**
+     * @covers \Nails\Common\Service\Cache\CachePrivate::delete
+     */
+    public function testCanDeleteInvalidItemFromPrivateCache()
+    {
+        $this->assertFileNotExists(static::$sDirPrivate . 'non-existing-file.txt');
+        $bResult = static::$oCache->delete('non-existing-file.txt');
+        $this->assertFalse($bResult);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * @covers \Nails\Common\Service\Cache::public
+     */
     public function testPublicCacheIsAccessible()
     {
         $this->assertSame(
@@ -135,6 +182,9 @@ class CacheTest extends TestCase
 
     // --------------------------------------------------------------------------
 
+    /**
+     * @covers \Nails\Common\Service\Cache\CachePublic::getDir
+     */
     public function testPublicCacheDirIsValid()
     {
         $this->assertEquals(
@@ -145,6 +195,9 @@ class CacheTest extends TestCase
 
     // --------------------------------------------------------------------------
 
+    /**
+     * @covers \Nails\Common\Service\Cache\CachePublic::write
+     */
     public function testCanWriteToPublicCache()
     {
         $sData = 'Some test data';
@@ -160,36 +213,82 @@ class CacheTest extends TestCase
 
     // --------------------------------------------------------------------------
 
-//    public function testCanReadFromPublicCache()
-//    {
-//        //  @todo (Pablo - 2019-05-02) - test the public cache can be read
-//    }
+    /**
+     * @covers \Nails\Common\Service\Cache\CachePublic::read
+     */
+    public function testCanReadFromPublicCache()
+    {
+        $oItem = static::$oCache->public()->read('existing-file.txt');
+
+        $this->assertInstanceOf(Item::class, $oItem);
+        $this->assertEquals('existing-file.txt', $oItem->getKey());
+        $this->assertEquals(static::$sDirPublic . 'existing-file.txt', $oItem->getPath());
+        $this->assertEquals('Some data', (string) $oItem);
+    }
 
     // --------------------------------------------------------------------------
 
-//    public function testCanDeleteFromPublicCache()
-//    {
-//        //  @todo (Pablo - 2019-05-02) - test items can be deleted from the public cache
-//    }
+    /**
+     * @covers \Nails\Common\Service\Cache\CachePublic::exists
+     */
+    public function testCheckValidItemExistsInPublicCache()
+    {
+        $this->assertTrue(static::$oCache->public()->exists('existing-file.txt'));
+    }
 
     // --------------------------------------------------------------------------
 
-//    public function testCheckValidItemExistsInPublicCache()
-//    {
-//        //  @todo (Pablo - 2019-05-02) - test that a valid item exists in the public cache
-//    }
+    /**
+     * @covers \Nails\Common\Service\Cache\CachePublic::exists
+     */
+    public function testCheckInvalidItemExistsInPublicCache()
+    {
+        $this->assertFalse(static::$oCache->public()->exists('non-existing-file.txt'));
+    }
 
     // --------------------------------------------------------------------------
 
-//    public function testCheckInvalidItemExistsInPublicCache()
-//    {
-//        //  @todo (Pablo - 2019-05-02) - test that an item does not exist in the public cache
-//    }
+    /**
+     * @covers \Nails\Common\Service\Cache\CachePublic::delete
+     */
+    public function testCanDeleteValidItemFromPublicCache()
+    {
+        $this->assertFileExists(static::$sDirPublic . 'existing-file.txt');
+        static::$oCache->public()->delete('existing-file.txt');
+        $this->assertFileNotExists(static::$sDirPublic . 'existing-file.txt');
+    }
 
     // --------------------------------------------------------------------------
 
-//    public function testPublicCacheReturnsValidUrl()
-//    {
-//        //  @todo (Pablo - 2019-05-02) - Test the public cache returns a valid URL
-//    }
+    /**
+     * @covers \Nails\Common\Service\Cache\CachePublic::delete
+     */
+    public function testCanDeleteInvalidItemFromPublicCache()
+    {
+        $this->assertFileNotExists(static::$sDirPublic . 'non-existing-file.txt');
+        $bResult = static::$oCache->public()->delete('non-existing-file.txt');
+        $this->assertFalse($bResult);
+    }
+
+    // --------------------------------------------------------------------------
+
+
+    /**
+     * @covers \Nails\Common\Service\Cache\CachePublic::getUrl
+     */
+    public function testPublicCacheReturnsValidUrl()
+    {
+        if (function_exists('get_instance')) {
+            $this->assertEquals(
+                Config::siteUrl('cache/public'),
+                static::$oCache->public()->getUrl()
+            );
+            $this->assertEquals(
+                Config::siteUrl('cache/public/existing-file.txt'),
+                static::$oCache->public()->getUrl('existing-file.txt')
+            );
+        } else {
+            $this->markTestSkipped('Test cannot run as CodeIgniter is not available');
+        }
+    }
 }

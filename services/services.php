@@ -38,8 +38,8 @@ return [
             return get_instance();
         },
         'Cache'          => function (
-            Cache $oPrivate = null,
-            Cache $oPublic = null
+            Cache\CachePrivate $oPrivate = null,
+            Cache\CachePublic $oPublic = null
         ) {
             if (class_exists('\App\Common\Service\Cache')) {
                 return new \App\Common\Service\Cache(

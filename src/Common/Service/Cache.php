@@ -32,14 +32,14 @@ class Cache
     /**
      * The Private cache driver
      *
-     * @var Interfaces\Service\Cache
+     * @var Interfaces\Service\Cache\CachePrivate
      */
     protected $oPrivate;
 
     /**
      * The Public cache driver
      *
-     * @var Interfaces\Service\Cache
+     * @var Interfaces\Service\Cache\CachePublic
      */
     protected $oPublic;
 
@@ -48,12 +48,12 @@ class Cache
     /**
      * Cache constructor.
      *
-     * @param Interfaces\Service\Cache $oPrivate The private cache
-     * @param Interfaces\Service\Cache $oPublic  The public cache
+     * @param Interfaces\Service\Cache\CachePrivate $oPrivate The private cache
+     * @param Interfaces\Service\Cache\CachePublic  $oPublic  The public cache
      */
     public function __construct(
-        Interfaces\Service\Cache $oPrivate,
-        Interfaces\Service\Cache $oPublic
+        Interfaces\Service\Cache\CachePrivate $oPrivate,
+        Interfaces\Service\Cache\CachePublic $oPublic
     ) {
         $this->oPrivate = $oPrivate;
         $this->oPublic  = $oPublic;
@@ -84,9 +84,9 @@ class Cache
     /**
      * Returns an interface to the public cache
      *
-     * @return Interfaces\Service\Cache
+     * @return Interfaces\Service\Cache\CachePublic
      */
-    public function public(): Interfaces\Service\Cache
+    public function public(): Interfaces\Service\Cache\CachePublic
     {
         return $this->oPublic;
     }
