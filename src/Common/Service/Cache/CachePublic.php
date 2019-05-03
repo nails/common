@@ -26,6 +26,7 @@ class CachePublic extends CachePrivate implements Cache\CachePublic
     public function getUrl(string $sKey = null): string
     {
         $sUrl = Config::siteUrl('cache/' . static::DIR);
+        $sUrl .= $sKey ? '/' . $sKey : '';
         return $sUrl;
     }
 }
