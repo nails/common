@@ -95,10 +95,10 @@ class Driver implements Interfaces\Service\FileCache\Driver
      *
      * @param string $sKey The key of the item
      *
-     * @return Item
+     * @return Item|null
      * @throws FactoryException
      */
-    public function read(string $sKey): Item
+    public function read(string $sKey): ?Item
     {
         return $this->exists($sKey) ? $this->newItem($sKey) : null;
     }

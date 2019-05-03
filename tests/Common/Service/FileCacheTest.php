@@ -163,6 +163,17 @@ class FileCacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
+     * @covers \Nails\Common\Service\FileCache\Driver::read
+     */
+    public function testPrivateCacheReadReturnsNullOnInvalidItem()
+    {
+        $oItem = static::$oCache->read('non-existing-file.txt');
+        $this->assertNull($oItem);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * @covers \Nails\Common\Service\FileCache\Driver::exists
      */
     public function testCheckValidItemExistsInPrivateCache()
@@ -292,6 +303,17 @@ class FileCacheTest extends TestCase
         $this->assertEquals('existing-file.txt', $oItem->getKey());
         $this->assertEquals(static::$sDirPublic . 'existing-file.txt', $oItem->getPath());
         $this->assertEquals('Some data', (string) $oItem);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * @covers \Nails\Common\Service\FileCache\Driver\AccessibleByUrl::read
+     */
+    public function testPublicCacheReadReturnsNullOnInvalidItem()
+    {
+        $oItem = static::$oCache->public()->read('non-existing-file.txt');
+        $this->assertNull($oItem);
     }
 
     // --------------------------------------------------------------------------

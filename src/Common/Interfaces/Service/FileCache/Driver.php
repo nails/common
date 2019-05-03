@@ -37,9 +37,9 @@ interface Driver
      *
      * @param string $sKey The key of the item
      *
-     * @return Item
+     * @return Item|null
      */
-    public function read(string $sKey): Item;
+    public function read(string $sKey): ?Item;
 
     // --------------------------------------------------------------------------
 
