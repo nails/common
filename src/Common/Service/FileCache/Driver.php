@@ -1,20 +1,21 @@
 <?php
 
-namespace Nails\Common\Service\Cache\Driver;
+namespace Nails\Common\Service\FileCache;
 
+use Nails\Common\Exception\Directory\DirectoryDoesNotExistException;
 use Nails\Common\Exception\Directory\DirectoryIsNotWritableException;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Helper\Strings;
 use Nails\Common\Interfaces;
-use Nails\Common\Resource\Cache\Item;
+use Nails\Common\Resource\FileCache\Item;
 use Nails\Factory;
 
 /**
- * Class Cache
+ * Class Driver
  *
  * @package Nails\Common\Service\Cache
  */
-class Cache implements Interfaces\Service\Cache\Driver\Cache
+class Driver implements Interfaces\Service\FileCache\Driver
 {
     /**
      * The directory to use for the cache
@@ -30,6 +31,7 @@ class Cache implements Interfaces\Service\Cache\Driver\Cache
      *
      * @param string|null $sDir
      *
+     * @throws DirectoryDoesNotExistException
      * @throws DirectoryIsNotWritableException
      */
     public function __construct(string $sDir = null)
@@ -38,7 +40,11 @@ class Cache implements Interfaces\Service\Cache\Driver\Cache
             $this->sDir = Strings::addTrailingSlash($sDir);
         }
 
-        if (!is_writable($this->getDir())) {
+        if (!is_dir($this->getDir())) {
+            throw new DirectoryDoesNotExistException(
+                'Cache directory "' . $this->getDir() . '" does not exist'
+            );
+        } elseif (!is_writable($this->getDir())) {
             throw new DirectoryIsNotWritableException(
                 'Cache directory "' . $this->getDir() . '" is not writable'
             );

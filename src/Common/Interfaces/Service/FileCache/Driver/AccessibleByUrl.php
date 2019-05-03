@@ -1,13 +1,15 @@
 <?php
 
-namespace Nails\Common\Interfaces\Service\Cache\Driver;
+namespace Nails\Common\Interfaces\Service\FileCache\Driver;
+
+use Nails\Common\Interfaces\Service\FileCache\Driver;
 
 /**
  * Interface Cache
  *
  * @package Nails\Common\Interfaces\Service
  */
-interface AccessibleByUrl extends Cache
+interface AccessibleByUrl extends Driver
 {
     /**
      * Return the URL for the public cache

@@ -1,15 +1,16 @@
 <?php
 
-namespace Nails\Common\Service\Cache\Driver;
+namespace Nails\Common\Service\FileCache\Driver;
 
 use Nails\Common\Interfaces;
+use Nails\Common\Service\FileCache\Driver;
 
 /**
  * Class AccessibleByUrl
  *
  * @package Nails\Common\Service\Cache
  */
-class AccessibleByUrl extends Cache implements Interfaces\Service\Cache\Driver\AccessibleByUrl
+class AccessibleByUrl extends Driver implements Interfaces\Service\FileCache\Driver\AccessibleByUrl
 {
     /**
      * The directory to use for the cache

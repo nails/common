@@ -1,13 +1,13 @@
 <?php
 
-namespace Nails\Common\Resource\Cache;
+namespace Nails\Common\Resource\FileCache;
 
 use Nails\Common\Resource;
 
 /**
  * Class Item
  *
- * @package Nails\Common\Resource\Cache
+ * @package Nails\Common\Resource\FileCache
  */
 class Item extends Resource
 {

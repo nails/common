@@ -4,17 +4,17 @@ namespace Tests\Common\Service;
 
 use Nails\Common\Exception;
 use Nails\Common\Helper\Directory;
-use Nails\Common\Resource\Cache\Item;
-use Nails\Common\Service\Cache;
-use Nails\Common\Service\Cache\Driver;
+use Nails\Common\Resource\FileCache\Item;
+use Nails\Common\Service\FileCache;
+use Nails\Common\Service\FileCache\Driver;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Class CacheTest
+ * Class FileCacheTest
  *
  * @package Tests\Common\Service
  */
-class CacheTest extends TestCase
+class FileCacheTest extends TestCase
 {
     /**
      * @var string
@@ -28,17 +28,17 @@ class CacheTest extends TestCase
 
 
     /**
-     * @var Cache\Cache
+     * @var FileCache\Driver
      */
     protected static $oCachePrivate;
 
     /**
-     * @var Cache\AccessibleByUrl
+     * @var FileCache\Driver\AccessibleByUrl
      */
     protected static $oCachePublic;
 
     /**
-     * @var Cache
+     * @var FileCache
      */
     protected static $oCache;
 
@@ -60,14 +60,14 @@ class CacheTest extends TestCase
         file_put_contents(static::$sDirPrivate . 'existing-file.txt', 'Some data');
         file_put_contents(static::$sDirPublic . 'existing-file.txt', 'Some data');
 
-        static::$oCachePrivate = new Driver\Cache(
+        static::$oCachePrivate = new Driver(
             static::$sDirPrivate
         );
         static::$oCachePublic  = new Driver\AccessibleByUrl(
             static::$sDirPublic
         );
 
-        static::$oCache = new Cache(
+        static::$oCache = new FileCache(
             static::$oCachePrivate,
             static::$oCachePublic
         );
@@ -75,8 +75,33 @@ class CacheTest extends TestCase
 
     // --------------------------------------------------------------------------
 
+    public function testCacheThrowsExceptionOnInvalidMethod()
+    {
+        $this->expectException(
+            Exception\FileCacheException::class
+        );
+
+        static::$oCache->invalidMethod();
+    }
+
+    // --------------------------------------------------------------------------
+
+    public function testPrivateCacheThrowsExceptionOnInvalidDirectory()
+    {
+        $this->expectException(
+            Exception\Directory\DirectoryDoesNotExistException::class
+        );
+
+        $sDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . md5(microtime(true));
+        $this->assertDirectoryNotExists($sDir);
+
+        new Driver($sDir);
+    }
+
+    // --------------------------------------------------------------------------
+
     /**
-     * @covers \Nails\Common\Service\Cache\Cache::getDir
+     * @covers \Nails\Common\Service\FileCache\Driver::getDir
      */
     public function testPrivateCacheDirIsValid()
     {
@@ -89,7 +114,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\Cache::write
+     * @covers \Nails\Common\Service\FileCache\Driver::write
      */
     public function testCanWriteToPrivateCache()
     {
@@ -107,7 +132,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\Cache::write
+     * @covers \Nails\Common\Service\FileCache\Driver::write
      */
     public function testCanWriteToPrivateCacheWithoutKey()
     {
@@ -123,7 +148,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\Cache::read
+     * @covers \Nails\Common\Service\FileCache\Driver::read
      */
     public function testCanReadFromPrivateCache()
     {
@@ -138,7 +163,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\Cache::exists
+     * @covers \Nails\Common\Service\FileCache\Driver::exists
      */
     public function testCheckValidItemExistsInPrivateCache()
     {
@@ -148,7 +173,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\Cache::exists
+     * @covers \Nails\Common\Service\FileCache\Driver::exists
      */
     public function testCheckInvalidItemExistsInPrivateCache()
     {
@@ -158,7 +183,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\Cache::delete
+     * @covers \Nails\Common\Service\FileCache\Driver::delete
      */
     public function testCanDeleteValidItemFromPrivateCache()
     {
@@ -171,7 +196,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\Cache::delete
+     * @covers \Nails\Common\Service\FileCache\Driver::delete
      */
     public function testCanDeleteInvalidItemFromPrivateCache()
     {
@@ -183,7 +208,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache::public
+     * @covers \Nails\Common\Service\FileCache::public
      */
     public function testPublicCacheIsAccessible()
     {
@@ -195,8 +220,22 @@ class CacheTest extends TestCase
 
     // --------------------------------------------------------------------------
 
+    public function testPublicCacheThrowsExceptionOnInvalidDirectory()
+    {
+        $this->expectException(
+            Exception\Directory\DirectoryDoesNotExistException::class
+        );
+
+        $sDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . md5(microtime(true));
+        $this->assertDirectoryNotExists($sDir);
+
+        new Driver\AccessibleByUrl($sDir);
+    }
+
+    // --------------------------------------------------------------------------
+
     /**
-     * @covers \Nails\Common\Service\Cache\AccessibleByUrl::getDir
+     * @covers \Nails\Common\Service\FileCache\Driver\AccessibleByUrl::getDir
      */
     public function testPublicCacheDirIsValid()
     {
@@ -209,7 +248,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\AccessibleByUrl::write
+     * @covers \Nails\Common\Service\FileCache\Driver\AccessibleByUrl::write
      */
     public function testCanWriteToPublicCache()
     {
@@ -227,7 +266,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\AccessibleByUrl::write
+     * @covers \Nails\Common\Service\FileCache\Driver\AccessibleByUrl::write
      */
     public function testCanWriteToPublicCacheWithoutKey()
     {
@@ -243,7 +282,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\AccessibleByUrl::read
+     * @covers \Nails\Common\Service\FileCache\Driver\AccessibleByUrl::read
      */
     public function testCanReadFromPublicCache()
     {
@@ -258,7 +297,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\AccessibleByUrl::exists
+     * @covers \Nails\Common\Service\FileCache\Driver\AccessibleByUrl::exists
      */
     public function testCheckValidItemExistsInPublicCache()
     {
@@ -268,7 +307,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\AccessibleByUrl::exists
+     * @covers \Nails\Common\Service\FileCache\Driver\AccessibleByUrl::exists
      */
     public function testCheckInvalidItemExistsInPublicCache()
     {
@@ -278,7 +317,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\AccessibleByUrl::delete
+     * @covers \Nails\Common\Service\FileCache\Driver\AccessibleByUrl::delete
      */
     public function testCanDeleteValidItemFromPublicCache()
     {
@@ -290,7 +329,7 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Service\Cache\AccessibleByUrl::delete
+     * @covers \Nails\Common\Service\FileCache\Driver\AccessibleByUrl::delete
      */
     public function testCanDeleteInvalidItemFromPublicCache()
     {
@@ -303,7 +342,7 @@ class CacheTest extends TestCase
 
 
     /**
-     * @covers \Nails\Common\Service\Cache\AccessibleByUrl::getUrl
+     * @covers \Nails\Common\Service\FileCache\Driver\AccessibleByUrl::getUrl
      */
     public function testPublicCacheReturnsValidUrl()
     {

@@ -55,7 +55,6 @@ class Directory
      * @param string      $sPrefix      A prefix to use
      * @param int         $iMode        The mode of the created directory
      * @param int         $iMaxAttempts The maximum number of attempts
-     *                                  ¬
      *
      * @return string
      * @throws DirectoryDoesNotExistException
@@ -64,16 +63,17 @@ class Directory
      */
     public static function tempdir(string $sDir = null, string $sPrefix = 'tmp_', int $iMode = 0700, int $iMaxAttempts = 1000)
     {
-        /* Use the system temp dir by default. */
+        //  Use the system temp dir by default
         if (is_null($sDir)) {
             $sDir = sys_get_temp_dir();
         }
 
-        /* Trim trailing slashes from $sDir. */
+        //  Trim trailing slashes from $sDir
         $sDir = rtrim($sDir, DIRECTORY_SEPARATOR);
 
-        /* If we don't have permission to create a directory, fail, otherwise we will
-         * be stuck in an endless loop.
+        /**
+         * If we don't have permission to create a directory, fail, otherwise we will
+         * be stuck in an endless loop
          */
         if (!is_dir($sDir)) {
             throw new DirectoryDoesNotExistException(
@@ -85,14 +85,15 @@ class Directory
             );
         }
 
-        /* Make sure characters in prefix are safe. */
+        //  Make sure characters in prefix are safe
         if (strpbrk($sPrefix, '\\/:*?"<>|') !== false) {
             throw new DirectoryNameException(
                 '"' . $sDir . '" name contains invalid characters'
             );
         }
 
-        /* Attempt to create a random directory until it works. Abort if we reach
+        /**
+         * Attempt to create a random directory until it works. Abort if we reach
          * $iMaxAttempts. Something screwy could be happening with the filesystem
          * and our loop could otherwise become endless.
          */

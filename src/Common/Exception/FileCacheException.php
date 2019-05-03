@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Cache Exception
+ * FileCache Exception
  *
  * @package     Nails
  * @subpackage  common
@@ -12,6 +12,6 @@
 
 namespace Nails\Common\Exception;
 
-class CacheException extends NailsException
+class FileCacheException extends NailsException
 {
 }

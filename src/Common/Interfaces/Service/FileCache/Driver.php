@@ -1,15 +1,15 @@
 <?php
 
-namespace Nails\Common\Interfaces\Service\Cache\Driver;
+namespace Nails\Common\Interfaces\Service\FileCache;
 
-use Nails\Common\Resource\Cache\Item;
+use Nails\Common\Resource\FileCache\Item;
 
 /**
- * Interface Cache
+ * Interface Driver
  *
  * @package Nails\Common\Interfaces\Service
  */
-interface Cache
+interface Driver
 {
     /**
      * Return the absolute path for the cache
