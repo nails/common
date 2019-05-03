@@ -3,7 +3,6 @@
 namespace Nails\Common\Service\Cache;
 
 use Nails\Common\Interfaces\Service\Cache;
-use Nails\Common\Service\Config;
 
 /**
  * Class CachePublic
@@ -12,8 +11,30 @@ use Nails\Common\Service\Config;
  */
 class CachePublic extends CachePrivate implements Cache\CachePublic
 {
-    const DIR = 'public';
-    const URL = '';
+    /**
+     * The directory to use for the cache
+     *
+     * @var string
+     */
+    protected $sDir = NAILS_APP_PATH . 'cache' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR;
+
+    /**
+     * The URL for accessing the public cache
+     *
+     * @var string
+     */
+    protected $sUrl = BASE_URL . 'cache/public';
+
+    // --------------------------------------------------------------------------
+
+    public function __construct(string $sDir = null, string $sUrl = null)
+    {
+        parent::__construct($sDir);
+
+        if (!is_null($sUrl)) {
+            $this->sUrl = $sUrl;
+        }
+    }
 
     // --------------------------------------------------------------------------
 
@@ -26,11 +47,7 @@ class CachePublic extends CachePrivate implements Cache\CachePublic
      */
     public function getUrl(string $sKey = null): string
     {
-        if (static::URL) {
-            $sUrl = rtrim(static::URL, '/');
-        } else {
-            $sUrl = Config::siteUrl('cache/' . static::DIR);
-        }
+        $sUrl = rtrim($this->sUrl, '/');
         $sUrl .= $sKey ? '/' . $sKey : '';
         return $sUrl;
     }

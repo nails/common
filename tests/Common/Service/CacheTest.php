@@ -8,7 +8,6 @@ use Nails\Common\Interfaces\Service\Cache\CachePrivate;
 use Nails\Common\Interfaces\Service\Cache\CachePublic;
 use Nails\Common\Resource\Cache\Item;
 use Nails\Common\Service\Cache;
-use Nails\Common\Service\Config;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -47,7 +46,6 @@ class CacheTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @throws Exception\CacheException
      * @throws Exception\Directory\DirectoryDoesNotExistException
      * @throws Exception\Directory\DirectoryIsNotWritableException
      * @throws Exception\Directory\DirectoryNameException
@@ -278,17 +276,13 @@ class CacheTest extends TestCase
      */
     public function testPublicCacheReturnsValidUrl()
     {
-        if (function_exists('get_instance')) {
-            $this->assertEquals(
-                Config::siteUrl('cache/public'),
-                static::$oCache->public()->getUrl()
-            );
-            $this->assertEquals(
-                Config::siteUrl('cache/public/existing-file.txt'),
-                static::$oCache->public()->getUrl('existing-file.txt')
-            );
-        } else {
-            $this->markTestSkipped('Test cannot run as CodeIgniter is not available');
-        }
+        $this->assertEquals(
+            BASE_URL . 'cache/public',
+            static::$oCache->public()->getUrl()
+        );
+        $this->assertEquals(
+            BASE_URL . 'cache/public/existing-file.txt',
+            static::$oCache->public()->getUrl('existing-file.txt')
+        );
     }
 }

@@ -60,11 +60,11 @@ return [
                 return new \Nails\Common\Service\Cache\CachePrivate($sDir);
             }
         },
-        'CachePublic'    => function (string $sDir = null) {
+        'CachePublic'    => function (string $sDir = null, string $sUrl = null) {
             if (class_exists('\App\Common\Service\Cache\CachePublic')) {
-                return new \App\Common\Service\Cache\CachePublic($sDir);
+                return new \App\Common\Service\Cache\CachePublic($sDir, $sUrl);
             } else {
-                return new \Nails\Common\Service\Cache\CachePublic($sDir);
+                return new \Nails\Common\Service\Cache\CachePublic($sDir, $sUrl);
             }
         },
         'Config'         => function () {
