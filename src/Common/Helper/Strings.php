@@ -12,23 +12,25 @@
 
 namespace Nails\Common\Helper;
 
+use Axisofstevil\StopWords\Filter;
+
 class Strings
 {
     /**
-     * Replace the last occurance of a string within a string with a string
+     * Replace the last occurrence of a string within a string with a string
      *
-     * @param string $search  The substring to replace
-     * @param string $replace The string to replace the substring with
-     * @param string $subject The string to search
+     * @param string $sString  The substring to replace
+     * @param string $sReplace The string to replace the substring with
+     * @param string $sSubject The string to search
      *
      * @return string
      */
-    public static function replaceLastOccurance($sString, $sReplace, $sSubject)
+    public static function replaceLastOccurrence($sString, $sReplace, $sSubject)
     {
         $iPos = strrpos($sSubject, $sString);
 
         if ($iPos !== false) {
-            $sSubject = substr_replace($sSubject, $sReplace, $pos, strlen($sString));
+            $sSubject = substr_replace($sSubject, $sReplace, $iPos, strlen($sString));
         }
 
         return $sSubject;
@@ -73,7 +75,7 @@ class Strings
     /**
      * Adds a trailing slash to the input string if there isn't already one there
      *
-     * @param string The string to add a trailing shash to.
+     * @param string The string to add a trailing slash to.
      *
      * @return  string
      **/
@@ -93,7 +95,7 @@ class Strings
      **/
     public static function removeStopWords($sString)
     {
-        $oFilter = new \Axisofstevil\StopWords\Filter();
+        $oFilter = new Filter();
         return $oFilter->cleanText($sString);
     }
 

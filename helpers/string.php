@@ -5,7 +5,7 @@ use Nails\Common\Helper\Strings;
 if (!function_exists('str_lreplace')) {
     function str_lreplace($sSearch, $sReplace, $sSubject)
     {
-        return Strings::replaceLastOccurance($sSearch, $sReplace, $sSubject);
+        return Strings::replaceLastOccurrence($sSearch, $sReplace, $sSubject);
     }
 }
 
