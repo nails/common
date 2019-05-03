@@ -3,6 +3,7 @@
 use MimeType\MimeType;
 use MimeTyper\Repository\MimeDbRepository;
 use Nails\Common\Interfaces;
+use Nails\Common\Service\FileCache;
 use Nails\Environment;
 use Nails\Factory;
 
@@ -88,34 +89,46 @@ return [
             }
         },
         'FileCache'                      => function (
-            Interfaces\Service\FileCache\Driver\Cache $oPrivate = null,
+            Interfaces\Service\FileCache\Driver $oPrivate = null,
             Interfaces\Service\FileCache\Driver\AccessibleByUrl $oPublic = null
-        ) {
+        ): FileCache {
             if (class_exists('\App\Common\Service\FileCache')) {
-                return new \App\Common\Service\FileCache(
+                /** @var FileCache $oFileCache */
+                $oFileCache = new \App\Common\Service\FileCache(
                     $oPrivate ?? Factory::service('FileCacheDriver'),
                     $oPublic ?? Factory::service('FileCacheDriverAccessibleByUrl')
                 );
             } else {
-                return new \Nails\Common\Service\FileCache(
+                /** @var FileCache $oFileCache */
+                $oFileCache = new \Nails\Common\Service\FileCache(
                     $oPrivate ?? Factory::service('FileCacheDriver'),
                     $oPublic ?? Factory::service('FileCacheDriverAccessibleByUrl')
                 );
             }
+
+            return $oFileCache;
         },
-        'FileCacheDriver'                => function (string $sDir = null) {
-            if (class_exists('\App\Common\Service\FileCache\Driver\Cache')) {
-                return new \App\Common\Service\FileCache\Driver\Cache($sDir);
+        'FileCacheDriver'                => function (string $sDir = null): FileCache\Driver {
+            if (class_exists('\App\Common\Service\FileCache\Driver')) {
+                /** @var FileCache\Driver $oDriver */
+                $oDriver = new \App\Common\Service\FileCache\Driver($sDir);
             } else {
-                return new \Nails\Common\Service\FileCache\Driver\Cache($sDir);
+                /** @var FileCache\Driver $oDriver */
+                $oDriver = new \Nails\Common\Service\FileCache\Driver($sDir);
             }
+
+            return $oDriver;
         },
-        'FileCacheDriverAccessibleByUrl' => function (string $sDir = null, string $sUrl = null) {
+        'FileCacheDriverAccessibleByUrl' => function (string $sDir = null, string $sUrl = null): FileCache\Driver\AccessibleByUrl {
             if (class_exists('\AApp\Common\Service\FileCache\Driver\AccessibleByUrl')) {
-                return new \App\Common\Service\FileCache\Driver\AccessibleByUrl($sDir, $sUrl);
+                /** @var FileCache\Driver\AccessibleByUrl $oDriver */
+                $oDriver = new \App\Common\Service\FileCache\Driver\AccessibleByUrl($sDir, $sUrl);
             } else {
-                return new \Nails\Common\Service\FileCache\Driver\AccessibleByUrl($sDir, $sUrl);
+                /** @var FileCache\Driver\AccessibleByUrl $oDriver */
+                $oDriver = new \Nails\Common\Service\FileCache\Driver\AccessibleByUrl($sDir, $sUrl);
             }
+
+            return $oDriver;
         },
         'FormValidation'                 => function () {
             if (class_exists('\App\Common\Service\FormValidation')) {
