@@ -171,7 +171,7 @@ class Driver implements Interfaces\Service\FileCache\Driver
             $oItem = new Item($oObj);
         } else {
             /** @var Item $oItem */
-            $oItem = Factory::resource('CacheItem', null, $oObj);
+            $oItem = Factory::resource('FileCacheItem', null, $oObj);
         }
 
         return $oItem;

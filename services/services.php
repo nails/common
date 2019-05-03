@@ -403,13 +403,6 @@ return [
         },
     ],
     'resources'  => [
-        'CacheItem'       => function ($oObj) {
-            if (class_exists('\App\Common\Resource\Cache\Item')) {
-                return new \App\Common\Resource\Cache\Item($oObj);
-            } else {
-                return new \Nails\Common\Resource\Cache\Item($oObj);
-            }
-        },
         'Cookie'          => function ($oObj) {
             if (class_exists('\App\Common\Resource\Cookie')) {
                 return new \App\Common\Resource\Cookie($oObj);
@@ -422,6 +415,13 @@ return [
                 return new \App\Common\Resource\ExpandableField();
             } else {
                 return new \Nails\Common\Resource\ExpandableField();
+            }
+        },
+        'FileCacheItem'   => function ($oObj) {
+            if (class_exists('\App\Common\Resource\FileCache\Item')) {
+                return new \App\Common\Resource\FileCache\Item($oObj);
+            } else {
+                return new \Nails\Common\Resource\FileCache\Item($oObj);
             }
         },
         'Resource'        => function ($oObj) {
