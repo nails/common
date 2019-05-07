@@ -76,7 +76,6 @@ abstract class Base
      */
     const EXPAND_ALL = 'ALL';
 
-
     /**
      * The trigger to fire when an item is created
      *
@@ -2425,7 +2424,7 @@ abstract class Base
                 }, $aSupportedLocales)
             );
 
-            $aFields[] = (object) [
+            $aFields['locale'] = (object) [
                 'key'        => 'locale',
                 'label'      => 'Locale',
                 'type'       => 'dropdown',
@@ -2440,6 +2439,7 @@ abstract class Base
 
         foreach ($aResult as $oField) {
 
+            //  @todo (Pablo - 2019-05-07) - Use a resource here and not \stdClass
             $oTemp = (object) [
                 'key'        => $oField->Field,
                 'label'      => $this->describeFieldsPrepareLabel($oField->Field),
