@@ -18,9 +18,9 @@ if (!function_exists('form_text')) {
     /**
      * Alias of form_input
      *
-     * @param    mixed
-     * @param    string
-     * @param    mixed
+     * @param mixed
+     * @param string
+     * @param mixed
      *
      * @return    string
      */
@@ -35,9 +35,9 @@ if (!function_exists('form_email')) {
     /**
      * Generates an input using the "email" type
      *
-     * @param  mixed  $data  The field's name or the config array
-     * @param  mixed  $value The form element's value
-     * @param  string $extra Any additional attributes to give to the field
+     * @param mixed  $data  The field's name or the config array
+     * @param mixed  $value The form element's value
+     * @param string $extra Any additional attributes to give to the field
      *
      * @return string
      */
@@ -60,9 +60,9 @@ if (!function_exists('form_tel')) {
     /**
      * Generates an input using the "tel" type
      *
-     * @param  mixed  $data  The field's name or the config array
-     * @param  mixed  $value The form element's value
-     * @param  string $extra Any additional attributes to give to the field
+     * @param mixed  $data  The field's name or the config array
+     * @param mixed  $value The form element's value
+     * @param string $extra Any additional attributes to give to the field
      *
      * @return string
      */
@@ -85,9 +85,9 @@ if (!function_exists('form_number')) {
     /**
      * Generates an input using the "number" type
      *
-     * @param  mixed  $data  The field's name or the config array
-     * @param  mixed  $value The form element's value
-     * @param  string $extra Any additional attributes to give to the field
+     * @param mixed  $data  The field's name or the config array
+     * @param mixed  $value The form element's value
+     * @param string $extra Any additional attributes to give to the field
      *
      * @return string
      */
@@ -111,9 +111,9 @@ if (!function_exists('form_url')) {
     /**
      * Generates an input using the "url" type
      *
-     * @param  mixed  $data  The field's name or the config array
-     * @param  mixed  $value The form element's value
-     * @param  string $extra Any additional attributes to give to the field
+     * @param mixed  $data  The field's name or the config array
+     * @param mixed  $value The form element's value
+     * @param string $extra Any additional attributes to give to the field
      *
      * @return string
      */
@@ -136,9 +136,9 @@ if (!function_exists('form_date')) {
     /**
      * Generates an input using the "date" type
      *
-     * @param  mixed  $data  The field's name or the config array
-     * @param  mixed  $value The form element's value
-     * @param  string $extra Any additional attributes to give to the field
+     * @param mixed  $data  The field's name or the config array
+     * @param mixed  $value The form element's value
+     * @param string $extra Any additional attributes to give to the field
      *
      * @return string
      */
@@ -161,9 +161,9 @@ if (!function_exists('form_time')) {
     /**
      * Generates an input using the "time" type
      *
-     * @param  mixed  $data  The field's name or the config array
-     * @param  mixed  $value The form element's value
-     * @param  string $extra Any additional attributes to give to the field
+     * @param mixed  $data  The field's name or the config array
+     * @param mixed  $value The form element's value
+     * @param string $extra Any additional attributes to give to the field
      *
      * @return string
      */
@@ -186,9 +186,9 @@ if (!function_exists('form_color')) {
     /**
      * Generates an input using the "date" type
      *
-     * @param  mixed  $data  The field's name or the config array
-     * @param  mixed  $value The form element's value
-     * @param  string $extra Any additional attributes to give to the field
+     * @param mixed  $data  The field's name or the config array
+     * @param mixed  $value The form element's value
+     * @param string $extra Any additional attributes to give to the field
      *
      * @return string
      */
@@ -211,9 +211,9 @@ if (!function_exists('form_datetime')) {
     /**
      * Generates an input using the "datetime" type
      *
-     * @param  mixed  $data  The field's name or the config array
-     * @param  mixed  $value The form element's value
-     * @param  string $extra Any additional attributes to give to the field
+     * @param mixed  $data  The field's name or the config array
+     * @param mixed  $value The form element's value
+     * @param string $extra Any additional attributes to give to the field
      *
      * @return string
      */
@@ -237,9 +237,9 @@ if (!function_exists('form_open')) {
      * Form Declaration
      * Creates the opening portion of the form, taking into account Secure base URL
      *
-     * @param   string  the URI segments of the form destination
-     * @param   array   a key/value pair of attributes
-     * @param   array   a key/value pair hidden data
+     * @param string  the URI segments of the form destination
+     * @param array   a key/value pair of attributes
+     * @param array   a key/value pair hidden data
      *
      * @return  string
      */
@@ -303,8 +303,8 @@ if (!function_exists('form_field')) {
     /**
      * Generates a form field
      *
-     * @param  array  $field The config array
-     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $field The config array
+     * @param string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string        The form HTML
      */
@@ -540,8 +540,8 @@ if (!function_exists('form_field_email')) {
     /**
      * Generates a form field using the "email" input type
      *
-     * @param  array  $field The config array
-     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $field The config array
+     * @param string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string        The form HTML
      */
@@ -559,8 +559,8 @@ if (!function_exists('form_field_number')) {
     /**
      * Generates a form field using the "number" input type
      *
-     * @param  array  $field The config array
-     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $field The config array
+     * @param string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string        The form HTML
      */
@@ -578,8 +578,8 @@ if (!function_exists('form_field_url')) {
     /**
      * Generates a form field using the "url" input type
      *
-     * @param  array  $field The config array
-     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $field The config array
+     * @param string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string        The form HTML
      */
@@ -597,8 +597,8 @@ if (!function_exists('form_field_tel')) {
     /**
      * Generates a form field using the "url" input type
      *
-     * @param  array  $field The config array
-     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $field The config array
+     * @param string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string        The form HTML
      */
@@ -616,8 +616,8 @@ if (!function_exists('form_field_color')) {
     /**
      * Generates a form field using the "color" input type
      *
-     * @param  array  $field The config array
-     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $field The config array
+     * @param string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string        The form HTML
      */
@@ -635,8 +635,8 @@ if (!function_exists('form_field_password')) {
     /**
      * Generates a form field using the "password" input type
      *
-     * @param  array  $field The config array
-     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $field The config array
+     * @param string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string        The form HTML
      */
@@ -654,8 +654,8 @@ if (!function_exists('form_field_textarea')) {
     /**
      * Generates a form field using the "textarea" input type
      *
-     * @param  array  $field The config array
-     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $field The config array
+     * @param string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string        The form HTML
      */
@@ -674,8 +674,8 @@ if (!function_exists('form_field_wysiwyg')) {
      * Generates a form field using the "textarea" input type, and sets it's class
      * to "wysiwyg"
      *
-     * @param  array  $field The config array
-     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $field The config array
+     * @param string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string        The form HTML
      */
@@ -700,8 +700,8 @@ if (!function_exists('form_field_text')) {
     /**
      * Generates a form field using the "text" input type
      *
-     * @param  array  $field The config array
-     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $field The config array
+     * @param string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string        The form HTML
      */
@@ -719,12 +719,12 @@ if (!function_exists('form_field_cdn_object_picker')) {
     /**
      * Generates a form field containing the media manager to select a file.
      *
-     * @todo  when form builder is updated, ensure that other things can create custom field types
-     *
-     * @param  array  $field The config array
-     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $field The config array
+     * @param string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string        The form HTML
+     * @todo  when form builder is updated, ensure that other things can create custom field types
+     *
      */
     function form_field_cdn_object_picker($field, $tip = '')
     {
@@ -849,12 +849,12 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
     /**
      * Generates a form field containing multiple object pickers
      *
-     * @todo  when form builder is updated, ensure that other things can create custom field types
-     *
-     * @param  array  $field The config array
-     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $field The config array
+     * @param string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string        The form HTML
+     * @todo  when form builder is updated, ensure that other things can create custom field types
+     *
      */
     function form_field_cdn_object_picker_multi($field, $tip = '')
     {
@@ -1074,12 +1074,12 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
     /**
      * Generates a form field containing multiple object pickers
      *
-     * @todo  when form builder is updated, ensure that other things can create custom field types
-     *
-     * @param  array  $aConfig The config array
-     * @param  string $sTip    An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $aConfig The config array
+     * @param string $sTip    An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string        The form HTML
+     * @todo  when form builder is updated, ensure that other things can create custom field types
+     *
      */
     function form_field_cdn_object_picker_multi_with_label($aConfig, $sTip = '')
     {
@@ -1170,10 +1170,12 @@ if (!function_exists('form_field_cdn_object_picker_multi_with_label')) {
         // --------------------------------------------------------------------------
 
         if ($sFieldSortable) {
+            $sFieldSrotableClass   = 'js-admin-sortable';
             $sFieldSortableHandle  = '<td class="handle" width="25"><b class="fa fa-bars"></b></td>';
             $sFieldSortableColspan = 'colspan="2"';
             $sFieldSortableOrder   = '<input type="hidden" name="' . $sFieldKey . '[{{index}}][order]" value="{{index}}" class="js-admin-sortable__order">';
         } else {
+            $sFieldSrotableClass   = '';
             $sFieldSortableHandle  = '';
             $sFieldSortableColspan = '';
             $sFieldSortableOrder   = '';
@@ -1265,7 +1267,7 @@ EOT;
                                 <th width="*">$sFieldTableLabelLabel</th>
                                 <th width="10"></th>
                             </thead>
-                            <tbody class="js-row-target js-admin-sortable">
+                            <tbody class="js-row-target $sFieldSrotableClass">
                                 $sDefaultHtml
                             </tbody>
                             <tbody>
@@ -1301,12 +1303,12 @@ if (!function_exists('form_field_mm')) {
     /**
      * Generates a form field containing the media manager to select a file.
      *
-     * @deprecated Use form_field_cdn_object_picker instead
-     *
-     * @param  array  $aField The config array
-     * @param  string $sTip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $aField The config array
+     * @param string $sTip   An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string         The form HTML
+     * @deprecated Use form_field_cdn_object_picker instead
+     *
      */
     function form_field_mm($aField, $sTip = '')
     {
@@ -1321,12 +1323,12 @@ if (!function_exists('form_field_mm_image')) {
     /**
      * Generates a form field containing the media manager to select an image
      *
-     * @deprecated Use form_field_cdn_object_picker instead
-     *
-     * @param  array  $aField The config array
-     * @param  string $sTip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $aField The config array
+     * @param string $sTip   An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string         The form HTML
+     * @deprecated Use form_field_cdn_object_picker instead
+     *
      */
     function form_field_mm_image($aField, $sTip = '')
     {
@@ -1341,8 +1343,8 @@ if (!function_exists('form_field_date')) {
     /**
      * Generates a form field for dates
      *
-     * @param  array  $field The config array
-     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $field The config array
+     * @param string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string        The form HTML
      */
@@ -1365,8 +1367,8 @@ if (!function_exists('form_field_time')) {
     /**
      * Generates a form field for times
      *
-     * @param  array  $field The config array
-     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $field The config array
+     * @param string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string        The form HTML
      */
@@ -1389,8 +1391,8 @@ if (!function_exists('form_field_datetime')) {
     /**
      * Generates a form field for datetimes
      *
-     * @param  array  $field The config array
-     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $field The config array
+     * @param string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string        The form HTML
      */
@@ -1413,9 +1415,9 @@ if (!function_exists('form_field_dropdown')) {
     /**
      * Generates a form field using the "select" input type
      *
-     * @param  array  $field   The config array
-     * @param  array  $options The options to use for the dropdown (DEPRECATED: use $field['options'] instead)
-     * @param  string $tip     An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $field   The config array
+     * @param array  $options The options to use for the dropdown (DEPRECATED: use $field['options'] instead)
+     * @param string $tip     An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string          The form HTML
      */
@@ -1557,9 +1559,9 @@ if (!function_exists('form_field_dropdown_multiple')) {
     /**
      * Generates a form field using the "select" input type, with multiple selections allowed
      *
-     * @param  array  $field   The config array
-     * @param  array  $options The options to use for the dropdown (DEPRECATED: use $field['options'] instead)
-     * @param  string $tip     An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $field   The config array
+     * @param array  $options The options to use for the dropdown (DEPRECATED: use $field['options'] instead)
+     * @param string $tip     An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string          The form HTML
      */
@@ -1695,8 +1697,8 @@ if (!function_exists('form_field_boolean')) {
     /**
      * Generates a form field using the "select" input type containing two options.
      *
-     * @param  array  $field The config array
-     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $field The config array
+     * @param string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string        The form HTML
      */
@@ -1787,9 +1789,9 @@ if (!function_exists('form_field_radio')) {
     /**
      * Generates a form field using the "radio" input type
      *
-     * @param  array  $field   The config array
-     * @param  array  $options The options to use for the radios (DEPRECATED: use $field['options'] instead)
-     * @param  string $tip     An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $field   The config array
+     * @param array  $options The options to use for the radios (DEPRECATED: use $field['options'] instead)
+     * @param string $tip     An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string          The form HTML
      */
@@ -1807,9 +1809,9 @@ if (!function_exists('form_field_checkbox')) {
     /**
      * Generates a form field using the "checkbox" input type
      *
-     * @param  array  $field   The config array
-     * @param  array  $options The options to use for the checkboxes (DEPRECATED: use $field['options'] instead)
-     * @param  string $tip     An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $field   The config array
+     * @param array  $options The options to use for the checkboxes (DEPRECATED: use $field['options'] instead)
+     * @param string $tip     An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string          The form HTML
      */
@@ -2019,12 +2021,12 @@ if (!function_exists('form_field_cms_widgets')) {
     /**
      * Generates a form field containing a button to open the CMS widgets manager
      *
-     * @todo oh God, sort this file out, use a proper form building class
-     *
-     * @param  array  $field The config array
-     * @param  string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
+     * @param array  $field The config array
+     * @param string $tip   An optional tip (DEPRECATED: use $field['tip'] instead)
      *
      * @return string        The form HTML
+     * @todo oh God, sort this file out, use a proper form building class
+     *
      */
     function form_field_cms_widgets($field, $tip = '')
     {
@@ -2126,9 +2128,9 @@ if (!function_exists('form_field_submit')) {
     /**
      * Generates a submit button which is aligned properly with the form_field_* functions
      *
-     * @param  string $button_value      The value to give the button
-     * @param  string $button_name       The name to give the button
-     * @param  string $button_attributes Any additional attributes to give the button
+     * @param string $button_value      The value to give the button
+     * @param string $button_name       The name to give the button
+     * @param string $button_attributes Any additional attributes to give the button
      *
      * @return string                    The form HTML
      */
@@ -2163,13 +2165,13 @@ if (!function_exists('form_field_render')) {
      * This function renders a generic form field; the actual contents of the
      * form field must be passed in via $aField's html parameter
      *
-     * @todo - Implement this into the other functions so all are the same
-     * @todo - Turn this into a class
-     *
      * @param array  $aField The configuration array
      * @param string $sTip   The tip (deprecated, pass in through $aField)
      *
      * @return string
+     * @todo - Turn this into a class
+     *
+     * @todo - Implement this into the other functions so all are the same
      */
     function form_field_render($aField, $sTip = null)
     {
