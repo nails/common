@@ -120,7 +120,7 @@ return [
             return $oDriver;
         },
         'FileCacheDriverAccessibleByUrl' => function (string $sDir = null, string $sUrl = null): FileCache\Driver\AccessibleByUrl {
-            if (class_exists('\AApp\Common\Service\FileCache\Driver\AccessibleByUrl')) {
+            if (class_exists('\App\Common\Service\FileCache\Driver\AccessibleByUrl')) {
                 /** @var FileCache\Driver\AccessibleByUrl $oDriver */
                 $oDriver = new \App\Common\Service\FileCache\Driver\AccessibleByUrl($sDir, $sUrl);
             } else {
