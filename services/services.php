@@ -394,6 +394,13 @@ return [
                 return new \Nails\Common\Factory\Locale\Script($sLabel);
             }
         },
+        'ModelField'        => function () {
+            if (class_exists('\App\Common\Factory\Model\Field')) {
+                return new \App\Common\Factory\Model\Field();
+            } else {
+                return new \Nails\Common\Factory\Model\Field();
+            }
+        },
         'Pagination'        => function () {
             if (class_exists('\App\Common\Factory\Pagination')) {
                 return new \App\Common\Factory\Pagination();

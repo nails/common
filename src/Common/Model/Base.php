@@ -15,6 +15,7 @@ namespace Nails\Common\Model;
 use Behat\Transliterator\Transliterator;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\ModelException;
+use Nails\Common\Factory\Model\Field;
 use Nails\Common\Helper\ArrayHelper;
 use Nails\Common\Resource;
 use Nails\Common\Service\Locale;
@@ -2403,10 +2404,11 @@ abstract class Base
      *
      * @param string|null $sTable The database table to query
      *
-     * @return array
+     * @return Field[]
      */
     public function describeFields($sTable = null)
     {
+        //  @todo (Pablo - 2019-05-09) - This doesn't feel right
         $sTable  = $sTable ?: $this->getTableName();
         $oDb     = Factory::service('Database');
         $aResult = $oDb->query('DESCRIBE `' . $sTable . '`;')->result();
@@ -2424,30 +2426,27 @@ abstract class Base
                 }, $aSupportedLocales)
             );
 
-            $aFields['locale'] = (object) [
-                'key'        => 'locale',
-                'label'      => 'Locale',
-                'type'       => 'dropdown',
-                'allow_null' => false,
-                'validation' => ['required', 'supportedLocale'],
-                'options'    => $aOptions,
-                'class'      => 'select2',
-                'info'       => 'This field specifies what language the item is written in.',
-                'default'    => $oLocale->getDefautLocale(),
-            ];
+            $oTemp             = Factory::factory('ModelField');
+            $oTemp->key        = 'locale';
+            $oTemp->label      = 'Locale';
+            $oTemp->type       = 'dropdown';
+            $oTemp->allow_null = false;
+            $oTemp->validation = ['required', 'supportedLocale'];
+            $oTemp->options    = $aOptions;
+            $oTemp->class      = 'select2';
+            $oTemp->info       = 'This field specifies what language the item is written in.';
+            $oTemp->default    = $oLocale->getDefautLocale();
+
+            $aFields['locale'] = $oTemp;
         }
 
         foreach ($aResult as $oField) {
 
-            //  @todo (Pablo - 2019-05-07) - Use a resource here and not \stdClass
-            $oTemp = (object) [
-                'key'        => $oField->Field,
-                'label'      => $this->describeFieldsPrepareLabel($oField->Field),
-                'type'       => null,
-                'allow_null' => $oField->Null === 'YES',
-                'validation' => [],
-                'default'    => null,
-            ];
+            $oTemp             = Factory::factory('ModelField');
+            $oTemp->key        = $oField->Field;
+            $oTemp->label      = $this->describeFieldsPrepareLabel($oField->Field);
+            $oTemp->allow_null = $oField->Null === 'YES';
+            $oTemp->validation = [];
 
             //  Guess the field's type and some basic validation
             $this->describeFieldsGuessType($oTemp, $oField->Type);
