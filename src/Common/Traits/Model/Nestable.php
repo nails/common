@@ -3,6 +3,7 @@
 namespace Nails\Common\Traits\Model;
 
 use Nails\Common\Service\Database;
+use Nails\Common\Resource;
 use Nails\Factory;
 
 /**
@@ -38,10 +39,10 @@ trait Nestable
     /**
      * Fetch an object by it's ID
      *
-     * @param  int   $iId   The ID of the object to fetch
-     * @param  mixed $aData Any data to pass to getCountCommon()
+     * @param int   $iId   The ID of the object to fetch
+     * @param mixed $aData Any data to pass to getCountCommon()
      *
-     * @return \stdClass|false
+     * @return Resource|false
      */
     abstract public function getById($iId, array $aData = []);
 
@@ -219,12 +220,15 @@ trait Nestable
     /**
      * Builds a tree of objects
      *
+     * This will only return complete trees beginning with the supplied $iParentId
+     *
      * @param array $aItems    The items to sort
      * @param int   $iParentId The parent ID to sort on
      *
      * @return array
+     * @todo (Pablo - 2019-05-10) - Support building partial trees
      */
-    protected function buildTree(array &$aItems, int $iParentId = null): array
+    public function buildTree(array $aItems, int $iParentId = null): array
     {
         $aTemp         = [];
         $sIdColumn     = $this->getColumn('id');
@@ -249,7 +253,7 @@ trait Nestable
      *
      * @return array
      */
-    protected function flattenTree(array $aItems, &$aOutput = []): array
+    public function flattenTree(array $aItems, &$aOutput = []): array
     {
         foreach ($aItems as $oItem) {
             $aOutput[] = $oItem;
@@ -265,11 +269,11 @@ trait Nestable
     /**
      * Generates the URL for nestable objects; optionally place under a URL namespace
      *
-     * @param \stdClass $oObj The object to generate the URL for
+     * @param Resource $oObj The object to generate the URL for
      *
      * @return string|null
      */
-    public function generateUrl($oObj)
+    public function generateUrl(Resource $oObj)
     {
         if (empty($oObj->breadcrumbs)) {
             return null;
