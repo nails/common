@@ -90,5 +90,5 @@ class Field
      *
      * @var array
      */
-    public $data;
+    public $data = [];
 }
