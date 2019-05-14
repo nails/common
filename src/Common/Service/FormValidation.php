@@ -24,6 +24,8 @@ use Nails\Factory;
  *
  * @property $validation_data = []
  *
+ * The following are provied natively by CodeIgniter's FormValidation library
+ *
  * @method set_rules($field, $label = '', $rules = [], $errors = [])
  * @method set_data(array $data)
  * @method set_message($lang, $val = '')
@@ -41,12 +43,10 @@ use Nails\Factory;
  * @method regex_match($str, $regex)
  * @method matches($str, $field)
  * @method differs($str, $field)
- * @method is_unique($str, $field)
  * @method min_length($str, $val)
  * @method max_length($str, $val)
  * @method exact_length($str, $val)
  * @method valid_url($str)
- * @method valid_email($str)
  * @method valid_emails($str)
  * @method valid_ip($ip, $which = '')
  * @method alpha($str)
@@ -69,6 +69,40 @@ use Nails\Factory;
  * @method strip_image_tags($str)
  * @method encode_php_tags($str)
  * @method reset_validation()
+ *
+ *
+ * The following are provied by the Nails FormValidation extension
+ *
+ * @method getRules(): array
+ * @method unique_if_diff($new, $params)
+ * @method valid_postcode($str)
+ * @method item_count(array $aArray, $sParam)
+ * @method valid_date($sDate, $sFormat)
+ * @method date_future($sDate, $sFormat)
+ * @method date_past($sDate, $sFormat)
+ * @method date_today($sDate, $sFormat)
+ * @method date_before($sDate, $sParams)
+ * @method date_after($sDate, $sParams)
+ * @method valid_datetime($sDateTime, $sFormat)
+ * @method datetime_future($sDateTime, $sFormat)
+ * @method datetime_past($sDateTime, $sFormat)
+ * @method datetime_before($sDateTime, $sParams)
+ * @method datetime_after($sDateTime, $sParams)
+ * @method valid_time($sTime, $sFormat)
+ * @method time_future($sTime, $sFormat)
+ * @method time_past($sTime, $sFormat)
+ * @method time_before($sTime, $sParams)
+ * @method time_after($sTime, $sParams)
+ * @method in_range($str, $field)
+ * @method valid_email($str)
+ * @method alpha_dash_period($str)
+ * @method cdnObjectPickerMultiObjectRequired($aValues)
+ * @method cdnObjectPickerMultiLabelRequired($aValues)
+ * @method cdnObjectPickerMultiAllRequired($aValues)
+ * @method is_unique($sString, $sParameters)
+ * @method is_bool($bValue)
+ * @method supportedLocale($sValue)
+ * @method is($sValue, $sExpected)
  */
 class FormValidation
 {
