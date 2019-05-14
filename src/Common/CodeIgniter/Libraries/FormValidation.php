@@ -38,13 +38,16 @@ class FormValidation extends CI_Form_validation
     // --------------------------------------------------------------------------
 
     /**
-     * Returns the form validation error array.
+     * Returns the current ruleset
      *
      * @return array
      */
-    public function get_error_array()
+    public function getRules(): array
     {
-        return $this->_error_array;
+        return array_combine(
+            array_keys($this->_field_data),
+            arrayExtractProperty($this->_field_data, 'rules')
+        );
     }
 
     // --------------------------------------------------------------------------
