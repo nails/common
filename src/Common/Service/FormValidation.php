@@ -5,19 +5,76 @@
  *
  * @todo (Pablo - 2018-04-18) - Remove dependency on CI
  *
- * @package     Nails
- * @subpackage  common
- * @category    Service
- * @author      Nails Dev Team
+ * @package                   Nails
+ * @subpackage                common
+ * @category                  Service
+ * @author                    Nails Dev Team
  * @link
  */
 
 namespace Nails\Common\Service;
 
+use Nails\Common\Factory\Service\FormValidation\Validator;
+use Nails\Factory;
+
+/**
+ * Class FormValidation
+ *
+ * @package Nails\Common\Service
+ *
+ * @property $validation_data = []
+ *
+ * @method set_rules($field, $label = '', $rules = [], $errors = [])
+ * @method set_data(array $data)
+ * @method set_message($lang, $val = '')
+ * @method set_error_delimiters($prefix = '<p>', $suffix = '</p>')
+ * @method error($field, $prefix = '', $suffix = '')
+ * @method error_array()
+ * @method error_string($prefix = '', $suffix = '')
+ * @method run($group = '')
+ * @method has_rule($field)
+ * @method set_value($field = '', $default = '')
+ * @method set_select($field = '', $value = '', $default = false)
+ * @method set_radio($field = '', $value = '', $default = false)
+ * @method set_checkbox($field = '', $value = '', $default = false)
+ * @method required($str)
+ * @method regex_match($str, $regex)
+ * @method matches($str, $field)
+ * @method differs($str, $field)
+ * @method is_unique($str, $field)
+ * @method min_length($str, $val)
+ * @method max_length($str, $val)
+ * @method exact_length($str, $val)
+ * @method valid_url($str)
+ * @method valid_email($str)
+ * @method valid_emails($str)
+ * @method valid_ip($ip, $which = '')
+ * @method alpha($str)
+ * @method alpha_numeric($str)
+ * @method alpha_numeric_spaces($str)
+ * @method alpha_dash($str)
+ * @method numeric($str)
+ * @method integer($str)
+ * @method decimal($str)
+ * @method greater_than($str, $min)
+ * @method greater_than_equal_to($str, $min)
+ * @method less_than($str, $max)
+ * @method less_than_equal_to($str, $max)
+ * @method in_list($value, $list)
+ * @method is_natural($str)
+ * @method is_natural_no_zero($str)
+ * @method valid_base64($str)
+ * @method prep_for_form($data)
+ * @method prep_url($str = '')
+ * @method strip_image_tags($str)
+ * @method encode_php_tags($str)
+ * @method reset_validation()
+ */
 class FormValidation
 {
     /**
      * The CI_Form_validation object
+     *
      * @var \CI_Form_validation
      */
     private $oFormValidation;
@@ -39,19 +96,16 @@ class FormValidation
     /**
      * Route calls to the CodeIgniter FormValidation class
      *
-     * @param  string $sMethod    The method being called
-     * @param  array  $aArguments Any arguments being passed
+     * @param string $sMethod    The method being called
+     * @param array  $aArguments Any arguments being passed
      *
      * @return mixed
      */
     public function __call($sMethod, $aArguments)
     {
         if (method_exists($this, $sMethod)) {
-
             return call_user_func_array([$this, $sMethod], $aArguments);
-
         } else {
-
             return call_user_func_array([$this->oFormValidation, $sMethod], $aArguments);
         }
     }
@@ -61,7 +115,7 @@ class FormValidation
     /**
      * Pass any property "gets" to the CodeIgniter FormValidation class
      *
-     * @param  string $sProperty The property to get
+     * @param string $sProperty The property to get
      *
      * @return mixed
      */
@@ -75,13 +129,37 @@ class FormValidation
     /**
      * Pass any property "sets" to the CodeIgniter FormValidation class
      *
-     * @param  string $sProperty The property to set
-     * @param  mixed  $mValue    The value to set
+     * @param string $sProperty The property to set
+     * @param mixed  $mValue    The value to set
      *
      * @return void
      */
     public function __set($sProperty, $mValue)
     {
         $this->oFormValidation->{$sProperty} = $mValue;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Builds a validator
+     *
+     * @param array      $aRules    The validation rules in a key => value format, with
+     *                              value being the rules either as an array or pipe separated string
+     * @param array      $aMessages An array of error message overrides
+     * @param array|null $aData     The data to validate, defaults to $_POST
+     *
+     * @return Validator
+     */
+    public function buildValidator(array $aRules = [], array $aMessages = [], array $aData = null)
+    {
+        $oInput = Factory::service('Input');
+        return Factory::factory(
+            'FormValidationValidator',
+            null,
+            $aRules,
+            $aMessages,
+            $aData ?? $oInput->post()
+        );
     }
 }

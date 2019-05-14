@@ -303,66 +303,77 @@ return [
         },
     ],
     'factories'  => [
-        'DateTime'          => function ($sTime = 'now', DateTimeZone $oTimeZone = null) {
+        'DateTime'              => function ($sTime = 'now', DateTimeZone $oTimeZone = null) {
             return new \DateTime($sTime, $oTimeZone);
         },
-        'EventSubscription' => function () {
+        'EventSubscription'     => function () {
             if (class_exists('\App\Common\Events\Subscription')) {
                 return new \App\Common\Events\Subscription();
             } else {
                 return new \Nails\Common\Events\Subscription();
             }
         },
-        'HttpClient'        => function (array $aConfig = []) {
+        'FormValidationValidator' => function (
+            array $aRules = [],
+            array $aMessages = [],
+            array $aData = []
+        ) {
+            if (class_exists('\App\Common\Factory\Service\FormValidation\Validator')) {
+                return new \App\Common\Factory\Service\FormValidation\Validator($aRules, $aMessages, $aData);
+            } else {
+                return new \Nails\Common\Factory\Service\FormValidation\Validator($aRules, $aMessages, $aData);
+            }
+        },
+        'HttpClient'            => function (array $aConfig = []) {
             if (class_exists('\App\Common\HttpClient')) {
                 return new \App\Common\HttpClient($aConfig);
             } else {
                 return new \GuzzleHttp\Client($aConfig);
             }
         },
-        'HttpRequestDelete' => function (array $aConfig = []) {
+        'HttpRequestDelete'     => function (array $aConfig = []) {
             if (class_exists('\App\Common\Factory\HttpRequest\Delete')) {
                 return new \App\Common\Factory\HttpRequest\Delete($aConfig);
             } else {
                 return new \Nails\Common\Factory\HttpRequest\Delete($aConfig);
             }
         },
-        'HttpRequestGet'    => function ($sBaseUri = null, $sPath = null, array $aHeaders = []) {
+        'HttpRequestGet'        => function ($sBaseUri = null, $sPath = null, array $aHeaders = []) {
             if (class_exists('\App\Common\Factory\HttpRequest\Get')) {
                 return new \App\Common\Factory\HttpRequest\Get($sBaseUri, $sPath, $aHeaders);
             } else {
                 return new \Nails\Common\Factory\HttpRequest\Get($sBaseUri, $sPath, $aHeaders);
             }
         },
-        'HttpRequestPatch'  => function ($sBaseUri = null, $sPath = null, array $aHeaders = []) {
+        'HttpRequestPatch'      => function ($sBaseUri = null, $sPath = null, array $aHeaders = []) {
             if (class_exists('\App\Common\Factory\HttpRequest\Patch')) {
                 return new \App\Common\Factory\HttpRequest\Patch($sBaseUri, $sPath, $aHeaders);
             } else {
                 return new \Nails\Common\Factory\HttpRequest\Patch($sBaseUri, $sPath, $aHeaders);
             }
         },
-        'HttpRequestPost'   => function ($sBaseUri = null, $sPath = null, array $aHeaders = []) {
+        'HttpRequestPost'       => function ($sBaseUri = null, $sPath = null, array $aHeaders = []) {
             if (class_exists('\App\Common\Factory\HttpRequest\Post')) {
                 return new \App\Common\Factory\HttpRequest\Post($sBaseUri, $sPath, $aHeaders);
             } else {
                 return new \Nails\Common\Factory\HttpRequest\Post($sBaseUri, $sPath, $aHeaders);
             }
         },
-        'HttpRequestPut'    => function ($sBaseUri = null, $sPath = null, array $aHeaders = []) {
+        'HttpRequestPut'        => function ($sBaseUri = null, $sPath = null, array $aHeaders = []) {
             if (class_exists('\App\Common\Factory\HttpRequest\Put')) {
                 return new \App\Common\Factory\HttpRequest\Put($sBaseUri, $sPath, $aHeaders);
             } else {
                 return new \Nails\Common\Factory\HttpRequest\Put($sBaseUri, $sPath, $aHeaders);
             }
         },
-        'HttpResponse'      => function (GuzzleHttp\Psr7\Response $oClient) {
+        'HttpResponse'          => function (GuzzleHttp\Psr7\Response $oClient) {
             if (class_exists('\App\Common\Factory\HttpResponse')) {
                 return new \App\Common\Factory\HttpResponse($oClient);
             } else {
                 return new \Nails\Common\Factory\HttpResponse($oClient);
             }
         },
-        'Locale'            => function (
+        'Locale'                => function (
             \Nails\Common\Factory\Locale\Language $oLanguage = null,
             \Nails\Common\Factory\Locale\Region $oRegion = null,
             \Nails\Common\Factory\Locale\Script $oScript = null
@@ -373,35 +384,35 @@ return [
                 return new \Nails\Common\Factory\Locale($oLanguage, $oRegion, $oScript);
             }
         },
-        'LocaleLanguage'    => function (string $sLabel = '') {
+        'LocaleLanguage'        => function (string $sLabel = '') {
             if (class_exists('\App\Common\Factory\Locale\Language')) {
                 return new \App\Common\Factory\Locale\Language($sLabel);
             } else {
                 return new \Nails\Common\Factory\Locale\Language($sLabel);
             }
         },
-        'LocaleRegion'      => function (string $sLabel = '') {
+        'LocaleRegion'          => function (string $sLabel = '') {
             if (class_exists('\App\Common\Factory\Locale\Region')) {
                 return new \App\Common\Factory\Locale\Region($sLabel);
             } else {
                 return new \Nails\Common\Factory\Locale\Region($sLabel);
             }
         },
-        'LocaleScript'      => function (string $sLabel = '') {
+        'LocaleScript'          => function (string $sLabel = '') {
             if (class_exists('\App\Common\Factory\Locale\Script')) {
                 return new \App\Common\Factory\Locale\Script($sLabel);
             } else {
                 return new \Nails\Common\Factory\Locale\Script($sLabel);
             }
         },
-        'ModelField'        => function () {
+        'ModelField'            => function () {
             if (class_exists('\App\Common\Factory\Model\Field')) {
                 return new \App\Common\Factory\Model\Field();
             } else {
                 return new \Nails\Common\Factory\Model\Field();
             }
         },
-        'Pagination'        => function () {
+        'Pagination'            => function () {
             if (class_exists('\App\Common\Factory\Pagination')) {
                 return new \App\Common\Factory\Pagination();
             } else {
