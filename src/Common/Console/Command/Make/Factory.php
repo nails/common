@@ -4,16 +4,15 @@ namespace Nails\Common\Console\Command\Make;
 
 use Nails\Console\Command\BaseMaker;
 use Nails\Console\Exception\ConsoleException;
-use Nails\Factory;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Service extends BaseMaker
+class Factory extends BaseMaker
 {
-    const SERVICE_TOKEN = 'SERVICES';
+    const SERVICE_TOKEN = 'FACTORIES';
     const RESOURCE_PATH = NAILS_COMMON_PATH . 'resources/console/';
-    const APP_PATH      = NAILS_APP_PATH . 'src/Service/';
+    const APP_PATH      = NAILS_APP_PATH . 'src/Factory/';
 
     // --------------------------------------------------------------------------
 
@@ -23,12 +22,12 @@ class Service extends BaseMaker
     protected function configure(): void
     {
         $this
-            ->setName('make:service')
-            ->setDescription('Creates a new App service')
+            ->setName('make:factory')
+            ->setDescription('Creates a new App factory')
             ->addArgument(
-                'serviceName',
+                'factoryName',
                 InputArgument::OPTIONAL,
-                'Define the name of the service to create'
+                'Define the name of the factory to create'
             );
     }
 
@@ -37,8 +36,8 @@ class Service extends BaseMaker
     /**
      * Executes the app
      *
-     * @param  InputInterface  $oInput  The Input Interface provided by Symfony
-     * @param  OutputInterface $oOutput The Output Interface provided by Symfony
+     * @param InputInterface  $oInput  The Input Interface provided by Symfony
+     * @param OutputInterface $oOutput The Output Interface provided by Symfony
      *
      * @return int
      */
@@ -50,7 +49,7 @@ class Service extends BaseMaker
             $this
                 ->validateServiceFile()
                 ->createPath(self::APP_PATH)
-                ->createService();
+                ->createFactory();
         } catch (ConsoleException $e) {
             return $this->abort(
                 self::EXIT_CODE_FAILURE,
@@ -76,48 +75,48 @@ class Service extends BaseMaker
     // --------------------------------------------------------------------------
 
     /**
-     * Create the Service
+     * Create the Factory
      *
+     * @return $this
      * @throws ConsoleException
-     * @return$this
      */
-    private function createService(): self
+    private function createFactory(): self
     {
         $aFields  = $this->getArguments();
         $aCreated = [];
 
         try {
 
-            $aToCreate = [];
-            $aServices = array_filter(
-                array_map(function ($sService) {
-                    return implode('/', array_map('ucfirst', explode('/', ucfirst(trim($sService)))));
-                }, explode(',', $aFields['SERVICE_NAME']))
+            $aToCreate  = [];
+            $aFactories = array_filter(
+                array_map(function ($sFactory) {
+                    return implode('/', array_map('ucfirst', explode('/', ucfirst(trim($sFactory)))));
+                }, explode(',', $aFields['FACTORY_NAME']))
             );
 
-            sort($aServices);
+            sort($aFactories);
 
-            foreach ($aServices as $sService) {
+            foreach ($aFactories as $sFactory) {
 
-                $aServiceBits = explode('/', $sService);
-                $aServiceBits = array_map('ucfirst', $aServiceBits);
+                $aFactoryBits = explode('/', $sFactory);
+                $aFactoryBits = array_map('ucfirst', $aFactoryBits);
 
-                $sNamespace       = $this->generateNamespace($aServiceBits);
-                $sClassName       = $this->generateClassName($aServiceBits);
+                $sNamespace       = $this->generateNamespace($aFactoryBits);
+                $sClassName       = $this->generateClassName($aFactoryBits);
                 $sClassNameFull   = $sNamespace . '\\' . $sClassName;
-                $sClassNameNormal = str_replace('AppService', '', str_replace('\\', '', $sClassNameFull));
-                $sFilePath        = $this->generateFilePath($aServiceBits);
+                $sClassNameNormal = str_replace('AppFactory', '', str_replace('\\', '', $sClassNameFull));
+                $sFilePath        = $this->generateFilePath($aFactoryBits);
 
                 //  Test it does not already exist
                 if (file_exists($sFilePath)) {
                     throw new ConsoleException(
-                        'A service at "' . $sFilePath . '" already exists'
+                        'A factory at "' . $sFilePath . '" already exists'
                     );
                 }
                 try {
-                    $oTest = Factory::service($sClassNameNormal, 'app');
+                    $oTest = \Nails\Factory::factory($sClassNameNormal, 'app');
                     throw new ConsoleException(
-                        'A service by "' . $sClassNameNormal . '" is already defined'
+                        'A factory by "' . $sClassNameNormal . '" is already defined'
                     );
                 } catch (\Exception $e) {
                     //  No exception? No problem!
@@ -133,7 +132,7 @@ class Service extends BaseMaker
                 ];
             }
 
-            $this->oOutput->writeln('The following service(s) will be created:');
+            $this->oOutput->writeln('The following factory(ies) will be created:');
             foreach ($aToCreate as $aConfig) {
                 $this->oOutput->writeln('');
                 $this->oOutput->writeln('Class: <info>' . $aConfig['CLASS_NAME_FULL'] . '</info>');
@@ -143,17 +142,16 @@ class Service extends BaseMaker
             $this->oOutput->writeln('');
 
             if ($this->confirm('Continue?', true)) {
-
                 $this->oOutput->writeln('');
 
-                //  Generate Services
+                //  Generate Factories
                 $aServiceDefinitions = [];
                 foreach ($aToCreate as $aConfig) {
-                    $this->oOutput->write('Creating service <comment>' . $aConfig['CLASS_NAME_FULL'] . '</comment>... ');
+                    $this->oOutput->write('Creating factory <comment>' . $aConfig['CLASS_NAME_FULL'] . '</comment>... ');
                     $this->createPath($aConfig['DIRECTORY']);
                     $this->createFile(
                         $aConfig['FILE_PATH'],
-                        $this->getResource('template/service.php', $aConfig)
+                        $this->getResource('template/factory.php', $aConfig)
                     );
                     $aCreated[] = $aConfig['FILE_PATH'];
                     $this->oOutput->writeln('<info>done!</info>');
@@ -167,16 +165,16 @@ class Service extends BaseMaker
                     $aServiceDefinitions[] = implode("\n", $aDefinition);
                 }
 
-                //  Add services to the app's services array
+                //  Add factories to the app's services array
                 $this->oOutput->writeln('');
-                $this->oOutput->write('Adding service(s) to app services... ');
+                $this->oOutput->write('Adding factory(ies) to app services... ');
                 $this->writeServiceFile($aServiceDefinitions);
                 $this->oOutput->writeln('<info>done!</info>');
             }
 
         } catch (ConsoleException $e) {
             $this->oOutput->writeln('<error>failed!</error>');
-            //  Clean up created services
+            //  Clean up created factories
             if (!empty($aCreated)) {
                 $this->oOutput->writeln('<error>Cleaning up - removing newly created files</error>');
                 foreach ($aCreated as $sPath) {
@@ -194,29 +192,28 @@ class Service extends BaseMaker
     /**
      * Generate the class name
      *
-     * @param array $aServiceBits The supplied classname "bits"
+     * @param array $aFactoryBits The supplied classname "bits"
      *
      * @return string
      */
-    protected function generateClassName(array $aServiceBits): string
+    protected function generateClassName(array $aFactoryBits): string
     {
-        return array_pop($aServiceBits);
+        return array_pop($aFactoryBits);
     }
 
     // --------------------------------------------------------------------------
 
-
     /**
      * Generate the class namespace
      *
-     * @param array $aServiceBits The supplied classname "bits"
+     * @param array $aFactoryBits The supplied classname "bits"
      *
      * @return string
      */
-    protected function generateNamespace(array $aServiceBits): string
+    protected function generateNamespace(array $aFactoryBits): string
     {
-        array_pop($aServiceBits);
-        return implode('\\', array_merge(['App', 'Service'], $aServiceBits));
+        array_pop($aFactoryBits);
+        return implode('\\', array_merge(['App', 'Factory'], $aFactoryBits));
     }
 
     // --------------------------------------------------------------------------
@@ -224,13 +221,13 @@ class Service extends BaseMaker
     /**
      * Generate the class file path
      *
-     * @param array $aServiceBits The supplied classname "bits"
+     * @param array $aFactoryBits The supplied classname "bits"
      *
      * @return string
      */
-    protected function generateFilePath(array $aServiceBits): string
+    protected function generateFilePath(array $aFactoryBits): string
     {
-        $sClassName = array_pop($aServiceBits);
+        $sClassName = array_pop($aFactoryBits);
         return implode(
             DIRECTORY_SEPARATOR,
             array_map(
@@ -239,7 +236,7 @@ class Service extends BaseMaker
                 },
                 array_merge(
                     [static::APP_PATH],
-                    $aServiceBits,
+                    $aFactoryBits,
                     [$sClassName . '.php']
                 )
             )

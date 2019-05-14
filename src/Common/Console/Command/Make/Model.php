@@ -409,7 +409,6 @@ class Model extends BaseMaker
         $sResourcePath      = substr($sResourcePath, -1) !== DIRECTORY_SEPARATOR ? $sResourcePath . DIRECTORY_SEPARATOR : $sResourcePath;
         $sResourceFilename  = $sFilename;
 
-
         return (object) [
             'namespace'           => $sNamespace,
             'class_name'          => $sClassName,
