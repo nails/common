@@ -26,8 +26,8 @@ class Rewrite extends Base
     /**
      * Executes the app
      *
-     * @param  InputInterface  $oInput  The Input Interface provided by Symfony
-     * @param  OutputInterface $oOutput The Output Interface provided by Symfony
+     * @param InputInterface  $oInput  The Input Interface provided by Symfony
+     * @param OutputInterface $oOutput The Output Interface provided by Symfony
      *
      * @return int
      */
@@ -35,11 +35,7 @@ class Rewrite extends Base
     {
         parent::execute($oInput, $oOutput);
 
-        $oOutput->writeln('');
-        $oOutput->writeln('<info>--------------------</info>');
-        $oOutput->writeln('<info>Nails Routes Rewrite</info>');
-        $oOutput->writeln('<info>--------------------</info>');
-        $oOutput->writeln('');
+        $this->banner('Nails Routes Rewrite');
 
         $oRoutesService = Factory::service('Routes');
 

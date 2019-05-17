@@ -81,22 +81,13 @@ class Migrate extends Base
     {
         parent::execute($oInput, $oOutput);
 
-        $oOutput->writeln('');
-        $oOutput->writeln('<info>-----------------------------</info>');
-        $oOutput->writeln('<info>Nails Database Migration Tool</info>');
-        $oOutput->writeln('<info>-----------------------------</info>');
+        $this->banner('Nails Database Migration Tool');
 
         // --------------------------------------------------------------------------
 
         //  Check environment
         if (Environment::is(Environment::ENV_PROD)) {
-
-            $oOutput->writeln('');
-            $oOutput->writeln('--------------------------------------');
-            $oOutput->writeln('| <info>WARNING: The app is in PRODUCTION.</info> |');
-            $oOutput->writeln('--------------------------------------');
-            $oOutput->writeln('');
-
+            $this->banner('WARNING: The app is in PRODUCTION', 'error');
             if (!$this->confirm('Continue with migration?', true)) {
                 return $this->abort();
             }

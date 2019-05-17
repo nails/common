@@ -49,11 +49,7 @@ class Seed extends Base
     {
         parent::execute($oInput, $oOutput);
 
-        $oOutput->writeln('');
-        $oOutput->writeln('<info>----------------------</info>');
-        $oOutput->writeln('<info>Nails Database Seeder </info>');
-        $oOutput->writeln('<info>----------------------</info>');
-        $oOutput->writeln('');
+        $this->banner('Nails Database Seeder');
 
         // --------------------------------------------------------------------------
 

@@ -68,11 +68,7 @@ class Install extends Base
 
         // --------------------------------------------------------------------------
 
-        $oOutput->writeln('');
-        $oOutput->writeln('<info>---------------</info>');
-        $oOutput->writeln('<info>Nails Installer</info>');
-        $oOutput->writeln('<info>---------------</info>');
-        $oOutput->writeln('');
+        $this->banner('Nails Installer');
 
         // --------------------------------------------------------------------------
 

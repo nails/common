@@ -61,23 +61,14 @@ class Rebuild extends Base
     {
         parent::execute($oInput, $oOutput);
 
-        $oOutput->writeln('');
-        $oOutput->writeln('<info>----------------------</info>');
-        $oOutput->writeln('<info>Nails Database Rebuild </info>');
-        $oOutput->writeln('<info>----------------------</info>');
-        $oOutput->writeln('');
+        $this->banner('Nails Database Rebuild');
 
         // --------------------------------------------------------------------------
 
         //  Check environment
         if (Environment::is(Environment::ENV_PROD)) {
-
-            $oOutput->writeln('--------------------------------------');
-            $oOutput->writeln('| <info>WARNING: The app is in PRODUCTION.</info> |');
-            $oOutput->writeln('--------------------------------------');
-            $oOutput->writeln('');
-            $oOutput->writeln('Aborting rebuild.');
-
+            $this->banner('WARNING: The app is in PRODUCTION', 'error');
+            $oOutput->writeln('<error>Aborting rebuild.</error>');
             return static::EXIT_CODE_FAILURE;
         }
 
