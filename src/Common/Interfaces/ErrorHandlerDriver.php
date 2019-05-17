@@ -16,6 +16,7 @@ interface ErrorHandlerDriver
 {
     /**
      * Instantiates the driver
+     *
      * @return void
      */
     public static function init();
@@ -25,10 +26,10 @@ interface ErrorHandlerDriver
     /**
      * Called when a PHP error occurs
      *
-     * @param  int    $iErrorNumber The error number
-     * @param  string $sErrorString The error message
-     * @param  string $sErrorFile   The file where the error occurred
-     * @param  int    $iErrorLine   The line number where the error occurred
+     * @param int    $iErrorNumber The error number
+     * @param string $sErrorString The error message
+     * @param string $sErrorFile   The file where the error occurred
+     * @param int    $iErrorLine   The line number where the error occurred
      *
      * @return void
      */
@@ -39,16 +40,18 @@ interface ErrorHandlerDriver
     /**
      * Catches uncaught exceptions
      *
-     * @param  \Exception $oException The caught exception
+     * @param \Exception $oException     The uncaught exception
+     * @param bool       $bHaltExecution Whether to show the error screen and halt execution
      *
      * @return void
      */
-    public static function exception($oException);
+    public static function exception($oException, $bHaltExecution = true);
 
     // --------------------------------------------------------------------------
 
     /**
      * Catches fatal errors on shut down
+     *
      * @return void
      */
     public static function fatal();
