@@ -84,6 +84,7 @@ if (!function_exists('formatBytes')) {
      */
     function formatBytes($iBytes, $iPrecision = 2)
     {
+        //  @todo (Pablo - 2019-05-17) - Remove dependency on CDN service
         $oCdn = Factory::service('Cdn', 'nails/module-cdn');
         return $oCdn->formatBytes($iBytes, $iPrecision);
     }
@@ -103,6 +104,7 @@ if (!function_exists('returnBytes')) {
      */
     function returnBytes($sSize)
     {
+        //  @todo (Pablo - 2019-05-17) - Remove dependency on CDN service
         $oCdn = Factory::service('Cdn', 'nails/module-cdn');
         return $oCdn->returnBytes($sSize);
     }
