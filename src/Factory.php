@@ -13,6 +13,7 @@
 namespace Nails;
 
 use Nails\Common\Exception\FactoryException;
+use Nails\Common\Helper\File;
 use Nails\Common\Model\Base;
 use Nails\Common\Resource;
 use Pimple\Container;
@@ -205,7 +206,7 @@ class Factory
     private static function findServicesAtPaths(array $aPaths): array
     {
         foreach ($aPaths as $sPath) {
-            if (file_exists($sPath)) {
+            if (File::fileExistsCS($sPath)) {
                 return require $sPath;
             }
         }
@@ -397,8 +398,8 @@ class Factory
      * @param string $sHelperName    The helper name
      * @param string $sComponentName The name of the component which provides the factory
      *
-     * @throws FactoryException
      * @return void
+     * @throws FactoryException
      */
     public static function helper(string $sHelperName, ?string $sComponentName = ''): void
     {
@@ -418,7 +419,7 @@ class Factory
 
                 $sAppPath = NAILS_APP_PATH . 'application/helpers/' . $sHelperName . '.php';
 
-                if (!file_exists($sAppPath)) {
+                if (!File::fileExistsCS($sAppPath)) {
                     throw new FactoryException(
                         'Helper "' . $sComponentName . '/' . $sHelperName . '" does not exist.',
                         1
@@ -432,14 +433,14 @@ class Factory
                 $sComponentPath = NAILS_APP_PATH . 'vendor/' . $sComponentName . '/helpers/' . $sHelperName . '.php';
                 $sAppPath       = NAILS_APP_PATH . 'application/helpers/' . $sComponentName . '/' . $sHelperName . '.php';
 
-                if (!file_exists($sComponentPath)) {
+                if (!File::fileExistsCS($sComponentPath)) {
                     throw new FactoryException(
                         'Helper "' . $sComponentName . '/' . $sHelperName . '" does not exist.',
                         1
                     );
                 }
 
-                if (file_exists($sAppPath)) {
+                if (File::fileExistsCS($sAppPath)) {
                     require_once $sAppPath;
                 }
 
@@ -459,8 +460,8 @@ class Factory
      * @param string $sServiceName   The name of the service to return
      * @param string $sComponentName The name of the module which defined it
      *
-     * @throws FactoryException
      * @return mixed
+     * @throws FactoryException
      */
     private static function getService(string $sServiceType, string $sServiceName, ?string $sComponentName = '')
     {
@@ -540,7 +541,7 @@ class Factory
     protected static function extractAutoLoadItemsFromComposerJson(string $sPath): \stdClass
     {
         $oOut = (object) ['helpers' => [], 'services' => []];
-        if (file_exists($sPath)) {
+        if (File::fileExistsCS($sPath)) {
             $oAppComposer = json_decode(file_get_contents($sPath));
             if (!empty($oAppComposer->extra->nails->autoload->helpers)) {
                 foreach ($oAppComposer->extra->nails->autoload->helpers as $sHelper) {
