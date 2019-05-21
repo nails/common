@@ -15,11 +15,34 @@ namespace Nails\Common\Helper;
 use Nails\Common\Exception\Directory\DirectoryDoesNotExistException;
 use Nails\Common\Exception\Directory\DirectoryIsNotWritableException;
 use Nails\Common\Exception\Directory\DirectoryNameException;
+use Nails\Common\Exception\FactoryException;
+use Nails\Factory;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
 class Directory
 {
+    /**
+     * Maps a directory
+     *
+     * @param string $sDir    The directory to map
+     * @param int    $iDepth  How deep to go down the rabbit hole
+     * @param bool   $bHidden Whether to show hidden files or not
+     *
+     * @return array
+     * @throws FactoryException
+     */
+    public static function map(string $sDir, int $iDepth = 0, bool $bHidden = false): array
+    {
+        if (!is_dir($sDir)) {
+            return [];
+        }
+
+        return directory_map($sDir, $iDepth, $bHidden);
+    }
+
+    // --------------------------------------------------------------------------
+
     /**
      * Recursively deletes a directory
      *

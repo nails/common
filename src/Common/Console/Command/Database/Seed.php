@@ -196,30 +196,27 @@ class Seed extends Base
         $aAllComponents = Components::available();
 
         foreach ($aAllComponents as $oComponent) {
-            $sPath = $oComponent->path . 'src/Seed/';
-            if (is_dir($sPath)) {
+            $sPath  = $oComponent->path . 'src/Seed/';
+            $aSeeds = directoryMap($sPath);
+            $aSeeds = array_map(
+                function ($sClass) {
+                    return basename($sClass, '.php');
+                },
+                $aSeeds
+            );
 
-                $aSeeds = directory_map($sPath);
-                $aSeeds = array_map(
-                    function ($sClass) {
-                        return basename($sClass, '.php');
-                    },
-                    $aSeeds
-                );
+            sort($aSeeds);
 
-                sort($aSeeds);
+            if (empty($aSeeds)) {
+                continue;
+            }
 
-                if (empty($aSeeds)) {
-                    continue;
-                }
-
-                foreach ($aSeeds as $sClass) {
-                    $aSeedClasses[] = (object) [
-                        'component' => $oComponent->slug,
-                        'namespace' => $oComponent->namespace,
-                        'class'     => $sClass,
-                    ];
-                }
+            foreach ($aSeeds as $sClass) {
+                $aSeedClasses[] = (object) [
+                    'component' => $oComponent->slug,
+                    'namespace' => $oComponent->namespace,
+                    'class'     => $sClass,
+                ];
             }
         }
 
