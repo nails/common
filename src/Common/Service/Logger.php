@@ -2,6 +2,7 @@
 
 /**
  * Provides enhanced logging facilities
+ *
  * @todo        - Deprecate this in favour of something like monolog
  *
  * @package     Nails
@@ -14,7 +15,6 @@
 namespace Nails\Common\Service;
 
 use Nails\Factory;
-use Nails\Environment;
 
 class Logger
 {
@@ -48,7 +48,7 @@ class Logger
     /**
      * Writes a line to the log
      *
-     * @param  string $sLine The line to write
+     * @param string $sLine The line to write
      *
      * @return void
      */
@@ -131,6 +131,18 @@ class Logger
     // --------------------------------------------------------------------------
 
     /**
+     * Return the active log file
+     *
+     * @return string
+     */
+    public function getFile(): string
+    {
+        return $this->oLog->file;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Set the log directory which is being written to
      *
      * @param string $sDir The directory to write to
@@ -149,5 +161,29 @@ class Logger
         } else {
             $this->oLog->dir = DEPLOY_LOG_DIR;
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Return the active log directory
+     *
+     * @return string
+     */
+    public function getDir(): string
+    {
+        return $this->oLog->dir;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns a stream handle for the active log file
+     *
+     * @return bool|resource
+     */
+    public function getStream()
+    {
+        return fopen($this->getDir() . $this->getFile(), 'a', false);
     }
 }
