@@ -13,10 +13,36 @@
 
 namespace Nails\Common\Service;
 
+/**
+ * Class Uri
+ *
+ * @package Nails\Common\Service
+ *
+ * @property $keyval     = array();
+ * @property $uri_string = '';
+ * @property $segments   = array();
+ * @property $rsegments  = array();
+ *
+ * @method filter_uri(&$str)
+ * @method segment($n, $no_result = null)
+ * @method rsegment($n, $no_result = null)
+ * @method uri_to_assoc($n = 3, $default = [])
+ * @method ruri_to_assoc($n = 3, $default = [])
+ * @method assoc_to_uri($array)
+ * @method slash_segment($n, $where = 'trailing')
+ * @method slash_rsegment($n, $where = 'trailing')
+ * @method segment_array()
+ * @method rsegment_array()
+ * @method total_segments()
+ * @method total_rsegments()
+ * @method uri_string()
+ * @method ruri_string()
+ */
 class Uri
 {
     /**
      * The CodeIgniter Uri object
+     *
      * @var \CI_URI
      */
     private $oUri;
@@ -37,8 +63,8 @@ class Uri
     /**
      * Route calls to the CodeIgniter Uri class
      *
-     * @param  string $sMethod    The method being called
-     * @param  array  $aArguments Any arguments being passed
+     * @param string $sMethod    The method being called
+     * @param array  $aArguments Any arguments being passed
      *
      * @return mixed
      */
@@ -56,7 +82,7 @@ class Uri
     /**
      * Pass any property "gets" to the CodeIgniter Uri class
      *
-     * @param  string $sProperty The property to get
+     * @param string $sProperty The property to get
      *
      * @return mixed
      */
@@ -70,8 +96,8 @@ class Uri
     /**
      * Pass any property "sets" to the CodeIgniter Uri class
      *
-     * @param  string $sProperty The property to set
-     * @param  mixed  $mValue    The value to set
+     * @param string $sProperty The property to set
+     * @param mixed  $mValue    The value to set
      *
      * @return void
      */
