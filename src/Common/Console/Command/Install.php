@@ -343,27 +343,27 @@ class Install extends Base
         ];
 
         $vars[] = [
-            'key'   => 'DEPLOY_EMAIL_HOST',
+            'key'   => 'EMAIL_HOST',
             'label' => 'Email Host',
-            'value' => defined('DEPLOY_EMAIL_HOST') ? DEPLOY_EMAIL_HOST : 'localhost',
+            'value' => defined('EMAIL_HOST') ? EMAIL_HOST : 'localhost',
         ];
 
         $vars[] = [
-            'key'   => 'DEPLOY_EMAIL_USER',
+            'key'   => 'EMAIL_USERNAME',
             'label' => 'Email Username',
-            'value' => defined('DEPLOY_EMAIL_USER') ? DEPLOY_EMAIL_USER : '',
+            'value' => defined('EMAIL_USERNAME') ? EMAIL_USERNAME : '',
         ];
 
         $vars[] = [
-            'key'   => 'DEPLOY_EMAIL_PASS',
+            'key'   => 'EMAIL_PASSWORD',
             'label' => 'Email Password',
-            'value' => defined('DEPLOY_EMAIL_PASS') ? DEPLOY_EMAIL_PASS : '',
+            'value' => defined('EMAIL_PASSWORD') ? EMAIL_PASSWORD : '',
         ];
 
         $vars[] = [
-            'key'   => 'DEPLOY_EMAIL_PORT',
+            'key'   => 'EMAIL_PORT',
             'label' => 'Email Port',
-            'value' => defined('DEPLOY_EMAIL_PORT') ? DEPLOY_EMAIL_PORT : 25,
+            'value' => defined('EMAIL_PORT') ? EMAIL_PORT : 25,
         ];
 
         // --------------------------------------------------------------------------

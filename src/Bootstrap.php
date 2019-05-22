@@ -179,10 +179,17 @@ final class Bootstrap
         Functions::define('APP_DEVELOPER_EMAIL', '');
         Functions::define('EMAIL_OVERRIDE', '');
         Functions::define('EMAIL_WHITELIST', '');
+
+        //  Specify these first for backwards compatability
         Functions::define('DEPLOY_EMAIL_HOST', '127.0.0.1');
         Functions::define('DEPLOY_EMAIL_USER', '');
         Functions::define('DEPLOY_EMAIL_PASS', '');
         Functions::define('DEPLOY_EMAIL_PORT', 25);
+
+        Functions::define('EMAIL_HOST', DEPLOY_EMAIL_HOST);
+        Functions::define('EMAIL_USERNAME', DEPLOY_EMAIL_USER);
+        Functions::define('EMAIL_PASSWORD', DEPLOY_EMAIL_PASS);
+        Functions::define('EMAIL_PORT', DEPLOY_EMAIL_PORT);
 
         //  Ensure the app's constants file is also loaded
         //  @todo (Pablo - 2018-11-16) - Remove reliance on this feature
