@@ -182,8 +182,8 @@ final class Bootstrap
 
         //  Specify these first for backwards compatability
         Functions::define('DEPLOY_EMAIL_HOST', '127.0.0.1');
-        Functions::define('DEPLOY_EMAIL_USER', '');
-        Functions::define('DEPLOY_EMAIL_PASS', '');
+        Functions::define('DEPLOY_EMAIL_USER', null);
+        Functions::define('DEPLOY_EMAIL_PASS', null);
         Functions::define('DEPLOY_EMAIL_PORT', 25);
 
         Functions::define('EMAIL_HOST', DEPLOY_EMAIL_HOST);
