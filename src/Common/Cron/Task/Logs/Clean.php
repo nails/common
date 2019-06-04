@@ -3,7 +3,7 @@
 /**
  * The Clean Cron task
  *
- * @package  App
+ * @package  Nails\Common
  * @category Task
  */
 
