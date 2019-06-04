@@ -19,7 +19,6 @@ namespace Nails\Common\Service;
 use Nails\Common\Exception\Database\ConnectionException;
 use Nails\Environment;
 use Nails\Factory;
-use Nails\Testing;
 
 /**
  * Class Database
@@ -76,6 +75,14 @@ use Nails\Testing;
  * @method start_cache()
  * @method stop_cache()
  * @method reset_query()
+ * @method db_connect($persistent = false)
+ * @method reconnect()
+ * @method db_select($database = '')
+ * @method version()
+ * @method affected_rows()
+ * @method insert_id()
+ * @method field_data($table)
+ * @method error()
  */
 class Database
 {
@@ -125,7 +132,6 @@ class Database
         $sDbPath = BASEPATH . 'database/';
         require_once $sDbPath . 'DB_driver.php';
         require_once $sDbPath . 'DB_query_builder.php';
-
 
         if (!class_exists('CI_DB')) {
             require_once __DIR__ . '/Database/CI_DB.php';
@@ -252,8 +258,8 @@ class Database
     /**
      * Route calls to the CodeIgniter Database class
      *
-     * @param  string $sMethod    The method being called
-     * @param  array  $aArguments Any arguments being passed
+     * @param string $sMethod    The method being called
+     * @param array  $aArguments Any arguments being passed
      *
      * @return mixed
      */
@@ -274,7 +280,7 @@ class Database
     /**
      * Pass any property "gets" to the CodeIgniter Database class
      *
-     * @param  string $sProperty The property to get
+     * @param string $sProperty The property to get
      *
      * @return mixed
      */
@@ -288,8 +294,8 @@ class Database
     /**
      * Pass any property "sets" to the CodeIgniter Database class
      *
-     * @param  string $sProperty The property to set
-     * @param  mixed  $mValue    The value to set
+     * @param string $sProperty The property to set
+     * @param mixed  $mValue    The value to set
      *
      * @return void
      */
