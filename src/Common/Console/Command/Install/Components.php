@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Components extends Base
 {
     /**
-     * Configures the app
+     * Configures the command
      *
      * @return void
      */

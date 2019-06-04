@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Rebuild extends Base
 {
     /**
-     * Configures the app
+     * Configures the command
      *
      * @return void
      */

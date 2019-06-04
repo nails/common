@@ -26,7 +26,7 @@ class Install extends Base
     // --------------------------------------------------------------------------
 
     /**
-     * Configures the app
+     * Configures the command
      *
      * @return void
      */

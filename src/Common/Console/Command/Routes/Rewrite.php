@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Rewrite extends Base
 {
     /**
-     * Configures the app
+     * Configures the command
      *
      * @return void
      */

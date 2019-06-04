@@ -32,7 +32,7 @@ class Migrate extends Base
     // --------------------------------------------------------------------------
 
     /**
-     * Configures the app
+     * Configures the command
      *
      * @return void
      */

@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Seed extends Base
 {
     /**
-     * Configures the app
+     * Configures the command
      *
      * @return void
      */
