@@ -48,7 +48,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Nails\\": "src/"
+            "Nails\\": "src/",
+            "Nails\\Common\\": "src/Common/"
         }
     },
     "extra": {
