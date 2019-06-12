@@ -20,6 +20,20 @@ use Nails\Common\Service\ErrorHandler;
 final class Components
 {
     /**
+     * The slug to use for App components
+     *
+     * @var string
+     */
+    public static $oAppSlug = 'app';
+
+    /**
+     * The namespace to use for App components
+     *
+     * @var string
+     */
+    static $oAppNamespace = '\\App\\';
+
+    /**
      * The component cache
      *
      * @var Component[]
@@ -259,14 +273,14 @@ final class Components
         $aNails    = !empty($oComposer->extra->nails) ? (array) $oComposer->extra->nails : [];
         $oOut      = new Component(
             (object) [
-                'slug'        => 'app',
-                'name'        => 'app',
+                'slug'        => static::$oAppSlug,
+                'name'        => static::$oAppSlug,
                 'description' => ArrayHelper::getFromArray('description', $aNails, ArrayHelper::getFromArray('description', $aComposer)),
                 'homepage'    => ArrayHelper::getFromArray('homepage', $aNails, ArrayHelper::getFromArray('homepage', $aComposer)),
                 'authors'     => ArrayHelper::getFromArray('authors', $aNails, ArrayHelper::getFromArray('authors', $aComposer)),
                 'extra'       => (object) [
                     'nails' => (object) [
-                        'namespace'  => '\\App\\',
+                        'namespace'  => static::$oAppNamespace,
                         'moduleName' => ArrayHelper::getFromArray('moduleName', $aNails, ''),
                         'data'       => ArrayHelper::getFromArray('data', $aNails, null),
                         'autoload'   => ArrayHelper::getFromArray('autoload', $aNails, null),
@@ -390,10 +404,10 @@ final class Components
     /**
      * Returns an instance of a single driver
      *
-     * @param  object $oDriver The Driver definition
+     * @param object $oDriver The Driver definition
      *
-     * @throws NailsException
      * @return Base
+     * @throws NailsException
      */
     public static function getDriverInstance($oDriver): Base
     {
@@ -465,7 +479,7 @@ final class Components
 
         foreach (static::available() as $oComponent) {
 
-            if ($oComponent->slug === 'app') {
+            if ($oComponent->slug === static::$oAppSlug) {
                 continue;
             } elseif (preg_match('/^' . preg_quote($oComponent->path, '/') . '/', $sPath)) {
                 return $oComponent;

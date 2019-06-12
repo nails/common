@@ -70,7 +70,9 @@ class File
      */
     public static function fileExistsCS($sFilename)
     {
-        if (array_key_exists($sFilename, static::$aFileExistsCache)) {
+        if (empty($sFilename)) {
+            return false;
+        } elseif (array_key_exists($sFilename, static::$aFileExistsCache)) {
             return static::$aFileExistsCache[$sFilename];
         }
 

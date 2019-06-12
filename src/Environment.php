@@ -44,8 +44,10 @@ class Environment
 
             if (!empty($_ENV['ENVIRONMENT'])) {
                 static::set($_ENV['ENVIRONMENT']);
-            } else {
+            } elseif (defined('ENVIRONMENT')) {
                 static::set(ENVIRONMENT);
+            } else {
+                static::set(static::ENV_DEV);
             }
 
             try {
@@ -86,7 +88,7 @@ class Environment
     /**
      * Returns whether the environment is the supplied environment
      *
-     * @param  array|string $mEnvironment The environment(s) to query
+     * @param array|string $mEnvironment The environment(s) to query
      *
      * @return boolean
      */
@@ -104,7 +106,7 @@ class Environment
     /**
      * Returns whether the environment is not the supplied environment
      *
-     * @param  string $sEnvironment The environment to query
+     * @param string $sEnvironment The environment to query
      *
      * @return boolean
      */

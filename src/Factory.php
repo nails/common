@@ -21,6 +21,13 @@ use Pimple\Container;
 class Factory
 {
     /**
+     * The slug to use for app services
+     *
+     * @var string
+     */
+    public static $oAppSlug = 'app';
+
+    /**
      * Contains an array of containers; each component gets its own element so as
      * to avoid naming collisions.
      *
@@ -62,8 +69,8 @@ class Factory
             $aDiscoveredServices[$oComponent->slug] = self::findServicesForComponent($oComponent->slug);
         }
 
-        $aDiscoveredServices['app'] = self::findServicesForApp();
-        $aDiscoveredServices        = array_filter($aDiscoveredServices);
+        $aDiscoveredServices[static::$oAppSlug] = self::findServicesForApp();
+        $aDiscoveredServices                    = array_filter($aDiscoveredServices);
 
         foreach ($aDiscoveredServices as $sComponentName => $aComponentServices) {
 
@@ -191,6 +198,7 @@ class Factory
     {
         return self::findServicesAtPaths([
             'application/services/services.php',
+            'services/services.php',
         ]);
     }
 
@@ -206,7 +214,7 @@ class Factory
     private static function findServicesAtPaths(array $aPaths): array
     {
         foreach ($aPaths as $sPath) {
-            if (File::fileExistsCS($sPath)) {
+            if (File::fileExistsCS(realpath($sPath))) {
                 return require $sPath;
             }
         }
@@ -415,7 +423,7 @@ class Factory
              * If we're only interested in the app version of the helper then we change things
              * around a little as the paths and reliance of a "component" based helper aren't the same
              */
-            if ($sComponentName == 'app') {
+            if ($sComponentName == static::$oAppSlug) {
 
                 $sAppPath = NAILS_APP_PATH . 'application/helpers/' . $sHelperName . '.php';
 
