@@ -13,6 +13,7 @@
 namespace Nails\Common\Traits;
 
 use Nails\Common\Helper\ArrayHelper;
+use Nails\Common\Service\Database;
 use Nails\Factory;
 
 trait GetCountCommon
@@ -22,10 +23,8 @@ trait GetCountCommon
      * methods and the count() method.
      *
      * @param array $aData Data passed from the calling method
-     *
-     * @return void
      **/
-    protected function getCountCommon(array $aData = [])
+    protected function getCountCommon(array $aData = []): void
     {
         //  @deprecated - searching should use the search() method, but this in place
         //  as a quick fix for loads of admin controllers
@@ -69,6 +68,7 @@ trait GetCountCommon
         $this->getCountCommonCompileLikes($aData);
         $this->getCountCommonCompileHavings($aData);
         $this->getCountCommonCompileSort($aData);
+        $this->getCountCommonCompileGroupBy($aData);
     }
 
     // --------------------------------------------------------------------------
@@ -77,12 +77,11 @@ trait GetCountCommon
      * Compiles the select statement
      *
      * @param array &$aData The data array
-     *
-     * @return void
      */
-    protected function getCountCommonCompileSelect(array &$aData)
+    protected function getCountCommonCompileSelect(array &$aData): void
     {
         if (!empty($aData['select'])) {
+            /** @var Database $oDb */
             $oDb = Factory::service('Database');
             $oDb->select($aData['select']);
         }
@@ -94,10 +93,8 @@ trait GetCountCommon
      * Compiles any active filters back into the $aData array
      *
      * @param array &$aData The data array
-     *
-     * @return void
      */
-    protected function getCountCommonCompileFilters(array &$aData)
+    protected function getCountCommonCompileFilters(array &$aData): void
     {
         /**
          * Handle filters
@@ -219,12 +216,13 @@ trait GetCountCommon
      *
      * @return string
      */
-    protected function getCountCommonCompileFiltersString($sColumn, $mValue, $bIsQuery)
+    protected function getCountCommonCompileFiltersString($sColumn, $mValue, $bIsQuery): string
     {
         if (is_object($mValue) && ($mValue instanceof \Closure)) {
             $mValue = $mValue();
         }
 
+        /** @var Database $oDb */
         $oDb = Factory::service('Database');
         if ($bIsQuery) {
             $aBits = [$mValue];
@@ -254,11 +252,10 @@ trait GetCountCommon
      * Compiles any where's into the query
      *
      * @param array &$aData The data array
-     *
-     * @return void
      */
-    protected function getCountCommonCompileWheres(array &$aData)
+    protected function getCountCommonCompileWheres(array &$aData): void
     {
+        /** @var Database $oDb */
         $oDb = Factory::service('Database');
 
         /**
@@ -445,11 +442,10 @@ trait GetCountCommon
      * Compiles any like's into the query
      *
      * @param array &$aData The data array
-     *
-     * @return void
      */
-    protected function getCountCommonCompileLikes(array &$aData)
+    protected function getCountCommonCompileLikes(array &$aData): void
     {
+        /** @var Database $oDb */
         $oDb = Factory::service('Database');
 
         $aLikes = [
@@ -579,11 +575,10 @@ trait GetCountCommon
      * Compiles any having's into the query
      *
      * @param array &$aData The data array
-     *
-     * @return void
      */
-    protected function getCountCommonCompileHavings(array &$aData)
+    protected function getCountCommonCompileHavings(array &$aData): void
     {
+        /** @var Database $oDb */
         $oDb = Factory::service('Database');
 
         /**
@@ -730,11 +725,10 @@ trait GetCountCommon
      * Compiles the sort element into the query
      *
      * @param array &$aData The data array
-     *
-     * @return void
      */
-    protected function getCountCommonCompileSort(array &$aData)
+    protected function getCountCommonCompileSort(array &$aData): void
     {
+        /** @var Database $oDb */
         $oDb = Factory::service('Database');
 
         if (!empty($aData['sort'])) {
@@ -795,7 +789,7 @@ trait GetCountCommon
      *
      * @return array
      */
-    protected function getCountCommonParseSort($mSort)
+    protected function getCountCommonParseSort($mSort): array
     {
         $aOut = ['column' => null, 'order' => null];
 
@@ -833,5 +827,28 @@ trait GetCountCommon
         }
 
         return $aOut;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Compiles the group element into the query
+     *
+     * @param array &$aData The data array
+     */
+    protected function getCountCommonCompileGroupBy(array &$aData): void
+    {
+        /** @var Database $oDb */
+        $oDb = Factory::service('Database');
+
+        if (!empty($aData['group'])) {
+            if (is_string($aData['group'])) {
+                $oDb->order_by($aData['group']);
+            } elseif (is_array($aData['group'])) {
+                foreach ($aData['group'] as $sColumn) {
+                    $oDb->group_by($sColumn);
+                }
+            }
+        }
     }
 }
