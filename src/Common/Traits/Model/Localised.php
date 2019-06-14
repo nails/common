@@ -74,7 +74,7 @@ trait Localised
      * @throws FactoryException
      * @throws ModelException
      */
-    protected function getCountCommon(array $aData = [])
+    protected function getCountCommon(array $aData = []): void
     {
         $this->injectLocalisationQuery($aData);
         parent::getCountCommon($aData);
