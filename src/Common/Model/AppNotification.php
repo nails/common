@@ -284,14 +284,17 @@ class AppNotification extends Base
             $email->data['template_body'] = $definition->email_tpl;
         }
 
+        $oEmailer = Factory::service('Emailer', 'nails/module-email');
+        $oLogger  = Factory::service('Logger');
+
         foreach ($emails as $e) {
 
-            Factory::service('Logger')->line('Sending notification (' . $grouping . '/' . $key . ') to ' . $e);
+            $oLogger->line('Sending notification (' . $grouping . '/' . $key . ') to ' . $e);
 
             $email->to_email = $e;
 
-            if (!$this->emailer->send($email, true)) {
-                $this->setError($this->emailer->lastError());
+            if (!$oEmailer->send($email, true)) {
+                $this->setError($oEmailer->lastError());
                 return false;
             }
         }

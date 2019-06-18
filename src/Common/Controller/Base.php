@@ -594,6 +594,7 @@ abstract class Base extends \MX_Controller
          */
 
         //  @todo (Pablo - 2017-06-07) - Remove these
+        //  @todo (Pablo - 2019-06-18) - Removed calls to these variables in Nails modules, probably safe to remove now
         $oBindTo->db                  = Factory::service('Database');
         $oBindTo->input               = Factory::service('Input');
         $oBindTo->output              = Factory::service('Output');
