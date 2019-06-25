@@ -114,6 +114,12 @@ class DefaultSeed extends Base
                     $mValue = $this->loremWord(3);
                     break;
             }
+
+            //  Ensure the value isn't too long
+            if (!empty($oField->max_length) && strlen($mValue) > $oField->max_length) {
+                $mValue = substr($mValue, 0, $oField->max_length);
+            }
+
             $aOut[$oField->key] = $mValue;
         }
 
