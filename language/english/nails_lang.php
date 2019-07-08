@@ -66,7 +66,7 @@ $lang['fv_valid_emails']                = 'This must contain only valid email ad
 $lang['fv_valid_emails_field']          = 'The {field} field must contain only valid email addresses.';
 $lang['fv_email_already_registered']    = 'This email is already registered.<br /><small><a href="%s">Forgotten your password?</a></small>';
 $lang['fv_username_already_registered'] = 'This username is already registered.<br /><small><a href="%s">Forgotten your password?</a></small>';
-$lang['fv_identity_already_registered'] = 'This %s is already registered.<br /><small><a href="%s">Forgotten your password?</a></small>';
+$lang['fv_identity_already_registered'] = 'This identity is already registered.<br /><small><a href="%s">Forgotten your password?</a></small>';
 $lang['fv_matches']                     = 'This field does not match the {param} field.';
 $lang['fv_matches_field']               = 'The {field} field does not match the {param} field.';
 $lang['fv_is_unique']                   = 'This field must be unique.';
