@@ -184,6 +184,8 @@ abstract class Base extends \MX_Controller
     {
         if ($force || file_exists(NAILS_APP_PATH . '.MAINTENANCE')) {
 
+            Functions::define('NAILS_MAINTENANCE', true);
+
             /**
              * We're in maintenance mode. This can happen very early so we need to
              * make sure that we've loaded everything we need to load as we're
