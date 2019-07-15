@@ -37,14 +37,24 @@ class DateTime
      */
     const FORMAT_DATE = [
         [
+            'slug'   => 'DDo-MMM-YYYY',
+            'label'  => 'DDo MMM YYYY',
+            'format' => 'jS M Y',
+        ],
+        [
             'slug'   => 'DD-MMM-YYYY',
             'label'  => 'DD MMM YYYY',
-            'format' => 'jS M Y',
+            'format' => 'j M Y',
+        ],
+        [
+            'slug'   => 'DDo-MMMM-YYYY',
+            'label'  => 'DDo MMMM YYYY',
+            'format' => 'jS F Y',
         ],
         [
             'slug'   => 'DD-MMMM-YYYY',
             'label'  => 'DD MMMM YYYY',
-            'format' => 'jS F Y',
+            'format' => 'j F Y',
         ],
         [
             'slug'   => 'DD/MM/YYYY',
