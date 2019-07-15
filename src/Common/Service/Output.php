@@ -13,8 +13,35 @@
 
 namespace Nails\Common\Service;
 
-use Nails\Factory;
-
+/**
+ * Class Output
+ *
+ * @package Nails\Common\Service
+ *
+ * @property $final_output     = null;
+ * @property $cache_expiration = 0;
+ * @property $headers          = array();
+ * @property $mimes            =    array();
+ * @property $enable_profiler  = FALSE;
+ * @property $parse_exec_vars  = TRUE;
+ *
+ * @method get_output()
+ * @method set_output($output)
+ * @method append_output($output)
+ * @method set_header($header, $replace = true)
+ * @method set_content_type($mime_type, $charset = null)
+ * @method get_content_type()
+ * @method get_header($header)
+ * @method set_status_header($code = 200, $text = '')
+ * @method enable_profiler($val = true)
+ * @method set_profiler_sections($sections)
+ * @method cache($time)
+ * @method _display($output = '')
+ * @method _write_cache($output)
+ * @method _display_cache(&$CFG, &$URI)
+ * @method delete_cache($uri = '')
+ * @method set_cache_header($last_modified, $expiration)
+ */
 class Output
 {
     /**
@@ -54,8 +81,8 @@ class Output
     /**
      * Route calls to the CodeIgniter Output class
      *
-     * @param  string $sMethod    The method being called
-     * @param  array  $aArguments Any arguments being passed
+     * @param string $sMethod    The method being called
+     * @param array  $aArguments Any arguments being passed
      *
      * @return mixed
      */
@@ -73,7 +100,7 @@ class Output
     /**
      * Pass any property "gets" to the CodeIgniter Output class
      *
-     * @param  string $sProperty The property to get
+     * @param string $sProperty The property to get
      *
      * @return mixed
      */
@@ -87,8 +114,8 @@ class Output
     /**
      * Pass any property "sets" to the CodeIgniter Output class
      *
-     * @param  string $sProperty The property to set
-     * @param  mixed  $mValue    The value to set
+     * @param string $sProperty The property to set
+     * @param mixed  $mValue    The value to set
      *
      * @return void
      */
