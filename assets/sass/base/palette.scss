@@ -1,31 +1,30 @@
 //  Brand colours
-$color-brand: #ca4007;
-$color-brand-text: darken($color-brand, 30%);
+$color-brand: #d53354;
+$color-brand-text: #ffffff;
 $color-brand-border: darken($color-brand, 10%);
 
 // --------------------------------------------------------------------------
 
 //  Whites
-$color-white: #fff;
+$color-white: #ffffff;
 $color-white-lightest: lighten($color-white, 10%);
 $color-white-lighter: lighten($color-white, 30%);
 $color-white-darker: darken($color-white, 5%);
 $color-white-darkest: darken($color-white, 10%);
 
-//  Greys: ;
-$color-grey: #ccc;
+//  Greys
+$color-grey: #cccccc;
 $color-grey-lightest: lighten($color-grey, 10%);
 $color-grey-lighter: lighten($color-grey, 5%);
 $color-grey-darker: darken($color-grey, 5%);
 $color-grey-darkest: darken($color-grey, 10%);
 
 //  Blacks
-$color-black: #333;
+$color-black: #333333;
 $color-black-lightest: lighten($color-black, 10%);
 $color-black-lighter: lighten($color-black, 5%);
 $color-black-darker: darken($color-black, 5%);
 $color-black-darkest: darken($color-black, 10%);
-
 
 // --------------------------------------------------------------------------
 
