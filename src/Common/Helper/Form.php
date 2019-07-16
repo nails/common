@@ -428,7 +428,7 @@ class Form
         }
 
         //  Download original file, if type is file and original is available
-        if (($_field_type == 'file' || $_field_type == 'upload') && $_field_default) :
+        if (($_field_type == 'file' || $_field_type == 'upload') && $_field_default) {
 
             $_field_html .= '<span class="file-download">';
 
@@ -461,17 +461,16 @@ class Form
             }
 
             $_field_html .= '</span>';
-
-        endif;
+        }
 
         // --------------------------------------------------------------------------
 
         //  Errors
-        if ($_error && $_field_error) :
+        if ($_error && $_field_error) {
             $_error = '<span class="alert alert-danger">' . $_field_error . '</span>';
-        elseif ($_error) :
+        } elseif ($_error) {
             $_error = form_error($_field_key, '<span class="alert alert-danger">', '</span>');
-        endif;
+        }
 
         // --------------------------------------------------------------------------
 
@@ -1397,11 +1396,9 @@ EOT;
 
         //  Any data attributes?
         $_data = '';
-        foreach ($_field['data'] as $attr => $value) :
-
+        foreach ($_field['data'] as $attr => $value) {
             $_data .= ' data-' . $attr . '="' . $value . '"';
-
-        endforeach;
+        }
 
         //  Get the selected options
         $_selected = set_value($_field['key'], $_field['default']);
@@ -1410,12 +1407,12 @@ EOT;
         $_placeholder = null !== $_field['placeholder'] ? 'data-placeholder="' . htmlentities($_field['placeholder'], ENT_QUOTES) . '"' : '';
         $_out         .= '<select name="' . $_field['key'] . '" class="' . $_field['class'] . '" style="' . $_field['style'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . $_data . '>';
 
-        foreach ($_field['options'] as $value => $label) :
+        foreach ($_field['options'] as $value => $label) {
 
-            if (is_array($label)) :
+            if (is_array($label)) {
 
                 $_out .= '<optgroup label="' . $value . '">';
-                foreach ($label as $k => $v) :
+                foreach ($label as $k => $v) {
 
                     //  Selected?
                     $_checked = $k == $_selected ? ' selected="selected"' : '';
@@ -1424,11 +1421,10 @@ EOT;
                     $_disabled = array_search($k, $_field['disabled_options']) !== false ? ' disabled="disabled"' : '';
 
                     $_out .= '<option value="' . $k . '"' . $_checked . $_disabled . '>' . $v . '</option>';
-
-                endforeach;
+                }
                 $_out .= '</optgroup>';
 
-            else :
+            } else {
 
                 //  Selected?
                 $_checked = $value == $_selected ? ' selected="selected"' : '';
@@ -1438,18 +1434,15 @@ EOT;
 
                 $_out .= '<option value="' . $value . '"' . $_checked . $_disabled . '>' . $label . '</option>';
 
-            endif;
-
-        endforeach;
+            }
+        }
         $_out .= '</select>';
 
         // --------------------------------------------------------------------------
 
-        if ($_readonly) :
-
+        if ($_readonly) {
             $_out .= form_hidden($_field['key'], $_field['default']);
-
-        endif;
+        }
 
         //  Tip
         $_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
@@ -1541,11 +1534,9 @@ EOT;
 
         //  Any data attributes?
         $_data = '';
-        foreach ($_field['data'] as $attr => $value) :
-
+        foreach ($_field['data'] as $attr => $value) {
             $_data .= ' data-' . $attr . '="' . $value . '"';
-
-        endforeach;
+        }
 
         //  Any defaults?
         $_field['default'] = (array) $_field['default'];
@@ -1557,32 +1548,29 @@ EOT;
         $_placeholder = null !== $_field['placeholder'] ? 'data-placeholder="' . htmlentities($_field['placeholder'], ENT_QUOTES) . '"' : '';
         $_out         .= '<select name="' . $_field['key'] . '" multiple="multiple" class="' . $_field['class'] . '" style="' . $_field['style'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . $_data . '>';
 
-        foreach ($options as $value => $label) :
+        foreach ($options as $value => $label) {
 
             //  Selected?
-            if (is_array($_selected)) :
-                if (in_array($value, $_selected)) :
+            if (is_array($_selected)) {
+                if (in_array($value, $_selected)) {
                     $_checked = ' selected="selected"';
-                else :
+                } else {
                     $_checked = '';
-                endif;
-            else :
+                }
+            } else {
                 $_checked = $value == $_selected ? ' selected="selected"' : '';
-            endif;
+            }
 
             //  Disabled?
             $_disabled = array_search($value, $_field['disabled_options']) !== false ? ' disabled="disabled"' : '';
 
             $_out .= '<option value="' . $value . '"' . $_checked . $_disabled . '>' . $label . '</option>';
-
-        endforeach;
+        }
         $_out .= '</select>';
 
-        if ($_readonly) :
-
+        if ($_readonly) {
             $_out .= form_hidden($_field['key'], $_field['default']);
-
-        endif;
+        }
 
         // --------------------------------------------------------------------------
 
@@ -1776,33 +1764,25 @@ EOT;
         $oInput = Factory::service('Input');
 
         //  Field
-        if (substr($_field['key'], -2) == '[]') :
+        if (substr($_field['key'], -2) == '[]') {
 
             //  Field is an array, need to look for the value
             $_values        = $oInput->post(substr($_field['key'], 0, -2));
             $_data_selected = isset($_field['options'][0]['selected']) ? $_field['options'][0]['selected'] : false;
             $_selected      = $oInput->post() ? false : $_data_selected;
 
-            if (is_array($_values) && array_search($_field['options'][0]['value'], $_values) !== false) :
+            if (is_array($_values) && array_search($_field['options'][0]['value'], $_values) !== false) {
+                $_select
+            }
 
-                $_selected = true;
-
-            endif;
-
-        else :
-
+        } else {
             //  Normal field, continue as normal Mr Norman!
-            if ($oInput->post($_field['key'])) :
-
+            if ($oInput->post($_field['key'])) {
                 $_selected = $oInput->post($_field['key']) == $_field['options'][0]['value'] ? true : false;
-
-            else :
-
+            } else {
                 $_selected = isset($_field['options'][0]['selected']) ? $_field['options'][0]['selected'] : false;
-
-            endif;
-
-        endif;
+            }
+        }
 
         $_key = isset($_field['options'][0]['key']) ? $_field['options'][0]['key'] : $_field['key'];
 
@@ -1838,7 +1818,7 @@ EOT;
 
         //  Remaining options
         $numOptions = count($_field['options']);
-        for ($i = 1; $i < $numOptions; $i++) :
+        for ($i = 1; $i < $numOptions; $i++) {
 
             $_out .= '<label>';
 
@@ -1855,33 +1835,25 @@ EOT;
             $_out .= '<span class="input ' . $_disabledclass . '">';
 
             //  Input
-            if (substr($_field['key'], -2) == '[]') :
+            if (substr($_field['key'], -2) == '[]') {
 
                 //  Field is an array, need to look for the value
                 $_values        = $oInput->post(substr($_field['key'], 0, -2));
                 $_data_selected = isset($_field['options'][$i]['selected']) ? $_field['options'][$i]['selected'] : false;
                 $_selected      = $oInput->post() ? false : $_data_selected;
 
-                if (is_array($_values) && array_search($_field['options'][$i]['value'], $_values) !== false) :
-
+                if (is_array($_values) && array_search($_field['options'][$i]['value'], $_values) !== false) {
                     $_selected = true;
+                }
 
-                endif;
-
-            else :
-
+            } else {
                 //  Normal field, continue as normal Mr Norman!
-                if ($oInput->post($_field['key'])) :
-
+                if ($oInput->post($_field['key'])) {
                     $_selected = $oInput->post($_field['key']) == $_field['options'][$i]['value'] ? true : false;
-
-                else :
-
+                } else {
                     $_selected = isset($_field['options'][$i]['selected']) ? $_field['options'][$i]['selected'] : false;
-
-                endif;
-
-            endif;
+                }
+            }
 
             $_key = isset($_field['options'][$i]['key']) ? $_field['options'][$i]['key'] : $_field['key'];
 
@@ -1907,8 +1879,7 @@ EOT;
 
             $_out .= '</span>';
             $_out .= '</label>';
-
-        endfor;
+        }
 
         //  Error
         $_out .= form_error($_field['key'], '<span class="alert alert-danger">', '</span>');

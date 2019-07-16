@@ -58,7 +58,7 @@ class Url
         // --------------------------------------------------------------------------
 
         if (!preg_match('#^https?://#i', $sUrl)) {
-            $sUrl = site_url($sUrl);
+            $sUrl = siteUrl($sUrl);
         }
 
         switch ($sMethod) {

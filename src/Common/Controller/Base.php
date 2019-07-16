@@ -703,7 +703,7 @@ abstract class Base extends \MX_Controller
         $oAsset     = Factory::service('Asset');
         $aVariables = [
             'ENVIRONMENT' => Environment::get(),
-            'SITE_URL'    => site_url('', Functions::isPageSecure()),
+            'SITE_URL'    => siteUrl('', Functions::isPageSecure()),
             'NAILS'       => (object) [
                 'URL'  => NAILS_ASSETS_URL,
                 'LANG' => (object) [],

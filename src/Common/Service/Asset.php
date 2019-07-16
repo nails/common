@@ -53,17 +53,17 @@ class Asset
         $this->sCacheBuster    = defined('DEPLOY_REVISION') ? DEPLOY_REVISION : '';
 
         $this->sBaseUrl       = defined('DEPLOY_ASSET_BASE_URL') ? DEPLOY_ASSET_BASE_URL : 'assets/build';
-        $this->sBaseUrl       = site_url($this->sBaseUrl);
+        $this->sBaseUrl       = siteUrl($this->sBaseUrl);
         $this->sBaseUrl       = addTrailingSlash($this->sBaseUrl);
         $this->sBaseUrlSecure = defined('DEPLOY_ASSET_BASE_URL_SECURE') ? DEPLOY_ASSET_BASE_URL_SECURE : 'assets/build';
-        $this->sBaseUrlSecure = site_url($this->sBaseUrlSecure);
+        $this->sBaseUrlSecure = siteUrl($this->sBaseUrlSecure);
         $this->sBaseUrlSecure = addTrailingSlash($this->sBaseUrlSecure);
 
         $this->sBaseModuleUrl       = defined('DEPLOY_ASSET_BASE_MODULE_URL') ? DEPLOY_ASSET_BASE_MODULE_URL : 'vendor';
-        $this->sBaseModuleUrl       = site_url($this->sBaseModuleUrl);
+        $this->sBaseModuleUrl       = siteUrl($this->sBaseModuleUrl);
         $this->sBaseModuleUrl       = addTrailingSlash($this->sBaseModuleUrl);
         $this->sBaseModuleUrlSecure = defined('DEPLOY_ASSET_BASE_MODULE_URL_SECURE') ? DEPLOY_ASSET_BASE_MODULE_URL_SECURE : 'vendor';
-        $this->sBaseModuleUrlSecure = site_url($this->sBaseModuleUrlSecure);
+        $this->sBaseModuleUrlSecure = siteUrl($this->sBaseModuleUrlSecure);
         $this->sBaseModuleUrlSecure = addTrailingSlash($this->sBaseModuleUrlSecure);
 
         $this->sBowerDir = defined('DEPLOY_ASSET_BOWER_DIR') ? DEPLOY_ASSET_BOWER_DIR : 'bower_components';
