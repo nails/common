@@ -1772,7 +1772,7 @@ EOT;
             $_selected      = $oInput->post() ? false : $_data_selected;
 
             if (is_array($_values) && array_search($_field['options'][0]['value'], $_values) !== false) {
-                $_select
+                $_selected = true;
             }
 
         } else {
