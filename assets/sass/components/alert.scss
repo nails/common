@@ -27,4 +27,9 @@
         border-color: $color-info-border;
         background: $color-info-background;
     }
+
+    a {
+        color: inherit;
+        text-decoration: underline;
+    }
 }

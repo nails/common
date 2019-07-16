@@ -1,7 +1,7 @@
 .form {
     &__group {
         display: block;
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem;
 
         input[type=text],
         input[type=password],
@@ -13,16 +13,43 @@
             padding: 0.5rem;
             box-sizing: border-box;
             margin-top: 0.5rem;
-
-            &.has-error {
-                border: 1px solid $color-danger-border;
-            }
+            font-size: 1rem;
+            border: 1px solid $color-grey;
         }
 
         input[type=radio],
         input[type=checkbox] {
             display: inline-block;
             margin-right: 0.5rem;
+        }
+
+        &--checkbox {
+            label {
+                cursor: pointer;
+            }
+        }
+
+        &.has-error {
+            input {
+                border: 1px solid $color-danger-border;
+            }
+        }
+
+        .form__help,
+        .form__error {
+            @extend .alert;
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            margin: 0;
+            margin-top: -1px;
+        }
+
+        .form__error {
+            @extend .alert--danger;
+        }
+
+        .form__help {
+            @extend .alert--info;
         }
     }
 }
