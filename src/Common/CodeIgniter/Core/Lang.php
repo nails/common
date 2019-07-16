@@ -23,7 +23,7 @@ class Lang extends MX_Lang
     /**
      * Overriding the default line() method so that parameters can be specified
      * @param   string  $line   the language line
-     * @param   array   $params any parameters to sub in
+     * @param   array|string   $params any parameters to sub in
      * @return  string
      */
     public function line($line = '', $params = null)
