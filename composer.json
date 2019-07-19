@@ -65,7 +65,6 @@
                     "string",
                     "array",
                     "app_setting",
-                    "app_notification",
                     "date",
                     "url",
                     "cookie",

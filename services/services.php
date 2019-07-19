@@ -299,13 +299,6 @@ return [
     ],
 
     'models' => [
-        'AppNotification' => function () {
-            if (class_exists('\App\Common\Model\AppNotification')) {
-                return new \App\Common\Model\AppNotification();
-            } else {
-                return new \Nails\Common\Model\AppNotification();
-            }
-        },
         'Country'         => function () {
             if (class_exists('\App\Common\Model\Country')) {
                 return new \App\Common\Model\Country();
