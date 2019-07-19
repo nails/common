@@ -13,8 +13,8 @@
 
 namespace Nails\Common\Controller;
 
-use Nails\Auth\Model\User;
 use Nails\Common\Events;
+use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
 use Nails\Components;
 use Nails\Environment;
@@ -44,6 +44,7 @@ abstract class Base extends \MX_Controller
         $this->setContentType();
         $this->definePackages();
         $this->passwordProtected();
+        $this->initiateDatabase();
         $this->instantiateUser();
         $this->instantiateLanguages();
         $this->isUserSuspended();
@@ -116,7 +117,7 @@ abstract class Base extends \MX_Controller
     /**
      * Sets the content type to use for the request to UTF-8
      *
-     * @throws \Nails\Common\Exception\FactoryException
+     * @throws FactoryException
      */
     protected function setContentType()
     {
@@ -387,7 +388,7 @@ abstract class Base extends \MX_Controller
      * Checks if routes need to be generated as part of the startup request
      *
      * @throws NailsException
-     * @throws \Nails\Common\Exception\FactoryException
+     * @throws FactoryException
      */
     protected function generateRoutes()
     {
@@ -411,6 +412,7 @@ abstract class Base extends \MX_Controller
      */
     protected function instantiateLanguages()
     {
+
         //  Define default language
         $oLanguageService = Factory::service('Language');
         $oDefault         = $oLanguageService->getDefault();
@@ -491,6 +493,18 @@ abstract class Base extends \MX_Controller
     // --------------------------------------------------------------------------
 
     /**
+     * Initiate the database connection; needs done early so all services properly connect
+     *
+     * @throws FactoryException
+     */
+    protected function initiateDatabase()
+    {
+        Factory::service('Database');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Set up the active user
      *
      * @return void
@@ -502,7 +516,6 @@ abstract class Base extends \MX_Controller
          * the user's cookies and set's up the session for an existing or new user.
          */
 
-        /** @var User $oUserModel */
         $oUserModel = Factory::model('User', 'nails/module-auth');
         $oUserModel->init();
     }
@@ -589,7 +602,7 @@ abstract class Base extends \MX_Controller
      *
      * @param array $aMeta Any additional meta items to set
      *
-     * @throws \Nails\Common\Exception\FactoryException
+     * @throws FactoryException
      */
     protected function setCommonMeta(array $aMeta = [])
     {
@@ -613,7 +626,7 @@ abstract class Base extends \MX_Controller
     /**
      * Sets a global Nails JS object
      *
-     * @throws \Nails\Common\Exception\FactoryException
+     * @throws FactoryException
      */
     public static function setNailsJs()
     {
@@ -642,7 +655,7 @@ abstract class Base extends \MX_Controller
     /**
      * Sets global JS
      *
-     * @throws \Nails\Common\Exception\FactoryException
+     * @throws FactoryException
      */
     protected function setGlobalJs()
     {
@@ -676,7 +689,7 @@ abstract class Base extends \MX_Controller
     /**
      * Sets global CSS
      *
-     * @throws \Nails\Common\Exception\FactoryException
+     * @throws FactoryException
      */
     protected function setGlobalCss()
     {
