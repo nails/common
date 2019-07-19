@@ -13,6 +13,7 @@
 
 namespace Nails\Common\Controller;
 
+use Nails\Auth\Model\User;
 use Nails\Common\Events;
 use Nails\Common\Exception\NailsException;
 use Nails\Components;
@@ -501,6 +502,7 @@ abstract class Base extends \MX_Controller
          * the user's cookies and set's up the session for an existing or new user.
          */
 
+        /** @var User $oUserModel */
         $oUserModel = Factory::model('User', 'nails/module-auth');
         $oUserModel->init();
     }
