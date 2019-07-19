@@ -1,9 +1,8 @@
 <?php
 
 /**
- * Migration:   4
- * Started:     14/09/2018
- * Finalised:   14/09/2018
+ * Migration:   5
+ * Started:     19/07/2019
  *
  * @package     Nails
  * @subpackage  common
@@ -17,7 +16,7 @@ namespace Nails\Database\Migration\Nails\Common;
 use Nails\Common\Console\Migrate\Base;
 use Nails\Factory;
 
-class Migration4 extends Base
+class Migration5 extends Base
 {
     /**
      * Execute the migration
