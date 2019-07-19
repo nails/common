@@ -14,7 +14,6 @@
 namespace Nails\Common\Helper;
 
 use Nails\Common\Exception\NailsException;
-use Nails\Components;
 use Nails\Factory;
 
 class Form
@@ -428,39 +427,11 @@ class Form
             $_max_length_html = '';
         }
 
-        //  Download original file, if type is file and original is available
+        //  Show current value
         if (($_field_type == 'file' || $_field_type == 'upload') && $_field_default) {
 
             $_field_html .= '<span class="file-download">';
-
-            $_ext = end(explode('.', $_field_default));
-
-            switch ($_ext) {
-
-                case 'jpg':
-                case 'png':
-                case 'gif':
-
-                    $_field_html .= 'Download: ';
-                    $_field_html .= anchor(
-                        cdnServe($_field_default),
-                        img(cdnCrop($_field_default, 35, 35)),
-                        'class="fancybox"'
-                    );
-                    break;
-
-                // --------------------------------------------------------------------------
-
-                default:
-
-                    $_field_html .= anchor(
-                        cdnServe($_field_default, true),
-                        'Download',
-                        'class="btn btn-xs btn-primary" target="_blank"'
-                    );
-                    break;
-            }
-
+            echo 'Current: ' . $_field_default;
             $_field_html .= '</span>';
         }
 
