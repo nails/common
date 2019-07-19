@@ -288,11 +288,6 @@ abstract class Base
                 'id_column' => 'modified_by',
             ]);
         }
-
-        // --------------------------------------------------------------------------
-
-        //  @todo (Pablo - 2017-06-08) - Remove this
-        static::backwardsCompatibility($this);
     }
 
     // --------------------------------------------------------------------------
@@ -2680,20 +2675,5 @@ abstract class Base
                     $aData
                 );
         }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Various older modules expect to be able to access a few services/models
-     * via magic methods. These will be deprecated soon.
-     *
-     * @param object $oBindTo The class to bind to
-     */
-    public static function backwardsCompatibility(&$oBindTo)
-    {
-        //  @todo (Pablo - 2017-06-07) - Remove these
-        $oBindTo->db      = Factory::service('Database');
-        $oBindTo->encrypt = Factory::service('Encrypt');
     }
 }

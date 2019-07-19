@@ -75,11 +75,6 @@ abstract class Base extends \MX_Controller
 
         // --------------------------------------------------------------------------
 
-        //  @todo (Pablo - 2017-06-08) - Remove this
-        self::backwardsCompatibility($this);
-
-        // --------------------------------------------------------------------------
-
         //  Call the SYSTEM:READY event, the system is all geared up and ready to go
         Factory::service('Event')
             ->trigger(Events::SYSTEM_READY);
@@ -578,45 +573,6 @@ abstract class Base extends \MX_Controller
             $oSession->setFlashData('error', lang('auth_login_fail_suspended'));
             redirect('/');
         }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Provides some backwards compatability
-     *
-     * @param \stdClass $oBindTo The class to bind to
-     */
-    public static function backwardsCompatibility(&$oBindTo)
-    {
-        /**
-         * Backwards compatibility
-         * Various older modules expect to be able to access a few services/models
-         * via magic methods. These will be deprecated soon.
-         */
-
-        //  @todo (Pablo - 2017-06-07) - Remove these
-        //  @todo (Pablo - 2019-06-18) - Removed calls to these variables in Nails modules, probably safe to remove now
-        $oBindTo->db                  = Factory::service('Database');
-        $oBindTo->input               = Factory::service('Input');
-        $oBindTo->output              = Factory::service('Output');
-        $oBindTo->meta                = Factory::service('Meta');
-        $oBindTo->asset               = Factory::service('Asset');
-        $oBindTo->encrypt             = Factory::service('Encrypt');
-        $oBindTo->logger              = Factory::service('Logger');
-        $oBindTo->uri                 = Factory::service('Uri');
-        $oBindTo->security            = Factory::service('Security');
-        $oBindTo->emailer             = Factory::service('Emailer', 'nails/module-email');
-        $oBindTo->event               = Factory::service('Event', 'nails/module-event');
-        $oBindTo->session             = Factory::service('Session', 'nails/module-auth');
-        $oBindTo->user                = Factory::model('User', 'nails/module-auth');
-        $oBindTo->user_group_model    = Factory::model('UserGroup', 'nails/module-auth');
-        $oBindTo->user_password_model = Factory::model('UserPassword', 'nails/module-auth');
-
-        //  Set variables for the views, too
-        $oBindTo->data['user']          = $oBindTo->user;
-        $oBindTo->data['user_group']    = $oBindTo->user_group_model;
-        $oBindTo->data['user_password'] = $oBindTo->user_password_model;
     }
 
     // --------------------------------------------------------------------------
