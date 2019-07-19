@@ -66,6 +66,7 @@
                     "array",
                     "app_setting",
                     "date",
+                    "email",
                     "url",
                     "cookie",
                     "form",
