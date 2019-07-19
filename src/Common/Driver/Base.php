@@ -12,6 +12,8 @@
 
 namespace Nails\Common\Driver;
 
+use Nails\Components;
+
 abstract class Base
 {
     protected $sSlug;
@@ -58,7 +60,7 @@ abstract class Base
     /**
      * Safely retrieve a value from the $oSettings object
      *
-     * @param  string $sProperty the property to retrieve
+     * @param string $sProperty the property to retrieve
      *
      * @return mixed
      */
@@ -77,6 +79,7 @@ abstract class Base
 
     /**
      * Return the driver's slug
+     *
      * @return string
      */
     public function getSlug()
@@ -88,6 +91,7 @@ abstract class Base
 
     /**
      * Return the driver's label
+     *
      * @return string
      */
     public function getLabel()
@@ -99,6 +103,7 @@ abstract class Base
 
     /**
      * Return the driver's logo ID
+     *
      * @return integer
      */
     public function getLogoId()
@@ -111,8 +116,8 @@ abstract class Base
     /**
      * Returns the URL of the driver's logo
      *
-     * @param  integer $iWidth  The bounding width
-     * @param  integer $iHeight The bounding height
+     * @param integer $iWidth  The bounding width
+     * @param integer $iHeight The bounding height
      *
      * @return string
      */
@@ -120,7 +125,9 @@ abstract class Base
     {
         $iLogoId = $this->getLogoId();
 
-        if (!empty($iLogoId) && !empty($iWidth) && !empty($iHeight)) {
+        if (!Components::exists('nails/module-cdn')) {
+            return null;
+        } elseif (!empty($iLogoId) && !empty($iWidth) && !empty($iHeight)) {
             return cdnScale($iLogoId, $iWidth, $iHeight);
         } elseif (!empty($iLogoId)) {
             return cdnServe($iLogoId);
