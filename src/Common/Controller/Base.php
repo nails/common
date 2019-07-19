@@ -43,7 +43,6 @@ abstract class Base extends \MX_Controller
         $this->setContentType();
         $this->definePackages();
         $this->passwordProtected();
-        $this->testCache();
         $this->instantiateUser();
         $this->instantiateLanguages();
         $this->isUserSuspended();
@@ -122,46 +121,6 @@ abstract class Base extends \MX_Controller
     {
         $oOutput = Factory::service('Output');
         $oOutput->set_content_type('text/html; charset=utf-8');
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Tests that the cache is writable
-     *
-     * @return bool
-     * @throws NailsException
-     */
-    protected function testCache()
-    {
-        if (is_writable(CACHE_PATH)) {
-
-            return true;
-
-        } elseif (is_dir(CACHE_PATH)) {
-
-            //  Attempt to chmod the dir
-            if (@chmod(CACHE_PATH, FILE_WRITE_MODE)) {
-
-                return true;
-
-            } else {
-                throw new NailsException(
-                    'The app\'s cache dir "' . CACHE_PATH . '" exists but is not writable.',
-                    1
-                );
-            }
-
-        } elseif (@mkdir(CACHE_PATH)) {
-
-            return true;
-
-        } else {
-            throw new NailsException(
-                'The app\'s cache dir "' . CACHE_PATH . '" does not exist and could not be created.',
-                1
-            );
-        }
     }
 
     // --------------------------------------------------------------------------
