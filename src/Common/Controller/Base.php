@@ -155,7 +155,7 @@ abstract class Base extends \MX_Controller
 
                 //  Load the encryption service. Set the package path so it is loaded correctly
                 //  (this runs early, before the paths are added)
-                $this->load->add_package_path(NAILS_COMMON_PATH);
+                get_instance()->load->add_package_path(NAILS_COMMON_PATH);
                 Factory::service('encrypt');
 
                 $whitelistIp   = (array) appSetting('maintenance_mode_whitelist', 'site');
@@ -444,7 +444,7 @@ abstract class Base extends \MX_Controller
         $oConfig->set_item('language', RENDER_LANG_CODE);
 
         //  Load the Nails. generic lang file
-        $this->lang->load('nails');
+        get_instance()->lang->load('nails');
     }
 
     // --------------------------------------------------------------------------
@@ -486,7 +486,7 @@ abstract class Base extends \MX_Controller
         $aPaths[] = NAILS_APP_PATH . 'application';
 
         foreach ($aPaths as $sPath) {
-            $this->load->add_package_path($sPath);
+            get_instance()->load->add_package_path($sPath);
         }
     }
 
@@ -534,7 +534,7 @@ abstract class Base extends \MX_Controller
 
             //  Load models and langs
             $oAuthModel = Factory::model('Auth', 'nails/module-auth');
-            $this->lang->load('auth/auth');
+            get_instance()->lang->load('auth/auth');
 
             //  Log the user out
             $oAuthModel->logout();
