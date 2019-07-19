@@ -141,6 +141,9 @@ class Database
      */
     public function __construct()
     {
+        /** @var FileCache $oFileCache */
+        $oFileCache = Factory::service('FileCache');
+
         $aParams = [
 
             //  Consistent between deployments
@@ -167,7 +170,7 @@ class Database
             'username' => Factory::property('DB_USERNAME'),
             'password' => Factory::property('DB_PASSWORD'),
             'database' => Factory::property('DB_DATABASE'),
-            'cachedir' => CACHE_PATH,
+            'cachedir' => $oFileCache->getDir(),
         ];
 
         $sDbPath = BASEPATH . 'database/';
