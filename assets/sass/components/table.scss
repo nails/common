@@ -1,0 +1,17 @@
+.table {
+    width: 100%;
+
+    thead,
+    tbody,
+    tfoot {
+        td {
+            padding: 1rem;
+        }
+    }
+
+    tbody {
+        td {
+            border-bottom: 1px solid $color-grey-lightest;
+        }
+    }
+}
