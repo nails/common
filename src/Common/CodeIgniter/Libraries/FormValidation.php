@@ -14,9 +14,16 @@ namespace Nails\Common\CodeIgniter\Libraries;
 
 use CI_Form_validation;
 use Nails\Common\Helper\ArrayHelper;
+use Nails\Common\Service\Database;
+use Nails\Common\Service\Input;
 use Nails\Common\Service\Locale;
 use Nails\Factory;
 
+/**
+ * Class FormValidation
+ *
+ * @package Nails\Common\CodeIgniter\Libraries
+ */
 class FormValidation extends CI_Form_validation
 {
     /**
@@ -30,7 +37,8 @@ class FormValidation extends CI_Form_validation
     public function run($module = '', $group = '')
     {
         if (is_object($module)) {
-            $this->CI = &$module;
+            $this->CI       = &$module;
+            $this->CI->lang = &get_instance()->lang;
         }
         return parent::run($group);
     }
@@ -87,6 +95,7 @@ class FormValidation extends CI_Form_validation
             $this->set_message('unique_if_diff', lang('fv_unique_if_diff_field'));
         }
 
+        /** @var Database $oDb */
         $oDb = Factory::service('Database');
         $oDb->where($column . ' !=', $old);
         $oDb->where($column, $new);
@@ -219,6 +228,7 @@ class FormValidation extends CI_Form_validation
 
         try {
 
+            /** @var \DateTime $oNow */
             $oNow  = Factory::factory('DateTime');
             $oDate = \DateTime::createFromFormat($sFormat, $sDate);
 
@@ -264,6 +274,7 @@ class FormValidation extends CI_Form_validation
 
         try {
 
+            /** @var \DateTime $oNow */
             $oNow  = Factory::factory('DateTime');
             $oDate = \DateTime::createFromFormat($sFormat, $sDate);
 
@@ -309,6 +320,7 @@ class FormValidation extends CI_Form_validation
 
         try {
 
+            /** @var \DateTime $oNow */
             $oNow  = Factory::factory('DateTime');
             $oDate = \DateTime::createFromFormat($sFormat, $sDate);
 
@@ -361,6 +373,7 @@ class FormValidation extends CI_Form_validation
         }
 
         //  If the other field is blank then bail out
+        /** @var Input $oInput */
         $oInput = Factory::service('Input');
         $sOther = $oInput->post($sField);
         if (empty($sOther)) {
@@ -421,6 +434,7 @@ class FormValidation extends CI_Form_validation
         }
 
         //  If the other field is blank then bail out
+        /** @var Input $oInput */
         $oInput = Factory::service('Input');
         $sOther = $oInput->post($sField);
         if (empty($sOther)) {
@@ -515,6 +529,7 @@ class FormValidation extends CI_Form_validation
 
         try {
 
+            /** @var \DateTime $oNow */
             $oNow  = Factory::factory('DateTime');
             $oDate = \DateTime::createFromFormat($sFormat, $sDateTime);
 
@@ -557,6 +572,7 @@ class FormValidation extends CI_Form_validation
 
         try {
 
+            /** @var \DateTime $oNow */
             $oNow  = Factory::factory('DateTime');
             $oDate = \DateTime::createFromFormat($sFormat, $sDateTime);
 
@@ -606,6 +622,7 @@ class FormValidation extends CI_Form_validation
         }
 
         //  If the other field is blank then bail out
+        /** @var Input $oInput */
         $oInput = Factory::service('Input');
         $sOther = $oInput->post($sField);
         if (empty($sOther)) {
@@ -663,6 +680,7 @@ class FormValidation extends CI_Form_validation
         }
 
         //  If the other field is blank then bail out
+        /** @var Input $oInput */
         $oInput = Factory::service('Input');
         $sOther = $oInput->post($sField);
         if (empty($sOther)) {
@@ -754,6 +772,7 @@ class FormValidation extends CI_Form_validation
 
         try {
 
+            /** @var \DateTime $oNow */
             $oNow  = Factory::factory('DateTime');
             $oDate = \DateTime::createFromFormat($sFormat, $sTime);
 
@@ -796,6 +815,7 @@ class FormValidation extends CI_Form_validation
 
         try {
 
+            /** @var \DateTime $oNow */
             $oNow  = Factory::factory('DateTime');
             $oDate = \DateTime::createFromFormat($sFormat, $sTime);
 
@@ -845,6 +865,7 @@ class FormValidation extends CI_Form_validation
         }
 
         //  If the other field is blank then bail out
+        /** @var Input $oInput */
         $oInput = Factory::service('Input');
         $sOther = $oInput->post($sField);
         if (empty($sOther)) {
@@ -902,6 +923,7 @@ class FormValidation extends CI_Form_validation
         }
 
         //  If the other field is blank then bail out
+        /** @var Input $oInput */
         $oInput = Factory::service('Input');
         $sOther = $oInput->post($sField);
         if (empty($sOther)) {
@@ -1095,6 +1117,7 @@ class FormValidation extends CI_Form_validation
         $sIgnoreId     = ArrayHelper::getFromArray(2, $aParameters);
         $sIgnoreColumn = ArrayHelper::getFromArray(3, $aParameters, 'id');
 
+        /** @var Database $oDb */
         $oDb = Factory::service('Database');
         $oDb->where($sColumn, $sString);
         if ($sIgnoreId) {
