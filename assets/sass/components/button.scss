@@ -29,6 +29,7 @@
         width: 100%;
         margin-bottom: 1rem;
         box-sizing: border-box;
+
         &:last-child {
             margin-bottom: 0;
         }
@@ -44,6 +45,7 @@
         border: 1px solid $color-white-darker;
         color: $color-grey-lighter;
         cursor: not-allowed;
+        opacity: 0.5;
     }
 
     &--primary {
@@ -76,4 +78,22 @@
         background: $color-info-background;
     }
 
+    &--working {
+        text-indent: -9999rem;
+        position: relative;
+        opacity: 0.5;
+
+        &:before {
+            content: '';
+            display: block;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url(../svg/loading-puff.svg);
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+    }
 }
