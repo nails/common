@@ -37,8 +37,9 @@ class FormValidation extends CI_Form_validation
     public function run($module = '', $group = '')
     {
         if (is_object($module)) {
-            $this->CI       = &$module;
-            $this->CI->lang = &get_instance()->lang;
+            $this->CI        = &$module;
+            $this->CI->input = &get_instance()->input;
+            $this->CI->lang  = &get_instance()->lang;
         }
         return parent::run($group);
     }
