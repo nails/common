@@ -411,6 +411,8 @@ class ErrorHandler
         $oRouter     = Factory::service('Router');
         $sController = ucfirst($oRouter->fetch_class());
 
+        //  @todo (Pablo - 2019-07-26) - Add path for app module-specific view
+
         if (class_exists($sController)) {
             $oReflection     = new \ReflectionClass($sController);
             $sModuleViewPath = preg_replace('/controllers$/', '', dirname($oReflection->getFileName()));

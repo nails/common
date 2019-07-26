@@ -187,7 +187,10 @@ class Database
         $this->oDb = new $sDriver($aParams);
 
         if (!empty($aParams['autoinit'])) {
+            $iErrorReporting = error_reporting();
+            error_reporting(0);
             $this->oDb->initialize();
+            error_reporting($iErrorReporting);
         }
 
         if (!empty($aParams['stricton'])) {
