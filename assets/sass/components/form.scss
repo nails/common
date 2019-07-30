@@ -1,4 +1,20 @@
 .form {
+    &__row {
+        display: flex;
+
+        .form__group--half {
+            width: 50%;
+
+            &:nth-child(odd) {
+                margin-right: 0.5rem;
+            }
+
+            &:nth-child(event) {
+                margin-left: 0.5rem;
+            }
+        }
+    }
+
     &__group {
         display: block;
         margin-bottom: 1.5rem;
@@ -34,6 +50,7 @@
             .input,
             input {
                 border: 1px solid $color-danger-border;
+                background: lighten($color-danger-border, 42.5%);
             }
         }
 
