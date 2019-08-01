@@ -40,7 +40,8 @@
             margin-right: 0.5rem;
         }
 
-        &--checkbox {
+        &--checkbox,
+        &--radio {
             label {
                 cursor: pointer;
             }
@@ -75,4 +76,8 @@
             @extend .alert--info;
         }
     }
+}
+label.form__group--checkbox,
+label.form__group--radio {
+    cursor: pointer;
 }
