@@ -265,7 +265,7 @@ class Migrate extends Base
 
         // --------------------------------------------------------------------------
 
-        if ($oComponent->slug === 'app') {
+        if ($oComponent->slug === Components::$oAppSlug) {
             $sMigrationsPath = $oComponent->path . 'application/migrations';
         } else {
             $sMigrationsPath = $oComponent->path . 'migrations';
@@ -357,7 +357,7 @@ class Migrate extends Base
         // --------------------------------------------------------------------------
 
         //  Map the directory and fetch only the files we need
-        $sPath   = $oModule->name == 'APP' ? 'application/migrations/' : 'vendor/' . $oModule->name . '/migrations/';
+        $sPath   = $oModule->name == Components::$oAppSlug ? 'application/migrations/' : 'vendor/' . $oModule->name . '/migrations/';
         $aDirMap = $this->mapDir($sPath);
 
         //  Set the current version to -1 if null so migrations with a zero index are picked up
