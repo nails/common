@@ -82,6 +82,7 @@ abstract class Base
      *
      * @var string
      */
+    const EVENT_CREATING = 'CREATING';
     const EVENT_CREATED = 'CREATED';
 
     /**
@@ -89,6 +90,7 @@ abstract class Base
      *
      * @var string
      */
+    const EVENT_UPDATING = 'UPDATING';
     const EVENT_UPDATED = 'UPDATED';
 
     /**
@@ -96,6 +98,7 @@ abstract class Base
      *
      * @var string
      */
+    const EVENT_DELETING = 'DELETING';
     const EVENT_DELETED = 'DELETED';
 
     /**
@@ -103,6 +106,7 @@ abstract class Base
      *
      * @var string
      */
+    const EVENT_DESTROYING = 'DESTROYING';
     const EVENT_DESTROYED = 'DESTROYED';
 
     /**
@@ -110,6 +114,7 @@ abstract class Base
      *
      * @var string
      */
+    const EVENT_RESTORING = 'RESTORING';
     const EVENT_RESTORED = 'RESTORED';
 
     /**
@@ -333,6 +338,8 @@ abstract class Base
      */
     public function create(array $aData = [], $bReturnObject = false)
     {
+        $this->triggerEvent(static::EVENT_CREATING, [$aData]);
+
         $oDb    = Factory::service('Database');
         $sTable = $this->getTableName();
 
@@ -419,6 +426,8 @@ abstract class Base
      */
     public function update($iId, array $aData = []): bool
     {
+        $this->triggerEvent(static::EVENT_UPDATING, [$aData]);
+
         $sAlias = $this->getTableAlias(true);
         $sTable = $this->getTableName(true);
         $oDb    = Factory::service('Database');
@@ -733,6 +742,8 @@ abstract class Base
             return false;
         }
 
+        $this->triggerEvent(static::EVENT_DELETING, [$oItem]);
+
         if ($this->isDestructiveDelete()) {
             $bResult = $this->destroy($iId);
         } else {
@@ -793,6 +804,8 @@ abstract class Base
      */
     public function restore($iId): bool
     {
+        $this->triggerEvent(static::EVENT_RESTORING, [$iId]);
+
         if ($this->isDestructiveDelete()) {
             return null;
         } elseif ($this->update($iId, [$this->tableDeletedColumn => false])) {
@@ -819,6 +832,8 @@ abstract class Base
      */
     public function destroy($iId): bool
     {
+        $this->triggerEvent(static::EVENT_DESTROYING, [$iId]);
+
         $oDb    = Factory::service('Database');
         $sTable = $this->getTableName();
 
