@@ -2,6 +2,7 @@
 
 namespace Nails\Common\Console\Command\Database;
 
+use Nails\Common\Factory\Component;
 use Nails\Common\Service\Database;
 use Nails\Components;
 use Nails\Console\Command\Base;
@@ -72,8 +73,8 @@ class Migrate extends Base
     /**
      * Executes the app
      *
-     * @param  InputInterface  $oInput  The Input Interface provided by Symfony
-     * @param  OutputInterface $oOutput The Output Interface provided by Symfony
+     * @param InputInterface  $oInput  The Input Interface provided by Symfony
+     * @param OutputInterface $oOutput The Output Interface provided by Symfony
      *
      * @return int
      */
@@ -148,12 +149,11 @@ class Migrate extends Base
         // --------------------------------------------------------------------------
 
         $aEnabledModules = $this->findEnabledModules();
-        $oApp            = $this->determineModuleState('APP', 'application/migrations/');
 
         // --------------------------------------------------------------------------
 
         //  Anything to migrate?
-        if (!$aEnabledModules && !$oApp) {
+        if (!$aEnabledModules) {
             $oOutput->writeln('');
             $oOutput->writeln('Nothing to migrate');
             $oOutput->writeln('');
@@ -167,23 +167,16 @@ class Migrate extends Base
         $oOutput->writeln('');
         $oOutput->writeln('OK, here\'s what\'s going to happen:');
 
-        if ($aEnabledModules || $oApp) {
+        if ($aEnabledModules) {
 
             $oOutput->writeln('');
 
             foreach ($aEnabledModules as $oModule) {
 
-                $sStart = is_null($oModule->start) ? 'The beginning of time' : $oModule->start;
+                $sStart = is_null($oModule->start) ? 'The beginning of time' : '#' . $oModule->start;
                 $sLine  = ' - <comment>' . $oModule->name . '</comment> from ';
-                $sLine  .= '<info>#' . $sStart . '</info> to <info>#' . $oModule->end . '</info>';
+                $sLine  .= '<info>' . $sStart . '</info> to <info>#' . $oModule->end . '</info>';
 
-                $oOutput->writeln($sLine);
-            }
-
-            if ($oApp) {
-                $sStart = is_null($oApp->start) ? 'The beginning of time' : $oApp->start;
-                $sLine  = ' - <comment>app</comment> from ';
-                $sLine  .= '<info>#' . $sStart . '</info> to <info>#' . $oApp->end . '</info>';
                 $oOutput->writeln($sLine);
             }
         }
@@ -207,7 +200,6 @@ class Migrate extends Base
         $iCurStep       = 1;
         $iNumMigrations = 0;
         $iNumMigrations += !empty($aEnabledModules) ? count($aEnabledModules) : 0;
-        $iNumMigrations += !empty($oApp) ? 1 : 0;
 
         //  Disable foreign key checks
         $oResult              = $this->oDb->query('SHOW Variables WHERE Variable_name=\'FOREIGN_KEY_CHECKS\'')->fetch(\PDO::FETCH_OBJ);
@@ -227,16 +219,6 @@ class Migrate extends Base
                 }
 
                 $iCurStep++;
-            }
-        }
-
-        //  Migrate the app
-        if (!empty($oApp)) {
-            $oOutput->write('[' . $iCurStep . '/' . $iNumMigrations . '] Migrating <info>app</info>... ');
-            if ($this->doMigration($oApp)) {
-                $oOutput->writeln('done!');
-            } else {
-                return $this->abort(static::EXIT_CODE_APP_MIGRATION_FAILED);
             }
         }
 
@@ -266,20 +248,28 @@ class Migrate extends Base
     // --------------------------------------------------------------------------
 
     /**
-     * Determines whether or not the module needs to migration, and if so between what versions
+     * Determines whether or not a component needs migrated, and if so between what versions
      *
-     * @param string $sModuleName     The module's name
-     * @param string $sMigrationsPath The module's path
+     * @param Component $oComponent The component being analysed
      *
      * @return \stdClass|null stdClass when migration needed, null when not needed
      */
-    protected function determineModuleState($sModuleName, $sMigrationsPath): ?\stdClass
+    protected function determineModuleState(Component $oComponent): ?\stdClass
     {
-        $oModule = (object) [
-            'name'  => $sModuleName,
+        $oState = (object) [
+            'name'  => $oComponent->slug,
+            'type'  => null,
             'start' => null,
             'end'   => null,
         ];
+
+        // --------------------------------------------------------------------------
+
+        if ($oComponent->slug === 'app') {
+            $sMigrationsPath = $oComponent->path . 'application/migrations';
+        } else {
+            $sMigrationsPath = $oComponent->path . 'migrations';
+        }
 
         // --------------------------------------------------------------------------
 
@@ -299,13 +289,13 @@ class Migrate extends Base
             // --------------------------------------------------------------------------
 
             //  Work out the current version
-            $sSql    = "SELECT `version` FROM `" . NAILS_DB_PREFIX . "migration` WHERE `module` = '$sModuleName';";
+            $sSql    = "SELECT `version` FROM `" . NAILS_DB_PREFIX . "migration` WHERE `module` = '$oComponent->slug';";
             $oResult = $this->oDb->query($sSql);
 
             if ($oResult->rowCount() === 0) {
 
                 //  Add a row for the module
-                $sSql = "INSERT INTO `" . NAILS_DB_PREFIX . "migration` (`module`, `version`) VALUES ('$sModuleName', NULL);";
+                $sSql = "INSERT INTO `" . NAILS_DB_PREFIX . "migration` (`module`, `version`) VALUES ('$oComponent->slug', NULL);";
                 $this->oDb->query($sSql);
 
                 $iCurrentVersion = null;
@@ -319,11 +309,11 @@ class Migrate extends Base
 
             //  Define the variable
             $aLastMigration = end($aMigrations);
-            $oModule->start = $iCurrentVersion;
-            $oModule->end   = $aLastMigration['index'];
+            $oState->start  = $iCurrentVersion;
+            $oState->end    = $aLastMigration['index'];
         }
 
-        return $oModule->start === $oModule->end ? null : $oModule;
+        return $oState->start === $oState->end ? null : $oState;
     }
 
     // --------------------------------------------------------------------------
@@ -339,10 +329,16 @@ class Migrate extends Base
         $aOut     = [];
 
         foreach ($aModules as $oModule) {
-            $aOut[] = $this->determineModuleState($oModule->slug, $oModule->path . 'migrations/');
+            $aOut[] = $this->determineModuleState($oModule);
         }
 
-        return array_filter($aOut);
+        $aOut = array_filter($aOut);
+
+        //  Shift the app migrations onto the end so they are executed last
+        $oApp = array_shift($aOut);
+        $aOut = array_merge($aOut, [$oApp]);
+
+        return $aOut;
     }
 
     // --------------------------------------------------------------------------
@@ -350,7 +346,7 @@ class Migrate extends Base
     /**
      * Executes a migration
      *
-     * @param  \stdClass $oModule The migration details object
+     * @param \stdClass $oModule The migration details object
      *
      * @return boolean
      */
@@ -398,8 +394,8 @@ class Migrate extends Base
     /**
      * Executes an individual migration
      *
-     * @param  object $oModule    The module being migrated
-     * @param  array  $aMigration The migration details
+     * @param object $oModule    The module being migrated
+     * @param array  $aMigration The migration details
      *
      * @return boolean
      */
@@ -466,7 +462,7 @@ class Migrate extends Base
     /**
      * Generates an array of files in a directory
      *
-     * @param  string $sDir The directory to analyse
+     * @param string $sDir The directory to analyse
      *
      * @return array|null
      */
@@ -528,8 +524,8 @@ class Migrate extends Base
     /**
      * Performs the abort functionality and returns the exit code
      *
-     * @param  integer $iExitCode The exit code
-     * @param  array   $aMessages The error message
+     * @param integer $iExitCode The exit code
+     * @param array   $aMessages The error message
      *
      * @return int
      */
