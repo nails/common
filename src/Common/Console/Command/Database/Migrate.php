@@ -333,12 +333,16 @@ class Migrate extends Base
         }
 
         $aOut = array_filter($aOut);
+        $aOut = array_values($aOut);
 
         //  Shift the app migrations onto the end so they are executed last
-        $oApp = array_shift($aOut);
-        $aOut = array_merge($aOut, [$oApp]);
-        $aOut = array_filter($aOut);
-        $aOut = array_values($aOut);
+        $oFirst = reset($aOut);
+        if ($oFirst->name === Components::$oAppSlug) {
+            $oApp = array_shift($aOut);
+            $aOut = array_merge($aOut, [$oApp]);
+            $aOut = array_filter($aOut);
+            $aOut = array_values($aOut);
+        }
 
         return $aOut;
     }
