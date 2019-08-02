@@ -167,15 +167,32 @@ final class Components
 
         $aOut = array_values($aOut);
 
-        //  Pluck common out so it is always the first item
-        for ($i = 0; $i < count($aOut); $i++) {
-            if ($aOut[$i]->slug === 'nails/common') {
-                break;
+        // --------------------------------------------------------------------------
+
+        /**
+         * Sort the components into a known order: app, nails/common, modules, drivers, skins
+         */
+
+        $aCommon  = [];
+        $aModules = [];
+        $aDrivers = [];
+        $aSkins   = [];
+
+        foreach ($aOut as $oComponent) {
+            if ($oComponent->slug === 'nails/common') {
+                $aCommon[] = $oComponent;
+            } elseif ($oComponent->type === 'module') {
+                $aModules[] = $oComponent;
+            } elseif ($oComponent->type === 'driver') {
+                $aDrivers[] = $oComponent;
+            } elseif ($oComponent->type === 'skin') {
+                $aSkins[] = $oComponent;
+            } else {
+                die('unknown type: ' . $oComponent->type);
             }
         }
 
-        $aExtracted = array_splice($aOut, $i, 1);
-        $aOut       = array_values(array_merge($aExtracted, $aOut));
+        $aOut = array_merge($aCommon, $aModules, $aDrivers, $aSkins);
 
         // --------------------------------------------------------------------------
 
