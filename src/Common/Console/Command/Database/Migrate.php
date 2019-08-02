@@ -337,6 +337,8 @@ class Migrate extends Base
         //  Shift the app migrations onto the end so they are executed last
         $oApp = array_shift($aOut);
         $aOut = array_merge($aOut, [$oApp]);
+        $aOut = array_filter($aOut);
+        $aOut = array_values($aOut);
 
         return $aOut;
     }
