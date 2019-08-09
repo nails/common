@@ -54,7 +54,7 @@ abstract class Base
     const TABLE_ALIAS = null;
 
     /**
-     * Whetehr this model sues destructive delete or not
+     * Whether this model uses destructive delete or not
      *
      * @var bool
      */
@@ -78,35 +78,70 @@ abstract class Base
     const EXPAND_ALL = 'ALL';
 
     /**
-     * The trigger to fire when an item is created
+     * The event to fire before an item is created
+     *
+     * @var string
+     */
+    const EVENT_CREATING = 'CREATING';
+
+    /**
+     * The event to fire after an item is created
      *
      * @var string
      */
     const EVENT_CREATED = 'CREATED';
 
     /**
-     * The trigger to fire when an item is updated
+     * The event to fire before an item is updated
+     *
+     * @var string
+     */
+    const EVENT_UPDATING = 'UPDATING';
+
+    /**
+     * The event to fire after an item is updated
      *
      * @var string
      */
     const EVENT_UPDATED = 'UPDATED';
 
     /**
-     * The trigger to fire when an item is deleted
+     * The event to fire before an item is deleted
+     *
+     * @var string
+     */
+    const EVENT_DELETING = 'DELETING';
+
+    /**
+     * The event to fire after an item is deleted
      *
      * @var string
      */
     const EVENT_DELETED = 'DELETED';
 
     /**
-     * The trigger to fire when an item is destroyed
+     * The event to fire before an item is destroyed
+     *
+     * @var string
+     */
+    const EVENT_DESTROYING = 'DESTROYING';
+
+    /**
+     * The event to fire after an item is destroyed
      *
      * @var string
      */
     const EVENT_DESTROYED = 'DESTROYED';
 
     /**
-     * The trigger to fire when an item is restored
+     * The event to fire before an item is restored
+     *
+     * @var string
+     */
+    const EVENT_RESTORING = 'RESTORING';
+
+    /**
+     * The event to fire after an item is restored
      *
      * @var string
      */
@@ -333,6 +368,8 @@ abstract class Base
      */
     public function create(array $aData = [], $bReturnObject = false)
     {
+        $this->triggerEvent(static::EVENT_CREATING, [$aData]);
+
         $oDb    = Factory::service('Database');
         $sTable = $this->getTableName();
 
@@ -419,6 +456,8 @@ abstract class Base
      */
     public function update($iId, array $aData = []): bool
     {
+        $this->triggerEvent(static::EVENT_UPDATING, [$aData]);
+
         $sAlias = $this->getTableAlias(true);
         $sTable = $this->getTableName(true);
         $oDb    = Factory::service('Database');
@@ -733,6 +772,8 @@ abstract class Base
             return false;
         }
 
+        $this->triggerEvent(static::EVENT_DELETING, [$oItem]);
+
         if ($this->isDestructiveDelete()) {
             $bResult = $this->destroy($iId);
         } else {
@@ -793,6 +834,8 @@ abstract class Base
      */
     public function restore($iId): bool
     {
+        $this->triggerEvent(static::EVENT_RESTORING, [$iId]);
+
         if ($this->isDestructiveDelete()) {
             return null;
         } elseif ($this->update($iId, [$this->tableDeletedColumn => false])) {
@@ -819,6 +862,8 @@ abstract class Base
      */
     public function destroy($iId): bool
     {
+        $this->triggerEvent(static::EVENT_DESTROYING, [$iId]);
+
         $oDb    = Factory::service('Database');
         $sTable = $this->getTableName();
 
