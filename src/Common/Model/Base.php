@@ -54,7 +54,7 @@ abstract class Base
     const TABLE_ALIAS = null;
 
     /**
-     * Whetehr this model sues destructive delete or not
+     * Whether this model uses destructive delete or not
      *
      * @var bool
      */
@@ -78,43 +78,73 @@ abstract class Base
     const EXPAND_ALL = 'ALL';
 
     /**
-     * The trigger to fire when an item is created
+     * The event to fire before an item is created
      *
      * @var string
      */
     const EVENT_CREATING = 'CREATING';
+
+    /**
+     * The event to fire after an item is created
+     *
+     * @var string
+     */
     const EVENT_CREATED = 'CREATED';
 
     /**
-     * The trigger to fire when an item is updated
+     * The event to fire before an item is updated
      *
      * @var string
      */
     const EVENT_UPDATING = 'UPDATING';
+
+    /**
+     * The event to fire after an item is updated
+     *
+     * @var string
+     */
     const EVENT_UPDATED = 'UPDATED';
 
     /**
-     * The trigger to fire when an item is deleted
+     * The event to fire before an item is deleted
      *
      * @var string
      */
     const EVENT_DELETING = 'DELETING';
+
+    /**
+     * The event to fire after an item is deleted
+     *
+     * @var string
+     */
     const EVENT_DELETED = 'DELETED';
 
     /**
-     * The trigger to fire when an item is destroyed
+     * The event to fire before an item is destroyed
      *
      * @var string
      */
     const EVENT_DESTROYING = 'DESTROYING';
+
+    /**
+     * The event to fire after an item is destroyed
+     *
+     * @var string
+     */
     const EVENT_DESTROYED = 'DESTROYED';
 
     /**
-     * The trigger to fire when an item is restored
+     * The event to fire before an item is restored
      *
      * @var string
      */
     const EVENT_RESTORING = 'RESTORING';
+
+    /**
+     * The event to fire after an item is restored
+     *
+     * @var string
+     */
     const EVENT_RESTORED = 'RESTORED';
 
     /**
