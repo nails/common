@@ -58,7 +58,7 @@ class Event
     /**
      * Looks for a component's event handler and executes the autoload() method if there is one
      *
-     * @param  string $sNamespace The namespace to check
+     * @param string $sNamespace The namespace to check
      *
      * @return void
      */
@@ -106,9 +106,6 @@ class Event
      */
     public function subscribe($sEvent, $sNamespace, $mCallback, $bOnce = false)
     {
-        $sEvent     = strtoupper($sEvent);
-        $sNamespace = strtoupper($sNamespace);
-
         if (is_callable($mCallback)) {
             if (!isset($this->aSubscriptions[$sNamespace])) {
                 $this->aSubscriptions[$sNamespace] = [];
@@ -136,9 +133,9 @@ class Event
     /**
      * Trigger the event and execute all callbacks
      *
-     * @param  string $sEvent     The event to trigger
-     * @param  string $sNamespace The event's namespace
-     * @param  array  $aData      Data to pass to the callbacks
+     * @param string $sEvent     The event to trigger
+     * @param string $sNamespace The event's namespace
+     * @param array  $aData      Data to pass to the callbacks
      *
      * @return \Nails\Common\Service\Event
      */
@@ -271,5 +268,17 @@ class Event
     public function hasBeenTriggered($sEvent, $sNamespace = 'nails/common')
     {
         return (bool) $this->getHistory($sNamespace, $sEvent);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the currently registered subscriptions
+     *
+     * @return array
+     */
+    public function getSubscriptions(): array
+    {
+        return $this->aSubscriptions;
     }
 }
