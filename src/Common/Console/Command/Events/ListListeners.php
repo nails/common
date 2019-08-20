@@ -51,11 +51,11 @@ class ListListeners extends Base
 
                 foreach ($aSubscribers as $oSubscriber) {
                     if (is_array($oSubscriber->callback)) {
-                        list($oObject, $sMethod) = $oSubscriber->callback;
-                        if (is_object($oObject)) {
-                            $this->oOutput->writeln('Class:  <comment>' . get_class($oObject) . '</comment>');
+                        list($mObject, $sMethod) = $oSubscriber->callback;
+                        if (is_object($mObject)) {
+                            $this->oOutput->writeln('Class:  <comment>' . get_class($mObject) . '</comment>');
                         } else {
-                            $this->oOutput->writeln('Class:  <comment>' . $oObject . '</comment>');
+                            $this->oOutput->writeln('Class:  <comment>' . $mObject . '</comment>');
                         }
                         $this->oOutput->writeln('Method: <comment>' . $sMethod . '</comment>');
                     } else {
