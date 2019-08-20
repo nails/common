@@ -1,6 +1,6 @@
 <?php
 
-namespace Nails\Common\Console\Command;
+namespace Nails\Common\Console\Command\Events;
 
 use Nails\Common\Exception\EventException;
 use Nails\Components;
@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Events extends Base
+class ListEvents extends Base
 {
     /**
      * Configures the command
@@ -19,7 +19,7 @@ class Events extends Base
     protected function configure()
     {
         $this
-            ->setName('events')
+            ->setName('events:list')
             ->setDescription('Lists the events which are available to subscribe to')
             ->addArgument('component', InputArgument::OPTIONAL, 'Filter by component');
     }
