@@ -116,7 +116,11 @@ class Event
             }
 
             //  Prevent duplicate subscriptions
-            $sHash = md5(serialize($mCallback));
+            if ($mCallback instanceof \Closure) {
+                $sHash = md5(print_r($mCallback, true));
+            } else {
+                $sHash = md5(serialize($mCallback));
+            }
             if (!isset($this->aSubscriptions[$sNamespace][$sEvent][$sHash])) {
                 $this->aSubscriptions[$sNamespace][$sEvent][$sHash] = (object) [
                     'is_once'  => $bOnce,

@@ -53,14 +53,23 @@ class ListListeners extends Base
                     if (is_array($oSubscriber->callback)) {
                         list($mObject, $sMethod) = $oSubscriber->callback;
                         if (is_object($mObject)) {
-                            $this->oOutput->writeln('Class:  <comment>' . get_class($mObject) . '</comment>');
+                            $sClass = get_class($mObject);
                         } else {
-                            $this->oOutput->writeln('Class:  <comment>' . $mObject . '</comment>');
+                            $sClass = $mObject;
                         }
-                        $this->oOutput->writeln('Method: <comment>' . $sMethod . '</comment>');
+                        $sListener = '<comment>' . $sClass . '</comment>::<info>' . $sMethod . '</info>';
+                    } elseif (is_string($oSubscriber->callback)) {
+                        $sListener = '<info>' . $oSubscriber->callback . '</info>';
+                    } elseif ($oSubscriber->callback instanceof \Closure) {
+                        //  Hack some info about the closure
+                        $sDetails = print_r($oSubscriber->callback, true);
+                        preg_match('/\[this\] => (.+) Object/', $sDetails, $aMatches);
+                        $sClass    = getFromArray(1, $aMatches, 'Unknown');
+                        $sListener = '<comment>' . $sClass . '</comment>::<info>{{Closure}}</info>';
                     } else {
-                        d($oSubscriber);
+                        $sListener = '<info>' . serialize($oSubscriber->callback) . '</info>';
                     }
+                    $this->oOutput->writeln($sListener);
                 }
                 $this->oOutput->writeln('');
             }
