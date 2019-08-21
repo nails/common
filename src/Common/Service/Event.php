@@ -14,6 +14,11 @@ namespace Nails\Common\Service;
 
 use Nails\Components;
 
+/**
+ * Class Event
+ *
+ * @package Nails\Common\Service
+ */
 class Event
 {
     /**
@@ -62,9 +67,8 @@ class Event
      *
      * @return void
      */
-    protected function autoLoadSubscriptions($sNamespace)
+    protected function autoLoadSubscriptions($sNamespace): void
     {
-
         $sClassName = '\\' . $sNamespace . 'Events';
 
         if (class_exists($sClassName)) {
@@ -102,9 +106,9 @@ class Event
      * @param mixed   $mCallback  The callback to execute
      * @param boolean $bOnce      Whether the subscription should only fire once
      *
-     * @return \Nails\Common\Service\Event
+     * @return $this
      */
-    public function subscribe($sEvent, $sNamespace, $mCallback, $bOnce = false)
+    public function subscribe($sEvent, $sNamespace, $mCallback, $bOnce = false): self
     {
         if (is_callable($mCallback)) {
             if (!isset($this->aSubscriptions[$sNamespace])) {
@@ -141,14 +145,11 @@ class Event
      * @param string $sNamespace The event's namespace
      * @param array  $aData      Data to pass to the callbacks
      *
-     * @return \Nails\Common\Service\Event
+     * @return $this
      */
-    public function trigger($sEvent, $sNamespace = 'nails/common', $aData = [])
+    public function trigger($sEvent, $sNamespace = 'nails/common', $aData = []): self
     {
         $this->addHistory($sEvent, $sNamespace);
-
-        $sEvent     = strtoupper($sEvent);
-        $sNamespace = strtoupper($sNamespace);
 
         if (!empty($this->aSubscriptions[$sNamespace][$sEvent])) {
             foreach ($this->aSubscriptions[$sNamespace][$sEvent] as $sSubscriptionHash => $oSubscription) {
@@ -175,11 +176,8 @@ class Event
      *
      * @return $this
      */
-    protected function addHistory($sEvent, $sNamespace = 'nails/common')
+    protected function addHistory($sEvent, $sNamespace = 'nails/common'): self
     {
-        $sEvent     = strtoupper($sEvent);
-        $sNamespace = strtoupper($sNamespace);
-
         if (!array_key_exists($sNamespace, $this->aHistory)) {
             $this->aHistory[$sNamespace] = [];
         }
@@ -207,9 +205,6 @@ class Event
      */
     public function getHistory($sNamespace = null, $sEvent = null)
     {
-        $sEvent     = strtoupper($sEvent);
-        $sNamespace = strtoupper($sNamespace);
-
         if (empty($sNamespace) && empty($sEvent)) {
             return $this->aHistory;
         } elseif (
@@ -240,11 +235,8 @@ class Event
      *
      * @return $this
      */
-    public function clearHistory($sNamespace = null, $sEvent = null)
+    public function clearHistory($sNamespace = null, $sEvent = null): self
     {
-        $sEvent     = strtoupper($sEvent);
-        $sNamespace = strtoupper($sNamespace);
-
         if (empty($sNamespace)) {
             $this->aHistory = [];
         } elseif (empty($sEvent) && array_key_exists($sNamespace, $this->aHistory)) {
@@ -269,7 +261,7 @@ class Event
      *
      * @return bool
      */
-    public function hasBeenTriggered($sEvent, $sNamespace = 'nails/common')
+    public function hasBeenTriggered($sEvent, $sNamespace = 'nails/common'): bool
     {
         return (bool) $this->getHistory($sNamespace, $sEvent);
     }
