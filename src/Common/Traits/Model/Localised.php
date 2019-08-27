@@ -264,7 +264,7 @@ trait Localised
      * @return string
      * @throws ModelException
      */
-    protected function generateSlug(string $sLabel, int $iIgnoreId = null, \Nails\Common\Factory\Locale $oLocale = null)
+    protected function generateSlug(string $sLabel, int $iIgnoreId = null, array $aData = [], \Nails\Common\Factory\Locale $oLocale = null)
     {
         if (empty($oLocale)) {
             throw new ModelException(
@@ -279,7 +279,7 @@ trait Localised
         $oDb->where('region', $oLocale->getRegion());
         $oDb->stop_cache();
 
-        $sSlug = parent::generateSlug($sLabel, $iIgnoreId);
+        $sSlug = parent::generateSlug($sLabel, $iIgnoreId, $aData);
 
         $oDb->flush_cache();
 
@@ -341,6 +341,7 @@ trait Localised
             $aData[$this->tableSlugColumn] = $this->generateSlug(
                 getFromArray($this->tableLabelColumn, $aData),
                 null,
+                $aData,
                 $oLocale
             );
         }
@@ -390,6 +391,7 @@ trait Localised
             $aData[$this->tableSlugColumn] = $this->generateSlug(
                 getFromArray($this->tableLabelColumn, $aData),
                 $iId,
+                $aData,
                 $oLocale
             );
         }

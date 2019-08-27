@@ -678,7 +678,8 @@ abstract class Base
 
             $aData[$this->tableSlugColumn] = $this->generateSlug(
                 $aData[$this->tableLabelColumn],
-                $iIgnoreId
+                $iIgnoreId,
+                $aData
             );
         }
 
@@ -2007,7 +2008,7 @@ abstract class Base
      * @return string
      * @throws ModelException
      */
-    protected function generateSlug(string $sLabel, int $iIgnoreId = null)
+    protected function generateSlug(string $sLabel, int $iIgnoreId = null, array $aData = [])
     {
         $iCounter = 0;
         $oDb      = Factory::service('Database');
@@ -2026,11 +2027,23 @@ abstract class Base
             }
 
             $oDb->where($this->tableSlugColumn, $sSlugTest);
+            $this->generateSlugHook($aData);
             $iCounter++;
 
         } while ($oDb->count_all_results($this->getTableName()));
 
         return $sSlugTest;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Provides a hook for the extending model to manipulate the query
+     *
+     * @param array $aData
+     */
+    protected function generateSlugHook(array $aData = []): void
+    {
     }
 
     // --------------------------------------------------------------------------
