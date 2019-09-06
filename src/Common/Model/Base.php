@@ -1236,7 +1236,7 @@ abstract class Base
      * @param array  $aData        Any additional data to pass in
      * @param bool   $bReturnsMany Whether the method expects to return a single item, or many
      *
-     * @return array|mixed|null
+     * @return Resource[]|Resource|null
      * @throws ModelException
      */
     protected function getByColumn($sColumn, $mValue, array $aData, $bReturnsMany = false)
@@ -1359,7 +1359,7 @@ abstract class Base
      * @param int   $iId   The ID of the object to fetch
      * @param mixed $aData Any data to pass to getCountCommon()
      *
-     * @return \stdClass|false
+     * @return Resource|null
      * @throws ModelException
      */
     public function getById($iId, array $aData = [])
@@ -1380,7 +1380,7 @@ abstract class Base
      * @param mixed $aData               Any data to pass to getCountCommon()
      * @param bool  $bMaintainInputOrder Whether to maintain the input order
      *
-     * @return array
+     * @return Resource[]
      * @throws ModelException
      */
     public function getByIds($aIds, array $aData = [], $bMaintainInputOrder = false)
@@ -1405,7 +1405,7 @@ abstract class Base
      * @param string $sSlug The slug of the object to fetch
      * @param array  $aData Any data to pass to getCountCommon()
      *
-     * @return \stdClass
+     * @return Resource|null
      * @throws ModelException
      */
     public function getBySlug($sSlug, array $aData = [])
@@ -1426,7 +1426,7 @@ abstract class Base
      * @param array $aData               Any data to pass to getCountCommon()
      * @param bool  $bMaintainInputOrder Whether to maintain the input order
      *
-     * @return array
+     * @return Resource[]
      * @throws ModelException
      */
     public function getBySlugs($aSlugs, array $aData = [], $bMaintainInputOrder = false)
@@ -1456,7 +1456,7 @@ abstract class Base
      * @param mixed $mIdSlug The ID or slug of the object to fetch
      * @param array $aData   Any data to pass to getCountCommon()
      *
-     * @return \stdClass
+     * @return Resource|null
      */
     public function getByIdOrSlug($mIdSlug, array $aData = [])
     {
@@ -1475,7 +1475,7 @@ abstract class Base
      * @param string $sToken The token of the object to fetch
      * @param array  $aData  Any data to pass to getCountCommon()
      *
-     * @return \stdClass|null
+     * @return Resource|null
      * @throws ModelException if object property tableTokenColumn is not set
      */
     public function getByToken($sToken, array $aData = [])
@@ -1496,7 +1496,7 @@ abstract class Base
      * @param array $aData               Any data to pass to getCountCommon()
      * @param bool  $bMaintainInputOrder Whether to maintain the input order
      *
-     * @return array
+     * @return Resource[]
      * @throws ModelException if object property tableTokenColumn is not set
      */
     public function getByTokens($aTokens, array $aData = [], $bMaintainInputOrder = false)
