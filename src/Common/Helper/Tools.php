@@ -23,17 +23,17 @@ class Tools
      * Re-maps a number from one range to another
      * See http://www.arduino.cc/en/Reference/Map
      *
-     * @param float   Number to map
-     * @param int     Current low
-     * @param int     Current high
-     * @param int     New low
-     * @param int     New high
+     * @param int|float $fX      Number to map
+     * @param int|float $iInMin  Current low
+     * @param int|float $iInMax  Current high
+     * @param int|float $iOutMin New low
+     * @param int|float $iOutMax New high
      *
      * @return  float
      */
-    public static function map($x, $in_min, $in_max, $out_min, $out_max): float
+    public static function map($fX, $iInMin, $iInMax, $iOutMin, $iOutMax): float
     {
-        return ($x - $in_min) * ($out_max - $out_min) / ($in_max - $in_min) + $out_min;
+        return ($fX - $iInMin) * ($iOutMax - $iOutMin) / ($iInMax - $iInMin) + $iOutMin;
     }
 
     // --------------------------------------------------------------------------
