@@ -2,6 +2,7 @@
 <module type="WEB_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src/Common" isTestSource="false" packagePrefix="Nails\Common\" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" packagePrefix="Nails\" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/adrienrn/php-mimetyper" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/annexare/countries-list" />

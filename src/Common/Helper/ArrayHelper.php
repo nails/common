@@ -12,6 +12,8 @@
 
 namespace Nails\Common\Helper;
 
+use Nails\Common\Exception\NailsException;
+
 class ArrayHelper
 {
     /**
@@ -145,6 +147,54 @@ class ArrayHelper
             }
         }
         return false;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Filters a multi-dimensional array based on a specific key/property
+     *
+     * @param string|int    $mKey    The key/property to analyse
+     * @param array         $aArray  The array to filter
+     * @param callable|null $cFilter The callable to test
+     *
+     * @return array
+     * @throws NailsException
+     */
+    public static function arrayFilterMulti($mKey, array $aArray, callable $cFilter = null): array
+    {
+        if ($cFilter === null) {
+            // Filter out empty values by default
+            $cFilter = function ($mVal) {
+                return !empty($mVal);
+            };
+        }
+
+        foreach ($aArray as $k => &$val) {
+
+            if (is_array($val)) {
+
+                if (!array_key_exists($mKey, $val)) {
+                    throw new NailsException('"' . $mKey . '" does not exist on item at index "' . $k . '"');
+                }
+
+                if (!$cFilter($val[$mKey])) {
+                    $val = null;
+                }
+
+            } elseif (is_object($val)) {
+
+                if (!property_exists($val, $mKey)) {
+                    throw new NailsException('"' . $mKey . '" does not exist on item at index "' . $k . '"');
+                }
+
+                if (!$cFilter($val->{$mKey})) {
+                    $val = null;
+                }
+            }
+        }
+
+        return array_filter($aArray);
     }
 
     // --------------------------------------------------------------------------

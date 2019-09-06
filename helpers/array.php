@@ -57,6 +57,13 @@ if (!function_exists('array_search_multi')) {
     }
 }
 
+if (!function_exists('arrayFilterMulti')) {
+    function arrayFilterMulti($sKey, array $aArray, callable $cFilter = null)
+    {
+        return ArrayHelper::arrayFilterMulti($sKey, $aArray, $cFilter);
+    }
+}
+
 if (!function_exists('inArray')) {
     function inArray($aValues, array $aArray): bool
     {
