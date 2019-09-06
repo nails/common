@@ -7,234 +7,70 @@
  * @subpackage  common
  * @category    Helper
  * @author      Nails Dev Team
- * @link
  */
 
-use Nails\Factory;
+use Nails\Common\Helper\Tools;
 
 if (!function_exists('map')) {
-
-    /**
-     * Re-maps a number from one range to another
-     * See http://www.arduino.cc/en/Reference/Map
-     *
-     * @param   float   Number to map
-     * @param   int     Current low
-     * @param   int     Current high
-     * @param   int     New low
-     * @param   int     New high
-     *
-     * @return  float
-     */
-    function map($x, $in_min, $in_max, $out_min, $out_max)
+    function map($x, $in_min, $in_max, $out_min, $out_max): float
     {
-        return ($x - $in_min) * ($out_max - $out_min) / ($in_max - $in_min) + $out_min;
+        return Tools::map($x, $in_min, $in_max, $out_min, $out_max);
     }
 }
-
-// --------------------------------------------------------------------------
 
 if (!function_exists('special_chars')) {
-
-    /**
-     * Replaces special chars with their HTML counterpart
-     *
-     * @param   string  String to parse
-     *
-     * @return  float
-     */
-    function special_chars($string)
+    function special_chars($sString): string
     {
-        /* Only do the slow convert if there are 8-bit characters */
-        /* avoid using 0xA0 (\240) in ereg ranges. RH73 does not like that */
-        if (!preg_match("/[\200-\237]/", $string) and !preg_match("/[\241-\377]/", $string)) {
-
-            return $string;
-        }
-
-        // decode three byte unicode characters
-        $string = preg_replace(
-            "/([\340-\357])([\200-\277])([\200-\277])/e",
-            "'&#'.((ord('\\1')-224)*4096 + (ord('\\2')-128)*64 + (ord('\\3')-128)).';'",
-            $string
-        );
-
-        // decode two byte unicode characters
-        $string = preg_replace(
-            "/([\300-\337])([\200-\277])/e",
-            "'&#'.((ord('\\1')-192)*64+(ord('\\2')-128)).';'",
-            $string
-        );
-
-        return $string;
+        deprecatedError('special_chars', 'specialChars');
+        return Tools::specialChars($sString);
     }
 }
 
-// --------------------------------------------------------------------------
+if (!function_exists('specialChars')) {
+    function specialChars($sString): string
+    {
+        return Tools::specialChars($sString);
+    }
+}
 
 if (!function_exists('stringToBoolean')) {
-
-    /**
-     * Converts a string to a boolean
-     *
-     * @param   string
-     *
-     * @return  float
-     */
-    function stringToBoolean($string)
+    function stringToBoolean($sString): bool
     {
-        if ($string && strtolower($string) !== 'false') {
-
-            return true;
-
-        } else {
-
-            return false;
-        }
+        return Tools::stringToBoolean($sString);
     }
 }
-
-// --------------------------------------------------------------------------
 
 if (!function_exists('isIpInRange')) {
-
-    /**
-     * Determines whether an IP Address falls within a CIDR range
-     *
-     * @param $sIp    string The IP Address to test
-     * @param $mRange mixed  The CIDR range, either as a string, or an array of ranges
-     *
-     * @return bool
-     */
-    function isIpInRange($sIp, $mRange)
+    function isIpInRange(string $sIp, $mRange): bool
     {
-        if (!is_array($mRange)) {
-
-            //  Prepare the range
-            $mRangeRaw = $mRange;
-            $mRangeRaw = str_replace("\n\r", "\n", $mRangeRaw);
-            $aRangeRaw = explode("\n", $mRangeRaw);
-            $aRange    = [];
-
-            foreach ($aRangeRaw as $line) {
-                $aRange = array_merge(explode(',', $line), $aRange);
-            }
-
-            $aRange = array_unique($aRange);
-            $aRange = array_filter($aRange);
-            $aRange = array_map('trim', $aRange);
-            $aRange = array_values($aRange);
-
-        } else {
-
-            $aRange = $mRange;
-        }
-
-        foreach ($aRange as $sCIDRMask) {
-
-            if (strpos($sCIDRMask, '/') !== false) {
-
-                //  Hat tip: http://stackoverflow.com/a/594134/789224
-                list ($sSubnet, $sBits) = explode('/', $sCIDRMask);
-
-                $iBits   = (int) $sBits;
-                $iIp     = ip2long($sIp);
-                $sSubnet = ip2long($sSubnet);
-                $iMask   = -1 << (32 - $iBits);
-                $sSubnet &= $iMask; # nb: in case the supplied subnet wasn't correctly aligned
-
-                if (($iIp & $iMask) == $sSubnet) {
-                    return true;
-                }
-
-            } else {
-
-                if ($sIp == $sCIDRMask) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return Tools::isIpInRange($sIp, $mRange);
     }
 }
-
-// --------------------------------------------------------------------------
 
 if (!function_exists('nullIfEmpty')) {
-
-    /**
-     * Returns null if the input is empty, or the input if not
-     *
-     * @param   mixed $mVal The input to check
-     *
-     * @return  mixed
-     */
     function nullIfEmpty($mVal)
     {
-        return empty($mVal) ? null : $mVal;
+        return Tools::nullIfEmpty($mVal);
     }
 }
-
-// --------------------------------------------------------------------------
 
 if (!function_exists('classImplements')) {
-
-    /**
-     * Checks if a class implements a particular interface
-     *
-     * @param object|string $mClass     The class to test, either as an object or a string
-     * @param string        $sInterface The interface to look for
-     *
-     * @return bool
-     */
-    function classImplements($mClass, $sInterface)
+    function classImplements($mClass, string $sInterface): bool
     {
-        return in_array(
-            ltrim($sInterface, '\\'),
-            class_implements($mClass)
-        );
+        return Tools::classImplements($mClass, $sInterface);
     }
 }
-
-// --------------------------------------------------------------------------
 
 if (!function_exists('classUses')) {
-
-    /**
-     * Checks if a class uses a particular trait
-     *
-     * @param object|string $mClass The class to test, either as an object or a string
-     * @param string        $sTrait The trait to look for
-     *
-     * @return bool
-     */
-    function classUses($mClass, $sTrait)
+    function classUses($mClass, string $sTrait): bool
     {
-        return in_array(
-            ltrim($sTrait, '\\'),
-            class_uses($mClass)
-        );
+        return Tools::classUses($mClass, $sTrait);
     }
 }
 
-// --------------------------------------------------------------------------
-
 if (!function_exists('classExtends')) {
-
-    /**
-     * Checks if a class extends a particular class
-     *
-     * @param object|string $mClass  The class to test, either as an object or a string
-     * @param string        $sParent The parent to look for
-     *
-     * @return bool
-     */
-    function classExtends($mClass, $sParent)
+    function classExtends($mClass, string $sParent): bool
     {
-        return in_array(
-            ltrim($sParent, '\\'),
-            class_parents($mClass)
-        );
+        return Tools::classExtends($mClass, $sParent);
     }
 }
