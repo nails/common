@@ -299,7 +299,7 @@ return [
     ],
 
     'models' => [
-        'Country'         => function () {
+        'Country' => function () {
             if (class_exists('\App\Common\Model\Country')) {
                 return new \App\Common\Model\Country();
             } else {
@@ -433,6 +433,20 @@ return [
                 return new \App\Common\Resource\Cookie($oObj);
             } else {
                 return new \Nails\Common\Resource\Cookie($oObj);
+            }
+        },
+        'Date'            => function ($oObj) {
+            if (class_exists('\App\Common\Resource\Date')) {
+                return new \App\Common\Resource\Date($oObj);
+            } else {
+                return new \Nails\Common\Resource\Date($oObj);
+            }
+        },
+        'DateTime'            => function ($oObj) {
+            if (class_exists('\App\Common\Resource\DateTime')) {
+                return new \App\Common\Resource\DateTime($oObj);
+            } else {
+                return new \Nails\Common\Resource\DateTime($oObj);
             }
         },
         'ExpandableField' => function () {

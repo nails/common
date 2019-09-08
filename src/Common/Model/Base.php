@@ -2119,7 +2119,8 @@ abstract class Base
 
         foreach ($aIntegers as $sProperty) {
             if (property_exists($oObj, $sProperty)) {
-                if (is_numeric($oObj->{$sProperty}) && !is_null($oObj->{$sProperty})) {
+                if (is_numeric($oObj->{$sProperty}) &&
+                    !is_null($oObj->{$sProperty})) {
                     $oObj->{$sProperty} = (int) $oObj->{$sProperty};
                 }
             }
@@ -2149,6 +2150,26 @@ abstract class Base
                 if (is_numeric($oObj->{$sProperty}) && !is_null($oObj->{$sProperty})) {
                     $oObj->{$sProperty} = (float) $oObj->{$sProperty};
                 }
+            }
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  @todo (Pablo - 2019-09-08) - allow this to be passed in as an argument
+        $aDateTimes = [$this->tableCreatedColumn, $this->tableModifiedColumn];
+        foreach ($aDateTimes as $sProperty) {
+            if (property_exists($oObj, $sProperty)) {
+                $oObj->{$sProperty} = Factory::resource('DateTime', null, ['raw' => $oObj->{$sProperty}]);
+            }
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  @todo (Pablo - 2019-09-08) - allow this to be passed in as an argument
+        $aDates = [];
+        foreach ($aDates as $sProperty) {
+            if (property_exists($oObj, $sProperty)) {
+                $oObj->{$sProperty} = Factory::resource('Date', null, ['raw' => $oObj->{$sProperty}]);
             }
         }
 
