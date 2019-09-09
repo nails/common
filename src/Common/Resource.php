@@ -10,9 +10,18 @@ namespace Nails\Common;
 class Resource
 {
     /**
+     * The resource's ID
+     *
+     * @var int|null
+     */
+    public $id = null;
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Resource constructor.
      *
-     * @param self|\stdClass|array $mObj The database row
+     * @param self|\stdClass|array $mObj The data to populate the resource with
      */
     public function __construct($mObj = [])
     {
