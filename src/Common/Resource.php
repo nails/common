@@ -16,6 +16,34 @@ class Resource
      */
     public $id = null;
 
+    /**
+     * The source's creation date
+     *
+     * @var Resource\DateTime
+     */
+    public $created;
+
+    /**
+     * The resource's creator's ID
+     *
+     * @var int|Resource|null
+     */
+    public $created_by;
+
+    /**
+     * The resource's modification date
+     *
+     * @var Resource\DateTime
+     */
+    public $modified;
+
+    /**
+     * The resource's modifier's ID
+     *
+     * @var int|Resource|null
+     */
+    public $modified_by;
+
     // --------------------------------------------------------------------------
 
     /**
