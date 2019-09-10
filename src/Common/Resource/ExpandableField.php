@@ -4,6 +4,11 @@ namespace Nails\Common\Resource;
 
 use Nails\Common\Resource;
 
+/**
+ * Class ExpandableField
+ *
+ * @package Nails\Common\Resource
+ */
 class ExpandableField extends Resource
 {
     /**

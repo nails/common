@@ -442,7 +442,7 @@ return [
                 return new \Nails\Common\Resource\Date($oObj);
             }
         },
-        'DateTime'            => function ($oObj) {
+        'DateTime'        => function ($oObj) {
             if (class_exists('\App\Common\Resource\DateTime')) {
                 return new \App\Common\Resource\DateTime($oObj);
             } else {
@@ -468,6 +468,13 @@ return [
                 return new \App\Common\Resource($oObj);
             } else {
                 return new \Nails\Common\Resource($oObj);
+            }
+        },
+        'Entity'            => function ($oObj) {
+            if (class_exists('\App\Common\Resource\Entity')) {
+                return new \App\Common\Resource\Entity($oObj);
+            } else {
+                return new \Nails\Common\Resource\Entity($oObj);
             }
         },
     ],

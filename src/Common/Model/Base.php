@@ -187,7 +187,7 @@ abstract class Base
      *
      * @var string
      */
-    const RESOURCE_NAME = 'Resource';
+    const RESOURCE_NAME = 'Entity';
 
     /**
      * The provider of the resource to use (as passed to \Nails\Factory::resource())
