@@ -17,9 +17,9 @@ return <<<'EOD'
 
 namespace {{RESOURCE_NAMESPACE}};
 
-use Nails\Common\Resource;
+use Nails\Common\Resource\Entity;
 
-class {{RESOURCE_CLASS_NAME}} extends Resource
+class {{RESOURCE_CLASS_NAME}} extends Entity
 {
 }
 
