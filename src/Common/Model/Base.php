@@ -2119,8 +2119,7 @@ abstract class Base
 
         foreach ($aIntegers as $sProperty) {
             if (property_exists($oObj, $sProperty)) {
-                if (is_numeric($oObj->{$sProperty}) &&
-                    !is_null($oObj->{$sProperty})) {
+                if (is_numeric($oObj->{$sProperty}) && !is_null($oObj->{$sProperty})) {
                     $oObj->{$sProperty} = (int) $oObj->{$sProperty};
                 }
             }
