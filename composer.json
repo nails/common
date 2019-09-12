@@ -62,23 +62,24 @@
                     "ErrorHandler"
                 ],
                 "helpers": [
-                    "string",
-                    "array",
                     "app_setting",
-                    "date",
-                    "email",
-                    "url",
+                    "array",
                     "cookie",
+                    "date",
+                    "debug",
+                    "directory",
+                    "email",
+                    "exception",
                     "form",
                     "html",
-                    "tools",
-                    "debug",
                     "language",
-                    "text",
-                    "exception",
-                    "typography",
                     "log",
-                    "directory"
+                    "logo",
+                    "string",
+                    "text",
+                    "tools",
+                    "typography",
+                    "url"
                 ]
             },
             "data": {

@@ -17,13 +17,6 @@ ERROR:   Maintenance
         <div id="container">
             <?php
 
-            $aPaths = [
-                [
-                    NAILS_APP_PATH . 'assets/img/errors/maintenance.png',
-                    BASE_URL . 'assets/img/errors/maintenance.png',
-                ],
-            ];
-
             include NAILS_COMMON_PATH . 'views/errors/components/header.php';
 
             if (empty($sMaintenanceTitle)) {

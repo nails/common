@@ -269,13 +269,6 @@ if (Environment::not(Environment::ENV_PROD)) {
             <div id="container">
                 <?php
 
-                $aPaths = [
-                    [
-                        NAILS_APP_PATH . 'assets/img/errors/fatal.png',
-                        BASE_URL . 'assets/img/errors/fatal.png',
-                    ]
-                ];
-
                 include NAILS_COMMON_PATH . 'views/errors/components/header.php';
 
                 ?>

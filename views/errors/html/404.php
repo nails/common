@@ -16,13 +16,6 @@ ERROR:   404
         <div id="container">
             <?php
 
-            $aPaths = [
-                [
-                    NAILS_APP_PATH . 'assets/img/errors/404.png',
-                    BASE_URL . 'assets/img/errors/404.png',
-                ],
-            ];
-
             include NAILS_COMMON_PATH . 'views/errors/components/header.php';
             echo 'The page you are looking for was not found.';
             include NAILS_COMMON_PATH . 'views/errors/components/footer.php';

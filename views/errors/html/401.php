@@ -16,12 +16,6 @@ MESSAGE: <?=$sMessage?>
     <body>
         <div id="container">
             <?php
-            $aPaths = [
-                [
-                    NAILS_APP_PATH . 'assets/img/errors/401.png',
-                    BASE_URL . 'assets/img/errors/401.png',
-                ],
-            ];
 
             include NAILS_COMMON_PATH . 'views/errors/components/header.php';
             echo $sMessage;
