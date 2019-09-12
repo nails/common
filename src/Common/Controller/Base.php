@@ -13,6 +13,7 @@
 
 namespace Nails\Common\Controller;
 
+use Nails\Auth;
 use Nails\Common\Events;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
@@ -21,6 +22,11 @@ use Nails\Environment;
 use Nails\Factory;
 use Nails\Functions;
 
+/**
+ * Class Base
+ *
+ * @package Nails\Common\Controller
+ */
 abstract class Base extends \MX_Controller
 {
     protected $data;
@@ -516,7 +522,7 @@ abstract class Base extends \MX_Controller
          * the user's cookies and set's up the session for an existing or new user.
          */
 
-        $oUserModel = Factory::model('User', 'nails/module-auth');
+        $oUserModel = Factory::model('User', Auth\Constants::MODULE_SLUG);
         $oUserModel->init();
     }
 
@@ -533,14 +539,14 @@ abstract class Base extends \MX_Controller
         if (isLoggedIn() && activeUser('is_suspended')) {
 
             //  Load models and langs
-            $oAuthModel = Factory::model('Auth', 'nails/module-auth');
+            $oAuthModel = Factory::model('Auth', Auth\Constants::MODULE_SLUG);
             get_instance()->lang->load('auth/auth');
 
             //  Log the user out
             $oAuthModel->logout();
 
             //  Create a new session
-            $oSession = Factory::service('Session', 'nails/module-auth');
+            $oSession = Factory::service('Session', Auth\Constants::MODULE_SLUG);
             $oSession->sess_create();
 
             //  Give them feedback
@@ -559,7 +565,7 @@ abstract class Base extends \MX_Controller
     public static function populateUserFeedback(array &$aData)
     {
         //  Set User Feedback alerts for the views
-        $oSession          = Factory::service('Session', 'nails/module-auth');
+        $oSession          = Factory::service('Session', Auth\Constants::MODULE_SLUG);
         $oUserFeedback     = Factory::service('UserFeedback');
         $aData['error']    = $oUserFeedback->get('error') ?: $oSession->getFlashData('error');
         $aData['negative'] = $oUserFeedback->get('negative') ?: $oSession->getFlashData('negative');

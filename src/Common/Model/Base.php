@@ -13,6 +13,7 @@
 namespace Nails\Common\Model;
 
 use Behat\Transliterator\Transliterator;
+use Nails\Auth;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\ModelException;
 use Nails\Common\Factory\Model\Field;
@@ -310,7 +311,7 @@ abstract class Base
             $this->addExpandableField([
                 'trigger'   => 'created_by',
                 'model'     => 'User',
-                'provider'  => 'nails/module-auth',
+                'provider'  => Auth\Constants::MODULE_SLUG,
                 'id_column' => 'created_by',
             ]);
         }
@@ -319,7 +320,7 @@ abstract class Base
             $this->addExpandableField([
                 'trigger'   => 'modified_by',
                 'model'     => 'User',
-                'provider'  => 'nails/module-auth',
+                'provider'  => Auth\Constants::MODULE_SLUG,
                 'id_column' => 'modified_by',
             ]);
         }

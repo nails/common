@@ -15,8 +15,14 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Auth;
 use Nails\Factory;
 
+/**
+ * Class UserFeedback
+ *
+ * @package Nails\Common\Service
+ */
 class UserFeedback
 {
     private $sSessionKey;
@@ -31,7 +37,7 @@ class UserFeedback
     public function __construct()
     {
         $this->sSessionKey = 'NailsUserFeedback';
-        $this->oSession    = Factory::service('Session', 'nails/module-auth');
+        $this->oSession    = Factory::service('Session', Auth\Constants::MODULE_SLUG);
         $this->aMessages   = $this->oSession->getFlashData($this->sSessionKey) ?: array();
     }
 

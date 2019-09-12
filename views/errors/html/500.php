@@ -1,5 +1,6 @@
 <?php
 
+use Nails\Auth;
 use Nails\Environment;
 use Nails\Factory;
 
@@ -245,7 +246,7 @@ if (Environment::not(Environment::ENV_PROD)) {
                 echo keyValueSection('GLOBAL Data', $_GLOBALS);
             }
 
-            $oSession = Factory::service('Session', 'nails/module-auth');
+            $oSession = Factory::service('Session', Auth\Constants::MODULE_SLUG);
             echo keyValueSection('SESSION Data', $oSession->getUserData());
 
             ?>

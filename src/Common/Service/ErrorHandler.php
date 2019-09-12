@@ -12,6 +12,7 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Auth;
 use Nails\Common\Controller\Nails404Controller;
 use Nails\Common\Events;
 use Nails\Common\Helper\ArrayHelper;
@@ -19,6 +20,11 @@ use Nails\Components;
 use Nails\Factory;
 use Nails\Functions;
 
+/**
+ * Class ErrorHandler
+ *
+ * @package Nails\Common\Service
+ */
 class ErrorHandler
 {
     /**
@@ -338,7 +344,7 @@ class ErrorHandler
 
             if (function_exists('wasAdmin') && wasAdmin()) {
 
-                $oUserModel = Factory::model('User', 'nails/module-auth');
+                $oUserModel = Factory::model('User', Auth\Constants::MODULE_SLUG);
                 $oRecovery  = $oUserModel->getAdminRecoveryData();
 
                 $sMessage .= '<br /><br />';
@@ -361,7 +367,7 @@ class ErrorHandler
 
         } else {
 
-            $oSession = Factory::service('Session', 'nails/module-auth');
+            $oSession = Factory::service('Session', Auth\Constants::MODULE_SLUG);
             $oInput   = Factory::service('Input');
             $sMessage = 'Sorry, you need to be logged in to see that page.';
 
