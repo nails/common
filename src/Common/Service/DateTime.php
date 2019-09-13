@@ -138,6 +138,7 @@ class DateTime
     public function __construct()
     {
         $this->setTimezones();
+        $this->setDateFormat();
         $this->setTimeFormat();
     }
 
@@ -383,7 +384,7 @@ class DateTime
      *
      * @param string $sSlug The date format's slug
      */
-    public function setDateFormat($sSlug)
+    public function setDateFormat($sSlug = null)
     {
         $oDateFormat = $this->getDateFormatBySlug($sSlug);
         if (empty($oDateFormat)) {

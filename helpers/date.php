@@ -17,14 +17,16 @@ if (!function_exists('convertDateTime')) {
     /**
      * Arbitrarily convert a timestamp between timezones
      *
-     * @param  mixed  $mTimestamp The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
-     * @param  string $sToTz      The timezone to convert to
-     * @param  string $sFromTz    The timezone to convert from
+     * @param mixed  $mTimestamp The timestamp to convert. If null current time is used, if numeric treated as timestamp, else passed to strtotime()
+     * @param string $sToTz      The timezone to convert to
+     * @param string $sFromTz    The timezone to convert from
      *
      * @return string
      */
     function convertDateTime($mTimestamp, $sToTz, $sFromTz = 'UTC')
     {
+        /** @var \Nails\Common\Service\DateTime $oDateTimeService */
+        /** @var \Nails\Common\Service\DateTime $oDateTimeService */
         $oDateTimeService = Factory::service('DateTime');
         return $oDateTimeService->convert($mTimestamp, $sToTz, $sFromTz);
     }
@@ -37,13 +39,14 @@ if (!function_exists('toUserDate')) {
     /**
      * Convert a date timestamp to the User's timezone from the Nails timezone
      *
-     * @param  mixed  $mTimestamp The timestamp to convert
-     * @param  string $sFormat    The format of the timestamp to return, defaults to User's date preference
+     * @param mixed  $mTimestamp The timestamp to convert
+     * @param string $sFormat    The format of the timestamp to return, defaults to User's date preference
      *
      * @return string
      */
     function toUserDate($mTimestamp = null, $sFormat = null)
     {
+        /** @var \Nails\Common\Service\DateTime $oDateTimeService */
         $oDateTimeService = Factory::service('DateTime');
         return $oDateTimeService->toUserDate($mTimestamp, $sFormat);
     }
@@ -56,12 +59,13 @@ if (!function_exists('toNailsDate')) {
     /**
      * Convert a date timestamp to the Nails timezone from the User's timezone
      *
-     * @param  mixed $mTimestamp The timestamp to convert
+     * @param mixed $mTimestamp The timestamp to convert
      *
      * @return string
      */
     function toNailsDate($mTimestamp = null)
     {
+        /** @var \Nails\Common\Service\DateTime $oDateTimeService */
         $oDateTimeService = Factory::service('DateTime');
         return $oDateTimeService->toNailsDate($mTimestamp);
     }
@@ -74,13 +78,14 @@ if (!function_exists('toUserDatetime')) {
     /**
      * Convert a datetime timestamp to the user's timezone from the Nails timezone
      *
-     * @param  mixed  $mTimestamp The timestamp to convert
-     * @param  string $sFormat    The format of the timestamp to return, defaults to User's dateTime preference
+     * @param mixed  $mTimestamp The timestamp to convert
+     * @param string $sFormat    The format of the timestamp to return, defaults to User's dateTime preference
      *
      * @return string
      */
     function toUserDatetime($mTimestamp = null, $sFormat = null)
     {
+        /** @var \Nails\Common\Service\DateTime $oDateTimeService */
         $oDateTimeService = Factory::service('DateTime');
         return $oDateTimeService->toUserDatetime($mTimestamp, $sFormat);
     }
@@ -93,12 +98,13 @@ if (!function_exists('toNailsDatetime')) {
     /**
      * Convert a datetime timestamp to the Nails timezone from the User's timezone
      *
-     * @param  mixed $mTimestamp The timestamp to convert
+     * @param mixed $mTimestamp The timestamp to convert
      *
      * @return string
      */
     function toNailsDatetime($mTimestamp = null)
     {
+        /** @var \Nails\Common\Service\DateTime $oDateTimeService */
         $oDateTimeService = Factory::service('DateTime');
         return $oDateTimeService->toNailsDatetime($mTimestamp);
     }
@@ -111,11 +117,11 @@ if (!function_exists('niceTime')) {
     /**
      * Converts a datetime into a human friendly relative string
      *
-     * @param  mixed   $mDate                  The timestamp to convert
-     * @param  boolean $bIncludeTense          Whether or not to append the tense (e.g, X minutes _ago_)
-     * @param  string  $sMessageBadDate        The message to show if a bad timestamp is supplied
-     * @param  string  $sMessageGreaterOneWeek The message to show if the timestamp is greater than one week away
-     * @param  string  $sMessageLessTenMinutes The message to show if the timestamp is less than ten minutes away
+     * @param mixed   $mDate                  The timestamp to convert
+     * @param boolean $bIncludeTense          Whether or not to append the tense (e.g, X minutes _ago_)
+     * @param string  $sMessageBadDate        The message to show if a bad timestamp is supplied
+     * @param string  $sMessageGreaterOneWeek The message to show if the timestamp is greater than one week away
+     * @param string  $sMessageLessTenMinutes The message to show if the timestamp is less than ten minutes away
      *
      * @return string
      */
@@ -126,6 +132,7 @@ if (!function_exists('niceTime')) {
         $sMessageGreaterOneWeek = null,
         $sMessageLessTenMinutes = null
     ) {
+        /** @var \Nails\Common\Service\DateTime $oDateTimeService */
         $oDateTimeService = Factory::service('DateTime');
         return $oDateTimeService->niceTime(
             $mDate,
@@ -154,6 +161,7 @@ if (!function_exists('calculateAge')) {
      */
     function calculateAge($birthYear, $birthMonth, $birthDay, $deathYear = null, $deathMonth = null, $deathDay = null)
     {
+        /** @var \Nails\Common\Service\DateTime $oDateTimeService */
         $oDateTimeService = Factory::service('DateTime');
         return $oDateTimeService->calculateAge($birthYear, $birthMonth, $birthDay, $deathYear, $deathMonth, $deathDay);
     }
