@@ -1528,6 +1528,10 @@ EOT;
         $bSortable = (bool) ArrayHelper::getFromArray('sortable', $aField, false);
         $sDefault  = ArrayHelper::getFromArray('default', $aField, '');
 
+        if (!is_string($sDefault)) {
+            $sDefault = json_encode($sDefault);
+        }
+
         if (empty($aColumns)) {
             throw new NailsException('Columns must be provided when using the form_field_dynamic_table method');
         }
