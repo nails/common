@@ -18,7 +18,6 @@ abstract class Base
 {
     protected $sSlug;
     protected $sLabel;
-    protected $iLogoId;
     protected $oSettings;
 
     // --------------------------------------------------------------------------
@@ -97,42 +96,5 @@ abstract class Base
     public function getLabel()
     {
         return $this->sLabel;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Return the driver's logo ID
-     *
-     * @return integer
-     */
-    public function getLogoId()
-    {
-        return (int) $this->iLogoId ?: null;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Returns the URL of the driver's logo
-     *
-     * @param integer $iWidth  The bounding width
-     * @param integer $iHeight The bounding height
-     *
-     * @return string
-     */
-    public function getLogoUrl($iWidth = null, $iHeight = null)
-    {
-        $iLogoId = $this->getLogoId();
-
-        if (!Components::exists('nails/module-cdn')) {
-            return null;
-        } elseif (!empty($iLogoId) && !empty($iWidth) && !empty($iHeight)) {
-            return cdnScale($iLogoId, $iWidth, $iHeight);
-        } elseif (!empty($iLogoId)) {
-            return cdnServe($iLogoId);
-        } else {
-            return null;
-        }
     }
 }
