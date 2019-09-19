@@ -802,6 +802,15 @@ abstract class Base
      */
     public function deleteMany(array $aIds): bool
     {
+        /**
+         * Ensure that passed IDs are unique; if they're not then we'll encounter
+         * an error when the second iteration of the item is hit because it has
+         * already been deleted.
+         */
+        $aIds = array_unique($aIds);
+        $aIds = array_filter($aIds);
+        $aIds = array_values($aIds);
+
         $oDb = Factory::service('Database');
         try {
             $oDb->trans_begin();
@@ -893,6 +902,15 @@ abstract class Base
      */
     public function destroyMany(array $aIds): bool
     {
+        /**
+         * Ensure that passed IDs are unique; if they're not then we'll encounter
+         * an error when the second iteration of the item is hit because it has
+         * already been destroyed.
+         */
+        $aIds = array_unique($aIds);
+        $aIds = array_filter($aIds);
+        $aIds = array_values($aIds);
+
         $oDb = Factory::service('Database');
         try {
             $oDb->trans_begin();
