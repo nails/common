@@ -770,7 +770,7 @@ abstract class Base
     {
         $oItem = $this->getById($iId);
         if (empty($oItem)) {
-            $this->setError('Item does not exist');
+            $this->setError('Item does not exist.');
             return false;
         }
 
@@ -816,7 +816,7 @@ abstract class Base
             $oDb->trans_begin();
             foreach ($aIds as $iId) {
                 if (!$this->delete($iId)) {
-                    throw new ModelException('Failed to delete item with ID ' . $iId);
+                    throw new ModelException('Failed to delete item with ID ' . $iId . '. ' . $this->lastError());
                 }
             }
             $oDb->trans_commit();
@@ -1840,7 +1840,7 @@ abstract class Base
             ],
         ];
 
-        $aExistingItems = $oAssociatedItemModel->getAll(null, null, $aData);
+        $aExistingItems = $oAssociatedItemModel->getAll($aData);
         foreach ($aExistingItems as $oExistingItem) {
             $aExistingItemIds[] = $oExistingItem->id;
         }
@@ -1896,7 +1896,7 @@ abstract class Base
         if (!empty($aIdDiff)) {
             if (!$oAssociatedItemModel->deleteMany($aIdDiff)) {
                 throw new ModelException(
-                    'Failed to delete old associated items (' . $sAssociatedModelProvider . ':' . $sAssociatedModel . ') ' . $oAssociatedItemModel->lastError()
+                    'Failed to delete old associated items (' . $sAssociatedModelProvider . ':' . $sAssociatedModel . '). ' . $oAssociatedItemModel->lastError()
                 );
             }
         }
