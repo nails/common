@@ -2647,6 +2647,7 @@ abstract class Base
              * ENUM
              */
             case 'enum':
+            case 'set':
                 $oField->type    = 'dropdown';
                 $oField->class   = 'select2';
                 $aOptions        = explode("','", substr($sTypeConfig, 1, -1));
