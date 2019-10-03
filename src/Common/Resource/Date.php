@@ -49,6 +49,6 @@ class Date extends Resource
      */
     public function __toString(): string
     {
-        return $this->raw;
+        return (string) $this->raw;
     }
 }
