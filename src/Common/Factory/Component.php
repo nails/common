@@ -79,11 +79,11 @@ final class Component
         $this->path         = rtrim($sAbsolutePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         $this->relativePath = rtrim($sRelativePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         $this->moduleName   = ArrayHelper::getFromArray('moduleName', $aNailsData, '');
-        $this->data         = ArrayHelper::getFromArray('data', $aNailsData, null);
+        $this->data         = ArrayHelper::getFromArray('data', $aNailsData, (object) []);
         $this->type         = ArrayHelper::getFromArray('type', $aNailsData, '');
         $this->subType      = ArrayHelper::getFromArray('subType', $aNailsData, '');
         $this->forModule    = ArrayHelper::getFromArray('forModule', $aNailsData, '');
-        $this->autoload     = ArrayHelper::getFromArray('autoload', $aNailsData, null);
+        $this->autoload     = ArrayHelper::getFromArray('autoload', $aNailsData, (object) []);
         $this->scripts      = ArrayHelper::getFromArray('scripts', $aNailsData, (object) []);
         $this->fromApp      = $bIsApp;
     }

@@ -17,6 +17,11 @@ use Nails\Common\Factory\Component;
 use Nails\Common\Helper\ArrayHelper;
 use Nails\Common\Service\ErrorHandler;
 
+/**
+ * Class Components
+ *
+ * @package Nails
+ */
 final class Components
 {
     /**
@@ -299,8 +304,8 @@ final class Components
                     'nails' => (object) [
                         'namespace'  => static::$oAppNamespace,
                         'moduleName' => ArrayHelper::getFromArray('moduleName', $aNails, ''),
-                        'data'       => ArrayHelper::getFromArray('data', $aNails, null),
-                        'autoload'   => ArrayHelper::getFromArray('autoload', $aNails, null),
+                        'data'       => ArrayHelper::getFromArray('data', $aNails, (object) []),
+                        'autoload'   => ArrayHelper::getFromArray('autoload', $aNails, (object) []),
                     ],
                 ],
             ],
