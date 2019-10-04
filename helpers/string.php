@@ -9,6 +9,13 @@ if (!function_exists('str_lreplace')) {
     }
 }
 
+if (!function_exists('replaceLastOccurrence')) {
+    function replaceLastOccurrence($sSearch, $sReplace, $sSubject)
+    {
+        return Strings::replaceLastOccurrence($sSearch, $sReplace, $sSubject);
+    }
+}
+
 if (!function_exists('underscoreToCamelcase')) {
     function underscoreToCamelcase($sString, $bLowerFirst = true)
     {
