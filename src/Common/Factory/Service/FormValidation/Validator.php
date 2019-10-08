@@ -3,6 +3,7 @@
 namespace Nails\Common\Factory\Service\FormValidation;
 
 use Nails\Common\Exception\FactoryException;
+use Nails\Common\Exception\NailsException;
 use Nails\Common\Exception\ValidationException;
 use Nails\Common\Service\FormValidation;
 use Nails\Factory;
@@ -14,6 +15,29 @@ use Nails\Factory;
  */
 class Validator
 {
+    /**
+     * The CI prefix for FormValidation callbacks
+     *
+     * @var string
+     */
+    const CI_CALLBACK_PREFIX = 'callback_';
+
+    /**
+     * The method on this class which should handle closures
+     *
+     * @var string
+     */
+    const CLOSURE_METHOD = 'handleClosure';
+
+    /**
+     * The closure validation fail string
+     *
+     * @var string
+     */
+    const CLOSURE_ERROR = 'Field failed validation.';
+
+    // --------------------------------------------------------------------------
+
     /**
      * The rules array, key => value format, where value is an array or pipe separated strings
      *
@@ -34,6 +58,13 @@ class Validator
      * @var array
      */
     protected $aData = [];
+
+    /**
+     * The closure map, allows closures to be passed as validation rules
+     *
+     * @var array
+     */
+    protected $aClosureMap = [];
 
     // --------------------------------------------------------------------------
 
@@ -154,8 +185,11 @@ class Validator
         $oFormValidation->set_data($this->getData());
 
         //  Set the rules
-        $aAllRules = [];
+        $aAllRules         = [];
+        $this->aClosureMap = [];
         foreach ($this->getRules() as $sField => $aRules) {
+
+            $this->mapClosures($aRules);
 
             if (is_array($aRules)) {
                 $aAllRules = array_merge($aAllRules, $aRules);
@@ -179,17 +213,43 @@ class Validator
 
         $aMessages = $this->getMessages();
         foreach ($aAllRules as $sRule) {
-            $oFormValidation->set_message(
-                $sRule,
-                getFromArray($sRule, $aMessages, lang('fv_' . $sRule))
-            );
+            if (preg_match('/^' . static::CI_CALLBACK_PREFIX . static::CLOSURE_METHOD . '/', $sRule)) {
+                $oFormValidation->set_message(
+                    preg_replace('/^' . static::CI_CALLBACK_PREFIX . '/', '', $sRule),
+                    'Field failed validation'
+                );
+            } else {
+                $oFormValidation->set_message(
+                    $sRule,
+                    getFromArray($sRule, $aMessages, lang('fv_' . $sRule))
+                );
+            }
         }
 
         //  Execute the validation
-        if (!$oFormValidation->run()) {
+        if (!$oFormValidation->run($this)) {
             $oException = new ValidationException(lang('fv_there_were_errors'));
             $oException->setData($this->getErrors());
             throw $oException;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Maps any closures to a callback proxy method
+     *
+     * @param array $aRules The rules to map
+     */
+    protected function mapClosures(array &$aRules)
+    {
+        foreach ($aRules as &$mRule) {
+            if ($mRule instanceof \Closure) {
+                $sClosureId                     = md5(uniqid() . random_string());
+                $this->aClosureMap[$sClosureId] = clone $mRule;
+
+                $mRule = static::CI_CALLBACK_PREFIX . static::CLOSURE_METHOD . '[' . $sClosureId . ']';
+            }
         }
     }
 
@@ -206,5 +266,41 @@ class Validator
         /** @var FormValidation $oFormValidation */
         $oFormValidation = Factory::service('FormValidation');
         return $oFormValidation->error_array();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Handles closure callbacks
+     *
+     * @return bool
+     * @throws FactoryException
+     * @throws NailsException
+     */
+    public function handleClosure()
+    {
+        $sValue     = func_get_arg(0);
+        $sClosureId = func_get_arg(1);
+
+        try {
+
+            if (!array_key_exists($sClosureId, $this->aClosureMap)) {
+                throw new NailsException('Invalid Closure ID');
+            }
+
+            $this->aClosureMap[$sClosureId]($sValue);
+            return true;
+
+        } catch (ValidationException $e) {
+
+            /** @var FormValidation $oFormValidation */
+            $oFormValidation = Factory::service('FormValidation');
+            $oFormValidation->set_message(
+                static::CLOSURE_METHOD,
+                $e->getMessage()
+            );
+
+            return false;
+        }
     }
 }
