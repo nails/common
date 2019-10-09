@@ -25,6 +25,13 @@ class Date extends Resource
      */
     public $formatted = '';
 
+    /**
+     * The internal date object
+     *
+     * @var \DateTime
+     */
+    public $oDateObj;
+
     // --------------------------------------------------------------------------
 
     /**
@@ -35,6 +42,7 @@ class Date extends Resource
     public function __construct($mObj = [])
     {
         parent::__construct($mObj);
+        $this->oDateObj = new \DateTime($this->raw);
         if (!empty($this->raw)) {
             $this->formatted = toUserDate($this->raw);
         }
@@ -50,5 +58,17 @@ class Date extends Resource
     public function __toString(): string
     {
         return (string) $this->raw;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Formats the date
+     *
+     * @param string $sFormat The format to use
+     */
+    public function format(string $sFormat)
+    {
+        return $this->oDateObj->format($sFormat);
     }
 }
