@@ -220,7 +220,7 @@ class View
      * @throws ViewNotFoundException
      * @throws ViewNotFoundCaseException
      */
-    protected function resolvePath($sView)
+    public function resolvePath($sView)
     {
         $sCacheKey = 'path:' . $sView;
         $sCached   = $this->getCache($sCacheKey);
