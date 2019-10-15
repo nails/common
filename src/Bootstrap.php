@@ -14,6 +14,11 @@ namespace Nails;
 use Nails\Common\Events;
 use Nails\Common\Service\ErrorHandler;
 
+/**
+ * Class Bootstrap
+ *
+ * @package Nails
+ */
 final class Bootstrap
 {
     /**
@@ -50,6 +55,18 @@ final class Bootstrap
     {
         static::setEntryPoint($sEntryPoint);
         static::setBaseDirectory($sEntryPoint);
+
+        /*
+         *---------------------------------------------------------------
+         * Bootstrapper: preSystem
+         *---------------------------------------------------------------
+         * Allows the app to execute code very early on in the app's lifecycle.
+         * All events after this event can be handled by the native event handler.
+         */
+        if (class_exists('\App\Events') && is_callable('\App\Events::preSystem')) {
+            \App\Events::preSystem();
+        }
+
         static::loadConfig('app');
         static::loadConfig('deploy');
         static::setNailsConstants();
@@ -81,6 +98,18 @@ final class Bootstrap
     // --------------------------------------------------------------------------
 
     /**
+     * Returns the entry point
+     *
+     * @return string
+     */
+    public static function getEntryPoint()
+    {
+        return static::$sEntryPoint;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Set the base directory
      *
      * @param string $sEntryPoint The entry point
@@ -88,6 +117,18 @@ final class Bootstrap
     public static function setBaseDirectory($sEntryPoint)
     {
         static::$sBaseDirectory = dirname($sEntryPoint) . '/';
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the base directory
+     *
+     * @return string
+     */
+    public static function getBaseDirectory()
+    {
+        return static::$sBaseDirectory;
     }
 
     // --------------------------------------------------------------------------
