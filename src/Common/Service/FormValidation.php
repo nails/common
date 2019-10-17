@@ -14,7 +14,9 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Common\Factory\Model\Field;
 use Nails\Common\Factory\Service\FormValidation\Validator;
+use Nails\Common\Model\Base;
 use Nails\Factory;
 
 /**
@@ -185,7 +187,7 @@ class FormValidation
      *
      * @return Validator
      */
-    public function buildValidator(array $aRules = [], array $aMessages = [], array $aData = null)
+    public function buildValidator(array $aRules = [], array $aMessages = [], array $aData = null): Validator
     {
         $oInput = Factory::service('Input');
         return Factory::factory(
@@ -195,5 +197,27 @@ class FormValidation
             $aMessages,
             $aData ?? $oInput->post()
         );
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Builds a validator from a model
+     *
+     * @param Base       $oModel    The model to use for rule generation
+     * @param array      $aMessages An array of error message overrides
+     * @param array|null $aData     The data to validate, defaults to $_POST
+     *
+     * @return Validator
+     */
+    public function buildValidatorFromModel(Base $oModel, array $aMessages = [], array $aData = null): Validator
+    {
+        $aRules = [];
+        /** @var Field $oField */
+        foreach ($oModel->describeFields() as $oField) {
+            $aRules[$oField->key] = $oField->validation;
+        }
+
+        return $this->buildValidator($aRules, $aMessages, $aData);
     }
 }
