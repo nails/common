@@ -11,7 +11,12 @@
 
 namespace Nails;
 
-class Environment
+/**
+ * Class Environment
+ *
+ * @package Nails
+ */
+final class Environment
 {
     /**
      * The default environments
@@ -29,7 +34,7 @@ class Environment
      *
      * @var string
      */
-    protected static $sEnvironment;
+    protected static $sEnvironment = self::ENV_DEV;
 
     // --------------------------------------------------------------------------
 
@@ -40,21 +45,21 @@ class Environment
      */
     public static function get()
     {
-        if (empty(static::$sEnvironment)) {
+        if (empty(self::$sEnvironment)) {
 
             if (!empty($_ENV['ENVIRONMENT'])) {
-                static::set($_ENV['ENVIRONMENT']);
+                self::set($_ENV['ENVIRONMENT']);
             } elseif (defined('ENVIRONMENT')) {
-                static::set(ENVIRONMENT);
+                self::set(ENVIRONMENT);
             } else {
-                static::set(static::ENV_DEV);
+                self::set(self::ENV_DEV);
             }
 
             try {
 
                 $oInput = Factory::service('Input');
-                if (static::not(static::ENV_PROD) && $oInput->header(Testing::TEST_HEADER_NAME) === Testing::TEST_HEADER_VALUE) {
-                    static::set(static::ENV_HTTP_TEST);
+                if (self::not(self::ENV_PROD) && $oInput->header(Testing::TEST_HEADER_NAME) === Testing::TEST_HEADER_VALUE) {
+                    self::set(self::ENV_HTTP_TEST);
                     //  @todo (Pablo - 2018-11-21) - Consider halting execution if on prod and a test header is received
                 }
 
@@ -68,7 +73,7 @@ class Environment
             }
         }
 
-        return static::$sEnvironment;
+        return self::$sEnvironment;
     }
 
     // --------------------------------------------------------------------------
@@ -95,9 +100,9 @@ class Environment
     public static function is($mEnvironment)
     {
         if (is_array($mEnvironment)) {
-            return array_search(static::get(), array_map('strtoupper', $mEnvironment)) !== false;
+            return array_search(self::get(), array_map('strtoupper', $mEnvironment)) !== false;
         } else {
-            return static::get() === strtoupper($mEnvironment);
+            return self::get() === strtoupper($mEnvironment);
         }
     }
 
@@ -112,7 +117,7 @@ class Environment
      */
     public static function not($sEnvironment)
     {
-        return static::get() !== strtoupper($sEnvironment);
+        return self::get() !== strtoupper($sEnvironment);
     }
 
     // --------------------------------------------------------------------------
@@ -120,16 +125,16 @@ class Environment
     /**
      * Lists the available environments
      *
-     * @return array
+     * @return string[]
      */
-    public static function available()
+    public static function available(): array
     {
         return [
-            static::ENV_PROD,
-            static::ENV_STAGE,
-            static::ENV_DEV,
-            static::ENV_TEST,
-            static::ENV_HTTP_TEST,
+            self::ENV_PROD,
+            self::ENV_STAGE,
+            self::ENV_DEV,
+            self::ENV_TEST,
+            self::ENV_HTTP_TEST,
         ];
     }
 }

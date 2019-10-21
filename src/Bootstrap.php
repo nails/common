@@ -53,8 +53,8 @@ final class Bootstrap
      */
     public static function run($sEntryPoint)
     {
-        static::setEntryPoint($sEntryPoint);
-        static::setBaseDirectory($sEntryPoint);
+        self::setEntryPoint($sEntryPoint);
+        self::setBaseDirectory($sEntryPoint);
 
         /*
          *---------------------------------------------------------------
@@ -67,15 +67,15 @@ final class Bootstrap
             \App\Events::preSystem();
         }
 
-        static::loadConfig('app');
-        static::loadConfig('deploy');
-        static::setNailsConstants();
-        static::setCodeIgniterConstants();
-        static::setErrorHandling();
-        static::setRuntime();
-        static::loadFunctions();
-        static::checkRoutes();
-        static::setupModules();
+        self::loadConfig('app');
+        self::loadConfig('deploy');
+        self::setNailsConstants();
+        self::setCodeIgniterConstants();
+        self::setErrorHandling();
+        self::setRuntime();
+        self::loadFunctions();
+        self::checkRoutes();
+        self::setupModules();
 
         Factory::setup();
         Factory::autoload();
@@ -92,7 +92,7 @@ final class Bootstrap
      */
     public static function setEntryPoint($sEntryPoint)
     {
-        static::$sEntryPoint = $sEntryPoint;
+        self::$sEntryPoint = $sEntryPoint;
     }
 
     // --------------------------------------------------------------------------
@@ -104,7 +104,7 @@ final class Bootstrap
      */
     public static function getEntryPoint()
     {
-        return static::$sEntryPoint;
+        return self::$sEntryPoint;
     }
 
     // --------------------------------------------------------------------------
@@ -116,7 +116,7 @@ final class Bootstrap
      */
     public static function setBaseDirectory($sEntryPoint)
     {
-        static::$sBaseDirectory = dirname($sEntryPoint) . '/';
+        self::$sBaseDirectory = dirname($sEntryPoint) . '/';
     }
 
     // --------------------------------------------------------------------------
@@ -128,7 +128,7 @@ final class Bootstrap
      */
     public static function getBaseDirectory()
     {
-        return static::$sBaseDirectory;
+        return self::$sBaseDirectory;
     }
 
     // --------------------------------------------------------------------------
@@ -140,7 +140,7 @@ final class Bootstrap
      */
     private static function loadConfig($sFile)
     {
-        $sPath = static::$sBaseDirectory . 'config/' . $sFile . '.php';
+        $sPath = self::$sBaseDirectory . 'config/' . $sFile . '.php';
         if (file_exists($sPath)) {
             require_once $sPath;
         }
@@ -159,11 +159,11 @@ final class Bootstrap
         Functions::define('NAILS_BRANDING', true);
 
         //  Paths
-        Functions::define('NAILS_PATH', static::$sBaseDirectory . 'vendor/nails/');
-        Functions::define('NAILS_APP_PATH', static::$sBaseDirectory);
+        Functions::define('NAILS_PATH', self::$sBaseDirectory . 'vendor/nails/');
+        Functions::define('NAILS_APP_PATH', self::$sBaseDirectory);
         Functions::define('NAILS_COMMON_PATH', NAILS_PATH . 'common/');
-        Functions::define('NAILS_CI_APP_PATH', static::$sBaseDirectory . 'vendor/codeigniter/framework/application/');
-        Functions::define('NAILS_CI_SYSTEM_PATH', static::$sBaseDirectory . 'vendor/codeigniter/framework/system/');
+        Functions::define('NAILS_CI_APP_PATH', self::$sBaseDirectory . 'vendor/codeigniter/framework/application/');
+        Functions::define('NAILS_CI_SYSTEM_PATH', self::$sBaseDirectory . 'vendor/codeigniter/framework/system/');
 
         //  So CodeIgniter configures itself correctly
         Functions::define('BASEPATH', NAILS_CI_SYSTEM_PATH);
@@ -183,8 +183,8 @@ final class Bootstrap
 
         //  Cache constants
         //  @todo (Pablo - 2018-11-16) - Move these to the cache service
-        Functions::define('CACHE_PATH', static::$sBaseDirectory . 'cache' . DIRECTORY_SEPARATOR . 'private' . DIRECTORY_SEPARATOR);
-        Functions::define('CACHE_PUBLIC_PATH', static::$sBaseDirectory . 'cache' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR);
+        Functions::define('CACHE_PATH', self::$sBaseDirectory . 'cache' . DIRECTORY_SEPARATOR . 'private' . DIRECTORY_SEPARATOR);
+        Functions::define('CACHE_PUBLIC_PATH', self::$sBaseDirectory . 'cache' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR);
         Functions::define('CACHE_PUBLIC_URL', rtrim(BASE_URL, '/') . '/cache/public/');
 
         //  Database
@@ -214,7 +214,7 @@ final class Bootstrap
 
         //  Log constants
         //  @todo (Pablo - 2018-11-16) - Move these to the log service
-        Functions::define('DEPLOY_LOG_DIR', static::$sBaseDirectory . 'application/logs/');
+        Functions::define('DEPLOY_LOG_DIR', self::$sBaseDirectory . 'application/logs/');
 
         //  Email constants
         Functions::define('APP_DEVELOPER_EMAIL', '');
@@ -234,8 +234,8 @@ final class Bootstrap
 
         //  Ensure the app's constants file is also loaded
         //  @todo (Pablo - 2018-11-16) - Remove reliance on this feature
-        if (is_file(static::$sBaseDirectory . 'application/config/constants.php')) {
-            require_once static::$sBaseDirectory . 'application/config/constants.php';
+        if (is_file(self::$sBaseDirectory . 'application/config/constants.php')) {
+            require_once self::$sBaseDirectory . 'application/config/constants.php';
         }
     }
 
@@ -248,8 +248,8 @@ final class Bootstrap
      * - The iniatal section considering environments has been removed
      * - The section detailing error reporting has been removed
      * - The $system_path variable has been updated to reflect its true location
-     * - The working directory is set to static::$sBaseDirectory
-     * - Calls to __FILE__ have been replaced with static::$sEntryPoint
+     * - The working directory is set to self::$sBaseDirectory
+     * - Calls to __FILE__ have been replaced with self::$sEntryPoint
      * - Calls to define() have been replaced with calls to Functions::define()
      * - Not kicking off CodeIgniter (as it needs to be called in the global scope)
      *
@@ -267,7 +267,7 @@ final class Bootstrap
          * Set the path if it is not in the same directory as this file.
          */
         if (empty($sSystemPath)) {
-            $system_path = static::$sBaseDirectory . 'vendor/codeigniter/framework/system';
+            $system_path = self::$sBaseDirectory . 'vendor/codeigniter/framework/system';
         } else {
             $system_path = $sSystemPath;
         }
@@ -365,7 +365,7 @@ final class Bootstrap
 
         // Set the current directory correctly for CLI requests
         if (defined('STDIN')) {
-            chdir(static::$sBaseDirectory);
+            chdir(self::$sBaseDirectory);
         }
 
         if (($_temp = realpath($system_path)) !== false) {
@@ -392,13 +392,13 @@ final class Bootstrap
          * -------------------------------------------------------------------
          */
         // The name of THIS file
-        Functions::define('SELF', pathinfo(static::$sEntryPoint, PATHINFO_BASENAME));
+        Functions::define('SELF', pathinfo(self::$sEntryPoint, PATHINFO_BASENAME));
 
         // Path to the system directory
         Functions::define('BASEPATH', $system_path);
 
         // Path to the front controller (this file) directory
-        Functions::define('FCPATH', dirname(static::$sEntryPoint) . DIRECTORY_SEPARATOR);
+        Functions::define('FCPATH', dirname(self::$sEntryPoint) . DIRECTORY_SEPARATOR);
 
         // Name of the "system" directory
         Functions::define('SYSDIR', basename(BASEPATH));
@@ -597,20 +597,20 @@ final class Bootstrap
     // --------------------------------------------------------------------------
 
     /**
-     * static::$aNailsControllerData is an array populated by $this->data in controllers,
+     * self::$aNailsControllerData is an array populated by $this->data in controllers,
      * this function provides an easy interface to this array when it's not in scope.
      *
      * @return array
      **/
     public static function &getControllerData()
     {
-        return static::$aNailsControllerData;
+        return self::$aNailsControllerData;
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * static::$aNailsControllerData is an array populated by $this->data
+     * self::$aNailsControllerData is an array populated by $this->data
      * in controllers, this function provides an easy interface to populate this
      * array when it's not in scope.
      *
@@ -621,7 +621,7 @@ final class Bootstrap
      **/
     public static function setControllerData($sKey, $mValue)
     {
-        static::$aNailsControllerData[$sKey] = $mValue;
+        self::$aNailsControllerData[$sKey] = $mValue;
     }
 
     // --------------------------------------------------------------------------
