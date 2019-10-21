@@ -11,6 +11,8 @@
 
 namespace Nails;
 
+use Nails\Common\Exception\EnvironmentException;
+
 /**
  * Class Environment
  *
@@ -85,7 +87,8 @@ final class Environment
      */
     private static function set($sEnvironment)
     {
-        static::$sEnvironment = trim(strtoupper($sEnvironment));
+        self::isValid($sEnvironment);
+        self::$sEnvironment = trim(strtoupper($sEnvironment));
     }
 
     // --------------------------------------------------------------------------
@@ -136,5 +139,21 @@ final class Environment
             self::ENV_TEST,
             self::ENV_HTTP_TEST,
         ];
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Determines whether the supplied string is a valid environment
+     *
+     * @param string $sEnvironment The environment to test
+     *
+     * @throws EnvironmentException
+     */
+    public static function isValid(string $sEnvironment): void
+    {
+        if (!in_array($sEnvironment, self::available())) {
+            throw new EnvironmentException('"' . $sEnvironment . '" is not a valid environment.');
+        }
     }
 }

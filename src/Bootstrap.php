@@ -181,6 +181,13 @@ final class Bootstrap
         Functions::define('ENVIRONMENT', Environment::ENV_DEV);
         Functions::define('NAILS_TIMEZONE', 'UTC');
 
+        /**
+         * Test the environment is valid
+         * If ENVIRONMENT is empty then CI will roll over with unhelpful issues as it tries to look
+         * up directory names etc with a missing segment.
+         */
+        Environment::isValid(ENVIRONMENT);
+
         //  Cache constants
         //  @todo (Pablo - 2018-11-16) - Move these to the cache service
         Functions::define('CACHE_PATH', self::$sBaseDirectory . 'cache' . DIRECTORY_SEPARATOR . 'private' . DIRECTORY_SEPARATOR);
