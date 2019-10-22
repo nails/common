@@ -36,7 +36,7 @@ final class Environment
      *
      * @var string
      */
-    protected static $sEnvironment = self::ENV_DEV;
+    protected static $sEnvironment;
 
     // --------------------------------------------------------------------------
 
