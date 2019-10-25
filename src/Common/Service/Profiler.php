@@ -98,7 +98,7 @@ class Profiler
 
             static::$aMarks[] = [
                 'Label'     => $sLabel,
-                'Timestamp' => microtime(true),
+                'Timestamp' => (int) (microtime(true) * 1000),
             ];
         }
     }
@@ -247,19 +247,19 @@ class Profiler
 
         foreach (static::$aMarks as $aMark) {
 
-            $aMark['Diff (Seconds)']  = $fPreviousTimestamp === null ? 0 : $aMark['Timestamp'] - $fPreviousTimestamp;
-            $aMark['Total (Seconds)'] = $fTotal + $aMark['Diff (Seconds)'];
+            $aMark['Diff (ms)']  = $fPreviousTimestamp === null ? 0 : $aMark['Timestamp'] - $fPreviousTimestamp;
+            $aMark['Total (ms)'] = $fTotal + $aMark['Diff (ms)'];
 
             $fPreviousTimestamp = $aMark['Timestamp'];
-            $fTotal             += $aMark['Diff (Seconds)'];
+            $fTotal             += $aMark['Diff (ms)'];
 
             $aReportedMarks[] = $aMark;
         }
 
         return [
-            'Count'           => count($aReportedMarks),
-            'Total (Seconds)' => $fTotal,
-            'Data'            => $aReportedMarks,
+            'Count'      => count($aReportedMarks),
+            'Total (ms)' => $fTotal,
+            'Data'       => $aReportedMarks,
         ];
 
     }
