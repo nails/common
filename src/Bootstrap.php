@@ -652,5 +652,11 @@ final class Bootstrap
         Profiler::mark(Events::SYSTEM_SHUTOWN);
         Factory::service('Event')
             ->trigger(Events::SYSTEM_SHUTOWN);
+
+        if (Profiler::isEnabled()) {
+            /** @var Profiler $oProfiler */
+            $oProfiler = Factory::service('Profiler');
+            echo $oProfiler->generateReport();
+        }
     }
 }
