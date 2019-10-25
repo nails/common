@@ -87,8 +87,8 @@ class Profiler
 
             $aBacktrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
             $aCaller    = $aBacktrace[1];
-            $sCaller    = $aCaller['class'] .
-                '->' . $aCaller['function'];
+            $sCaller    = (!empty($aCaller['class']) ? $aCaller['class'] . '->' : '') .
+                (!empty($aCaller['function']) ? $aCaller['function'] : 'Unknown');
 
             if (!$sLabel) {
                 $sLabel = $sCaller;
