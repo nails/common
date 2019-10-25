@@ -130,60 +130,133 @@ class Profiler
         }
 
         ob_start();
-        echo '<div class="' . static::HTML_CLASS_PROFILER . '">';
-        foreach ($oReport as $sSection => $oData) {
-            ?>
-            <section class="<?=static::HTML_CLASS_PROFILER_SECTION?>">
-                <h1><?=$sSection?></h1>
-                <table class="<?=static::HTML_CLASS_PROFILER_TABLE_PROPERTY?>">
-                    <tbody>
-                        <?php
-                        foreach ($oData as $sProperty => $mValue) {
-                            if (!is_array($mValue)) {
-                                $this->renderPropertyRow($sProperty, $mValue);
+        $this->renderStyles();
+        $this->renderJavascript();
+        ?>
+        <div class="<?=static::HTML_CLASS_PROFILER?>">
+            <h1>Profiler</h1>
+            <?php
+            foreach ($oReport as $sSection => $oData) {
+                ?>
+                <section class="<?=static::HTML_CLASS_PROFILER_SECTION?>">
+                    <h2><?=$sSection?></h2>
+                    <table class="<?=static::HTML_CLASS_PROFILER_TABLE_PROPERTY?>">
+                        <tbody>
+                            <?php
+                            foreach ($oData as $sProperty => $mValue) {
+                                if (!is_array($mValue)) {
+                                    $this->renderPropertyRow($sProperty, $mValue);
+                                }
                             }
-                        }
-                        ?>
-                    </tbody>
-                </table>
-                <?php
-                foreach ($oData as $sProperty => $mValue) {
-                    if (is_array($mValue)) {
+                            ?>
+                        </tbody>
+                    </table>
+                    <?php
+                    foreach ($oData as $sProperty => $mValue) {
+                        if (is_array($mValue)) {
 
-                        $aFirst   = reset($mValue);
-                        $aColumns = array_keys($aFirst);
-                        ?>
-                        <h2><?=$sProperty?></h2>
-                        <table class="<?=static::HTML_CLASS_PROFILER_TABLE_DATA?>">
-                            <thead>
-                                <tr>
-                                    <?php
-                                    foreach ($aColumns as $sColumn) {
-                                        ?>
-                                        <th><?=$sColumn?></th>
+                            $aFirst   = reset($mValue);
+                            $aColumns = array_keys($aFirst);
+                            ?>
+                            <h3><?=$sProperty?></h3>
+                            <table class="<?=static::HTML_CLASS_PROFILER_TABLE_DATA?>">
+                                <thead>
+                                    <tr>
                                         <?php
+                                        foreach ($aColumns as $sColumn) {
+                                            ?>
+                                            <th><?=$sColumn?></th>
+                                            <?php
+                                        }
+                                        ?>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    foreach ($mValue as $aRow) {
+                                        $this->renderDataRow($aRow);
                                     }
                                     ?>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                foreach ($mValue as $aRow) {
-                                    $this->renderDataRow($aRow);
-                                }
-                                ?>
-                            </tbody>
-                        </table>
-                        <?php
+                                </tbody>
+                            </table>
+                            <?php
+                        }
                     }
-                }
-                ?>
-            </section>
-            <?php
-        }
-        echo '</div>';
+                    ?>
+                </section>
+                <?php
+            }
+            ?>
+        </div>
+        <?php
 
         return ob_get_clean();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Renders the report javascript
+     */
+    protected function renderJavascript()
+    {
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Renders the report styles
+     */
+    protected function renderStyles()
+    {
+        ?>
+        <style>
+            .<?=static::HTML_CLASS_PROFILER?> {
+                padding: 1rem;
+                margin-top: 5rem;
+                border-top: 2px solid #ccc;
+            }
+
+            .<?=static::HTML_CLASS_PROFILER?> h1 {
+                margin-top: 0;
+            }
+
+            .<?=static::HTML_CLASS_PROFILER_SECTION?> {
+                border: 1px solid #ccc;
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .<?=static::HTML_CLASS_PROFILER_SECTION?> *:last-child {
+                margin-bottom: 0;
+            }
+
+            .<?=static::HTML_CLASS_PROFILER_SECTION?> h2,
+            .<?=static::HTML_CLASS_PROFILER_SECTION?> h3 {
+                margin: 0 0 1rem 0;
+                padding: 0;
+            }
+
+            .<?=static::HTML_CLASS_PROFILER_TABLE_PROPERTY?>,
+            .<?=static::HTML_CLASS_PROFILER_TABLE_DATA?> {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+
+            .<?=static::HTML_CLASS_PROFILER_TABLE_PROPERTY?> th,
+            .<?=static::HTML_CLASS_PROFILER_TABLE_DATA?> th {
+                background: #000;
+                color: #fff;
+                padding: 0.5rem;
+            }
+
+            .<?=static::HTML_CLASS_PROFILER_TABLE_PROPERTY?> td,
+            .<?=static::HTML_CLASS_PROFILER_TABLE_DATA?> td {
+                border: 1px solid #ccc;
+                padding: 0.5rem;
+            }
+        </style>
+        <?php
     }
 
     // --------------------------------------------------------------------------
@@ -290,8 +363,9 @@ class Profiler
         }
 
         return [
-            'Count' => $iNumQueries,
-            'Data'  => $aReportedQueries,
+            'Count'     => $iNumQueries,
+            'Total (s)' => array_sum($oDb->query_times),
+            'Data'      => $aReportedQueries,
         ];
     }
 }
