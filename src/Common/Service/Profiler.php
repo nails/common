@@ -88,8 +88,7 @@ class Profiler
             $aBacktrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
             $aCaller    = $aBacktrace[1];
             $sCaller    = $aCaller['class'] .
-                '->' . $aCaller['function'] .
-                '::' . $aCaller['line'];
+                '->' . $aCaller['function'];
 
             if (!$sLabel) {
                 $sLabel = $sCaller;
@@ -99,7 +98,7 @@ class Profiler
 
             static::$aMarks[] = [
                 'Label'     => $sLabel,
-                'Timestamp' => (int) (microtime(true) * 1000),
+                'Timestamp' => microtime(true),
             ];
         }
     }
@@ -109,21 +108,20 @@ class Profiler
     /**
      * Generates the profiling report
      *
-     * @param bool $bAsJson    Return the report as JSON rather than HTML
-     * @param bool $bInSeconds Return timestamps in seconds
+     * @param bool $bAsJson Return the report as JSON rather than HTML
      *
      * @return string
      * @throws FactoryException
      * @throws NailsException
      */
-    public function generateReport(bool $bAsJson = false, bool $bInSeconds = false): string
+    public function generateReport(bool $bAsJson = false): string
     {
         if (!static::isEnabled()) {
             throw new NailsException('Profiling is disabled');
         }
 
         $oReport = [
-            'Timestamps' => $this->summariseMarks($bInSeconds),
+            'Timestamps' => $this->summariseMarks(),
             'Database'   => $this->summariseQueries(),
         ];
 
@@ -241,27 +239,27 @@ class Profiler
      *
      * @return array
      */
-    protected function summariseMarks(bool $bInSeconds = false): array
+    protected function summariseMarks(): array
     {
         $aReportedMarks     = [];
-        $iPreviousTimestamp = null;
-        $iTotal             = 0;
+        $fPreviousTimestamp = null;
+        $fTotal             = 0;
 
         foreach (static::$aMarks as $aMark) {
 
-            $aMark['Diff']  = $iPreviousTimestamp === null ? 0 : $aMark['Timestamp'] - $iPreviousTimestamp;
-            $aMark['Total'] = $iTotal + $aMark['Diff'];
+            $aMark['Diff (Seconds)']  = $fPreviousTimestamp === null ? 0 : $aMark['Timestamp'] - $fPreviousTimestamp;
+            $aMark['Total (Seconds)'] = $fTotal + $aMark['Diff (Seconds)'];
 
-            $iPreviousTimestamp = $aMark['Timestamp'];
-            $iTotal             += $aMark['Diff'];
+            $fPreviousTimestamp = $aMark['Timestamp'];
+            $fTotal             += $aMark['Diff (Seconds)'];
 
             $aReportedMarks[] = $aMark;
         }
 
         return [
-            'Count' => count($aReportedMarks),
-            'Total' => $iTotal,
-            'Data'  => $aReportedMarks,
+            'Count'           => count($aReportedMarks),
+            'Total (Seconds)' => $fTotal,
+            'Data'            => $aReportedMarks,
         ];
 
     }
