@@ -98,7 +98,7 @@ class Profiler
 
             static::$aMarks[] = [
                 'Label'     => $sLabel,
-                'Timestamp' => (int) (microtime(true) * 1000),
+                'Timestamp' => microtime(true),
             ];
         }
     }
@@ -247,19 +247,21 @@ class Profiler
 
         foreach (static::$aMarks as $aMark) {
 
-            $aMark['Diff (ms)']  = $fPreviousTimestamp === null ? 0 : $aMark['Timestamp'] - $fPreviousTimestamp;
-            $aMark['Total (ms)'] = $fTotal + $aMark['Diff (ms)'];
+            $iDiff            = $fPreviousTimestamp === null ? 0 : $aMark['Timestamp'] - $fPreviousTimestamp;
+            $aReportedMarks[] = [
+                'Label'     => $aMark['Label'],
+                'Diff (s)'  => $iDiff,
+                'Total (s)' => $fTotal + $iDiff,
+            ];
 
             $fPreviousTimestamp = $aMark['Timestamp'];
-            $fTotal             += $aMark['Diff (ms)'];
-
-            $aReportedMarks[] = $aMark;
+            $fTotal             += $iDiff;
         }
 
         return [
-            'Count'      => count($aReportedMarks),
-            'Total (ms)' => $fTotal,
-            'Data'       => $aReportedMarks,
+            'Count'     => count($aReportedMarks),
+            'Total (s)' => $fTotal,
+            'Data'      => $aReportedMarks,
         ];
 
     }
@@ -278,14 +280,17 @@ class Profiler
         $oDb = Factory::service('Database');
 
         $aReportedQueries = [];
-        foreach ($oDb->queries as $sQuery) {
+        $iNumQueries      = count($oDb->queries);
+
+        for ($i = 0; $i < $iNumQueries; $i++) {
             $aReportedQueries[] = [
-                'Query' => $sQuery,
+                'Query'    => $oDb->queries[$i],
+                'Time (s)' => $oDb->query_times[$i],
             ];
         }
 
         return [
-            'Count' => $oDb->total_queries(),
+            'Count' => $iNumQueries,
             'Data'  => $aReportedQueries,
         ];
     }
