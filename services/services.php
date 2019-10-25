@@ -3,7 +3,9 @@
 use MimeType\MimeType;
 use MimeTyper\Repository\MimeDbRepository;
 use Nails\Common\Interfaces;
-use Nails\Common\Service\FileCache;
+use Nails\Common\Service;
+use Nails\Common\Model;
+use Nails\Common\Resource;
 use Nails\Environment;
 use Nails\Factory;
 
@@ -32,86 +34,86 @@ return [
     ],
 
     'services' => [
-        'AppSetting'                     => function () {
+        'AppSetting'                     => function (): Service\AppSetting {
             if (class_exists('\App\Common\Service\AppSetting')) {
                 return new \App\Common\Service\AppSetting();
             } else {
-                return new \Nails\Common\Service\AppSetting();
+                return new Service\AppSetting();
             }
         },
-        'Asset'                          => function () {
+        'Asset'                          => function (): Service\Asset {
             if (class_exists('\App\Common\Service\Asset')) {
                 return new \App\Common\Service\Asset();
             } else {
-                return new \Nails\Common\Service\Asset();
+                return new Service\Asset();
             }
         },
         'CodeIgniter'                    => function () {
             return get_instance();
         },
-        'Config'                         => function () {
+        'Config'                         => function (): Service\Config {
             if (class_exists('\App\Common\Service\Config')) {
                 return new \App\Common\Service\Config();
             } else {
-                return new \Nails\Common\Service\Config();
+                return new Service\Config();
             }
         },
-        'Cookie'                         => function () {
+        'Cookie'                         => function (): Service\Cookie {
             if (class_exists('\App\Common\Service\Cookie')) {
                 return new \App\Common\Service\Cookie();
             } else {
-                return new \Nails\Common\Service\Cookie();
+                return new Service\Cookie();
             }
         },
-        'Database'                       => function () {
+        'Database'                       => function (): Service\Database {
             if (class_exists('\App\Common\Service\Database')) {
                 return new \App\Common\Service\Database();
             } else {
-                return new \Nails\Common\Service\Database();
+                return new Service\Database();
             }
         },
-        'DateTime'                       => function () {
+        'DateTime'                       => function (): Service\DateTime {
             if (class_exists('\App\Common\Service\DateTime')) {
                 return new \App\Common\Service\DateTime();
             } else {
-                return new \Nails\Common\Service\DateTime();
+                return new Service\DateTime();
             }
         },
-        'Encrypt'                        => function () {
+        'Encrypt'                        => function (): Service\Encrypt {
             if (class_exists('\App\Common\Service\Encrypt')) {
                 return new \App\Common\Service\Encrypt();
             } else {
                 require_once BASEPATH . 'libraries/Encrypt.php';
-                return new \Nails\Common\Service\Encrypt();
+                return new Service\Encrypt();
             }
         },
-        'ErrorHandler'                   => function () {
+        'ErrorHandler'                   => function (): Service\ErrorHandler {
             if (class_exists('\App\Common\Service\ErrorHandler')) {
                 return new \App\Common\Service\ErrorHandler();
             } else {
-                return new \Nails\Common\Service\ErrorHandler();
+                return new Service\ErrorHandler();
             }
         },
-        'Event'                          => function () {
+        'Event'                          => function (): Service\Event {
             if (class_exists('\App\Common\Service\Event')) {
                 return new \App\Common\Service\Event();
             } else {
-                return new \Nails\Common\Service\Event();
+                return new Service\Event();
             }
         },
         'FileCache'                      => function (
             Interfaces\Service\FileCache\Driver $oPrivate = null,
             Interfaces\Service\FileCache\Driver\AccessibleByUrl $oPublic = null
-        ): FileCache {
+        ): Service\FileCache {
             if (class_exists('\App\Common\Service\FileCache')) {
-                /** @var FileCache $oFileCache */
+                /** @var Service\FileCache $oFileCache */
                 $oFileCache = new \App\Common\Service\FileCache(
                     $oPrivate ?? Factory::service('FileCacheDriver'),
                     $oPublic ?? Factory::service('FileCacheDriverAccessibleByUrl')
                 );
             } else {
-                /** @var FileCache $oFileCache */
-                $oFileCache = new \Nails\Common\Service\FileCache(
+                /** @var Service\FileCache $oFileCache */
+                $oFileCache = new Service\FileCache(
                     $oPrivate ?? Factory::service('FileCacheDriver'),
                     $oPublic ?? Factory::service('FileCacheDriverAccessibleByUrl')
                 );
@@ -119,60 +121,61 @@ return [
 
             return $oFileCache;
         },
-        'FileCacheDriver'                => function (string $sDir = null): FileCache\Driver {
+        'FileCacheDriver'                => function (string $sDir = null): Service\FileCache\Driver {
             if (class_exists('\App\Common\Service\FileCache\Driver')) {
-                /** @var FileCache\Driver $oDriver */
+                /** @var Service\FileCache\Driver $oDriver */
                 $oDriver = new \App\Common\Service\FileCache\Driver($sDir);
             } else {
-                /** @var FileCache\Driver $oDriver */
-                $oDriver = new \Nails\Common\Service\FileCache\Driver($sDir);
+                /** @var Service\FileCache\Driver $oDriver */
+                $oDriver = new Service\FileCache\Driver($sDir);
             }
 
             return $oDriver;
         },
-        'FileCacheDriverAccessibleByUrl' => function (string $sDir = null, string $sUrl = null): FileCache\Driver\AccessibleByUrl {
+        'FileCacheDriverAccessibleByUrl' => function (string $sDir = null, string $sUrl = null): Service\FileCache\Driver\AccessibleByUrl {
             if (class_exists('\App\Common\Service\FileCache\Driver\AccessibleByUrl')) {
-                /** @var FileCache\Driver\AccessibleByUrl $oDriver */
+                /** @var Service\FileCache\Driver\AccessibleByUrl $oDriver */
                 $oDriver = new \App\Common\Service\FileCache\Driver\AccessibleByUrl($sDir, $sUrl);
             } else {
-                /** @var FileCache\Driver\AccessibleByUrl $oDriver */
-                $oDriver = new \Nails\Common\Service\FileCache\Driver\AccessibleByUrl($sDir, $sUrl);
+                /** @var Service\FileCache\Driver\AccessibleByUrl $oDriver */
+                $oDriver = new Service\FileCache\Driver\AccessibleByUrl($sDir, $sUrl);
             }
 
             return $oDriver;
         },
-        'FormValidation'                 => function () {
+        'FormValidation'                 => function (): Service\FormValidation {
             if (class_exists('\App\Common\Service\FormValidation')) {
                 return new \App\Common\Service\FormValidation();
             } else {
-                return new \Nails\Common\Service\FormValidation();
+                return new Service\FormValidation();
             }
         },
-        'HttpCodes'                      => function () {
+        'HttpCodes'                      => function (): Service\HttpCodes {
             if (class_exists('\App\Common\Service\HttpCodes')) {
                 return new \App\Common\Service\HttpCodes();
             } else {
-                return new \Nails\Common\Service\HttpCodes();
+                return new Service\HttpCodes();
             }
         },
-        'Input'                          => function () {
+        'Input'                          => function (): Service\Input {
             if (class_exists('\App\Common\Service\Input')) {
                 return new \App\Common\Service\Input();
             } else {
-                return new \Nails\Common\Service\Input();
+                return new Service\Input();
             }
         },
-        'Language'                       => function () {
+        'Language'                       => function (): Service\Language {
             if (class_exists('\App\Common\Service\Language')) {
                 return new \App\Common\Service\Language();
             } else {
-                return new \Nails\Common\Service\Language();
+                return new Service\Language();
             }
         },
         'Locale'                         => function (
             \Nails\Common\Factory\Locale $oLocale = null,
-            \Nails\Common\Service\Input $oInput = null
-        ) {
+            Service\Input $oInput = null
+        ): Service\Locale {
+
             $oInput = $oInput ?? \Nails\Factory::service('Input');
 
             if (class_exists('\App\Common\Service\Locale')) {
@@ -181,27 +184,27 @@ return [
                     $oLocale
                 );
             } else {
-                return new \Nails\Common\Service\Locale(
+                return new Service\Locale(
                     $oInput,
                     $oLocale
                 );
             }
         },
-        'Logger'                         => function () {
+        'Logger'                         => function (): Service\Logger {
             if (class_exists('\App\Common\Service\Logger')) {
                 return new \App\Common\Service\Logger();
             } else {
-                return new \Nails\Common\Service\Logger();
+                return new Service\Logger();
             }
         },
-        'Meta'                           => function () {
+        'Meta'                           => function (): Service\Meta {
             if (class_exists('\App\Common\Service\Meta')) {
                 return new \App\Common\Service\Meta();
             } else {
-                return new \Nails\Common\Service\Meta();
+                return new Service\Meta();
             }
         },
-        'Mime'                           => function ($oDatabase = null, $oDetector = null) {
+        'Mime'                           => function ($oDatabase = null, $oDetector = null): Service\Mime {
 
             if (!$oDatabase) {
                 $oDatabase = new MimeDbRepository();
@@ -214,35 +217,42 @@ return [
             if (class_exists('\App\Common\Service\Mime')) {
                 return new \App\Common\Service\Mime($oDatabase, $oDetector);
             } else {
-                return new \Nails\Common\Service\Mime($oDatabase, $oDetector);
+                return new Service\Mime($oDatabase, $oDetector);
             }
         },
-        'Mustache'                       => function () {
+        'Mustache'                       => function (): Mustache_Engine {
             if (class_exists('\App\Common\Service\Mustache')) {
                 return new \App\Common\Service\Mustache();
             } else {
                 return new Mustache_Engine();
             }
         },
-        'Output'                         => function () {
+        'Output'                         => function (): Service\Output {
             if (class_exists('\App\Common\Service\Output')) {
                 return new \App\Common\Service\Output();
             } else {
-                return new \Nails\Common\Service\Output();
+                return new Service\Output();
             }
         },
-        'PDODatabase'                    => function () {
+        'PDODatabase'                    => function (): Service\PDODatabase {
             if (class_exists('\App\Common\Service\PDODatabase')) {
                 return new \App\Common\Service\PDODatabase();
             } else {
-                return new \Nails\Common\Service\PDODatabase();
+                return new Service\PDODatabase();
             }
         },
-        'Routes'                         => function () {
+        'Profiler'                       => function (): Service\Profiler {
+            if (class_exists('\App\Common\Service\Profiler')) {
+                return new \App\Common\Service\Profiler();
+            } else {
+                return new Service\Profiler();
+            }
+        },
+        'Routes'                         => function (): Service\Routes {
             if (class_exists('\App\Common\Service\Routes')) {
                 return new \App\Common\Service\Routes();
             } else {
-                return new \Nails\Common\Service\Routes();
+                return new Service\Routes();
             }
         },
         'Router'                         => function () {
@@ -254,65 +264,65 @@ return [
                 return new \Nails\Common\CodeIgniter\Core\Router\Dummy();
             }
         },
-        'Security'                       => function () {
+        'Security'                       => function (): Service\Security {
             if (class_exists('\App\Common\Service\Security')) {
                 return new \App\Common\Service\Security();
             } else {
-                return new \Nails\Common\Service\Security();
+                return new Service\Security();
             }
         },
-        'Typography'                     => function () {
+        'Typography'                     => function (): Service\Typography {
             if (class_exists('\App\Common\Service\Typography')) {
                 return new \App\Common\Service\Typography();
             } else {
-                return new \Nails\Common\Service\Typography();
+                return new Service\Typography();
             }
         },
-        'Uri'                            => function () {
+        'Uri'                            => function (): Service\Uri {
             if (class_exists('\App\Common\Service\Uri')) {
                 return new \App\Common\Service\Uri();
             } else {
-                return new \Nails\Common\Service\Uri();
+                return new Service\Uri();
             }
         },
-        'UserFeedback'                   => function () {
+        'UserFeedback'                   => function (): Service\UserFeedback {
             if (class_exists('\App\Common\Service\UserFeedback')) {
                 return new \App\Common\Service\UserFeedback();
             } else {
-                return new \Nails\Common\Service\UserFeedback();
+                return new Service\UserFeedback();
             }
         },
-        'View'                           => function () {
+        'View'                           => function (): Service\View {
             if (class_exists('\App\Common\Service\View')) {
                 return new \App\Common\Service\View();
             } else {
-                return new \Nails\Common\Service\View();
+                return new Service\View();
             }
         },
-        'Zip'                            => function () {
+        'Zip'                            => function (): Service\Zip {
             if (class_exists('\App\Common\Service\Zip')) {
                 return new \App\Common\Service\Zip();
             } else {
-                return new \Nails\Common\Service\Zip();
+                return new Service\Zip();
             }
         },
     ],
 
     'models' => [
-        'Country' => function () {
+        'Country' => function (): Model\Country {
             if (class_exists('\App\Common\Model\Country')) {
                 return new \App\Common\Model\Country();
             } else {
-                return new \Nails\Common\Model\Country();
+                return new Model\Country();
             }
         },
     ],
 
     'factories' => [
-        'DateTime'                => function ($sTime = 'now', DateTimeZone $oTimeZone = null) {
+        'DateTime'                => function ($sTime = 'now', DateTimeZone $oTimeZone = null): \DateTime {
             return new \DateTime($sTime, $oTimeZone);
         },
-        'EventSubscription'       => function () {
+        'EventSubscription'       => function (): \Nails\Common\Events\Subscription {
             if (class_exists('\App\Common\Events\Subscription')) {
                 return new \App\Common\Events\Subscription();
             } else {
@@ -323,56 +333,74 @@ return [
             array $aRules = [],
             array $aMessages = [],
             array $aData = []
-        ) {
+        ): \Nails\Common\Factory\Service\FormValidation\Validator {
             if (class_exists('\App\Common\Factory\Service\FormValidation\Validator')) {
                 return new \App\Common\Factory\Service\FormValidation\Validator($aRules, $aMessages, $aData);
             } else {
                 return new \Nails\Common\Factory\Service\FormValidation\Validator($aRules, $aMessages, $aData);
             }
         },
-        'HttpClient'              => function (array $aConfig = []) {
+        'HttpClient'              => function (array $aConfig = []): \GuzzleHttp\Client {
             if (class_exists('\App\Common\HttpClient')) {
                 return new \App\Common\HttpClient($aConfig);
             } else {
                 return new \GuzzleHttp\Client($aConfig);
             }
         },
-        'HttpRequestDelete'       => function (array $aConfig = []) {
+        'HttpRequestDelete'       => function (array $aConfig = []): \Nails\Common\Factory\HttpRequest\Delete {
             if (class_exists('\App\Common\Factory\HttpRequest\Delete')) {
                 return new \App\Common\Factory\HttpRequest\Delete($aConfig);
             } else {
                 return new \Nails\Common\Factory\HttpRequest\Delete($aConfig);
             }
         },
-        'HttpRequestGet'          => function ($sBaseUri = null, $sPath = null, array $aHeaders = []) {
+        'HttpRequestGet'          => function (
+            $sBaseUri = null,
+            $sPath = null,
+            array $aHeaders = []
+        ): \Nails\Common\Factory\HttpRequest\Get {
             if (class_exists('\App\Common\Factory\HttpRequest\Get')) {
                 return new \App\Common\Factory\HttpRequest\Get($sBaseUri, $sPath, $aHeaders);
             } else {
                 return new \Nails\Common\Factory\HttpRequest\Get($sBaseUri, $sPath, $aHeaders);
             }
         },
-        'HttpRequestPatch'        => function ($sBaseUri = null, $sPath = null, array $aHeaders = []) {
+        'HttpRequestPatch'        => function (
+            $sBaseUri = null,
+            $sPath = null,
+            array $aHeaders = []
+        ): \Nails\Common\Factory\HttpRequest\Patch {
             if (class_exists('\App\Common\Factory\HttpRequest\Patch')) {
                 return new \App\Common\Factory\HttpRequest\Patch($sBaseUri, $sPath, $aHeaders);
             } else {
                 return new \Nails\Common\Factory\HttpRequest\Patch($sBaseUri, $sPath, $aHeaders);
             }
         },
-        'HttpRequestPost'         => function ($sBaseUri = null, $sPath = null, array $aHeaders = []) {
+        'HttpRequestPost'         => function (
+            $sBaseUri = null,
+            $sPath = null,
+            array $aHeaders = []
+        ): \Nails\Common\Factory\HttpRequest\Post {
             if (class_exists('\App\Common\Factory\HttpRequest\Post')) {
                 return new \App\Common\Factory\HttpRequest\Post($sBaseUri, $sPath, $aHeaders);
             } else {
                 return new \Nails\Common\Factory\HttpRequest\Post($sBaseUri, $sPath, $aHeaders);
             }
         },
-        'HttpRequestPut'          => function ($sBaseUri = null, $sPath = null, array $aHeaders = []) {
+        'HttpRequestPut'          => function (
+            $sBaseUri = null,
+            $sPath = null,
+            array $aHeaders = []
+        ): \Nails\Common\Factory\HttpRequest\Put {
             if (class_exists('\App\Common\Factory\HttpRequest\Put')) {
                 return new \App\Common\Factory\HttpRequest\Put($sBaseUri, $sPath, $aHeaders);
             } else {
                 return new \Nails\Common\Factory\HttpRequest\Put($sBaseUri, $sPath, $aHeaders);
             }
         },
-        'HttpResponse'            => function (GuzzleHttp\Psr7\Response $oClient) {
+        'HttpResponse'            => function (
+            GuzzleHttp\Psr7\Response $oClient
+        ): \Nails\Common\Factory\HttpResponse {
             if (class_exists('\App\Common\Factory\HttpResponse')) {
                 return new \App\Common\Factory\HttpResponse($oClient);
             } else {
@@ -383,42 +411,48 @@ return [
             \Nails\Common\Factory\Locale\Language $oLanguage = null,
             \Nails\Common\Factory\Locale\Region $oRegion = null,
             \Nails\Common\Factory\Locale\Script $oScript = null
-        ) {
+        ): \Nails\Common\Factory\Locale {
             if (class_exists('\App\Common\Factory\Locale')) {
                 return new \App\Common\Factory\Locale($oLanguage, $oRegion, $oScript);
             } else {
                 return new \Nails\Common\Factory\Locale($oLanguage, $oRegion, $oScript);
             }
         },
-        'LocaleLanguage'          => function (string $sLabel = '') {
+        'LocaleLanguage'          => function (
+            string $sLabel = ''
+        ): \Nails\Common\Factory\Locale\Language {
             if (class_exists('\App\Common\Factory\Locale\Language')) {
                 return new \App\Common\Factory\Locale\Language($sLabel);
             } else {
                 return new \Nails\Common\Factory\Locale\Language($sLabel);
             }
         },
-        'LocaleRegion'            => function (string $sLabel = '') {
+        'LocaleRegion'            => function (
+            string $sLabel = ''
+        ): \Nails\Common\Factory\Locale\Region {
             if (class_exists('\App\Common\Factory\Locale\Region')) {
                 return new \App\Common\Factory\Locale\Region($sLabel);
             } else {
                 return new \Nails\Common\Factory\Locale\Region($sLabel);
             }
         },
-        'LocaleScript'            => function (string $sLabel = '') {
+        'LocaleScript'            => function (
+            string $sLabel = ''
+        ): \Nails\Common\Factory\Locale\Script {
             if (class_exists('\App\Common\Factory\Locale\Script')) {
                 return new \App\Common\Factory\Locale\Script($sLabel);
             } else {
                 return new \Nails\Common\Factory\Locale\Script($sLabel);
             }
         },
-        'ModelField'              => function () {
+        'ModelField'              => function (): \Nails\Common\Factory\Model\Field {
             if (class_exists('\App\Common\Factory\Model\Field')) {
                 return new \App\Common\Factory\Model\Field();
             } else {
                 return new \Nails\Common\Factory\Model\Field();
             }
         },
-        'Pagination'              => function () {
+        'Pagination'              => function (): \Nails\Common\Factory\Pagination {
             if (class_exists('\App\Common\Factory\Pagination')) {
                 return new \App\Common\Factory\Pagination();
             } else {
@@ -428,53 +462,53 @@ return [
     ],
 
     'resources' => [
-        'Cookie'          => function ($oObj) {
+        'Cookie'          => function ($oObj): Resource\Cookie {
             if (class_exists('\App\Common\Resource\Cookie')) {
                 return new \App\Common\Resource\Cookie($oObj);
             } else {
-                return new \Nails\Common\Resource\Cookie($oObj);
+                return new Resource\Cookie($oObj);
             }
         },
-        'Date'            => function ($oObj) {
+        'Date'            => function ($oObj): Resource\Date {
             if (class_exists('\App\Common\Resource\Date')) {
                 return new \App\Common\Resource\Date($oObj);
             } else {
-                return new \Nails\Common\Resource\Date($oObj);
+                return new Resource\Date($oObj);
             }
         },
-        'DateTime'        => function ($oObj) {
+        'DateTime'        => function ($oObj): Resource\DateTime {
             if (class_exists('\App\Common\Resource\DateTime')) {
                 return new \App\Common\Resource\DateTime($oObj);
             } else {
-                return new \Nails\Common\Resource\DateTime($oObj);
+                return new Resource\DateTime($oObj);
             }
         },
-        'ExpandableField' => function () {
+        'ExpandableField' => function (): Resource\ExpandableField {
             if (class_exists('\App\Common\Resource\ExpandableField')) {
                 return new \App\Common\Resource\ExpandableField();
             } else {
-                return new \Nails\Common\Resource\ExpandableField();
+                return new Resource\ExpandableField();
             }
         },
-        'FileCacheItem'   => function ($oObj) {
+        'FileCacheItem'   => function ($oObj): Resource\FileCache\Item {
             if (class_exists('\App\Common\Resource\FileCache\Item')) {
                 return new \App\Common\Resource\FileCache\Item($oObj);
             } else {
-                return new \Nails\Common\Resource\FileCache\Item($oObj);
+                return new Resource\FileCache\Item($oObj);
             }
         },
-        'Resource'        => function ($oObj) {
+        'Resource'        => function ($oObj): Resource {
             if (class_exists('\App\Common\Resource')) {
                 return new \App\Common\Resource($oObj);
             } else {
-                return new \Nails\Common\Resource($oObj);
+                return new Resource($oObj);
             }
         },
-        'Entity'            => function ($oObj) {
+        'Entity'          => function ($oObj): Resource\Entity {
             if (class_exists('\App\Common\Resource\Entity')) {
                 return new \App\Common\Resource\Entity($oObj);
             } else {
-                return new \Nails\Common\Resource\Entity($oObj);
+                return new Resource\Entity($oObj);
             }
         },
     ],

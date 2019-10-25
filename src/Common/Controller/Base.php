@@ -17,6 +17,7 @@ use Nails\Auth;
 use Nails\Common\Events;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
+use Nails\Common\Service\Profiler;
 use Nails\Components;
 use Nails\Environment;
 use Nails\Factory;
@@ -41,6 +42,7 @@ abstract class Base extends \MX_Controller
      */
     public function __construct()
     {
+        Profiler::mark('CONTROLLER:PRE');
         parent::__construct();
 
         // --------------------------------------------------------------------------
@@ -83,6 +85,7 @@ abstract class Base extends \MX_Controller
         // --------------------------------------------------------------------------
 
         //  Call the SYSTEM:READY event, the system is all geared up and ready to go
+        Profiler::mark(Events::SYSTEM_READY);
         Factory::service('Event')
             ->trigger(Events::SYSTEM_READY);
     }

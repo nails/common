@@ -13,6 +13,7 @@ namespace Nails;
 
 use Nails\Common\Events;
 use Nails\Common\Service\ErrorHandler;
+use Nails\Common\Service\Profiler;
 
 /**
  * Class Bootstrap
@@ -53,6 +54,8 @@ final class Bootstrap
      */
     public static function run($sEntryPoint)
     {
+        Profiler::mark('BOOTSTRAPPING:START');
+
         self::setEntryPoint($sEntryPoint);
         self::setBaseDirectory($sEntryPoint);
 
@@ -79,6 +82,8 @@ final class Bootstrap
 
         Factory::setup();
         Factory::autoload();
+
+        Profiler::mark(Events::SYSTEM_STARTUP);
         Factory::service('Event')
             ->trigger(Events::SYSTEM_STARTUP);
     }
@@ -238,6 +243,12 @@ final class Bootstrap
         Functions::define('EMAIL_USERNAME', DEPLOY_EMAIL_USER);
         Functions::define('EMAIL_PASSWORD', DEPLOY_EMAIL_PASS);
         Functions::define('EMAIL_PORT', DEPLOY_EMAIL_PORT);
+
+        //  Profiling constants
+        Functions::define('PROFILER_ENABLED', false);
+        if (!PROFILER_ENABLED) {
+            Profiler::disable();
+        }
 
         //  Ensure the app's constants file is also loaded
         //  @todo (Pablo - 2018-11-16) - Remove reliance on this feature
@@ -638,6 +649,7 @@ final class Bootstrap
      */
     public static function shutdown()
     {
+        Profiler::mark(Events::SYSTEM_SHUTOWN);
         Factory::service('Event')
             ->trigger(Events::SYSTEM_SHUTOWN);
     }
