@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Url helper
+ * URL helper
  *
  * @package     Nails
  * @subpackage  common
@@ -12,6 +12,14 @@
 
 namespace Nails\Common\Helper;
 
+use Nails\Bootstrap;
+use Nails\Factory;
+
+/**
+ * Class Url
+ *
+ * @package Nails\Common\Helper
+ */
 class Url
 {
     /**
@@ -49,11 +57,10 @@ class Url
     public static function redirect(string $sUrl = null, string $sMethod = 'location', int $iHttpResponseCode = 302): void
     {
         /**
-         * Call the post_system hook, the system will be killed in approximately 13
+         * Call the Bootstrap::shutdown method, the system will be killed in approximately 13
          * lines so this is the last chance to cleanup.
          */
-        $oHook =& load_class('Hooks', 'core');
-        $oHook->call_hook('post_system');
+        Bootstrap::shutdown();
 
         // --------------------------------------------------------------------------
 
@@ -63,7 +70,7 @@ class Url
 
         switch ($sMethod) {
             case 'refresh':
-                header("Refresh:0;url=" . $sUrl);
+                header('Refresh:0;url=' . $sUrl);
                 break;
 
             default:
