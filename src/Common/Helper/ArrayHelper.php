@@ -14,6 +14,11 @@ namespace Nails\Common\Helper;
 
 use Nails\Common\Exception\NailsException;
 
+/**
+ * Class ArrayHelper
+ *
+ * @package Nails\Common\Helper
+ */
 class ArrayHelper
 {
     /**
@@ -257,5 +262,30 @@ class ArrayHelper
             }
         }
         return $aOutput;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Flattens a multi-deimensional object into a flat array with dot notation for keys
+     *
+     * @param mixed $mInput The object to iterate over
+     *
+     * @return array
+     */
+    public static function arrayFlattenWithDotNotation($mInput): array
+    {
+        $oIterator = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($mInput));
+        $aResult   = [];
+
+        foreach ($oIterator as $mLeafValue) {
+            $aKeys = [];
+            foreach (range(0, $oIterator->getDepth()) as $iDepth) {
+                $aKeys[] = $oIterator->getSubIterator($iDepth)->key();
+            }
+            $aResult[join('.', $aKeys)] = $mLeafValue;
+        }
+
+        return $aResult;
     }
 }

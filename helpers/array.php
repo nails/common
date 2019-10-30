@@ -93,6 +93,13 @@ if (!function_exists('arrayExtractProperty')) {
     }
 }
 
+if (!function_exists('arrayFlattenWithDotNotation')) {
+    function arrayFlattenWithDotNotation($mInput)
+    {
+        return ArrayHelper::arrayFlattenWithDotNotation($mInput);
+    }
+}
+
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
