@@ -649,9 +649,9 @@ final class Bootstrap
      */
     public static function shutdown()
     {
-        Profiler::mark(Events::SYSTEM_SHUTOWN);
+        Profiler::mark(Events::SYSTEM_SHUTDOWN);
         Factory::service('Event')
-            ->trigger(Events::SYSTEM_SHUTOWN);
+            ->trigger(Events::SYSTEM_SHUTDOWN);
 
         if (Profiler::isEnabled()) {
             /** @var Profiler $oProfiler */

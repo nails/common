@@ -32,7 +32,7 @@ class Events extends Base
     /**
      * Fired when the system shutsdown, this is the last event to be fired
      */
-    const SYSTEM_SHUTOWN = 'SYSTEM:SHUTDOWN';
+    const SYSTEM_SHUTDOWN = 'SYSTEM:SHUTDOWN';
 
     // --------------------------------------------------------------------------
 
