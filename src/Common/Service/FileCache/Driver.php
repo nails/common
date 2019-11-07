@@ -83,6 +83,14 @@ class Driver implements Interfaces\Service\FileCache\Driver
 
         $sPath = $this->prepKey($sKey);
 
+        //  If the key contains a path, ensure the parent directory exists
+        if (strpos($sKey, DIRECTORY_SEPARATOR) !== false) {
+            $sDir = dirname($sPath);
+            if (!is_dir($sDir)) {
+                mkdir($sDir, DIR_WRITE_MODE, true);
+            }
+        }
+
         file_put_contents($sPath, $mData);
 
         return $this->newItem($sKey);
