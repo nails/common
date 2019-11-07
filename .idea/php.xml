@@ -48,6 +48,7 @@
       <path value="$PROJECT_DIR$/vendor/adrienrn/php-mimetyper" />
       <path value="$PROJECT_DIR$/vendor/katzien/php-mime-type" />
       <path value="$PROJECT_DIR$/vendor/dflydev/apache-mime-types" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/type" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="7.2" />
