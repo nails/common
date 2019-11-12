@@ -270,9 +270,36 @@ class View
         }
 
         if (!$sResolvedPath) {
-            throw new ViewNotFoundException('Could not resolve view "' . $sView . '"');
+
+            $aDebug  = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+            $aCaller = getFromArray(1, $aDebug);
+
+            if (!empty($aCaller)) {
+
+                if (!empty($aCaller['file'])) {
+                    $sFile = $aCaller['file'];
+                } else {
+                    $sFile = 'unknown';
+                }
+                if (!empty($aCaller['line'])) {
+                    $sLine = $aCaller['line'];
+                } else {
+                    $sLine = 'unknown';
+                }
+
+                throw new ViewNotFoundException(
+                    sprintf('Could not resolve view "%s"; called in "%s" on line %s', $sView, $sFile, $sLine)
+                );
+
+            } else {
+                throw new ViewNotFoundException(
+                    sprintf('Could not resolve view "%s"', $sView)
+                );
+            }
         } elseif (!fileExistsCS($sResolvedPath)) {
-            throw new ViewNotFoundCaseException('Incorrect casing for view "' . $sView . '"');
+            throw new ViewNotFoundCaseException(
+                sprintf('Incorrect casing for view "%s"', $sView)
+            );
         }
 
         $this->setCache($sCacheKey, $sResolvedPath);
