@@ -174,7 +174,9 @@ class Validator
      */
     public function run(array $aData = null)
     {
-        if ($aData !== null) {
+        if (empty($this->getRules())) {
+            return;
+        } elseif ($aData !== null) {
             $this->setData($aData);
         }
 
