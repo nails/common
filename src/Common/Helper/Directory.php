@@ -15,30 +15,79 @@ namespace Nails\Common\Helper;
 use Nails\Common\Exception\Directory\DirectoryDoesNotExistException;
 use Nails\Common\Exception\Directory\DirectoryIsNotWritableException;
 use Nails\Common\Exception\Directory\DirectoryNameException;
-use Nails\Common\Exception\FactoryException;
-use Nails\Factory;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
+/**
+ * Class Directory
+ *
+ * @package Nails\Common\Helper
+ */
 class Directory
 {
     /**
-     * Maps a directory
+     * Returns all files within a directory
      *
-     * @param string $sDir    The directory to map
-     * @param int    $iDepth  How deep to go down the rabbit hole
-     * @param bool   $bHidden Whether to show hidden files or not
+     * @param string      $sPath          The directory to map
+     * @param int|null    $iMaxDepth      How deep to map, 1 = this dir, 2 this dir and next, etc
+     * @param bool        $bAbsolutePath  Return the absolute path of each file
+     * @param bool        $bIncludeHidden Include hidden files (i.e. dot files like .htaccess)
+     * @param int         $iCurrentDepth  For recursion, the current depth of the iteration
+     * @param string|null $sInitialPath   For recursion, the initial path to map
+     * @param array       $aResults       For recursion, the array to populate
      *
      * @return array
-     * @throws FactoryException
      */
-    public static function map(string $sDir, int $iDepth = 0, bool $bHidden = false): array
-    {
-        if (!is_dir($sDir)) {
+    public static function map(
+        string $sPath,
+        int $iMaxDepth = null,
+        bool $bAbsolutePath = true,
+        bool $bIncludeHidden = false,
+        int $iCurrentDepth = 0,
+        string $sInitialPath = null,
+        array &$aResults = []
+    ): array {
+
+        if (!is_dir($sPath)) {
             return [];
         }
 
-        return directory_map($sDir, $iDepth, $bHidden);
+        if ($iMaxDepth === $iCurrentDepth) {
+            return $aResults;
+        }
+
+        $sPath = rtrim($sPath, '/') . '/';
+
+        if (is_null($sInitialPath)) {
+            $sInitialPath = $sPath;
+        }
+
+        $oIterator = new \FilesystemIterator(
+            $sPath
+        );
+
+        /** @var \SplFileInfo $oItem */
+        foreach ($oIterator as $oItem) {
+            if ($oItem->isDir()) {
+                static::map(
+                    $oItem->getPathname(),
+                    $iMaxDepth,
+                    $bAbsolutePath,
+                    $bIncludeHidden,
+                    $iCurrentDepth + 1,
+                    $sInitialPath,
+                    $aResults
+                );
+            } elseif (!$bIncludeHidden && preg_match('/^\./', $oItem->getFilename())) {
+                continue;
+            } elseif (!$bAbsolutePath) {
+                $aResults[] = preg_replace('/^' . preg_quote($sInitialPath, '/') . '/', '', $oItem->getPathname());
+            } else {
+                $aResults[] = $oItem->getPathname();
+            }
+        }
+
+        return $aResults;
     }
 
     // --------------------------------------------------------------------------
