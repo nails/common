@@ -1466,9 +1466,18 @@ EOT;
         // --------------------------------------------------------------------------
 
         //  Prep the field's attributes
+        $aClasses = array_filter([
+            'field',
+            $oField->type,
+            $sErrorClass,
+            $oField->oddeven,
+            $oField->class,
+            $sReadOnlyClass,
+        ]);
+
         $aAttr = [
-            $oField->id ? 'id="' . $oField->id . '" ' : '',
-            'class="' . $oField->class . '" ',
+            $oField->id ? 'id="field-' . $oField->id . '"' : '',
+            'class="' . (implode(' ', $aClasses)) . '" ',
             $sReadonly,
         ];
 
@@ -1499,7 +1508,7 @@ EOT;
 
         $sOut = <<<EOT
 
-    <div class="field $oField->type $sErrorClass $oField->oddeven $sReadOnlyClass " $sFieldIdTop>
+    <div $sFieldAttr>
         <label>
             <span class="label">
                 $oField->label
