@@ -87,6 +87,8 @@ class Directory
             }
         }
 
+        sort($aResults);
+
         return $aResults;
     }
 
