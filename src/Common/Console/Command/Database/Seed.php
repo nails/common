@@ -2,6 +2,7 @@
 
 namespace Nails\Common\Console\Command\Database;
 
+use Nails\Common\Helper\Directory;
 use Nails\Components;
 use Nails\Console\Command\Base;
 use Nails\Environment;
@@ -39,11 +40,11 @@ class Seed extends Base
     /**
      * Executes the app
      *
-     * @param  InputInterface  $oInput  The Input Interface provided by Symfony
-     * @param  OutputInterface $oOutput The Output Interface provided by Symfony
+     * @param InputInterface  $oInput  The Input Interface provided by Symfony
+     * @param OutputInterface $oOutput The Output Interface provided by Symfony
      *
-     * @throws \Exception
      * @return int
+     * @throws \Exception
      */
     protected function execute(InputInterface $oInput, OutputInterface $oOutput)
     {
@@ -197,7 +198,7 @@ class Seed extends Base
 
         foreach ($aAllComponents as $oComponent) {
             $sPath  = $oComponent->path . 'src/Seed/';
-            $aSeeds = directoryMap($sPath);
+            $aSeeds = Directory::map($sPath, 1);
             $aSeeds = array_map(
                 function ($sClass) {
                     return basename($sClass, '.php');
