@@ -224,7 +224,7 @@ class DateTime
         $aFormats = $this->getAllDateFormat();
 
         foreach ($aFormats as $oFormat) {
-            $aOut[$oFormat->slug] = $oFormat->example;
+            $aOut[$oFormat->slug] = sprintf('%s (%s)', $oFormat->label, $oFormat->example);
         }
 
         return $aOut;
@@ -335,7 +335,7 @@ class DateTime
         $aFormats = $this->getAllTimeFormat();
 
         foreach ($aFormats as $oFormat) {
-            $aOut[$oFormat->slug] = $oFormat->label;
+            $aOut[$oFormat->slug] = sprintf('%s (%s)', $oFormat->label, $oFormat->example);
         }
 
         return $aOut;
