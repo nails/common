@@ -166,8 +166,8 @@ class DateTime
     public function __construct()
     {
         $this->setTimezones();
-        $this->setDateFormat();
-        $this->setTimeFormat();
+        $this->setUserDateFormat();
+        $this->setUserTimeFormat();
     }
 
     // --------------------------------------------------------------------------
@@ -399,10 +399,10 @@ class DateTime
      * @param string $sDateSlug The date format's slug
      * @param string $sTimeSlug The time format's slug
      */
-    public function setFormats($sDateSlug, $sTimeSlug)
+    public function setUserFormats($sDateSlug, $sTimeSlug)
     {
-        $this->setDateFormat($sDateSlug);
-        $this->setTimeFormat($sTimeSlug);
+        $this->setUserDateFormat($sDateSlug);
+        $this->setUserTimeFormat($sTimeSlug);
     }
 
     // --------------------------------------------------------------------------
@@ -412,7 +412,7 @@ class DateTime
      *
      * @param string $sSlug The date format's slug
      */
-    public function setDateFormat($sSlug = null)
+    public function setUserDateFormat($sSlug = null)
     {
         $oDateFormat = $this->getDateFormatBySlug($sSlug);
         if (empty($oDateFormat)) {
@@ -441,7 +441,7 @@ class DateTime
      *
      * @param string $sSlug The time format's slug
      */
-    public function setTimeFormat($sSlug = null)
+    public function setUserTimeFormat($sSlug = null)
     {
         $oTimeFormat = $this->getTimeFormatBySlug($sSlug);
         if (empty($oTimeFormat)) {

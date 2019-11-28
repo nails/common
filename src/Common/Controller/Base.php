@@ -382,7 +382,7 @@ abstract class Base extends \MX_Controller
         $sFormatTime = activeUser('datetime_format_time');
         $sFormatTime = $sFormatTime ? $sFormatTime : APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG;
 
-        $oDateTimeService->setFormats($sFormatDate, $sFormatTime);
+        $oDateTimeService->setUserFormats($sFormatDate, $sFormatTime);
 
         // --------------------------------------------------------------------------
 
