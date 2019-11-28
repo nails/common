@@ -2250,13 +2250,13 @@ abstract class Base
         }
 
         foreach ($aDateTimes as $sProperty) {
-            if (property_exists($oObj, $sProperty)) {
+            if (property_exists($oObj, $sProperty) && !is_null($oObj->{$sProperty})) {
                 $oObj->{$sProperty} = Factory::resource('DateTime', null, ['raw' => $oObj->{$sProperty}]);
             }
         }
 
         foreach ($aDates as $sProperty) {
-            if (property_exists($oObj, $sProperty)) {
+            if (property_exists($oObj, $sProperty) && !is_null($oObj->{$sProperty})) {
                 $oObj->{$sProperty} = Factory::resource('Date', null, ['raw' => $oObj->{$sProperty}]);
             }
         }
