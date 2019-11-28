@@ -14,6 +14,11 @@ namespace Nails\Common\Service;
 
 use Nails\Factory;
 
+/**
+ * Class DateTime
+ *
+ * @package Nails\Common\Service
+ */
 class DateTime
 {
     /**
@@ -125,9 +130,32 @@ class DateTime
 
     // --------------------------------------------------------------------------
 
+    /**
+     * The Nails timezone
+     *
+     * @var string
+     */
     protected $sTimezoneNails;
+
+    /**
+     * The user's timezone
+     *
+     * @var string
+     */
     protected $sTimezoneUser;
+
+    /**
+     * The user's date format
+     *
+     * @var string
+     */
     protected $sUserFormatDate;
+
+    /**
+     * The user's time format
+     *
+     * @var string
+     */
     protected $sUserFormatTime;
 
     // --------------------------------------------------------------------------
