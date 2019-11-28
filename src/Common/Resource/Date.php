@@ -42,7 +42,7 @@ class Date extends Resource
     public function __construct($mObj = [])
     {
         parent::__construct($mObj);
-        $this->oDateObj = new \DateTime($this->raw);
+        $this->oDateObj = $this->raw ? new \DateTime($this->raw) : null;
         if (!empty($this->raw)) {
             $this->formatted = toUserDate($this->raw);
         }
@@ -65,9 +65,9 @@ class Date extends Resource
     /**
      * Returns the internal date object
      *
-     * @return \DateTime
+     * @return \DateTime|null
      */
-    public function getDateObject(): \DateTime
+    public function getDateTimeObject(): ?\DateTime
     {
         return $this->oDateObj;
     }
@@ -84,7 +84,9 @@ class Date extends Resource
      */
     public function diff(\DateTimeInterface $oDateTime, bool $bAbsolute = false)
     {
-        $this->getDateObject()->diff($oDateTime, $bAbsolute);
+        return $this->getDateTimeObject()
+            ? $this->getDateTimeObject()->diff($oDateTime, $bAbsolute)
+            : null;
     }
 
     // --------------------------------------------------------------------------
@@ -94,11 +96,13 @@ class Date extends Resource
      *
      * @param string $sFormat The format to use
      *
-     * @return string
+     * @return string|null
      */
-    public function format(string $sFormat): string
+    public function format(string $sFormat): ?string
     {
-        $this->getDateObject()->format($sFormat);
+        return $this->getDateTimeObject()
+            ? $this->getDateTimeObject()->format($sFormat)
+            : null;
     }
 
     // --------------------------------------------------------------------------
@@ -106,11 +110,13 @@ class Date extends Resource
     /**
      * Returns the timezone offset
      *
-     * @return int
+     * @return int|null
      */
-    public function getOffset(): int
+    public function getOffset(): ?int
     {
-        $this->getDateObject()->getOffset();
+        return $this->getDateTimeObject()
+            ? $this->getDateTimeObject()->getOffset()
+            : null;
     }
 
     // --------------------------------------------------------------------------
@@ -118,11 +124,13 @@ class Date extends Resource
     /**
      * Gets the Unix timestamp
      *
-     * @return int
+     * @return int|null
      */
-    public function getTimestamp(): int
+    public function getTimestamp(): ?int
     {
-        $this->getDateObject()->getTimestamp();
+        return $this->getDateTimeObject()
+            ? $this->getDateTimeObject()->getTimestamp()
+            : null;
     }
 
     // --------------------------------------------------------------------------
@@ -130,11 +138,13 @@ class Date extends Resource
     /**
      * Return time zone relative to given DateTime
      *
-     * @return \DateTimeZone
+     * @return \DateTimeZone|null
      */
-    public function getTimezone(): \DateTimeZone
+    public function getTimezone(): ?\DateTimeZone
     {
-        $this->getDateObject()->getTimezone();
+        return $this->getDateTimeObject()
+            ? $this->getDateTimeObject()->getTimezone()
+            : null;
     }
 
     // --------------------------------------------------------------------------
