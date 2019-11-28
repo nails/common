@@ -30,7 +30,7 @@ class Date extends Resource
      *
      * @var \DateTime
      */
-    public $oDateObj;
+    protected $oDateObj;
 
     // --------------------------------------------------------------------------
 
@@ -63,12 +63,87 @@ class Date extends Resource
     // --------------------------------------------------------------------------
 
     /**
-     * Formats the date
+     * Returns the internal date object
+     *
+     * @return \DateTime
+     */
+    public function getDateObject(): \DateTime
+    {
+        return $this->oDateObj;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the difference between two DateTime objects
+     *
+     * @param \DateTimeInterface $oDateTime The date to compare to.
+     * @param bool               $bAbsolute Should the interval be forced to be positive?
+     *
+     * @return \DateInterval|false
+     */
+    public function diff(\DateTimeInterface $oDateTime, bool $bAbsolute = false)
+    {
+        $this->getDateObject()->diff($oDateTime, $bAbsolute);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns date formatted according to given format
      *
      * @param string $sFormat The format to use
+     *
+     * @return string
      */
-    public function format(string $sFormat)
+    public function format(string $sFormat): string
     {
-        return $this->oDateObj->format($sFormat);
+        $this->getDateObject()->format($sFormat);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the timezone offset
+     *
+     * @return int
+     */
+    public function getOffset(): int
+    {
+        $this->getDateObject()->getOffset();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Gets the Unix timestamp
+     *
+     * @return int
+     */
+    public function getTimestamp(): int
+    {
+        $this->getDateObject()->getTimestamp();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Return time zone relative to given DateTime
+     *
+     * @return \DateTimeZone
+     */
+    public function getTimezone(): \DateTimeZone
+    {
+        $this->getDateObject()->getTimezone();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * The __wakeup handler
+     */
+    public function __wakeup()
+    {
+        $this->oDateObj->__wakeup();
     }
 }
