@@ -17,6 +17,7 @@ use Nails\Auth;
 use Nails\Common\Events;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
+use Nails\Common\Service\DateTime;
 use Nails\Common\Service\Profiler;
 use Nails\Components;
 use Nails\Environment;
@@ -327,6 +328,7 @@ abstract class Base extends \MX_Controller
      */
     protected function instantiateDateTime()
     {
+        /** @var DateTime $oDateTimeService */
         $oDateTimeService = Factory::service('DateTime');
 
         //  Define default date format
@@ -334,8 +336,7 @@ abstract class Base extends \MX_Controller
 
         if (empty($oDefaultDateFormat)) {
             throw new NailsException(
-                'No default date format has been set, or it\'s been set incorrectly.',
-                1
+                'No default date format has been set, or it\'s been set incorrectly.'
             );
         }
 
@@ -348,8 +349,7 @@ abstract class Base extends \MX_Controller
 
         if (empty($oDefaultTimeFormat)) {
             throw new NailsException(
-                'No default time format has been set, or it\'s been set incorrectly.',
-                1
+                'No default time format has been set, or it\'s been set incorrectly.'
             );
         }
 
