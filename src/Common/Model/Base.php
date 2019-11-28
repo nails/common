@@ -13,7 +13,6 @@
 namespace Nails\Common\Model;
 
 use Behat\Transliterator\Transliterator;
-use Nails\Auth;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\ModelException;
 use Nails\Common\Factory\Model\Field;
@@ -199,27 +198,75 @@ abstract class Base
 
     // --------------------------------------------------------------------------
 
-    //  Data/Table structure
-    //  @deprecated use const TABLE
-    protected $table;
-    protected $tableAlias;
+    /**
+     * The name of the "id" column
+     *
+     * @var string
+     */
+    protected $tableIdColumn = 'id';
 
-    //  Column names
-    protected $tableIdColumn;
-    protected $tableSlugColumn;
-    protected $tableTokenColumn;
-    protected $tableLabelColumn;
-    protected $tableCreatedColumn;
-    protected $tableCreatedByColumn;
-    protected $tableModifiedColumn;
-    protected $tableModifiedByColumn;
-    protected $tableDeletedColumn;
-    protected $searchableFields;
+    /**
+     * The name of the "slug" column
+     *
+     * @var string
+     */
+    protected $tableSlugColumn = 'slug';
 
-    //  Model options
-    protected $tableAutoSetTimestamps;
-    protected $tableAutoSetSlugs;
-    protected $tableAutoSetTokens;
+    /**
+     * The name of the "token" column
+     *
+     * @var string
+     */
+    protected $tableTokenColumn = 'token';
+
+    /**
+     * The name of the "label" column
+     *
+     * @var string
+     */
+    protected $tableLabelColumn = 'label';
+
+    /**
+     * The name of the "created" column
+     *
+     * @var string
+     */
+    protected $tableCreatedColumn = 'created';
+
+    /**
+     * The name of the "created by" column
+     *
+     * @var string
+     */
+    protected $tableCreatedByColumn = 'created_by';
+
+    /**
+     * The name of the "modified" column
+     *
+     * @var string
+     */
+    protected $tableModifiedColumn = 'modified';
+
+    /**
+     * The name of the "modified by" column
+     *
+     * @var string
+     */
+    protected $tableModifiedByColumn = 'modified_by';
+
+    /**
+     * The name of the "deleted" column
+     *
+     * @var string
+     */
+    protected $tableDeletedColumn = 'is_deleted';
+
+    /**
+     * The columns which should be included when searching by keyword
+     *
+     * @var array
+     */
+    protected $searchableFields = [];
 
     /**
      * Keeps a track of the columns which have been used by getByColumn(); allows
@@ -236,14 +283,85 @@ abstract class Base
      */
     protected $sTokenMask;
 
-    //  Expandable fields
-    protected $aExpandableFields;
+    /**
+     * The model's expandable field definitions
+     *
+     * @var array
+     */
+    protected $aExpandableFields = [];
 
-    //  Preferences
-    protected $destructiveDelete;
-    protected $perPage;
+    /**
+     * The default number of items to render per page of paginated results
+     *
+     * @var int
+     */
+    protected $perPage = 50;
+
+    /**
+     * The default column to use for sorting items
+     *
+     * @var string|null
+     */
     protected $defaultSortColumn;
-    protected $defaultSortOrder;
+
+    /**
+     * The default sort order
+     *
+     * @var string
+     */
+    protected $defaultSortOrder = 'ASC';
+
+    /**
+     * --------------------------------------------------------------------------
+     * DEPRECATED PROPERTIES
+     * --------------------------------------------------------------------------
+     */
+
+    /**
+     * The name of the table this model binds to
+     *
+     * @var string|null
+     * @deprecated Use constant TABLE instead
+     */
+    protected $table;
+
+    /**
+     * The alias to give this model's table
+     *
+     * @var string
+     * @deprecated Leave null to auto-define
+     */
+    protected $tableAlias;
+
+    /**
+     * Whether to automatically set created/modified timestamps
+     *
+     * @var bool|null
+     * @deprecated Use constant AUTO_SET_TIMESTAMP instead
+     */
+    protected $tableAutoSetTimestamps;
+
+    /**
+     * Whether to automatically set slugs
+     *
+     * @var bool|null
+     * @deprecated Use constant AUTO_SET_SLUG instead
+     */
+    protected $tableAutoSetSlugs;
+
+    /**
+     * Whether to automatically set tokens
+     *
+     * @var bool|null
+     * @deprecated Use constant AUTO_SET_TOKEN instead
+     */
+    protected $tableAutoSetTokens;
+
+    /**
+     * @var bool|null
+     * @deprecated Use constant DESTRUCTIVE_DELETE instead
+     */
+    protected $destructiveDelete;
 
     /**
      * --------------------------------------------------------------------------
@@ -258,41 +376,17 @@ abstract class Base
      */
     public function __construct()
     {
-        //  Define defaults
         $this->clearErrors();
-        $this->tableIdColumn          = 'id';
-        $this->tableSlugColumn        = 'slug';
-        $this->tableTokenColumn       = 'token';
-        $this->tableLabelColumn       = 'label';
-        $this->tableCreatedColumn     = 'created';
-        $this->tableCreatedByColumn   = 'created_by';
-        $this->tableModifiedColumn    = 'modified';
-        $this->tableModifiedByColumn  = 'modified_by';
-        $this->tableDeletedColumn     = 'is_deleted';
-        $this->destructiveDelete      = null;   //  @todo (Pablo - 2019-04-15) - Deprecated in favour of constant
-        $this->tableAutoSetTimestamps = null;   //  @todo (Pablo - 2019-04-15) - Deprecated in favour of constant
-        $this->tableAutoSetSlugs      = null;   //  @todo (Pablo - 2019-04-15) - Deprecated in favour of constant
-        $this->tableAutoSetTokens     = null;   //  @todo (Pablo - 2019-04-15) - Deprecated in favour of constant
-        $this->perPage                = 50;
-        $this->searchableFields       = [];
 
         if (classUses(static::class, 'Nails\Common\Traits\Model\Sortable')) {
             $this->defaultSortColumn = $this->getSortableColumn();
-            $this->defaultSortOrder  = 'ASC';
-        } else {
-            $this->defaultSortColumn = null;
-            $this->defaultSortOrder  = 'ASC';
         }
-
-        // --------------------------------------------------------------------------
 
         $this->aCacheColumns = [
             $this->tableIdColumn,
             $this->tableSlugColumn,
             $this->tableTokenColumn,
         ];
-
-        // --------------------------------------------------------------------------
 
         /**
          * Set up default searchable fields. Each field is passed directly to the
