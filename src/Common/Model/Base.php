@@ -2127,14 +2127,30 @@ abstract class Base
         array $aBools = [],
         array $aFloats = []
     ) {
+        //  @todo (Pablo - 2019-11-28) - Allow these to be passed in as arguments
+        $aDates     = [];
+        $aDateTimes = [];
 
-        $aIntegers   = (array) $aIntegers;
-        $aIntegers[] = $this->tableIdColumn;
-        $aIntegers[] = $this->tableCreatedByColumn;
-        $aIntegers[] = $this->tableModifiedByColumn;
-        $aIntegers[] = 'parent_id';
-        $aIntegers[] = 'user_id';
-        $aIntegers[] = 'order';
+        /** @var Field[] $aFields */
+        $aFields = $this->describeFields();
+        foreach ($aFields as $oField) {
+            switch ($oField->type) {
+                case 'number':
+                    $aIntegers[] = $oField->key;
+                    break;
+                case 'boolean':
+                    $aBools[] = $oField->key;
+                    break;
+                case 'date':
+                    $aDates[] = $oField->key;
+                    break;
+                case 'datetime':
+                    $aDateTimes[] = $oField->key;
+                    break;
+            }
+        }
+
+        // --------------------------------------------------------------------------
 
         foreach ($aIntegers as $sProperty) {
             if (property_exists($oObj, $sProperty)) {
@@ -2144,13 +2160,6 @@ abstract class Base
             }
         }
 
-        // --------------------------------------------------------------------------
-
-        $aBools   = (array) $aBools;
-        $aBools[] = $this->tableDeletedColumn;
-        $aBools[] = 'is_active';
-        $aBools[] = 'is_published';
-
         foreach ($aBools as $sProperty) {
             if (property_exists($oObj, $sProperty)) {
                 if (!is_null($oObj->{$sProperty})) {
@@ -2158,10 +2167,6 @@ abstract class Base
                 }
             }
         }
-
-        // --------------------------------------------------------------------------
-
-        $aFloats = (array) $aFloats;
 
         foreach ($aFloats as $sProperty) {
             if (property_exists($oObj, $sProperty)) {
@@ -2171,20 +2176,12 @@ abstract class Base
             }
         }
 
-        // --------------------------------------------------------------------------
-
-        //  @todo (Pablo - 2019-09-08) - allow this to be passed in as an argument
-        $aDateTimes = [$this->tableCreatedColumn, $this->tableModifiedColumn];
         foreach ($aDateTimes as $sProperty) {
             if (property_exists($oObj, $sProperty)) {
                 $oObj->{$sProperty} = Factory::resource('DateTime', null, ['raw' => $oObj->{$sProperty}]);
             }
         }
 
-        // --------------------------------------------------------------------------
-
-        //  @todo (Pablo - 2019-09-08) - allow this to be passed in as an argument
-        $aDates = [];
         foreach ($aDates as $sProperty) {
             if (property_exists($oObj, $sProperty)) {
                 $oObj->{$sProperty} = Factory::resource('Date', null, ['raw' => $oObj->{$sProperty}]);
@@ -2603,6 +2600,7 @@ abstract class Base
              * Numeric
              */
             case 'int':
+                //  @todo (Pablo - 2019-11-28) - This is only number to match the form type, and could be misleading
                 $oField->type = 'number';
                 break;
 
