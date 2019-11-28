@@ -308,16 +308,6 @@ return [
         },
     ],
 
-    'models' => [
-        'Country' => function (): Model\Country {
-            if (class_exists('\App\Common\Model\Country')) {
-                return new \App\Common\Model\Country();
-            } else {
-                return new Model\Country();
-            }
-        },
-    ],
-
     'factories' => [
         'DateTime'                => function ($sTime = 'now', DateTimeZone $oTimeZone = null): \DateTime {
             return new \DateTime($sTime, $oTimeZone);
