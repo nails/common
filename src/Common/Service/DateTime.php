@@ -425,6 +425,18 @@ class DateTime
     // --------------------------------------------------------------------------
 
     /**
+     * Returns the current user date format string
+     *
+     * @return string
+     */
+    public function getUserDateFormat(): string
+    {
+        return $this->sUserFormatDate;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Set the time format to use, uses default if slug cannot be found
      *
      * @param string $sSlug The time format's slug
@@ -437,6 +449,18 @@ class DateTime
         }
 
         $this->sUserFormatTime = $oTimeFormat->format;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the current user time format string
+     *
+     * @return string
+     */
+    public function getUserTimeFormat(): string
+    {
+        return $this->sUserFormatTime;
     }
 
     // --------------------------------------------------------------------------
