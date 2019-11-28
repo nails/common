@@ -303,27 +303,6 @@ abstract class Base
          */
         $this->searchableFields[] = $this->tableIdColumn;
         $this->searchableFields[] = $this->tableLabelColumn;
-
-        // --------------------------------------------------------------------------
-
-        //  Default expandable fields
-        if (!empty($this->tableCreatedByColumn)) {
-            $this->addExpandableField([
-                'trigger'   => 'created_by',
-                'model'     => 'User',
-                'provider'  => Auth\Constants::MODULE_SLUG,
-                'id_column' => 'created_by',
-            ]);
-        }
-
-        if (!empty($this->tableModifiedByColumn)) {
-            $this->addExpandableField([
-                'trigger'   => 'modified_by',
-                'model'     => 'User',
-                'provider'  => Auth\Constants::MODULE_SLUG,
-                'id_column' => 'modified_by',
-            ]);
-        }
     }
 
     // --------------------------------------------------------------------------
