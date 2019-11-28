@@ -2497,6 +2497,13 @@ abstract class Base
      */
     public function describeFields($sTable = null)
     {
+        $aCache = $this->getCache('MODEL-FIELDS');
+        if (!empty($aCache)) {
+            return $aCache;
+        }
+
+        // --------------------------------------------------------------------------
+
         //  @todo (Pablo - 2019-05-09) - This doesn't feel right
         $sTable  = $sTable ?: $this->getTableName();
         $oDb     = Factory::service('Database');
@@ -2548,6 +2555,8 @@ abstract class Base
             unset($aFields['language']);
             unset($aFields['region']);
         }
+
+        $this->setCache('MODEL-FIELDS', $aFields);
 
         return $aFields;
     }
