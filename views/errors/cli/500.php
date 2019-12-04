@@ -8,6 +8,8 @@ if (Environment::not(Environment::ENV_PROD)) {
     echo 'ERROR:   FATAL' . "\n";
     echo 'SUBJECT: ' . strip_tags($sSubject) . "\n";
     echo 'MESSAGE: ' . strip_tags($sMessage) . "\n";
+    echo !empty($oDetails->file) ? 'FILE:    ' . $oDetails->file . "\n" : null;
+    echo !empty($oDetails->file) ? 'LINE:    ' . $oDetails->line . "\n" : null;
     echo "\n";
     echo 'BACKTRACE:' . "\n";
 
