@@ -1016,7 +1016,7 @@ class FormValidation extends CI_Form_validation
      */
     public function alpha_dash_period($str)
     {
-        return (!preg_match("/^([\.-a-z0-9_-])+$/i", $str)) ? false : true;
+        return (!preg_match("/^([\.-a-z0-9_])+$/i", $str)) ? false : true;
     }
 
     // --------------------------------------------------------------------------
