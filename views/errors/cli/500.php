@@ -23,7 +23,6 @@ if (Environment::not(Environment::ENV_PROD)) {
     }
 
 } else {
-    echo 'Sorry, an error occurred which we couldn\'t recover from. The technical team have been informed, ';
-    echo 'we apologise for the inconvenience.';
+    echo 'Sorry, an error occurred which we could not recover from. We apologise for the inconvenience.';
 }
 echo "\n";
