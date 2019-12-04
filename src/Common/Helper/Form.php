@@ -241,7 +241,7 @@ class Form
         $action || $action = $oConfig->site_url($oUri->uri_string());
 
         $sForm = '<form action="' . $action . '"';
-        $sForm .= _attributes_to_string($attributes, true);
+        $sForm .= _attributes_to_string($attributes);
         $sForm .= '>';
 
         if (!(bool) preg_match('/method="(.+)"/', $sForm)) {
