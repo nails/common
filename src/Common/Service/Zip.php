@@ -105,6 +105,11 @@ class Zip
 
     // --------------------------------------------------------------------------
 
+    /**
+     * @param string $filename
+     *
+     * @throws NailsException
+     */
     public function download($filename = 'backup.zip')
     {
         if (!function_exists('get_instance')) {

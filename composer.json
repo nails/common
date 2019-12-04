@@ -41,7 +41,10 @@
         "adrienrn/php-mimetyper": "0.*",
         "katzien/php-mime-type": "2.*",
         "axisofstevil/stop-words": "0.*",
-        "annexare/countries-list": "2.*"
+        "annexare/countries-list": "2.*",
+        "ext-pdo": "*",
+        "ext-fileinfo": "*",
+        "ext-mbstring": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "8.*"
