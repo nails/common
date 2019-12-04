@@ -43,7 +43,7 @@ class Inflector
      *
      * @return string
      */
-    public function possessionise($sString)
+    public static function possessionise($sString)
     {
         trigger_error('Function ' . __METHOD__ . ' is deprecated', E_USER_DEPRECATED);
         return static::possessive($sString);
