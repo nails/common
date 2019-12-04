@@ -947,11 +947,7 @@ class DateTime
         // --------------------------------------------------------------------------
 
         //  Calculate age
-        $_age       = ($_birth_time < 0) ? ($_death_time + ($_birth_time * -1)) : $_death_time - $_birth_time;
-        $_age_years = floor($_age / (31536000));    //  Divide by number of seconds in a year
-
-        // --------------------------------------------------------------------------
-
-        return $_age_years;
+        $_age = ($_birth_time < 0) ? ($_death_time + ($_birth_time * -1)) : $_death_time - $_birth_time;
+        return floor($_age / (31536000));    //  Divide by number of seconds in a year
     }
 }
