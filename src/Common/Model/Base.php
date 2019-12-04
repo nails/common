@@ -2297,6 +2297,7 @@ abstract class Base
      * @param bool $bIncludeSeparator Whether to include the prefix separator
      *
      * @return string
+     * @throws ModelException
      */
     public function getTableAlias($bIncludeSeparator = false)
     {

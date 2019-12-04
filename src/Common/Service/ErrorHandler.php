@@ -15,10 +15,12 @@ namespace Nails\Common\Service;
 use Nails\Auth;
 use Nails\Common\Controller\Nails404Controller;
 use Nails\Common\Events;
+use Nails\Common\Exception\FactoryException;
 use Nails\Common\Helper\ArrayHelper;
 use Nails\Components;
 use Nails\Factory;
 use Nails\Functions;
+use stdClass;
 
 /**
  * Class ErrorHandler
@@ -75,7 +77,7 @@ class ErrorHandler
     /**
      * The configuration for the default driver
      *
-     * @var \stdClass
+     * @var stdClass
      */
     protected static $oDefaultDriver;
 
@@ -163,7 +165,7 @@ class ErrorHandler
     /**
      * Returns the default error driver config
      *
-     * @return \stdClass
+     * @return stdClass
      */
     public function getDefaultDriver()
     {
@@ -210,7 +212,7 @@ class ErrorHandler
      *
      * @param string    $sSubject The error subject
      * @param string    $sMessage The error message
-     * @param \stdClass $oDetails Breakdown of the error which occurred
+     * @param stdClass $oDetails Breakdown of the error which occurred
      *
      * @return void
      */
@@ -256,6 +258,8 @@ class ErrorHandler
      * Renders the 404 page and halts script execution
      *
      * @param bool $bLogError Whether to log the error
+     *
+     * @throws FactoryException
      */
     public function show404($bLogError = true)
     {
