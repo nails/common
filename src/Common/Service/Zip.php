@@ -33,7 +33,6 @@ use Nails\Common\Exception\NailsException;
  * @method read_dir($path, $preserve_filepath = true, $root_path = null)
  * @method get_zip()
  * @method archive($filepath)
- * @method download($filename = 'backup.zip')
  * @method clear_data()
  */
 class Zip
