@@ -99,7 +99,7 @@ class Factory
                 foreach ($aComponentServices['services'] as $sKey => $cCallable) {
                     self::$aContainers[$sComponentName]['services'][$sKey] = function () use ($sKey, $cCallable) {
                         return $cCallable;
-                    };;
+                    };
                 }
             }
 
