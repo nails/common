@@ -120,8 +120,6 @@ class Hooks extends CI_Hooks
             $this->runCustomHook($this->aCustomHooks[$sWhich]);
             return true;
         }
-
-        return parent::call_hook($sWhich);
     }
 
     // --------------------------------------------------------------------------
