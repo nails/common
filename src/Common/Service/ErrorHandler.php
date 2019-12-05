@@ -331,13 +331,13 @@ class ErrorHandler
     /**
      * Renders the 401 page and halts script execution
      *
+     * @param string $sFlashMessage The flash message to display to the user
      * @param string $sReturnUrl    The URL to return to after logging in
-     * @param string $sFlashMessage The flashmessage to display to the user
      * @param bool   $bLogError     Whether to log the error or not
      */
     public function show401(
-        string $sReturnUrl = null,
         string $sFlashMessage = null,
+        string $sReturnUrl = null,
         bool $bLogError = true
     ): void {
 

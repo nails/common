@@ -194,19 +194,19 @@ class Functions
      * Renders the 401 page, optionally logging the error to the database.
      * If a user is not logged in they are directed to the login page.
      *
+     * @param string $sFlashMessage The flash message to display to the user
      * @param string $sReturnUrl    The URL to return to after logging in
-     * @param string $sFlashMessage The flashmessage to display to the user
      * @param bool   $bLogError     Whether to log the error or not
      */
     public static function show401(
-        string $sReturnUrl = null,
         string $sFlashMessage = null,
+        string $sReturnUrl = null,
         bool $bLogError = true
     ): void {
 
         /** @var ErrorHandler $oErrorHandler */
         $oErrorHandler = Factory::service('ErrorHandler');
-        $oErrorHandler->show401($sReturnUrl, $sFlashMessage, $bLogError);
+        $oErrorHandler->show401($sFlashMessage, $sReturnUrl, $bLogError);
     }
 
     // --------------------------------------------------------------------------
