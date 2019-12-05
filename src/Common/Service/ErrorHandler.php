@@ -331,10 +331,15 @@ class ErrorHandler
     /**
      * Renders the 401 page and halts script execution
      *
-     * @param bool $bLogError Whether to log the error
+     * @param string $sReturnUrl    The URL to return to after logging in
+     * @param string $sFlashMessage The flashmessage to display to the user
+     * @param bool   $bLogError     Whether to log the error or not
      */
-    public function show401($bLogError = true)
-    {
+    public function show401(
+        string $sReturnUrl = null,
+        string $sFlashMessage = null,
+        bool $bLogError = true
+    ): void {
 
         if (function_exists('isLoggedIn') && isLoggedIn()) {
 
@@ -374,23 +379,28 @@ class ErrorHandler
 
             /** @var Auth\Service\Session $oSession */
             $oSession = Factory::service('Session', Auth\Constants::MODULE_SLUG);
-            $sMessage = 'Sorry, you need to be logged in to see that page.';
             /** @var Input $oInput */
             $oInput = Factory::service('Input');
 
-            $oSession->setFlashData('message', $sMessage);
-
-            if ($oInput->server('REQUEST_URI')) {
-                $sReturn = $oInput->server('REQUEST_URI');
-            } elseif (uri_string()) {
-                $sReturn = uri_string();
-            } else {
-                $sReturn = '';
+            if (is_null($sFlashMessage)) {
+                $sFlashMessage = 'Sorry, you need to be logged in to see that page.';
             }
 
-            $sReturn = $sReturn ? '?return_to=' . urlencode($sReturn) : '';
+            $oSession->setFlashData('error', $sFlashMessage);
 
-            redirect('auth/login' . $sReturn);
+            if (is_null($sReturnUrl)) {
+                if ($oInput->server('REQUEST_URI')) {
+                    $sReturnUrl = $oInput->server('REQUEST_URI');
+                } elseif (uri_string()) {
+                    $sReturnUrl = uri_string();
+                } else {
+                    $sReturnUrl = '';
+                }
+            }
+
+            $sReturnUrl = $sReturnUrl ? '?return_to=' . urlencode($sReturnUrl) : '';
+
+            redirect('auth/login' . $sReturnUrl);
         }
     }
 

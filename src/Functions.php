@@ -168,10 +168,24 @@ class Functions
      * @param string $sSubject    The error subject
      * @param int    $iStatusCode The status code
      */
-    public static function showError($sMessage = '', $sSubject = '', $iStatusCode = 500)
-    {
-        $oError =& load_class('Exceptions', 'core');
-        $oError->show_error($sSubject, $sMessage, $iStatusCode, $iStatusCode);
+    public static function showError(
+        $sMessage = '',
+        $sSubject = '',
+        $iStatusCode = 500,
+        $bUseException = true
+    ): void {
+
+        if (is_array($sMessage)) {
+            $sMessage = implode('<br>', $sMessage);
+        }
+
+        if ($bUseException) {
+            throw new NailsException($sMessage, $iStatusCode);
+        } else {
+            /** @var ErrorHandler $oErrorHandler */
+            $oErrorHandler = Factory::service('ErrorHandler');
+            $oErrorHandler->showFatalErrorScreen($sSubject, $sMessage);
+        }
     }
 
     // --------------------------------------------------------------------------
@@ -180,14 +194,19 @@ class Functions
      * Renders the 401 page, optionally logging the error to the database.
      * If a user is not logged in they are directed to the login page.
      *
-     * @param boolean $bLogError Whether to log the error or not
-     *
-     * @return void
+     * @param string $sReturnUrl    The URL to return to after logging in
+     * @param string $sFlashMessage The flashmessage to display to the user
+     * @param bool   $bLogError     Whether to log the error or not
      */
-    public static function show401($bLogError = true)
-    {
-        $oError =& load_class('Exceptions', 'core');
-        $oError->show_401($bLogError);
+    public static function show401(
+        string $sReturnUrl = null,
+        string $sFlashMessage = null,
+        bool $bLogError = true
+    ): void {
+
+        /** @var ErrorHandler $oErrorHandler */
+        $oErrorHandler = Factory::service('ErrorHandler');
+        $oErrorHandler->show401($sReturnUrl, $sFlashMessage, $bLogError);
     }
 
     // --------------------------------------------------------------------------
@@ -199,8 +218,9 @@ class Functions
      */
     public static function show404($bLogError = true): void
     {
-        $oError =& load_class('Exceptions', 'core');
-        $oError->show_404('', $bLogError);
+        /** @var ErrorHandler $oErrorHandler */
+        $oErrorHandler = Factory::service('ErrorHandler');
+        $oErrorHandler->show404($bLogError);
     }
 
     // --------------------------------------------------------------------------

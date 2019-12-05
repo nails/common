@@ -42,16 +42,12 @@ class Exceptions extends CI_Exceptions
         $iStatusCode = 500,
         $bUseException = true
     ) {
-        if (is_array($sMessage)) {
-            $sMessage = implode('<br>', $sMessage);
-        }
-
-        if ($bUseException) {
-            throw new NailsException($sMessage, $iStatusCode);
-        } else {
-            $oErrorHandler = Factory::service('ErrorHandler');
-            $oErrorHandler->showFatalErrorScreen($sSubject, $sMessage);
-        }
+        Functions::showError(
+            $sMessage,
+            $sSubject,
+            $iStatusCode,
+            $bUseException
+        );
     }
 
     // --------------------------------------------------------------------------
@@ -102,8 +98,7 @@ class Exceptions extends CI_Exceptions
      */
     public function show_404($sPage = '', $bLogError = true)
     {
-        $oErrorHandler = Factory::service('ErrorHandler');
-        $oErrorHandler->show404($bLogError);
+        Functions::show404($bLogError);
     }
 
     // --------------------------------------------------------------------------
@@ -115,7 +110,6 @@ class Exceptions extends CI_Exceptions
      */
     public function show_401($bLogError = true)
     {
-        $oErrorHandler = Factory::service('ErrorHandler');
-        $oErrorHandler->show401($bLogError);
+        Functions::show401($bLogError);
     }
 }

@@ -29,10 +29,16 @@ if (!function_exists('setControllerData')) {
 }
 
 if (!function_exists('show_error')) {
-
-    function show_error($sMessage = '', $sSubject = '', $iStatusCode = 500)
+    function show_error($sMessage = '', $sSubject = '', $iStatusCode = 500, $bUseException = true)
     {
-        Functions::showError($sMessage, $sSubject, $iStatusCode);
+        Functions::showError($sMessage, $sSubject, $iStatusCode, $bUseException);
+    }
+}
+
+if (!function_exists('showError')) {
+    function showError($sMessage = '', $sSubject = '', $iStatusCode = 500, $bUseException = true)
+    {
+        Functions::showError($sMessage, $sSubject, $iStatusCode, $bUseException);
     }
 }
 
@@ -44,16 +50,22 @@ if (!function_exists('show_401')) {
 }
 
 if (!function_exists('show401')) {
-    function show401($bLogError = true)
-    {
-        Functions::show401($bLogError);
+    function show401(
+        string $sReturnUrl = null,
+        string $sFlashMessage = null,
+        bool $bLogError = true
+    ) {
+        Functions::show401($sReturnUrl, $sFlashMessage, $bLogError);
     }
 }
 
 if (!function_exists('unauthorised')) {
-    function unauthorised($bLogError = true)
-    {
-        Functions::show401($bLogError);
+    function unauthorised(
+        string $sReturnUrl = null,
+        string $sFlashMessage = null,
+        bool $bLogError = true
+    ) {
+        Functions::show401($sReturnUrl, $sFlashMessage, $bLogError);
     }
 }
 
