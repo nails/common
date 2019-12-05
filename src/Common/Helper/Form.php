@@ -14,8 +14,16 @@
 namespace Nails\Common\Helper;
 
 use Nails\Common\Exception\NailsException;
+use Nails\Common\Service\Config;
+use Nails\Common\Service\Input;
+use Nails\Common\Service\Uri;
 use Nails\Factory;
 
+/**
+ * Class Form
+ *
+ * @package Nails\Common\Helper
+ */
 class Form
 {
     /**
@@ -225,8 +233,10 @@ class Form
     {
         $CI =& get_instance();
 
+        /** @var Config $oConfig */
         $oConfig = Factory::service('Config');
-        $oUri    = Factory::service('Uri');
+        /** @var Uri $oUri */
+        $oUri = Factory::service('Uri');
 
         if ($attributes == '') {
             $attributes = 'method="post"';
@@ -1124,6 +1134,7 @@ EOT;
 
         $_out .= '<span class="input ' . $_tipclass . ' ' . $_disabledclass . '">';
 
+        /** @var Input $oInput */
         $oInput = Factory::service('Input');
 
         //  Field
