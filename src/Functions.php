@@ -11,6 +11,10 @@
 
 namespace Nails;
 
+use Nails\Common\Exception\NailsException;
+use Nails\Common\Service\ErrorHandler;
+use Nails\Common\Service\Input;
+
 class Functions
 {
     /**
@@ -19,7 +23,7 @@ class Functions
      * @param string $sConstantName The constant to define
      * @param mixed  $mValue        The constant's value
      */
-    public static function define($sConstantName, $mValue)
+    public static function define(string $sConstantName, $mValue): void
     {
         if (!defined($sConstantName)) {
             define($sConstantName, $mValue);
@@ -33,7 +37,7 @@ class Functions
      *
      * @return bool
      */
-    public static function isPageSecure()
+    public static function isPageSecure(): bool
     {
         if (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) === 'on') {
 
@@ -122,7 +126,7 @@ class Functions
      *
      * @return string
      */
-    public static function getRelativePath($sFrom, $sTo)
+    public static function getRelativePath($sFrom, $sTo): string
     {
         $aFrom    = explode('/', $sFrom);
         $aTo      = explode('/', $sTo);
@@ -191,15 +195,9 @@ class Functions
     /**
      * Renders the 404 page, logging disabled by default.
      *
-     * Note that the Exception class does log by default. Manual 404's are probably
-     * a result of some other checking and not technically a 404 so should not be
-     * logged as one. _Actual_ 404's should continue to be logged however.
-     *
-     * @param boolean $bLogError Whether to log the error or not
-     *
-     * @return void
+     * @param bool $bLogError Whether to log the error or not
      */
-    public static function show404($bLogError = true)
+    public static function show404($bLogError = true): void
     {
         $oError =& load_class('Exceptions', 'core');
         $oError->show_404('', $bLogError);
@@ -212,8 +210,9 @@ class Functions
      *
      * @return bool
      */
-    public static function isCli()
+    public static function isCli(): bool
     {
+        /** @var Input $oInput */
         $oInput = Factory::service('Input');
         return $oInput::isCli();
     }
@@ -225,8 +224,9 @@ class Functions
      *
      * @return bool
      */
-    public static function isAjax()
+    public static function isAjax(): bool
     {
+        /** @var Input $oInput */
         $oInput = Factory::service('Input');
         return $oInput::isAjax();
     }

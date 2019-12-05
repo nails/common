@@ -15,7 +15,13 @@ namespace Nails\Common\CodeIgniter\Core;
 use CI_Exceptions;
 use Nails\Common\Exception\NailsException;
 use Nails\Factory;
+use Nails\Functions;
 
+/**
+ * Class Exceptions
+ *
+ * @package Nails\Common\CodeIgniter\Core
+ */
 class Exceptions extends CI_Exceptions
 {
     /**
@@ -28,7 +34,6 @@ class Exceptions extends CI_Exceptions
      * @param boolean $bUseException Whether to use an exception
      *
      * @throws NailsException
-     * @return void
      */
     public function show_error(
         $sSubject,
@@ -94,8 +99,6 @@ class Exceptions extends CI_Exceptions
      * Renders the 404 page and halts script execution
      *
      * @param bool $bLogError Whether to log the error
-     *
-     * @return void
      */
     public function show_404($sPage = '', $bLogError = true)
     {
@@ -109,8 +112,6 @@ class Exceptions extends CI_Exceptions
      * Renders the 401 page and halts script execution
      *
      * @param bool $bLogError Whether to log the error
-     *
-     * @return void
      */
     public function show_401($bLogError = true)
     {

@@ -210,8 +210,8 @@ class ErrorHandler
      * Shows the fatal error screen. A diagnostic screen is shown on non-production
      * environments
      *
-     * @param string    $sSubject The error subject
-     * @param string    $sMessage The error message
+     * @param string   $sSubject The error subject
+     * @param string   $sMessage The error message
      * @param stdClass $oDetails Breakdown of the error which occurred
      *
      * @return void
@@ -263,7 +263,6 @@ class ErrorHandler
      */
     public function show404($bLogError = true)
     {
-
         $sPage = ArrayHelper::getFromArray('REQUEST_URI', $_SERVER);
 
         /**
@@ -272,7 +271,7 @@ class ErrorHandler
          *
          * Reasoning: I often use HEAD requests to check the existence of a file
          * in JS before fetching it. I feel that these shouldn't be logged. A
-         * direct GET/POST/etc request to a non-existent file is more  likely a
+         * direct GET/POST/etc request to a non-existent file is more likely a
          * user following a dead link so these _should_ be logged.
          *
          * If you disagree, open up an issue and we'll work something out.
@@ -300,6 +299,7 @@ class ErrorHandler
          * have been loaded.
          */
 
+        /** @var Event $oEvent */
         $oEvent = Factory::service('Event');
         if (!$oEvent->hasBeenTriggered(Events::SYSTEM_READY)) {
 
@@ -348,6 +348,7 @@ class ErrorHandler
 
             if (function_exists('wasAdmin') && wasAdmin()) {
 
+                /** @var Auth\Model\User $oUserModel */
                 $oUserModel = Factory::model('User', Auth\Constants::MODULE_SLUG);
                 $oRecovery  = $oUserModel->getAdminRecoveryData();
 
@@ -371,9 +372,11 @@ class ErrorHandler
 
         } else {
 
+            /** @var Auth\Service\Session $oSession */
             $oSession = Factory::service('Session', Auth\Constants::MODULE_SLUG);
-            $oInput   = Factory::service('Input');
             $sMessage = 'Sorry, you need to be logged in to see that page.';
+            /** @var Input $oInput */
+            $oInput = Factory::service('Input');
 
             $oSession->setFlashData('message', $sMessage);
 
@@ -414,6 +417,7 @@ class ErrorHandler
             }
         }
 
+        /** @var Input $oInput */
         $oInput = Factory::service('Input');
         $sType  = $oInput::isCli() ? 'cli' : 'html';
         $aPaths = [];
@@ -463,6 +467,7 @@ class ErrorHandler
 
         if ($sValidPath) {
 
+            /** @var View $oView */
             $oView = Factory::service('View');
             $oView->setData($aData);
             echo $oView->load($sValidPath, [], true);
