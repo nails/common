@@ -228,22 +228,6 @@ final class Bootstrap
         //  @todo (Pablo - 2018-11-16) - Move these to the log service
         Functions::define('DEPLOY_LOG_DIR', self::$sBaseDirectory . 'application/logs/');
 
-        //  Email constants
-        Functions::define('APP_DEVELOPER_EMAIL', '');
-        Functions::define('EMAIL_OVERRIDE', '');
-        Functions::define('EMAIL_WHITELIST', '');
-
-        //  Specify these first for backwards compatability
-        Functions::define('DEPLOY_EMAIL_HOST', '127.0.0.1');
-        Functions::define('DEPLOY_EMAIL_USER', null);
-        Functions::define('DEPLOY_EMAIL_PASS', null);
-        Functions::define('DEPLOY_EMAIL_PORT', 25);
-
-        Functions::define('EMAIL_HOST', DEPLOY_EMAIL_HOST);
-        Functions::define('EMAIL_USERNAME', DEPLOY_EMAIL_USER);
-        Functions::define('EMAIL_PASSWORD', DEPLOY_EMAIL_PASS);
-        Functions::define('EMAIL_PORT', DEPLOY_EMAIL_PORT);
-
         //  Profiling constants
         Functions::define('PROFILER_ENABLED', false);
         if (!PROFILER_ENABLED) {
