@@ -12,6 +12,11 @@ namespace App\Admin\App;
 
 use Nails\Admin\Controller\DefaultController;
 
+/**
+ * Class {{ADMIN_CLASS_NAME}}
+ *
+ * @package App\Admin\App
+ */
 class {{ADMIN_CLASS_NAME}} extends DefaultController
 {
     const CONFIG_MODEL_NAME     = '{{SERVICE_NAME}}';

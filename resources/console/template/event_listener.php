@@ -19,6 +19,11 @@ namespace {{NAMESPACE}};
 
 use Nails\Common\Events\Subscription;
 
+/**
+ * Class {{CLASS_NAME}}
+ *
+ * @package {{NAMESPACE}}
+ */
 class {{CLASS_NAME}} extends Subscription
 {
     /**

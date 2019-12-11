@@ -12,6 +12,11 @@ namespace App\Seed;
 
 use Nails\Common\Console\Seed\DefaultSeed;
 
+/**
+ * Class {{MODEL_NAME}}
+ *
+ * @package App\Seed
+ */
 class {{MODEL_NAME}} extends DefaultSeed
 {
     const CONFIG_MODEL_NAME     = '{{MODEL_NAME}}';

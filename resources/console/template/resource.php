@@ -19,6 +19,11 @@ namespace {{RESOURCE_NAMESPACE}};
 
 use Nails\Common\Resource\Entity;
 
+/**
+ * Class {{RESOURCE_CLASS_NAME}}
+ *
+ * @package {{RESOURCE_NAMESPACE}}
+ */
 class {{RESOURCE_CLASS_NAME}} extends Entity
 {
 }

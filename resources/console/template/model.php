@@ -19,6 +19,11 @@ namespace {{NAMESPACE}};
 
 use Nails\Common\Model\Base;
 
+/**
+ * Class {{CLASS_NAME}}
+ *
+ * @package {{NAMESPACE}}
+ */
 class {{CLASS_NAME}} extends Base
 {
     /**
