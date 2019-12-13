@@ -61,11 +61,5 @@ if (!empty($_ENV['ENVIRONMENT']) && $_ENV['ENVIRONMENT'] === 'TESTING') {
      */
     require 'vendor/autoload.php';
 
-    Bootstrap::setEntryPoint(dirname(__FILE__));
-    Bootstrap::setBaseDirectory(dirname(__FILE__));
-    Bootstrap::setNailsConstants();
-    Bootstrap::setCodeIgniterConstants(
-        realpath(dirname(__FILE__) . '/../vendor/codeigniter/framework/system'),
-        realpath(dirname(__FILE__) . '/../vendor/codeigniter/framework/application')
-    );
+    Testing::bootstrapModule(__FILE__);
 }

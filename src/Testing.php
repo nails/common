@@ -102,4 +102,22 @@ class Testing
     {
         \App\Tests\Bootstrap::tearDown();
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Bootstraps Nails for testing, so tests can use the Factory etc
+     *
+     * @param string $sFile The module's bootstrapper (i.e __FILE__)
+     */
+    public static function bootstrapModule(string $sFile): void
+    {
+        Bootstrap::setEntryPoint(dirname($sFile));
+        Bootstrap::setBaseDirectory(dirname($sFile));
+        Bootstrap::setNailsConstants();
+        Bootstrap::setCodeIgniterConstants(
+            realpath(dirname($sFile) . '/../vendor/codeigniter/framework/system'),
+            realpath(dirname($sFile) . '/../vendor/codeigniter/framework/application')
+        );
+    }
 }
