@@ -139,6 +139,8 @@ $lang['fv_is_bool']                     = 'This field must be a boolean';
 $lang['fv_is_bool_field']               = 'The {field} field must be a boolean';
 $lang['fv_is_id']                       = 'This field must be a valid ID';
 $lang['fv_is_id_field']                 = 'The {field} field must be a valid ID';
+$lang['fv_in_list']                     = 'This field must be one of: {param}';
+$lang['fv_in_list_field']               = 'The {field} field must be one of: {param}.';
 
 // --------------------------------------------------------------------------
 
