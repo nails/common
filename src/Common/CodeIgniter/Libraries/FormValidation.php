@@ -13,6 +13,8 @@
 namespace Nails\Common\CodeIgniter\Libraries;
 
 use CI_Form_validation;
+use Nails\Common\Exception\FactoryException;
+use Nails\Common\Exception\ValidationException;
 use Nails\Common\Helper\ArrayHelper;
 use Nails\Common\Service\Database;
 use Nails\Common\Service\Input;
@@ -1140,6 +1142,37 @@ class FormValidation extends CI_Form_validation
     {
         $this->set_message('is_bool', lang('fv_is_bool_field'));
         return is_bool($bValue) || $bValue === '1' || $bValue === '0' || $bValue === 1 || $bValue === 0;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Checks whether a value is a valid ID
+     *
+     * @param string $bValue The value to check
+     *
+     * @return bool
+     */
+    public function is_id($sId, $sParams)
+    {
+        $this->set_message('is_id', lang('fv_is_id_field'));
+
+        try {
+
+            [$sModel, $sProvider] = array_pad(explode('.', $sParams), 2, 'app');
+            $oModel = Factory::model($sModel, $sProvider);
+            return $oModel->getById($sId) !== null;
+
+        } catch (FactoryException $e) {
+            throw new ValidationException(
+                sprintf(
+                    'Failed to load model %s::%s when processing rule is_id; %s',
+                    $sModel,
+                    $sProvider,
+                    $e->getMessage()
+                )
+            );
+        }
     }
 
     // --------------------------------------------------------------------------
