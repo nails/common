@@ -86,6 +86,18 @@ class HttpResponse
     // --------------------------------------------------------------------------
 
     /**
+     * Returns the response's reason phrase
+     *
+     * @return string
+     */
+    public function getReasonPhrase()
+    {
+        return $this->oResponse->getReasonPhrase();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Return the response's body, optionally parsed as JSON
      *
      * @param boolean $bIsJSON Whether the body is JSON or not
