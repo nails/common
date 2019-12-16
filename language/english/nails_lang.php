@@ -141,6 +141,18 @@ $lang['fv_is_id']                       = 'This field must be a valid ID';
 $lang['fv_is_id_field']                 = 'The {field} field must be a valid ID';
 $lang['fv_in_list']                     = 'This field must be one of: {param}';
 $lang['fv_in_list_field']               = 'The {field} field must be one of: {param}.';
+$lang['fv_supportedLocale']             = 'This field is not a supported locale';
+$lang['fv_supportedLocale_field']       = 'The {field} field is not a supported locale';
+$lang['fv_is']                          = 'This field must be exactly "{param}"';
+$lang['fv_is_field']                    = 'The {field} field must be exactly "{param}"';
+
+//  @todo (Pablo - 2019-12-16) - Deprecate/remove/move these
+$lang['cdnObjectPickerMultiObjectRequired']       = 'All items must have a file set.';
+$lang['cdnObjectPickerMultiObjectRequired_field'] = 'All items must have a file set.';
+$lang['fv_cdnObjectPickerMultiLabelRequired']       = 'All items must have a label set.';
+$lang['fv_cdnObjectPickerMultiLabelRequired_field'] = 'All items must have a label set.';
+$lang['fv_cdnObjectPickerMultiAllRequired']         = 'All items must have a file and a label set.';
+$lang['fv_cdnObjectPickerMultiAllRequired_field']   = 'All items must have a file and a label set.';
 
 // --------------------------------------------------------------------------
 
