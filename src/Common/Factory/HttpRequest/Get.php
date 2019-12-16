@@ -13,6 +13,11 @@ namespace Nails\Common\Factory\HttpRequest;
 
 use Nails\Common\Factory\HttpRequest;
 
+/**
+ * Class Get
+ *
+ * @package Nails\Common\Factory\HttpRequest
+ */
 class Get extends HttpRequest
 {
     /**

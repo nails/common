@@ -19,6 +19,11 @@ use Nails\Environment;
 use Nails\Factory;
 use Nails\Testing;
 
+/**
+ * Class HttpRequest
+ *
+ * @package Nails\Common\Factory
+ */
 abstract class HttpRequest
 {
     /**

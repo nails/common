@@ -14,6 +14,11 @@ namespace Nails\Common\Factory;
 use GuzzleHttp\Psr7\Response;
 use Nails\Common\Helper\ArrayHelper;
 
+/**
+ * Class HttpResponse
+ *
+ * @package Nails\Common\Factory
+ */
 class HttpResponse
 {
     /**
