@@ -88,7 +88,7 @@ class FormValidation extends CI_Form_validation
      */
     public function unique_if_diff($new, $params)
     {
-        list($table, $column, $old) = explode(".", $params, 3);
+        [$table, $column, $old] = explode(".", $params, 3);
 
         if ($new == $old) {
             return true;
