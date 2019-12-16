@@ -1159,6 +1159,11 @@ class FormValidation extends CI_Form_validation
      */
     public function is_id($sId, $sParams)
     {
+        //  If blank, then assume the ID is not required
+        if (empty($sId)) {
+            return true;
+        }
+
         if (!array_key_exists('is_id', $this->_error_messages)) {
             $this->set_message('is_id', lang('fv_is_id_field'));
         }
