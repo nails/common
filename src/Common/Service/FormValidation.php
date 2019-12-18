@@ -14,6 +14,7 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\ValidationException;
 use Nails\Common\Factory\Model\Field;
 use Nails\Common\Factory\Service\FormValidation\Validator;
@@ -255,6 +256,7 @@ class FormValidation
      * @param array|null $aData     The data to validate, defaults to $_POST
      *
      * @return Validator
+     * @throws FactoryException
      */
     public function buildValidator(array $aRules = [], array $aMessages = [], array $aData = null): Validator
     {
@@ -278,16 +280,13 @@ class FormValidation
      * @param array|null $aData     The data to validate, defaults to $_POST
      *
      * @return Validator
+     * @throws FactoryException
+     * @throws ValidationException
      */
     public function buildValidatorFromModel(Base $oModel, array $aMessages = [], array $aData = null): Validator
     {
-        $aRules = [];
-        /** @var Field $oField */
-        foreach ($oModel->describeFields() as $oField) {
-            $aRules[$oField->key] = $oField->validation;
-        }
-
-        return $this->buildValidator($aRules, $aMessages, $aData);
+        $oValidator = $this->buildValidator([], $aMessages, $aData);
+        return $oValidator->setRulesFromModel($oModel);
     }
 
     // --------------------------------------------------------------------------
@@ -299,6 +298,7 @@ class FormValidation
      * @param mixed  ...$aArgs Any arguments to pass to the validation rule
      *
      * @return string
+     * @throws FactoryException
      * @throws ValidationException
      */
     public static function rule(string $sRule, ...$aArgs): string

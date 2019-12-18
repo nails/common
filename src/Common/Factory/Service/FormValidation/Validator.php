@@ -5,6 +5,8 @@ namespace Nails\Common\Factory\Service\FormValidation;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Exception\ValidationException;
+use Nails\Common\Factory\Model\Field;
+use Nails\Common\Model\Base;
 use Nails\Common\Service\FormValidation;
 use Nails\Factory;
 
@@ -304,5 +306,48 @@ class Validator
 
             return false;
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets the validation rules from a model's describeFields method
+     *
+     * @param string|Base $mModel    The model's name or instance
+     * @param string      $sProvider The model's provider (if $mModel is a string)
+     *
+     * @return $this
+     * @throws FactoryException
+     * @throws ValidationException
+     */
+    public function setRulesFromModel($mModel, $sProvider = 'app'): Validator
+    {
+        if (is_string($mModel)) {
+            $oModel = Factory::model($mModel, $sProvider);
+        } elseif ($mModel instanceof Base) {
+            $oModel = $mModel;
+        } else {
+            throw new ValidationException(
+                sprintf(
+                    'Expected string or %s, got %s',
+                    Base::class,
+                    is_object($mModel) ? get_class($mModel) : gettype($mModel)
+                )
+            );
+        }
+
+        $aRules = [];
+
+        /** @var Field $oField */
+        foreach ($oModel->describeFields() as $oField) {
+            $aRules[$oField->key] = $oField->validation;
+        }
+
+        $this->aRules = array_merge(
+            $this->aRules,
+            $aRules
+        );
+
+        return $this;
     }
 }
