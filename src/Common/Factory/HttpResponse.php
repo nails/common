@@ -14,6 +14,11 @@ namespace Nails\Common\Factory;
 use GuzzleHttp\Psr7\Response;
 use Nails\Common\Helper\ArrayHelper;
 
+/**
+ * Class HttpResponse
+ *
+ * @package Nails\Common\Factory
+ */
 class HttpResponse
 {
     /**
@@ -81,6 +86,18 @@ class HttpResponse
     public function getStatusCode()
     {
         return $this->oResponse->getStatusCode();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the response's reason phrase
+     *
+     * @return string
+     */
+    public function getReasonPhrase()
+    {
+        return $this->oResponse->getReasonPhrase();
     }
 
     // --------------------------------------------------------------------------

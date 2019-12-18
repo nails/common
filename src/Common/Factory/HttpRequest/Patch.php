@@ -11,6 +11,11 @@
 
 namespace Nails\Common\Factory\HttpRequest;
 
+/**
+ * Class Patch
+ *
+ * @package Nails\Common\Factory\HttpRequest
+ */
 class Patch extends Post
 {
     const HTTP_METHOD = 'PATCH';

@@ -11,6 +11,11 @@
 
 namespace Nails\Common\Factory\HttpRequest;
 
+/**
+ * Class Post
+ *
+ * @package Nails\Common\Factory\HttpRequest
+ */
 class Post extends Get
 {
     const HTTP_METHOD = 'POST';

@@ -13,6 +13,8 @@
 namespace Nails\Common\CodeIgniter\Libraries;
 
 use CI_Form_validation;
+use Nails\Common\Exception\FactoryException;
+use Nails\Common\Exception\ValidationException;
 use Nails\Common\Helper\ArrayHelper;
 use Nails\Common\Service\Database;
 use Nails\Common\Service\Input;
@@ -86,7 +88,7 @@ class FormValidation extends CI_Form_validation
      */
     public function unique_if_diff($new, $params)
     {
-        list($table, $column, $old) = explode(".", $params, 3);
+        [$table, $column, $old] = explode(".", $params, 3);
 
         if ($new == $old) {
             return true;
@@ -1016,6 +1018,10 @@ class FormValidation extends CI_Form_validation
      */
     public function alpha_dash_period($str)
     {
+        if (!array_key_exists('alpha_dash_period', $this->_error_messages)) {
+            $this->set_message('alpha_dash_period', lang('fv_alpha_dash_period_field'));
+        }
+
         return (!preg_match("/^([\.-a-z0-9_])+$/i", $str)) ? false : true;
     }
 
@@ -1032,10 +1038,9 @@ class FormValidation extends CI_Form_validation
      */
     public function cdnObjectPickerMultiObjectRequired($aValues)
     {
-        $this->set_message(
-            'cdnObjectPickerMultiObjectRequired',
-            'All items must have a file set.'
-        );
+        if (!array_key_exists('cdnObjectPickerMultiObjectRequired', $this->_error_messages)) {
+            $this->set_message('cdnObjectPickerMultiObjectRequired', lang('fv_cdnObjectPickerMultiObjectRequired_field'));
+        }
 
         foreach ($aValues as $aValue) {
             if (empty($aValue['object_id'])) {
@@ -1059,10 +1064,9 @@ class FormValidation extends CI_Form_validation
      */
     public function cdnObjectPickerMultiLabelRequired($aValues)
     {
-        $this->set_message(
-            'cdnObjectPickerMultiLabelRequired',
-            'All items must have a label set.'
-        );
+        if (!array_key_exists('cdnObjectPickerMultiLabelRequired', $this->_error_messages)) {
+            $this->set_message('cdnObjectPickerMultiLabelRequired', lang('fv_cdnObjectPickerMultiLabelRequired_field'));
+        }
 
         foreach ($aValues as $aValue) {
             if (empty($aValue['label'])) {
@@ -1086,10 +1090,9 @@ class FormValidation extends CI_Form_validation
      */
     public function cdnObjectPickerMultiAllRequired($aValues)
     {
-        $this->set_message(
-            'cdnObjectPickerMultiAllRequired',
-            'All items must have a file and a label set.'
-        );
+        if (!array_key_exists('cdnObjectPickerMultiAllRequired', $this->_error_messages)) {
+            $this->set_message('cdnObjectPickerMultiAllRequired', lang('fv_cdnObjectPickerMultiAllRequired_field'));
+        }
 
         foreach ($aValues as $aValue) {
             if (empty($aValue['object_id']) || empty($aValue['label'])) {
@@ -1138,8 +1141,49 @@ class FormValidation extends CI_Form_validation
      */
     public function is_bool($bValue)
     {
-        $this->set_message('is_bool', lang('fv_is_bool_field'));
+        if (!array_key_exists('is_bool', $this->_error_messages)) {
+            $this->set_message('is_bool', lang('fv_is_bool_field'));
+        }
+
         return is_bool($bValue) || $bValue === '1' || $bValue === '0' || $bValue === 1 || $bValue === 0;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Checks whether a value is a valid ID
+     *
+     * @param string $bValue The value to check
+     *
+     * @return bool
+     */
+    public function is_id($sId, $sParams)
+    {
+        //  If blank, then assume the ID is not required
+        if (empty($sId)) {
+            return true;
+        }
+
+        if (!array_key_exists('is_id', $this->_error_messages)) {
+            $this->set_message('is_id', lang('fv_is_id_field'));
+        }
+
+        try {
+
+            [$sModel, $sProvider] = array_pad(explode('.', $sParams), 2, 'app');
+            $oModel = Factory::model($sModel, $sProvider);
+            return $oModel->getById($sId) !== null;
+
+        } catch (FactoryException $e) {
+            throw new ValidationException(
+                sprintf(
+                    'Failed to load model %s::%s when processing rule is_id; %s',
+                    $sModel,
+                    $sProvider,
+                    $e->getMessage()
+                )
+            );
+        }
     }
 
     // --------------------------------------------------------------------------
@@ -1158,7 +1202,11 @@ class FormValidation extends CI_Form_validation
         $oLocale           = Factory::service('Locale');
         $aSupportedLocales = $oLocale->getSupportedLocales();
         if (!in_array($sValue, $aSupportedLocales)) {
-            $this->set_message('supportedLocale', 'This is not a supported locale');
+
+            if (!array_key_exists('supportedLocale', $this->_error_messages)) {
+                $this->set_message('supportedLocale', lang('fv_supportedLocale_field'));
+            }
+
             return false;
         }
 
@@ -1178,7 +1226,9 @@ class FormValidation extends CI_Form_validation
     public function is($sValue, $sExpected)
     {
         if ($sValue !== $sExpected) {
-            $this->set_message('is', 'This field must be exactly "' . $sExpected . '"');
+            if (!array_key_exists('is', $this->_error_messages)) {
+                $this->set_message('is', lang('fv_is_field'));
+            }
             return false;
         }
 
