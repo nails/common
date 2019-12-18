@@ -2774,10 +2774,8 @@ abstract class Base
                 $oField->validation[] = FormValidation::RULE_INTEGER;
 
                 if ($sExtra === 'unsigned') {
-                    $oField->validation[] = FormValidation::rule(
-                        FormValidation::RULE_GREATER_THAN,
-                        -1
-                    );
+                    //  @todo (Pablo - 2019-12-18) - Use FormValidation::rule when CI is no longer a dependency
+                    $oField->validation[] = sprintf('%s[%s]', FormValidation::RULE_GREATER_THAN, -1);
                 }
                 break;
 
@@ -2794,10 +2792,8 @@ abstract class Base
              */
             case 'varchar':
                 if ($iLength) {
-                    $oField->validation[] = FormValidation::rule(
-                        FormValidation::RULE_MAX_LENGTH,
-                        $iLength
-                    );
+                    //  @todo (Pablo - 2019-12-18) - Use FormValidation::rule when CI is no longer a dependency
+                    $oField->validation[] = sprintf('%s[%s]', FormValidation::RULE_MAX_LENGTH, $iLength);
                 }
                 break;
 
@@ -2816,10 +2812,8 @@ abstract class Base
              * ENUM
              */
             case 'enum':
-                $oField->validation[] = FormValidation::rule(
-                    FormValidation::RULE_IN_LIST,
-                    implode(',', array_keys($oField->options))
-                );
+                //  @todo (Pablo - 2019-12-18) - Use FormValidation::rule when CI is no longer a dependency
+                $oField->validation[] = sprintf('%s[%s]', FormValidation::RULE_IN_LIST, implode(',', array_keys($oField->options)));
                 break;
 
             /**
@@ -2827,10 +2821,8 @@ abstract class Base
              */
             default:
                 if ($iLength) {
-                    $oField->validation[] = FormValidation::rule(
-                        FormValidation::RULE_MAX_LENGTH,
-                        $iLength
-                    );
+                    //  @todo (Pablo - 2019-12-18) - Use FormValidation::rule when CI is no longer a dependency
+                    $oField->validation[] = sprintf('%s[%s]', FormValidation::RULE_MAX_LENGTH, $iLength);
                 }
                 break;
         }
