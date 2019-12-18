@@ -18,6 +18,7 @@ use Nails\Common\Exception\ModelException;
 use Nails\Common\Factory\Model\Field;
 use Nails\Common\Helper\ArrayHelper;
 use Nails\Common\Resource;
+use Nails\Common\Service\FormValidation;
 use Nails\Common\Service\Locale;
 use Nails\Common\Traits\Caching;
 use Nails\Common\Traits\ErrorHandling;
@@ -2770,18 +2771,21 @@ abstract class Base
              * Numeric
              */
             case 'int':
+                $oField->validation[] = FormValidation::RULE_INTEGER;
+
                 if ($sExtra === 'unsigned') {
-                    $oField->validation[] = 'greater_than[-1]';
-                } else {
-                    $oField->validation[] = 'integer';
+                    $oField->validation[] = FormValidation::rule(
+                        FormValidation::RULE_GREATER_THAN,
+                        -1
+                    );
                 }
                 break;
 
             case 'tinyint':
                 if ($oField->type === 'boolean') {
-                    $oField->validation[] = 'is_bool';
+                    $oField->validation[] = FormValidation::RULE_IS_BOOL;
                 } else {
-                    $oField->validation[] = 'integer';
+                    $oField->validation[] = FormValidation::RULE_INTEGER;
                 }
                 break;
 
@@ -2790,7 +2794,10 @@ abstract class Base
              */
             case 'varchar':
                 if ($iLength) {
-                    $oField->validation[] = 'max_length[' . $iLength . ']';
+                    $oField->validation[] = FormValidation::rule(
+                        FormValidation::RULE_MAX_LENGTH,
+                        $iLength
+                    );
                 }
                 break;
 
@@ -2798,17 +2805,21 @@ abstract class Base
              * Date and time
              */
             case 'date':
-                $oField->validation[] = 'valid_date';
+                $oField->validation[] = FormValidation::RULE_VALID_DATE;
                 break;
+
             case 'datetime':
-                $oField->validation[] = 'valid_datetime';
+                $oField->validation[] = FormValidation::RULE_VALID_DATETIME;
                 break;
 
             /**
              * ENUM
              */
             case 'enum':
-                $oField->validation[] = 'in_list[' . implode(',', array_keys($oField->options)) . ']';
+                $oField->validation[] = FormValidation::rule(
+                    FormValidation::RULE_IN_LIST,
+                    implode(',', array_keys($oField->options))
+                );
                 break;
 
             /**
@@ -2816,7 +2827,10 @@ abstract class Base
              */
             default:
                 if ($iLength) {
-                    $oField->validation[] = 'max_length[' . $iLength . ']';
+                    $oField->validation[] = FormValidation::rule(
+                        FormValidation::RULE_MAX_LENGTH,
+                        $iLength
+                    );
                 }
                 break;
         }
