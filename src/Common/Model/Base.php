@@ -1609,6 +1609,30 @@ abstract class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Returns items, picked at random
+     *
+     * @param array $aData  Any data to pass to getCountCommon()
+     * @param int   $iLimit The number of items to return
+     *
+     * @return Resource[]
+     * @throws ModelException
+     */
+    public function getRandom(array $aData = [], int $iLimit = 1): array
+    {
+        $aData = array_merge(
+            $aData,
+            [
+                'limit' => $iLimit,
+                'sort'  => ['*', 'RANDOM'],
+            ]
+        );
+
+        return $this->getAll($aData);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Sorts items into a specific order based on a specific column
      *
      * @param array  $aItems      The items to sort
