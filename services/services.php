@@ -143,6 +143,13 @@ return [
 
             return $oDriver;
         },
+        'Form'                           => function (): Service\Form {
+            if (class_exists('\App\Common\Service\Form')) {
+                return new \App\Common\Service\Form();
+            } else {
+                return new Service\Form();
+            }
+        },
         'FormValidation'                 => function (): Service\FormValidation {
             if (class_exists('\App\Common\Service\FormValidation')) {
                 return new \App\Common\Service\FormValidation();
