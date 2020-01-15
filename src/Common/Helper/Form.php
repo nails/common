@@ -27,6 +27,33 @@ use Nails\Factory;
 class Form
 {
     /**
+     * The following constants represent the various field types available.
+     */
+    const FIELD_EMAIL             = 'email';
+    const FIELD_NUMBER            = 'number';
+    const FIELD_URL               = 'url';
+    const FIELD_TEL               = 'tel';
+    const FIELD_COLOR             = 'color';
+    const FIELD_PASSWORD          = 'password';
+    const FIELD_TEXTAREA          = 'textarea';
+    const FIELD_WYSIWYG           = 'wysiwyg';
+    const FIELD_TEXT              = 'text';
+    const FIELD_DATE              = 'date';
+    const FIELD_TIME              = 'time';
+    const FIELD_DATETIME          = 'datetime';
+    const FIELD_DROPDOWN          = 'dropdown';
+    const FIELD_DROPDOWN_MULTIPLE = 'dropdown_multiple';
+    const FIELD_BOOLEAN           = 'boolean';
+    const FIELD_RADIO             = 'radio';
+    const FIELD_CHECKBOX          = 'checkbox';
+    const FIELD_CMS_WIDGETS       = 'cms_widgets';
+    const FIELD_SUBMIT            = 'submit';
+    const FIELD_RENDER            = 'render';
+    const FIELD_DYNAMIC_TABLE     = 'dynamic_table';
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Alias of form_input
      *
      * @param mixed
