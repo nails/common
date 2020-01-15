@@ -2709,6 +2709,8 @@ abstract class Base
              * Numeric
              */
             case 'int':
+            case 'mediumint':
+            case 'bigint':
                 //  @todo (Pablo - 2019-11-28) - This is only number to match the form type, and could be misleading
                 $oField->type = 'number';
                 break;
