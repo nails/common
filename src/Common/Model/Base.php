@@ -2234,16 +2234,16 @@ abstract class Base
         $aFields = $this->describeFields();
         foreach ($aFields as $oField) {
             switch ($oField->type) {
-                case FORM::FIELD_NUMBER:
+                case Form::FIELD_NUMBER:
                     $aIntegers[] = $oField->key;
                     break;
-                case FORM::FIELD_BOOLEAN:
+                case Form::FIELD_BOOLEAN:
                     $aBools[] = $oField->key;
                     break;
-                case FORM::FIELD_DATE:
+                case Form::FIELD_DATE:
                     $aDates[] = $oField->key;
                     break;
-                case FORM::FIELD_DATETIME:
+                case Form::FIELD_DATETIME:
                     $aDateTimes[] = $oField->key;
                     break;
             }
@@ -2716,7 +2716,7 @@ abstract class Base
             case 'mediumint':
             case 'bigint':
                 //  @todo (Pablo - 2019-11-28) - This is only number to match the form type, and could be misleading
-                $oField->type = FORM::FIELD_NUMBER;
+                $oField->type = Form::FIELD_NUMBER;
                 break;
 
             /**
@@ -2726,34 +2726,34 @@ abstract class Base
             case 'tinyint':
             case 'bool':
             case 'boolean':
-                $oField->type = $iLength == 1 ? FORM::FIELD_BOOLEAN : FORM::FIELD_NUMBER;
+                $oField->type = $iLength == 1 ? Form::FIELD_BOOLEAN : Form::FIELD_NUMBER;
                 break;
 
             /**
              * String
              */
             case 'varchar':
-                $oField->type       = FORM::FIELD_TEXT;
+                $oField->type       = Form::FIELD_TEXT;
                 $oField->max_length = $iLength ?: null;
                 break;
             case 'tinytext':
             case 'text':
             case 'mediumtext':
             case 'longtext':
-                $oField->type = FORM::FIELD_TEXTAREA;
+                $oField->type = Form::FIELD_TEXTAREA;
                 break;
 
             /**
              * Date and time
              */
             case 'date':
-                $oField->type = FORM::FIELD_DATE;
+                $oField->type = Form::FIELD_DATE;
                 break;
             case 'datetime':
-                $oField->type = FORM::FIELD_DATETIME;
+                $oField->type = Form::FIELD_DATETIME;
                 break;
             case 'time':
-                $oField->type = FORM::FIELD_TIME;
+                $oField->type = Form::FIELD_TIME;
                 break;
 
             /**
@@ -2761,7 +2761,7 @@ abstract class Base
              */
             case 'enum':
             case 'set':
-                $oField->type    = FORM::FIELD_DROPDOWN;
+                $oField->type    = Form::FIELD_DROPDOWN;
                 $oField->class   = 'select2';
                 $aOptions        = explode("','", substr($sTypeConfig, 1, -1));
                 $aLabels         = array_map('strtolower', $aOptions);
@@ -2773,7 +2773,7 @@ abstract class Base
              * Default to basic string
              */
             default:
-                $oField->type       = FORM::FIELD_TEXT;
+                $oField->type       = Form::FIELD_TEXT;
                 $oField->max_length = $iLength ?: null;
                 break;
         }
