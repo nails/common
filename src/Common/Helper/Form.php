@@ -54,6 +54,21 @@ class Form
     // --------------------------------------------------------------------------
 
     /**
+     * Renders a field
+     *
+     * @param string $sType   The type of field to render
+     * @param array  $aConfig The config array
+     *
+     * @return string
+     */
+    public static function render(string $sType, array $aConfig): string
+    {
+        return call_user_func('static::form_' . $sType, $aConfig);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Alias of form_input
      *
      * @param mixed
