@@ -17,6 +17,7 @@ use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\ModelException;
 use Nails\Common\Factory\Model\Field;
 use Nails\Common\Helper\ArrayHelper;
+use Nails\Common\Helper\Form;
 use Nails\Common\Resource;
 use Nails\Common\Service\FormValidation;
 use Nails\Common\Service\Locale;
@@ -2233,16 +2234,16 @@ abstract class Base
         $aFields = $this->describeFields();
         foreach ($aFields as $oField) {
             switch ($oField->type) {
-                case 'number':
+                case FORM::FIELD_NUMBER:
                     $aIntegers[] = $oField->key;
                     break;
-                case 'boolean':
+                case FORM::FIELD_BOOLEAN:
                     $aBools[] = $oField->key;
                     break;
-                case 'date':
+                case FORM::FIELD_DATE:
                     $aDates[] = $oField->key;
                     break;
-                case 'datetime':
+                case FORM::FIELD_DATETIME:
                     $aDateTimes[] = $oField->key;
                     break;
             }
@@ -2625,9 +2626,12 @@ abstract class Base
             $oTemp             = Factory::factory('ModelField');
             $oTemp->key        = 'locale';
             $oTemp->label      = 'Locale';
-            $oTemp->type       = 'dropdown';
+            $oTemp->type       = Form::FIELD_DROPDOWN;
             $oTemp->allow_null = false;
-            $oTemp->validation = ['required', 'supportedLocale'];
+            $oTemp->validation = [
+                FormValidation::RULE_REQUIRED,
+                FormValidation::RULE_SUPPORTED_LOCALE,
+            ];
             $oTemp->options    = $aOptions;
             $oTemp->class      = 'select2';
             $oTemp->info       = 'This field specifies what language the item is written in.';
@@ -2712,7 +2716,7 @@ abstract class Base
             case 'mediumint':
             case 'bigint':
                 //  @todo (Pablo - 2019-11-28) - This is only number to match the form type, and could be misleading
-                $oField->type = 'number';
+                $oField->type = FORM::FIELD_NUMBER;
                 break;
 
             /**
@@ -2722,34 +2726,34 @@ abstract class Base
             case 'tinyint':
             case 'bool':
             case 'boolean':
-                $oField->type = $iLength == 1 ? 'boolean' : 'number';
+                $oField->type = $iLength == 1 ? FORM::FIELD_BOOLEAN : FORM::FIELD_NUMBER;
                 break;
 
             /**
              * String
              */
             case 'varchar':
-                $oField->type       = 'text';
+                $oField->type       = FORM::FIELD_TEXT;
                 $oField->max_length = $iLength ?: null;
                 break;
             case 'tinytext':
             case 'text':
             case 'mediumtext':
             case 'longtext':
-                $oField->type = 'textarea';
+                $oField->type = FORM::FIELD_TEXTAREA;
                 break;
 
             /**
              * Date and time
              */
             case 'date':
-                $oField->type = 'date';
+                $oField->type = FORM::FIELD_DATE;
                 break;
             case 'datetime':
-                $oField->type = 'datetime';
+                $oField->type = FORM::FIELD_DATETIME;
                 break;
             case 'time':
-                $oField->type = 'time';
+                $oField->type = FORM::FIELD_TIME;
                 break;
 
             /**
@@ -2757,7 +2761,7 @@ abstract class Base
              */
             case 'enum':
             case 'set':
-                $oField->type    = 'dropdown';
+                $oField->type    = FORM::FIELD_DROPDOWN;
                 $oField->class   = 'select2';
                 $aOptions        = explode("','", substr($sTypeConfig, 1, -1));
                 $aLabels         = array_map('strtolower', $aOptions);
@@ -2769,7 +2773,7 @@ abstract class Base
              * Default to basic string
              */
             default:
-                $oField->type       = 'text';
+                $oField->type       = FORM::FIELD_TEXT;
                 $oField->max_length = $iLength ?: null;
                 break;
         }
