@@ -12,7 +12,9 @@
 
 namespace Nails\Common\Factory;
 
+use Nails\Common\Factory\Component\ClassCollection;
 use Nails\Common\Helper\ArrayHelper;
+use Nails\Common\Helper\Directory;
 
 /**
  * Class Component
@@ -131,5 +133,42 @@ final class Component
     {
         $aPsr4NameSpaces = require(NAILS_APP_PATH . 'vendor/composer/autoload_psr4.php');
         return getFromArray(ltrim($this->namespace, '\\'), $aPsr4NameSpaces, []);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Find classes in this component's namespace
+     *
+     * @param string $sNamespace The namespace to filter by
+     *
+     * @return ClassCollection
+     */
+    public function findClasses(string $sNamespace = ''): ClassCollection
+    {
+        $oCollection = new ClassCollection();
+        $aNamespace  = explode('\\', $sNamespace);
+        $aPaths      = $this->getNamespaceRootPaths();
+
+        foreach ($aPaths as $sPath) {
+
+            $sPath  = $sPath . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $aNamespace);
+            $aFiles = Directory::map($sPath, null, false);
+
+            foreach ($aFiles as $sFile) {
+
+                $sClass = $this->namespace . implode(
+                        '\\',
+                        array_merge(
+                            $aNamespace,
+                            explode(DIRECTORY_SEPARATOR, preg_replace('/\.php$/', '', $sFile))
+                        )
+                    );
+
+                $oCollection->add($sClass);
+            }
+        }
+
+        return $oCollection;
     }
 }
