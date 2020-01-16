@@ -2860,6 +2860,10 @@ abstract class Base
                 }
                 break;
         }
+
+        if ($this->isAutoSetSlugs() && $oField->key == $this->getColumn('label')) {
+            $oField->validation[] = FormValidation::RULE_REQUIRED;
+        }
     }
 
     // --------------------------------------------------------------------------
