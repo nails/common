@@ -2769,9 +2769,7 @@ abstract class Base
                 }
                 $oField->class   = 'select2';
                 $aOptions        = explode("','", substr($sTypeConfig, 1, -1));
-                $aLabels         = array_map('strtolower', $aOptions);
-                $aLabels         = array_map([$this, 'describeFieldsPrepareLabel'], $aLabels);
-                $oField->options = array_combine($aOptions, $aLabels);
+                $oField->options = array_combine($aOptions, $aOptions);
                 break;
 
             /**
