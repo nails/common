@@ -703,6 +703,10 @@ EOT;
         $_field['info_class']       = isset($field['info_class']) ? $field['info_class'] : false;
         $_field['tip']              = isset($field['tip']) ? $field['tip'] : $tip;
 
+        if (!preg_match('/\[\]$/', $_field['key'])) {
+            $_field['key'] .= '[]';
+        }
+
         if (is_null($options)) {
             $options = isset($field['options']) ? $field['options'] : [];
         }
@@ -746,10 +750,13 @@ EOT;
         }
 
         //  Any defaults?
-        $_field['default'] = (array) $_field['default'];
+        //  @todo (Pablo - 2020-01-16) - This done to support CSV items (e.g. MySQL `SET`s) - feels a bit hack arbitrary
+        if (!is_array($_field['default'])) {
+            $_field['default'] = explode(',', $_field['default']);
+        }
 
         //  Get the selected options
-        $_selected = set_value($_field['key'], $_field['default']);
+        $_selected = set_value(preg_replace('/\[\]$/', '', $_field['key']), $_field['default']);
 
         //  Build the select
         $_placeholder = null !== $_field['placeholder'] ? 'data-placeholder="' . htmlentities($_field['placeholder'], ENT_QUOTES) . '"' : '';

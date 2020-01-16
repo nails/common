@@ -2761,7 +2761,12 @@ abstract class Base
              */
             case 'enum':
             case 'set':
-                $oField->type    = Form::FIELD_DROPDOWN;
+                if ($sType === 'enum') {
+                    $oField->type = Form::FIELD_DROPDOWN;
+                } else {
+                    $oField->type = Form::FIELD_DROPDOWN_MULTIPLE;
+                    $oField->key  .= '[]';
+                }
                 $oField->class   = 'select2';
                 $aOptions        = explode("','", substr($sTypeConfig, 1, -1));
                 $aLabels         = array_map('strtolower', $aOptions);
@@ -2842,6 +2847,7 @@ abstract class Base
              * ENUM
              */
             case 'enum':
+            case 'set':
                 //  @todo (Pablo - 2019-12-18) - Use FormValidation::rule when CI is no longer a dependency
                 $oField->validation[] = sprintf('%s[%s]', FormValidation::RULE_IN_LIST, implode(',', array_keys($oField->options)));
                 break;
