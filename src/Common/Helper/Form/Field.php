@@ -854,7 +854,7 @@ EOT;
 
         // --------------------------------------------------------------------------
 
-        $_out = '<div class="field checkbox boolean ' . $_error . ' ' . $_field['oddeven'] . ' ' . $_readonly_cls . '" data-text-on="' . $_field['text_on'] . '" data-text-off="' . $_field['text_off'] . '" ' . $_field_id_top . '>';
+        $_out = '<div class="field boolean ' . $_error . ' ' . $_field['oddeven'] . ' ' . $_readonly_cls . '" data-text-on="' . $_field['text_on'] . '" data-text-off="' . $_field['text_off'] . '" ' . $_field_id_top . '>';
 
         //  Does the field have an id?
         $_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
