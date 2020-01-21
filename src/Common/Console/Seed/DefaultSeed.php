@@ -3,6 +3,7 @@
 namespace Nails\Common\Console\Seed;
 
 use Nails\Common\Exception\NailsException;
+use Nails\Common\Helper\Form;
 use Nails\Common\Service\Locale;
 use Nails\Common\Traits\Model\Localised;
 use Nails\Factory;
@@ -86,29 +87,32 @@ class DefaultSeed extends Base
         $aOut = [];
         foreach ($aFields as $oField) {
             switch ($oField->type) {
-                case 'textarea':
+                case Form::FIELD_TEXTAREA:
                     $mValue = $this->loremParagraph();
+                    break;
+                case Form::FIELD_NUMBER:
+                    $mValue = $this->randomInteger();
+                    break;
+                case Form::FIELD_BOOLEAN:
+                    $mValue = $this->randomBool();
+                    break;
+                case Form::FIELD_DATETIME:
+                    $mValue = $this->randomDateTime();
+                    break;
+                case Form::FIELD_DATE:
+                    $mValue = $this->randomDateTime(null, null, 'Y-m-d');
+                    break;
+                case Form::FIELD_TIME:
+                    $mValue = $this->randomDateTime(null, null, 'H:i:s');
+                    break;
+                case Form::FIELD_DROPDOWN:
+                    $mValue = $this->randomItem(array_keys($oField->options));
+                    break;
+                case Form::FIELD_DROPDOWN_MULTIPLE:
+                    $mValue = $this->randomItems(array_keys($oField->options));
                     break;
                 case 'wysiwyg':
                     $mValue = $this->loremHtml();
-                    break;
-                case 'number':
-                    $mValue = $this->randomInteger();
-                    break;
-                case 'boolean':
-                    $mValue = $this->randomBool();
-                    break;
-                case 'datetime':
-                    $mValue = $this->randomDateTime();
-                    break;
-                case 'date':
-                    $mValue = $this->randomDateTime(null, null, 'Y-m-d');
-                    break;
-                case 'time':
-                    $mValue = $this->randomDateTime(null, null, 'H:i:s');
-                    break;
-                case 'dropdown':
-                    $mValue = $this->randomItem(array_keys($oField->options));
                     break;
                 default:
                     $mValue = $this->loremWord(3);
@@ -120,7 +124,8 @@ class DefaultSeed extends Base
                 $mValue = substr($mValue, 0, $oField->max_length);
             }
 
-            $aOut[$oField->key] = $mValue;
+            $sKey        = preg_replace('/\[\]$/', '', $oField->key);
+            $aOut[$sKey] = $mValue;
         }
 
         //  Special Cases, model dependant
