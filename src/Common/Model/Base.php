@@ -744,19 +744,27 @@ abstract class Base
                 throw new ModelException(static::class . '::create() Label column variable not set', 1);
             }
 
-            if (empty($aData[$this->tableLabelColumn])) {
-                throw new ModelException(
-                    static::class . '::create() "' . $this->tableLabelColumn .
-                    '" is required when automatically generating slugs.',
-                    1
+            /**
+             * We only want to set slugs if:
+             * - It is a create operation
+             * - it is an update operation and the label column is defined (else, lease it as it is)
+             */
+            if ($bIsCreate || array_key_exists($this->tableLabelColumn, $aData)) {
+
+                if (empty($aData[$this->tableLabelColumn])) {
+                    throw new ModelException(
+                        static::class . '::create() "' . $this->tableLabelColumn .
+                        '" is required when automatically generating slugs.',
+                        1
+                    );
+                }
+
+                $aData[$this->tableSlugColumn] = $this->generateSlug(
+                    $aData[$this->tableLabelColumn],
+                    $iIgnoreId,
+                    $aData
                 );
             }
-
-            $aData[$this->tableSlugColumn] = $this->generateSlug(
-                $aData[$this->tableLabelColumn],
-                $iIgnoreId,
-                $aData
-            );
         }
 
         return $this;
