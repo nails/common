@@ -66,6 +66,28 @@ class Field
 
         // --------------------------------------------------------------------------
 
+        //  Prep the containers attributes
+        $_field_attributes = [];
+
+        //  Move revealer properties to the container
+        foreach ($_field_data as $attr => $value) {
+            if (
+                in_array($attr, ['revealer', 'reveal-on'])
+                && !in_array($_field_type, [Form::FIELD_DROPDOWN, Form::FIELD_CHECKBOX, Form::FIELD_BOOLEAN])
+            ) {
+                $_field_attributes[] = sprintf(
+                    'data-%s="%s"',
+                    $attr,
+                    $value
+                );
+                unset($_field_data[$attr]);
+            }
+        }
+
+        $_field_attributes = implode(' ', $_field_attributes);
+
+        // --------------------------------------------------------------------------
+
         //  Prep the field's attributes
         $_attr = '';
 
@@ -145,7 +167,7 @@ class Field
 
         $_out = <<<EOT
 
-    <div class="field $_error_class $_field_oddeven $_readonly_cls $_field_type" $_field_id_top>
+    <div class="field $_error_class $_field_oddeven $_readonly_cls $_field_type" $_field_id_top, $_field_attributes>
         <label>
             <span class="label">
                 $_field_label
