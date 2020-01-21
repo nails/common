@@ -39,6 +39,7 @@ class Field
         $_field_max_length   = isset($field['max_length']) ? (int) $field['max_length'] : null;
         $_field_tip          = isset($field['tip']) ? $field['tip'] : $tip;
         $_field_autocomplete = isset($field['autocomplete']) ? (bool) $field['autocomplete'] : true;
+        $_field_helper       = isset($field['helper']) ? $field['helper'] : '';
 
         $_tip          = [];
         $_tip['class'] = is_array($_field_tip) && isset($_field_tip['class']) ? $_field_tip['class'] : 'fa fa-question-circle fa-lg tip';
@@ -90,6 +91,10 @@ class Field
 
         //  Prep the field's attributes
         $_attr = '';
+
+        if ($_field_helper) {
+            $_field_data['helper'] = $_field_helper;
+        }
 
         //  Does the field have an id?
         $_attr .= $_field_id ? 'id="' . $_field_id . '" ' : '';
@@ -167,7 +172,7 @@ class Field
 
         $_out = <<<EOT
 
-    <div class="field $_error_class $_field_oddeven $_readonly_cls $_field_type" $_field_id_top, $_field_attributes>
+    <div class="field $_error_class $_field_oddeven $_readonly_cls $_field_type" $_field_id_top $_field_attributes>
         <label>
             <span class="label">
                 $_field_label
