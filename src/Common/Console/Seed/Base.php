@@ -152,16 +152,17 @@ class Base
     /**
      * Generate some random Lorem Ipsum paragraphs
      *
-     * @param int $iNumParagraphs The number of paragraphs to generate
+     * @param int    $iNumParagraphs  The number of paragraphs to generate
+     * @param string $sFirstParagraph The contents of the first paragraph
      *
      * @return string
      */
-    protected function loremParagraph($iNumParagraphs = 1)
+    protected function loremParagraph($iNumParagraphs = 1, string $sFirstParagraph = '')
     {
-        $aOut     = [];
+        $aOut     = array_filter([$sFirstParagraph]);
         $aLengths = [5, 6, 8, 10, 12];
 
-        for ($i = 0; $i < $iNumParagraphs; $i++) {
+        for ($i = count($aOut); $i < $iNumParagraphs; $i++) {
             $iLength = $aLengths[array_rand($aLengths)];
             $aOut[]  = $this->loremSentence($iLength);
         }
@@ -174,13 +175,14 @@ class Base
     /**
      * Generate some ranodm Lorem Ipsum paragraphs as HTML
      *
-     * @param int $iNumParagraphs The number of paragraphs to generate
+     * @param int    $iNumParagraphs  The number of paragraphs to generate
+     * @param string $sFirstParagraph The contents of the first paragraph
      *
      * @return string
      */
-    protected function loremHtml($iNumParagraphs = 3)
+    protected function loremHtml($iNumParagraphs = 3, string $sFirstParagraph = '')
     {
-        $sOut = $this->loremParagraph($iNumParagraphs);
+        $sOut = $this->loremParagraph($iNumParagraphs, $sFirstParagraph);
         return '<p>' . str_replace("\n\n", "</p>\n<p>", $sOut) . '</p>';
     }
 
