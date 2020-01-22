@@ -9,7 +9,7 @@ class Base
     /**
      * The database object
      *
-     * @var \Nails\Console\Database;
+     * @var \Nails\Console\Database
      */
     protected $oDb;
 

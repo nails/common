@@ -12,17 +12,30 @@ class DefaultSeed extends Base
 {
     /**
      * The number of items to create
+     *
+     * @var int
      */
     const CONFIG_NUM_PER_SEED = 20;
 
     /**
      * The model to bind this seeder to
+     *
+     * @var string
      */
     const CONFIG_MODEL_NAME     = '';
     const CONFIG_MODEL_PROVIDER = '';
 
     /**
+     * Defines the priority of the seeder, useful for ordering
+     *
+     * @var int
+     */
+    const CONFIG_PRIORITY = 0;
+
+    /**
      * Fields to explicitly ignore when generating
+     *
+     * @var array
      */
     const CONFIG_IGNORE_FIELDS = [
         'id',

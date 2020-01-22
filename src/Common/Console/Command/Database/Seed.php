@@ -2,6 +2,7 @@
 
 namespace Nails\Common\Console\Command\Database;
 
+use Nails\Common\Console\Seed\DefaultSeed;
 use Nails\Common\Helper\Directory;
 use Nails\Components;
 use Nails\Console\Command\Base;
@@ -59,16 +60,12 @@ class Seed extends Base
             $oOutput->writeln('');
             $aSeeders = $this->getSeeders();
             if (empty($aSeeders)) {
-                $oOutput->writeln('No seeders were discovered. Make one using <comment>make:db:seed</comment>'
-                );
+                $oOutput->writeln('No seeders were discovered. Make one using <comment>make:db:seed</comment>');
+                $oOutput->writeln('');
             } else {
                 $oOutput->writeln('The following seeders are available:');
-                $oOutput->writeln('');
-                foreach ($aSeeders as $oSeeder) {
-                    $oOutput->writeln(' - <comment>' . $oSeeder->component . ' [' . $oSeeder->class . ']</comment>');
-                }
+                $this->listSeeders($aSeeders);
             }
-            $oOutput->writeln('');
 
             return static::EXIT_CODE_SUCCESS;
         }
@@ -110,13 +107,13 @@ class Seed extends Base
             $aSeeders = $aSeedersAll;
         } elseif (!empty($sComponent) && empty($aClasses)) {
             foreach ($aSeedersAll as $oSeeder) {
-                if ($oSeeder->component === $sComponent) {
+                if ($oSeeder->component->slug === $sComponent) {
                     $aSeeders[] = $oSeeder;
                 }
             }
         } else {
             foreach ($aSeedersAll as $oSeeder) {
-                if ($oSeeder->component === $sComponent && in_array($oSeeder->class, $aClasses)) {
+                if ($oSeeder->component->slug === $sComponent && in_array($this->stripNamespace($oSeeder), $aClasses)) {
                     $aSeeders[] = $oSeeder;
                 }
             }
@@ -133,14 +130,7 @@ class Seed extends Base
 
         //  Get confirmation
         $oOutput->writeln('The following seeds will be executed in this order:');
-        $oOutput->writeln('');
-        foreach ($aSeeders as $oSeeder) {
-            //  Execute migration
-            $oOutput->writeln(
-                ' - <comment>' . $oSeeder->component . ' [' . $oSeeder->class . ']</comment>'
-            );
-        }
-        $oOutput->writeln('');
+        $this->listSeeders($aSeeders);
 
         $bDoSeed = $this->confirm('Does this look OK?', true);
 
@@ -152,22 +142,22 @@ class Seed extends Base
             $oDb = Factory::service('PDODatabase');
 
             foreach ($aSeeders as $oSeeder) {
-                //  Execute seed
+
                 $oOutput->write(
-                    str_pad(
-                        ' - <comment>' . $oSeeder->component . ' [' . $oSeeder->class . ']</comment>... ',
-                        50,
-                        ' '
-                    )
+                    str_pad($this->renderLine($oSeeder) . '... ', 50, ' ')
                 );
-                $sClassName = $oSeeder->namespace . 'Seed\\' . $oSeeder->class;
+
+                $sClassName = $oSeeder->class;
                 $oClass     = new $sClassName($oDb);
+
                 $oClass->pre();
                 $oClass->execute();
                 $oClass->post();
+
                 $oOutput->writeln('<info>done!</info>');
             }
             $oOutput->writeln('');
+
         } else {
             $oOutput->writeln('');
             $oOutput->writeln('No seeds were executed');
@@ -191,36 +181,66 @@ class Seed extends Base
 
     // --------------------------------------------------------------------------
 
-    protected function getSeeders()
+    /**
+     * Returns the discovered seeders
+     *
+     * @return \stdClass[]
+     */
+    protected function getSeeders(): array
     {
-        $aSeedClasses   = [];
-        $aAllComponents = Components::available();
+        $aSeedClasses = [];
+        foreach (Components::available() as $oComponent) {
 
-        foreach ($aAllComponents as $oComponent) {
-            $sPath  = $oComponent->path . 'src/Seed/';
-            $aSeeds = Directory::map($sPath, 1);
-            $aSeeds = array_map(
-                function ($sClass) {
-                    return basename($sClass, '.php');
-                },
-                $aSeeds
-            );
-
-            sort($aSeeds);
-
-            if (empty($aSeeds)) {
-                continue;
-            }
+            $aSeeds = $oComponent
+                ->findClasses('Seed')
+                ->whichExtend(DefaultSeed::class);
 
             foreach ($aSeeds as $sClass) {
                 $aSeedClasses[] = (object) [
-                    'component' => $oComponent->slug,
-                    'namespace' => $oComponent->namespace,
+                    'component' => $oComponent,
                     'class'     => $sClass,
+                    'priority'  => constant($sClass . '::CONFIG_PRIORITY'),
                 ];
             }
         }
 
+        arraySortMulti($aSeedClasses, 'priority');
+
         return $aSeedClasses;
+    }
+
+    // --------------------------------------------------------------------------
+
+    protected function listSeeders(array $aSeeders): void
+    {
+        $this->oOutput->writeln('');
+        foreach ($aSeeders as $oSeeder) {
+            $this->oOutput->writeln(
+                $this->renderLine($oSeeder)
+            );
+        }
+        $this->oOutput->writeln('');
+    }
+
+    // --------------------------------------------------------------------------
+
+    protected function renderLine($oSeeder): string
+    {
+        return sprintf(
+            ' - [<comment>%s</comment>] <info>%s</info>',
+            $oSeeder->component->slug,
+            $this->stripNamespace($oSeeder)
+        );
+    }
+
+    // --------------------------------------------------------------------------
+
+    protected function stripNamespace($oSeeder): string
+    {
+        return preg_replace(
+            '/^' . preg_quote($oSeeder->component->namespace . 'Seed\\', '/') . '/',
+            '',
+            $oSeeder->class
+        );
     }
 }
