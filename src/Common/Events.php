@@ -11,7 +11,7 @@
 
 namespace Nails\Common;
 
-use Nails\Common\Event\Listener\Locale;
+use Nails\Common\Event\Listener;
 use Nails\Common\Events\Base;
 use Nails\Common\Events\Subscription;
 use Nails\Factory;
@@ -34,6 +34,11 @@ class Events extends Base
      */
     const SYSTEM_SHUTDOWN = 'SYSTEM:SHUTDOWN';
 
+    /**
+     * Firing this event will rewrite app routes
+     */
+    const ROUTES_UPDATE = 'ROUTES:UPDATE';
+
     // --------------------------------------------------------------------------
 
     /**
@@ -44,7 +49,8 @@ class Events extends Base
     public function autoload(): array
     {
         return [
-            new Locale\Detect(),
+            new Listener\Locale\Detect(),
+            new Listener\Routes\Update(),
         ];
     }
 }

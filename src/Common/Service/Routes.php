@@ -26,18 +26,21 @@ class Routes
 
     /**
      * Whether the routes can be written
+     *
      * @var boolean
      */
     protected $bCanWriteRoutes;
 
     /**
      * The reason, if any, why routes cannot be written
+     *
      * @var string
      */
     public $sCantWriteReason;
 
     /**
      * The routes to write
+     *
      * @var array
      */
     protected $aRoutes;
@@ -74,13 +77,13 @@ class Routes
     /**
      * Update routes
      *
-     * @param  string          $sModule For which module to restrict the route update
-     * @param  OutputInterface $oOutput A Symfony OutputInterface to write logs to
+     * @param string          $sModule For which module to restrict the route update
+     * @param OutputInterface $oOutput A Symfony OutputInterface to write logs to
      *
      * @return boolean
      * @throws \Exception
      */
-    public function update($sModule = null, $oOutput = null)
+    public function update(string $sModule = null, OutputInterface $oOutput = null)
     {
         if (!$this->bCanWriteRoutes) {
             $this->setError($this->sCantWriteReason);
@@ -159,6 +162,7 @@ class Routes
 
     /**
      * Write the routes file
+     *
      * @return boolean
      */
     protected function writeFile()
@@ -216,6 +220,7 @@ class Routes
 
     /**
      * Determine whether or not the routes can be written
+     *
      * @return boolean
      */
     public function canWriteRoutes()

@@ -18,6 +18,8 @@ use Nails\Common\Events;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Service\DateTime;
+use Nails\Common\Service\Event;
+use Nails\Common\Service\Input;
 use Nails\Common\Service\Profiler;
 use Nails\Components;
 use Nails\Environment;
@@ -402,12 +404,21 @@ abstract class Base extends \MX_Controller
     protected function generateRoutes()
     {
         if (defined('NAILS_STARTUP_GENERATE_APP_ROUTES') && NAILS_STARTUP_GENERATE_APP_ROUTES) {
-            $oRoutesService = Factory::service('Routes');
-            if (!$oRoutesService->update()) {
-                throw new NailsException('Failed to generate routes_app.php. ' . $oRoutesService->lastError(), 500);
-            } else {
+            try {
+
+                /** @var Event $oEventService */
+                $oEventService = Factory::service('Event');
+                $oEventService->trigger(Events::ROUTES_UPDATE);
+
+                /** @var Input $oInput */
                 $oInput = Factory::service('Input');
                 redirect($oInput->server('REQUEST_URI'), 'auto', 307);
+
+            } catch (NailsException $e) {
+                throw new NailsException(
+                    'Failed to generate routes_app.php. ' . $e->getMessage(),
+                    500
+                );
             }
         }
     }

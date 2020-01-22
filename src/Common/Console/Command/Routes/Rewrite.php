@@ -2,7 +2,9 @@
 
 namespace Nails\Common\Console\Command\Routes;
 
+use Nails\Common\Events;
 use Nails\Common\Exception\NailsException;
+use Nails\Common\Service\Event;
 use Nails\Console\Command\Base;
 use Nails\Factory;
 use Symfony\Component\Console\Input\InputInterface;
@@ -37,12 +39,18 @@ class Rewrite extends Base
 
         $this->banner('Nails Routes Rewrite');
 
-        $oRoutesService = Factory::service('Routes');
-
         try {
-            if (!$oRoutesService->update(null, $oOutput)) {
-                throw new NailsException($oRoutesService->lastError());
-            }
+
+            /** @var Event $oEventService */
+            $oEventService = Factory::service('Event');
+            $oEventService->trigger(
+                Events::ROUTES_UPDATE,
+                'nails/common',
+                [null, $oOutput]
+            );
+
+            $this->data['success'] = 'Routes rewritten successfully.';
+
         } catch (\Exception $e) {
             $this->abort(
                 static::EXIT_CODE_FAILURE,
