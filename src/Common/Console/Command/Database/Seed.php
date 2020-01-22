@@ -216,6 +216,11 @@ class Seed extends Base
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Renders a styalized list of seeder class names
+     *
+     * @param \stdClass[] $aSeeders The seeders to render
+     */
     protected function listSeeders(array $aSeeders): void
     {
         $this->oOutput->writeln('');
@@ -229,6 +234,13 @@ class Seed extends Base
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Renders a single styalised line for a seeder
+     *
+     * @param \stdClass $oSeeder The seeder to rendered
+     *
+     * @return string
+     */
     protected function renderLine($oSeeder): string
     {
         return sprintf(
@@ -240,6 +252,13 @@ class Seed extends Base
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Returns the seeder's class anme without the namespace prefix
+     *
+     * @param \stdClass $oSeeder The seeder to render
+     *
+     * @return string
+     */
     protected function stripNamespace($oSeeder): string
     {
         return preg_replace(
