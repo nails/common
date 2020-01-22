@@ -49,8 +49,6 @@ class Rewrite extends Base
                 [null, $oOutput]
             );
 
-            $this->data['success'] = 'Routes rewritten successfully.';
-
         } catch (\Exception $e) {
             $this->abort(
                 static::EXIT_CODE_FAILURE,
