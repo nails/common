@@ -204,7 +204,12 @@ class Seed extends Base
             }
         }
 
-        arraySortMulti($aSeedClasses, 'priority');
+        //  Sort by priority, then class name
+        array_multisort(
+            array_column($aSeedClasses, 'priority'), SORT_ASC,
+            array_column($aSeedClasses, 'class'), SORT_ASC,
+            $aSeedClasses
+        );
 
         return $aSeedClasses;
     }
