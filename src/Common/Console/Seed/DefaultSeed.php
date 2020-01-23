@@ -30,7 +30,7 @@ class DefaultSeed extends Base
      *
      * @var int
      */
-    const CONFIG_PRIORITY = 0;
+    const CONFIG_PRIORITY = 100;
 
     /**
      * Fields to explicitly ignore when generating
