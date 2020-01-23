@@ -13,9 +13,15 @@
 namespace Nails\Common\Service;
 
 use Nails\Common\Exception\AssetException;
+use Nails\Common\Exception\NailsException;
 use Nails\Factory;
 use Nails\Functions;
 
+/**
+ * Class Asset
+ *
+ * @package Nails\Common\Service
+ */
 class Asset
 {
     protected $oCi;
@@ -82,9 +88,9 @@ class Asset
     /**
      * Loads an asset
      *
-     * @param  mixed  $mAssets        The asset to load, can be an array or a string
-     * @param  string $sAssetLocation The asset's location
-     * @param  string $sForceType     The asset's file type (e.g., JS or CSS)
+     * @param mixed  $mAssets        The asset to load, can be an array or a string
+     * @param string $sAssetLocation The asset's location
+     * @param string $sForceType     The asset's file type (e.g., JS or CSS)
      *
      * @return $this
      */
@@ -168,8 +174,8 @@ class Asset
     /**
      * Loads an asset supplied as a URL
      *
-     * @param  string $sAsset     The asset to load
-     * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string $sAsset     The asset to load
+     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
      * @return void
      */
@@ -196,8 +202,8 @@ class Asset
     /**
      * Loads an asset supplied as an absolute URL
      *
-     * @param  string $sAsset     The asset to load
-     * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string $sAsset     The asset to load
+     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
      * @return void
      */
@@ -224,8 +230,8 @@ class Asset
     /**
      * Loads an asset from the Nails asset module
      *
-     * @param  string $sAsset     The asset to load
-     * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string $sAsset     The asset to load
+     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
      * @return void
      */
@@ -252,8 +258,8 @@ class Asset
     /**
      * Loads a Bower asset from the NAils asset module's bower_components directory
      *
-     * @param  string $sAsset     The asset to load
-     * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string $sAsset     The asset to load
+     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
      * @return void
      */
@@ -280,8 +286,8 @@ class Asset
     /**
      * Loads a Nails package asset (as a relative url from NAILS_ASSETS_URL . 'packages/')
      *
-     * @param  string $sAsset     The asset to load
-     * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string $sAsset     The asset to load
+     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
      * @return void
      */
@@ -308,8 +314,8 @@ class Asset
     /**
      * Loads a Bower asset from the app's bower_components directory
      *
-     * @param  string $sAsset     The asset to load
-     * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string $sAsset     The asset to load
+     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
      * @return void
      */
@@ -336,8 +342,8 @@ class Asset
     /**
      * Loads an App package asset (as a relative url from 'packages/')
      *
-     * @param  string $sAsset     The asset to load
-     * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string $sAsset     The asset to load
+     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
      * @return void
      */
@@ -364,8 +370,8 @@ class Asset
     /**
      * Loads an asset from the app's asset directory
      *
-     * @param  string $sAsset     The asset to load
-     * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string $sAsset     The asset to load
+     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
      * @return void
      */
@@ -392,9 +398,9 @@ class Asset
     /**
      * Loads an asset from a module's asset directory
      *
-     * @param  string $sAsset     The asset to load
-     * @param  mixed  $mModule    The module to load from
-     * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string $sAsset     The asset to load
+     * @param mixed  $mModule    The module to load from
+     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
      * @return void
      */
@@ -440,9 +446,9 @@ class Asset
     /**
      * Unloads an asset
      *
-     * @param  mixed  $mAssets        The asset to unload, can be an array or a string
-     * @param  string $sAssetLocation The asset's location
-     * @param  string $sForceType     The asset's file type (e.g., JS or CSS)
+     * @param mixed  $mAssets        The asset to unload, can be an array or a string
+     * @param string $sAssetLocation The asset's location
+     * @param string $sForceType     The asset's file type (e.g., JS or CSS)
      *
      * @return object
      */
@@ -526,8 +532,8 @@ class Asset
     /**
      * Unloads an asset supplied as a URL
      *
-     * @param  string $sAsset     The asset to unload
-     * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string $sAsset     The asset to unload
+     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
      * @return void
      */
@@ -554,8 +560,8 @@ class Asset
     /**
      * Unloads an asset supplied as an absolute URL
      *
-     * @param  string $sAsset     The asset to unload
-     * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string $sAsset     The asset to unload
+     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
      * @return void
      */
@@ -582,8 +588,8 @@ class Asset
     /**
      * Unloads an asset from the Nails asset module
      *
-     * @param  string $sAsset     The asset to unload
-     * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string $sAsset     The asset to unload
+     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
      * @return void
      */
@@ -610,8 +616,8 @@ class Asset
     /**
      * Loads a Bower asset from the Nails asset module's bower_components directory
      *
-     * @param  string $sAsset     The asset to unload
-     * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string $sAsset     The asset to unload
+     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
      * @return void
      */
@@ -638,8 +644,8 @@ class Asset
     /**
      * Unloads a Nails package asset (as a relative url from NAILS_ASSETS_URL . 'packages/')
      *
-     * @param  string $sAsset     The asset to unload
-     * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string $sAsset     The asset to unload
+     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
      * @return void
      */
@@ -666,8 +672,8 @@ class Asset
     /**
      * Unloads a Bower asset from the app's bower_components directory
      *
-     * @param  string $sAsset     The asset to unload
-     * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string $sAsset     The asset to unload
+     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
      * @return void
      */
@@ -694,8 +700,8 @@ class Asset
     /**
      * Unloads an App package asset (as a relative url from 'packages/')
      *
-     * @param  string $sAsset     The asset to load
-     * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string $sAsset     The asset to load
+     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
      * @return void
      */
@@ -722,8 +728,8 @@ class Asset
     /**
      * Unloads an asset from the app's asset directory
      *
-     * @param  string $sAsset     The asset to unload
-     * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string $sAsset     The asset to unload
+     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
      * @return void
      */
@@ -750,8 +756,8 @@ class Asset
     /**
      * Unloads an asset from the app's asset directory
      *
-     * @param  string $sAsset     The asset to unload
-     * @param  string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string $sAsset     The asset to unload
+     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
      * @return void
      */
@@ -778,9 +784,9 @@ class Asset
     /**
      * Loads an inline asset
      *
-     * @param  string $sScript     The inline asset to load, wrap in script tags for JS, or style tags for CSS
-     * @param  string $sForceType  Force a particular type of asset (i.e. JS-INLINE or CSS-INLINE)
-     * @param  string $sJsLocation Where the inline JS should appear, accepts FOOTER or HEADER
+     * @param string|\Closure $sScript     The inline asset to load, wrap in script tags for JS, or style tags for CSS
+     * @param string          $sForceType  Force a particular type of asset (i.e. JS-INLINE or CSS-INLINE)
+     * @param string          $sJsLocation Where the inline JS should appear, accepts FOOTER or HEADER
      *
      * @return object
      */
@@ -796,6 +802,13 @@ class Asset
                 );
             }
 
+            if ($sScript instanceof \Closure && empty($sForceType)) {
+                throw new NailsException(
+                    'Type must be specified when passing a closure.'
+                );
+            }
+
+            $sHash = $sScript instanceof \Closure ? md5(uniqid('inline-closure-')) : md5($sScript);
             $sType = $this->determineType($sScript, $sForceType);
 
             switch ($sType) {
@@ -803,16 +816,16 @@ class Asset
                 case 'CSS-INLINE':
                 case 'CSS':
 
-                    $this->aCssInline['INLINE-CSS-' . md5($sScript)] = $sScript;
+                    $this->aCssInline['INLINE-CSS-' . $sHash] = $sScript;
                     break;
 
                 case 'JS-INLINE':
                 case 'JS':
 
                     if ($sJsLocation == 'FOOTER') {
-                        $this->aJsInlineFooter['INLINE-JS-' . md5($sScript)] = $sScript;
+                        $this->aJsInlineFooter['INLINE-JS-' . $sHash] = $sScript;
                     } else {
-                        $this->aJsInlineHeader['INLINE-JS-' . md5($sScript)] = $sScript;
+                        $this->aJsInlineHeader['INLINE-JS-' . $sHash] = $sScript;
                     }
                     break;
             }
@@ -826,9 +839,9 @@ class Asset
     /**
      * Unloads an inline asset
      *
-     * @param  string $sScript     The inline asset to load, wrap in script tags for JS, or style tags for CSS
-     * @param  string $sForceType  Force a particular type of asset (i.e. JS-INLINE or CSS-INLINE)
-     * @param  string $sJsLocation Where the inline JS should appear, accepts FOOTER or HEADER
+     * @param string $sScript     The inline asset to load, wrap in script tags for JS, or style tags for CSS
+     * @param string $sForceType  Force a particular type of asset (i.e. JS-INLINE or CSS-INLINE)
+     * @param string $sJsLocation Where the inline JS should appear, accepts FOOTER or HEADER
      *
      * @return void
      */
@@ -874,7 +887,7 @@ class Asset
     /**
      * Loads a set of assets
      *
-     * @param  string $sLibrary The library to load
+     * @param string $sLibrary The library to load
      *
      * @return object
      */
@@ -1041,8 +1054,8 @@ class Asset
     /**
      * Output the assets for HTML
      *
-     * @param  string  $sType   The type of asset to output
-     * @param  boolean $bOutput Whether to output to the browser or to return as a string
+     * @param string  $sType   The type of asset to output
+     * @param boolean $bOutput Whether to output to the browser or to return as a string
      *
      * @return string
      */
@@ -1078,7 +1091,11 @@ class Asset
 
             $aOut[] = '<style type="text/css">';
             foreach ($this->aCssInline as $sAsset) {
-                $aOut[] = preg_replace('/<\/?style.*?>/si', '', $sAsset);
+                if ($sAsset instanceof \Closure) {
+                    $aOut[] = $sAsset();
+                } else {
+                    $aOut[] = preg_replace('/<\/?style.*?>/si', '', $sAsset);
+                }
             }
             $aOut[] = '</style>';
         }
@@ -1089,7 +1106,11 @@ class Asset
         if (!empty($this->aJsInlineHeader) && ($sType == 'JS-INLINE-HEADER' || $sType == 'ALL')) {
             $aOut[] = '<script>';
             foreach ($this->aJsInlineHeader as $sAsset) {
-                $aOut[] = preg_replace('/<\/?script.*?>/si', '', $sAsset);
+                if ($sAsset instanceof \Closure) {
+                    $aOut[] = $sAsset();
+                } else {
+                    $aOut[] = preg_replace('/<\/?script.*?>/si', '', $sAsset);
+                }
             }
             $aOut[] = '</script>';
         }
@@ -1100,7 +1121,11 @@ class Asset
         if (!empty($this->aJsInlineFooter) && ($sType == 'JS-INLINE-FOOTER' || $sType == 'ALL')) {
             $aOut[] = '<script>';
             foreach ($this->aJsInlineFooter as $sAsset) {
-                $aOut[] = preg_replace('/<\/?script.*?>/si', '', $sAsset);
+                if ($sAsset instanceof \Closure) {
+                    $aOut[] = $sAsset();
+                } else {
+                    $aOut[] = preg_replace('/<\/?script.*?>/si', '', $sAsset);
+                }
             }
             $aOut[] = '</script>';
         }
@@ -1156,8 +1181,8 @@ class Asset
     /**
      * Determines the type of asset being loaded
      *
-     * @param  string $sAsset     The asset being loaded
-     * @param  string $sForceType Forces a particular type (accepts values CSS, JS, CSS-INLINE or JS-INLINE)
+     * @param string $sAsset     The asset being loaded
+     * @param string $sForceType Forces a particular type (accepts values CSS, JS, CSS-INLINE or JS-INLINE)
      *
      * @return string
      */
