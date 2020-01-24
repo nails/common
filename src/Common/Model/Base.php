@@ -1183,6 +1183,34 @@ abstract class Base
             return;
         }
 
+        // --------------------------------------------------------------------------
+
+        /**
+         * Extract any Expand and Expand\Group objects into the main expand property
+         * and compile them.
+         */
+        $aHelpers = Helper\Model\Expand::extractHelpers($aData);
+
+        if (empty($aData['expand'])) {
+            $aData['expand'] = [];
+        }
+
+        $aData['expand'] = array_merge($aData['expand'], $aHelpers);
+
+        $aHelpers = Helper\Model\Expand::extractHelpers($aData['expand']);
+
+        foreach ($aHelpers as $mTrigger) {
+            if ($mTrigger instanceof Helper\Model\Expand\Group) {
+                $aData['expand'] = array_merge($aData['expand'], $mTrigger->compile());
+            } elseif ($mTrigger instanceof Helper\Model\Expand) {
+                $aData['expand'][] = $mTrigger->compile();
+            }
+        }
+
+        $aData['expand'] = array_values($aData['expand']);
+
+        // --------------------------------------------------------------------------
+
         /**
          * Prepare the expand request; The developer can pass an array of triggers to expand, any of
          * those triggers may themselves be an array with options to pass to the model (e.g to expand
