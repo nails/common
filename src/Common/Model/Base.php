@@ -16,8 +16,7 @@ use Behat\Transliterator\Transliterator;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\ModelException;
 use Nails\Common\Factory\Model\Field;
-use Nails\Common\Helper\ArrayHelper;
-use Nails\Common\Helper\Form;
+use Nails\Common\Helper;
 use Nails\Common\Resource;
 use Nails\Common\Service\FormValidation;
 use Nails\Common\Service\Locale;
@@ -1091,8 +1090,8 @@ abstract class Base
                 $iPerPage = $aData['limit'];
             } elseif (is_array($aData['limit'])) {
                 //  Consider the first element to be the page number and the second the number of results
-                $iPage    = ArrayHelper::getFromArray(0, $aData['limit'], 0);
-                $iPerPage = ArrayHelper::getFromArray(1, $aData['limit']);
+                $iPage    = Helper\ArrayHelper::getFromArray(0, $aData['limit'], 0);
+                $iPerPage = Helper\ArrayHelper::getFromArray(1, $aData['limit']);
             }
         }
 
@@ -1201,8 +1200,8 @@ abstract class Base
                     $aTriggers[]             = $mTrigger;
                     $aTriggerData[$mTrigger] = [];
                 } elseif (is_array($mTrigger)) {
-                    $sArrayTrigger     = ArrayHelper::getFromArray(0, $mTrigger) ?: ArrayHelper::getFromArray('trigger', $mTrigger);
-                    $aArrayTriggerData = ArrayHelper::getFromArray(1, $mTrigger) ?: ArrayHelper::getFromArray('data', $mTrigger, []);
+                    $sArrayTrigger     = Helper\ArrayHelper::getFromArray(0, $mTrigger) ?: Helper\ArrayHelper::getFromArray('trigger', $mTrigger);
+                    $aArrayTriggerData = Helper\ArrayHelper::getFromArray(1, $mTrigger) ?: Helper\ArrayHelper::getFromArray('data', $mTrigger, []);
                     if (!empty($sArrayTrigger)) {
                         $aTriggers[]                  = $sArrayTrigger;
                         $aTriggerData[$sArrayTrigger] = $aArrayTriggerData;
@@ -1234,7 +1233,7 @@ abstract class Base
                 //  Merge any data defined with the expandable field with any custom data added by the expansion
                 $aMergedData = array_merge(
                     $oExpandableField->data,
-                    ArrayHelper::getFromArray($oExpandableField->trigger, $aTriggerData, [])
+                    Helper\ArrayHelper::getFromArray($oExpandableField->trigger, $aTriggerData, [])
                 );
 
                 if ($oExpandableField->type === static::EXPANDABLE_TYPE_SINGLE) {
@@ -1273,7 +1272,6 @@ abstract class Base
             }
         }
     }
-
 
     // --------------------------------------------------------------------------
 
@@ -2242,16 +2240,16 @@ abstract class Base
         $aFields = $this->describeFields();
         foreach ($aFields as $oField) {
             switch ($oField->type) {
-                case Form::FIELD_NUMBER:
+                case Helper\Form::FIELD_NUMBER:
                     $aIntegers[] = $oField->key;
                     break;
-                case Form::FIELD_BOOLEAN:
+                case Helper\Form::FIELD_BOOLEAN:
                     $aBools[] = $oField->key;
                     break;
-                case Form::FIELD_DATE:
+                case Helper\Form::FIELD_DATE:
                     $aDates[] = $oField->key;
                     break;
-                case Form::FIELD_DATETIME:
+                case Helper\Form::FIELD_DATETIME:
                     $aDateTimes[] = $oField->key;
                     break;
             }
@@ -2424,7 +2422,7 @@ abstract class Base
             'provider'    => $aOptions['provider'],
 
             //  Any data to pass to the getAll (every time)
-            'data'        => ArrayHelper::getFromArray('data', $aOptions, []),
+            'data'        => Helper\ArrayHelper::getFromArray('data', $aOptions, []),
 
             /**
              * The ID column to use; for EXPANDABLE_TYPE_SINGLE this is property of the
@@ -2434,7 +2432,7 @@ abstract class Base
             'id_column'   => $aOptions['id_column'],
 
             //  Whether the field is expanded by default
-            'auto_expand' => ArrayHelper::getFromArray('auto_expand', $aOptions, false),
+            'auto_expand' => Helper\ArrayHelper::getFromArray('auto_expand', $aOptions, false),
 
             //  Whether to automatically save expanded objects when the trigger is
             //  passed as a key to the create or update methods
@@ -2634,7 +2632,7 @@ abstract class Base
             $oTemp             = Factory::factory('ModelField');
             $oTemp->key        = 'locale';
             $oTemp->label      = 'Locale';
-            $oTemp->type       = Form::FIELD_DROPDOWN;
+            $oTemp->type       = Helper\Form::FIELD_DROPDOWN;
             $oTemp->allow_null = false;
             $oTemp->validation = [
                 FormValidation::RULE_REQUIRED,
@@ -2711,8 +2709,8 @@ abstract class Base
     {
         preg_match('/^(.*?)(\((.+?)\)(.*))?$/', $sType, $aMatches);
 
-        $sType       = ArrayHelper::getFromArray(1, $aMatches, 'text');
-        $sTypeConfig = trim(ArrayHelper::getFromArray(3, $aMatches));
+        $sType       = Helper\ArrayHelper::getFromArray(1, $aMatches, 'text');
+        $sTypeConfig = trim(Helper\ArrayHelper::getFromArray(3, $aMatches));
         $iLength     = is_numeric($sTypeConfig) ? (int) $sTypeConfig : null;
 
         switch ($sType) {
@@ -2724,7 +2722,7 @@ abstract class Base
             case 'mediumint':
             case 'bigint':
                 //  @todo (Pablo - 2019-11-28) - This is only number to match the form type, and could be misleading
-                $oField->type = Form::FIELD_NUMBER;
+                $oField->type = Helper\Form::FIELD_NUMBER;
                 break;
 
             /**
@@ -2734,34 +2732,34 @@ abstract class Base
             case 'tinyint':
             case 'bool':
             case 'boolean':
-                $oField->type = $iLength == 1 ? Form::FIELD_BOOLEAN : Form::FIELD_NUMBER;
+                $oField->type = $iLength == 1 ? Helper\Form::FIELD_BOOLEAN : Helper\Form::FIELD_NUMBER;
                 break;
 
             /**
              * String
              */
             case 'varchar':
-                $oField->type       = Form::FIELD_TEXT;
+                $oField->type       = Helper\Form::FIELD_TEXT;
                 $oField->max_length = $iLength ?: null;
                 break;
             case 'tinytext':
             case 'text':
             case 'mediumtext':
             case 'longtext':
-                $oField->type = Form::FIELD_TEXTAREA;
+                $oField->type = Helper\Form::FIELD_TEXTAREA;
                 break;
 
             /**
              * Date and time
              */
             case 'date':
-                $oField->type = Form::FIELD_DATE;
+                $oField->type = Helper\Form::FIELD_DATE;
                 break;
             case 'datetime':
-                $oField->type = Form::FIELD_DATETIME;
+                $oField->type = Helper\Form::FIELD_DATETIME;
                 break;
             case 'time':
-                $oField->type = Form::FIELD_TIME;
+                $oField->type = Helper\Form::FIELD_TIME;
                 break;
 
             /**
@@ -2770,9 +2768,9 @@ abstract class Base
             case 'enum':
             case 'set':
                 if ($sType === 'enum') {
-                    $oField->type = Form::FIELD_DROPDOWN;
+                    $oField->type = Helper\Form::FIELD_DROPDOWN;
                 } else {
-                    $oField->type = Form::FIELD_DROPDOWN_MULTIPLE;
+                    $oField->type = Helper\Form::FIELD_DROPDOWN_MULTIPLE;
                     $oField->key  .= '[]';
                 }
                 $oField->class   = 'select2';
@@ -2784,7 +2782,7 @@ abstract class Base
              * Default to basic string
              */
             default:
-                $oField->type       = Form::FIELD_TEXT;
+                $oField->type       = Helper\Form::FIELD_TEXT;
                 $oField->max_length = $iLength ?: null;
                 break;
         }
@@ -2802,9 +2800,9 @@ abstract class Base
     {
         preg_match('/^(.*?)(\((.+?)\)(.*))?$/', $sType, $aMatches);
 
-        $sType   = ArrayHelper::getFromArray(1, $aMatches, 'text');
-        $iLength = ArrayHelper::getFromArray(3, $aMatches);
-        $sExtra  = trim(strtolower(ArrayHelper::getFromArray(4, $aMatches)));
+        $sType   = Helper\ArrayHelper::getFromArray(1, $aMatches, 'text');
+        $iLength = Helper\ArrayHelper::getFromArray(3, $aMatches);
+        $sExtra  = trim(strtolower(Helper\ArrayHelper::getFromArray(4, $aMatches)));
 
         switch ($sType) {
 
