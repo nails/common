@@ -12,6 +12,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Class Migrate
+ *
+ * @package Nails\Common\Console\Command\Database
+ */
 class Migrate extends Base
 {
     const VALID_MIGRATION_PATTERN           = '/^(\d+)(.*)\.php$/';

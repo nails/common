@@ -13,6 +13,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Class Seed
+ *
+ * @package Nails\Common\Console\Command\Database
+ */
 class Seed extends Base
 {
     /**
@@ -118,7 +123,19 @@ class Seed extends Base
             if ($oInput->getOption('fresh')) {
                 $oOutput->writeln('');
                 $oOutput->write('Rebuilding database... ');
-                if ($this->callCommand('db:rebuild', [], false, true) !== static::EXIT_CODE_SUCCESS) {
+
+                $iExitCode = $this->callCommand(
+                    'db:rebuild',
+                    array_filter([
+                        '-v'   => $oOutput->getVerbosity() === $oOutput::VERBOSITY_VERBOSE,
+                        '-vv'  => $oOutput->getVerbosity() === $oOutput::VERBOSITY_VERY_VERBOSE,
+                        '-vvv' => $oOutput->getVerbosity() === $oOutput::VERBOSITY_DEBUG,
+                    ]),
+                    false,
+                    $oOutput->getVerbosity() <= $oOutput::VERBOSITY_NORMAL
+                );
+
+                if ($iExitCode !== static::EXIT_CODE_SUCCESS) {
                     return $this->abort(
                         static::EXIT_CODE_FAILURE,
                         ['Failed to reset database.']

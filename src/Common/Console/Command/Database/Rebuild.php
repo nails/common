@@ -9,6 +9,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Class Rebuild
+ *
+ * @package Nails\Common\Console\Command\Database
+ */
 class Rebuild extends Base
 {
     /**
@@ -51,11 +56,11 @@ class Rebuild extends Base
     /**
      * Executes the app
      *
-     * @param  InputInterface  $oInput  The Input Interface provided by Symfony
-     * @param  OutputInterface $oOutput The Output Interface provided by Symfony
+     * @param InputInterface  $oInput  The Input Interface provided by Symfony
+     * @param OutputInterface $oOutput The Output Interface provided by Symfony
      *
-     * @throws \Exception
      * @return int
+     * @throws \Exception
      */
     protected function execute(InputInterface $oInput, OutputInterface $oOutput)
     {
@@ -124,14 +129,17 @@ class Rebuild extends Base
             $oOutput->write('Migrating database... ');
             $iExitCode = $this->callCommand(
                 'db:migrate',
-                [
+                array_filter([
                     '--dbHost' => $sDbHost,
                     '--dbUser' => $sDbUser,
                     '--dbPass' => $sDbPass,
                     '--dbName' => $sDbName,
-                ],
+                    '-v'       => $oOutput->getVerbosity() === $oOutput::VERBOSITY_VERBOSE,
+                    '-vv'      => $oOutput->getVerbosity() === $oOutput::VERBOSITY_VERY_VERBOSE,
+                    '-vvv'     => $oOutput->getVerbosity() === $oOutput::VERBOSITY_DEBUG,
+                ]),
                 false,
-                true
+                $oOutput->getVerbosity() <= $oOutput::VERBOSITY_NORMAL
             );
 
             if ($iExitCode == static::EXIT_CODE_SUCCESS) {
