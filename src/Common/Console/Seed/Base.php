@@ -200,7 +200,7 @@ class Base
     protected function randomId($sModel, $sProvider, $aData = [])
     {
         $oModel   = Factory::model($sModel, $sProvider);
-        $aResults = $oModel->getAll(0, 1, $aData + ['sort' => [['id', 'random']]]);
+        $aResults = $oModel->getRandom($aData);
         $oRow     = reset($aResults);
 
         return $oRow ? $oRow->id : null;
