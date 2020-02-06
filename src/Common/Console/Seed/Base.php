@@ -422,8 +422,32 @@ class Base
      *
      * @return string
      */
-    protected function email($sDomain = 'example.com')
+    protected function email($sDomain = 'example.com'): string
     {
-        return str_replace(' ', '-', $this->loremWord(3)) . '@' . $sDomain;
+        return sprintf(
+            '%s@%s',
+            str_replace(' ', '-', $this->loremWord(3)),
+            $sDomain
+        );
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Generates a random URL
+     *
+     * @param string $sProtocol The protocol to use
+     * @param string $sTld      The TLD to use
+     *
+     * @return string
+     */
+    protected function url($sProtocol = 'https', $sTld = '.com'): string
+    {
+        return sprintf(
+            '%s://%s%s',
+            $sProtocol,
+            url_title($this->loremWord(2)),
+            $sTld
+        );
     }
 }
