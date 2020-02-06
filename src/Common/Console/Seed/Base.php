@@ -317,6 +317,41 @@ class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Generates a random timestamp
+     *
+     * @param int    $iLowHour  The low value for the hour
+     * @param int    $iHighHour The high value for the hour
+     * @param int    $iLowMin   The low value for the minute
+     * @param int    $iHighMin  The high value for the minute
+     * @param bool   $bPadHour  Whether to pad the hour segment with $sPad
+     * @param bool   $bPadMin   Whether to pad the minute segment with $sPad
+     * @param string $sPad      The padding string to use
+     *
+     * @return string
+     */
+    protected function randomTime(
+        int $iLowHour = 0,
+        int $iHighHour = 23,
+        int $iLowMin = 0,
+        int $iHighMin = 59,
+        bool $bPadHour = true,
+        bool $bPadMin = true,
+        string $sPad = '0'
+    ): string {
+
+        $iHour = rand($iLowHour, $iHighHour);
+        $iMin  = rand($iLowMin, $iHighMin);
+
+        return sprintf(
+            '%s:%s',
+            $bPadHour ? str_pad($iHour, 2, $sPad, STR_PAD_LEFT) : $iHour,
+            $bPadMin ? str_pad($iMin, 2, $sPad, STR_PAD_LEFT) : $iMin,
+        );
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Return a random integer
      *
      * @param integer $iLow  The lowest possible value to return
