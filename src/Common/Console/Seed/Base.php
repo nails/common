@@ -345,7 +345,7 @@ class Base
         return sprintf(
             '%s:%s',
             $bPadHour ? str_pad($iHour, 2, $sPad, STR_PAD_LEFT) : $iHour,
-            $bPadMin ? str_pad($iMin, 2, $sPad, STR_PAD_LEFT) : $iMin,
+            $bPadMin ? str_pad($iMin, 2, $sPad, STR_PAD_LEFT) : $iMin
         );
     }
 
