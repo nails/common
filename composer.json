@@ -49,6 +49,9 @@
     "require-dev": {
         "phpunit/phpunit": "8.*"
     },
+    "scripts": {
+        "test": "./vendor/bin/phpunit"
+    },
     "autoload": {
         "psr-4": {
             "Nails\\": "src/",

@@ -10,6 +10,7 @@
  * @link
  */
 
+use Nails\Common\Helper\Date;
 use Nails\Factory;
 
 if (!function_exists('convertDateTime')) {
@@ -404,6 +405,15 @@ if (!function_exists('datepicker')) {
         $sOut .= dropdownMinutes($sFieldName . '_minute');
 
         return $sOut;
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('dateAddPeriod')) {
+    function dateAddPeriod(\DateTime $oStart, string $sPeriod, int $iNum): DateTime
+    {
+        return Date::addPeriod($oStart, $sPeriod, $iNum);
     }
 }
 
