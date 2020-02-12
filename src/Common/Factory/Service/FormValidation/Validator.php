@@ -173,11 +173,13 @@ class Validator
      *
      * @throws ValidationException
      * @throws FactoryException
+     *
+     * @return $this
      */
-    public function run(array $aData = null)
+    public function run(array $aData = null): Validator
     {
         if (empty($this->getRules())) {
-            return;
+            return $this;
         } elseif ($aData !== null) {
             $this->setData($aData);
         }
@@ -236,6 +238,8 @@ class Validator
             $oException->setData($this->getErrors());
             throw $oException;
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
