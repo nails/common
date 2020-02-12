@@ -50,10 +50,13 @@ class NailsException extends \Exception
      * Set exception data
      *
      * @param array $aData Any data you'd like to pass into the exception
+     *
+     * @return $this
      */
-    public function setData(array $aData)
+    public function setData(array $aData): NailsException
     {
         $this->aData = $aData;
+        return $this;
     }
 
     // --------------------------------------------------------------------------
