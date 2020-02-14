@@ -12,6 +12,7 @@
 
 namespace Nails\Common\Helper;
 
+use InvalidArgumentException;
 use Nails\Common\Exception\NailsException;
 
 /**
@@ -103,8 +104,32 @@ class ArrayHelper
             $oA = (object) $a;
             $oB = (object) $b;
 
-            $mA = property_exists($oA, $sField) ? strtolower($oA->$sField) : null;
-            $mB = property_exists($oB, $sField) ? strtolower($oB->$sField) : null;
+            if (strpos($sField, '.') !== false) {
+
+                //  Check validity of variable name
+                $aKey = array_map(
+                    function ($sKey) {
+                        if (preg_match('/[^a-zA-Z0-9_\-]/', $sKey)) {
+                            throw new InvalidArgumentException(
+                                sprintf(
+                                    '"%s" contains invalid characters',
+                                    $sKey
+                                )
+                            );
+                        }
+                        return $sKey;
+                    },
+                    explode('.', $sField)
+                );
+
+                $sKey = implode('->', $aKey);
+                $mA   = strtolower(eval('return $oA->' . $sKey . ' ?? null;'));
+                $mB   = strtolower(eval('return $oB->' . $sKey . ' ?? null;'));
+
+            } else {
+                $mA = property_exists($oA, $sField) ? strtolower($oA->$sField) : null;
+                $mB = property_exists($oB, $sField) ? strtolower($oB->$sField) : null;
+            }
 
             //  Equal?
             if ($mA == $mB) {
