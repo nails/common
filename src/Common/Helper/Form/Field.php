@@ -235,13 +235,13 @@ EOT;
             'html'        => ArrayHelper::getFromArray('html', $aField, ''),
         ];
 
-        if (is_array($oField->tip)) {
+        if (is_array($oField->tip) && !empty($oField->tip['title'])) {
             $oTip = (object) [
                 'class' => ArrayHelper::getFromArray('class', $oField->tip, 'fa fa-question-circle fa-lg tip'),
                 'rel'   => ArrayHelper::getFromArray('rel', $oField->tip, 'tipsy-left'),
                 'title' => ArrayHelper::getFromArray('title', $oField->tip, null),
             ];
-        } elseif (is_string($oField->tip)) {
+        } elseif (is_string($oField->tip) && !empty($oField->tip)) {
             $oTip = (object) [
                 'class' => 'fa fa-question-circle fa-lg tip',
                 'rel'   => 'tipsy-left',
