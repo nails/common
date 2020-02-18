@@ -63,7 +63,7 @@ abstract class Base
      *
      * @return mixed
      */
-    protected function getSetting($sProperty = null)
+    public function getSetting($sProperty = null)
     {
         if (property_exists($this->oSettings, $sProperty)) {
             return $this->oSettings->{$sProperty};
