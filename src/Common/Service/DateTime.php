@@ -12,6 +12,7 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Common\Resource\Date;
 use Nails\Factory;
 
 /**
@@ -882,6 +883,10 @@ class DateTime
         } elseif ($mTimestamp instanceof \DateTime) {
 
             $oDateTime = $mTimestamp;
+
+        } elseif ($mTimestamp instanceof Date) {
+
+            $oDateTime = $mTimestamp->getDateTimeObject();
 
         } elseif (!empty($mTimestamp) && $mTimestamp !== '0000-00-00' && $mTimestamp !== '0000-00-00 00:00:00') {
 
