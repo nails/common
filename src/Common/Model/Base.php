@@ -1193,7 +1193,9 @@ abstract class Base
 
         if (empty($aData['expand'])) {
             $aData['expand'] = [];
-        } elseif ($aData['expand'] !== static::EXPAND_ALL) {
+        }
+
+        if ($aData['expand'] !== static::EXPAND_ALL) {
 
             $aData['expand'] = array_merge($aData['expand'], $aHelpers);
 
