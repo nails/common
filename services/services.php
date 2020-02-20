@@ -65,6 +65,13 @@ return [
                 return new Service\Cookie();
             }
         },
+        'Country'                        => function (): Service\Country {
+            if (class_exists('\App\Common\Service\Country')) {
+                return new \App\Common\Service\Country();
+            } else {
+                return new Service\Country();
+            }
+        },
         'Database'                       => function (): Service\Database {
             if (class_exists('\App\Common\Service\Database')) {
                 return new \App\Common\Service\Database();
@@ -459,49 +466,70 @@ return [
     ],
 
     'resources' => [
-        'Cookie'          => function ($oObj): Resource\Cookie {
+        'Cookie'           => function ($oObj): Resource\Cookie {
             if (class_exists('\App\Common\Resource\Cookie')) {
                 return new \App\Common\Resource\Cookie($oObj);
             } else {
                 return new Resource\Cookie($oObj);
             }
         },
-        'Date'            => function ($oObj): Resource\Date {
+        'Country'          => function ($oObj): Resource\Country {
+            if (class_exists('\App\Common\Resource\Country')) {
+                return new \App\Common\Resource\Country($oObj);
+            } else {
+                return new Resource\Country($oObj);
+            }
+        },
+        'CountryContinent' => function ($oObj): Resource\Country\Continent {
+            if (class_exists('\App\Common\Resource\Country\Continent')) {
+                return new \App\Common\Resource\Country\Continent($oObj);
+            } else {
+                return new Resource\Country\Continent($oObj);
+            }
+        },
+        'CountryLanguage'  => function ($oObj): Resource\Country\Language {
+            if (class_exists('\App\Common\Resource\Country\Language')) {
+                return new \App\Common\Resource\Country\Language($oObj);
+            } else {
+                return new Resource\Country\Language($oObj);
+            }
+        },
+        'Date'             => function ($oObj): Resource\Date {
             if (class_exists('\App\Common\Resource\Date')) {
                 return new \App\Common\Resource\Date($oObj);
             } else {
                 return new Resource\Date($oObj);
             }
         },
-        'DateTime'        => function ($oObj): Resource\DateTime {
+        'DateTime'         => function ($oObj): Resource\DateTime {
             if (class_exists('\App\Common\Resource\DateTime')) {
                 return new \App\Common\Resource\DateTime($oObj);
             } else {
                 return new Resource\DateTime($oObj);
             }
         },
-        'ExpandableField' => function (): Resource\ExpandableField {
+        'ExpandableField'  => function (): Resource\ExpandableField {
             if (class_exists('\App\Common\Resource\ExpandableField')) {
                 return new \App\Common\Resource\ExpandableField();
             } else {
                 return new Resource\ExpandableField();
             }
         },
-        'FileCacheItem'   => function ($oObj): Resource\FileCache\Item {
+        'FileCacheItem'    => function ($oObj): Resource\FileCache\Item {
             if (class_exists('\App\Common\Resource\FileCache\Item')) {
                 return new \App\Common\Resource\FileCache\Item($oObj);
             } else {
                 return new Resource\FileCache\Item($oObj);
             }
         },
-        'Resource'        => function ($oObj): Resource {
+        'Resource'         => function ($oObj): Resource {
             if (class_exists('\App\Common\Resource')) {
                 return new \App\Common\Resource($oObj);
             } else {
                 return new Resource($oObj);
             }
         },
-        'Entity'          => function ($oObj): Resource\Entity {
+        'Entity'           => function ($oObj): Resource\Entity {
             if (class_exists('\App\Common\Resource\Entity')) {
                 return new \App\Common\Resource\Entity($oObj);
             } else {
