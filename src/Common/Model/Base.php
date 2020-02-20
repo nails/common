@@ -1193,21 +1193,22 @@ abstract class Base
 
         if (empty($aData['expand'])) {
             $aData['expand'] = [];
-        }
+        } elseif ($aData['expand'] !== static::EXPAND_ALL) {
 
-        $aData['expand'] = array_merge($aData['expand'], $aHelpers);
+            $aData['expand'] = array_merge($aData['expand'], $aHelpers);
 
-        $aHelpers = Helper\Model\Expand::extractHelpers($aData['expand']);
+            $aHelpers = Helper\Model\Expand::extractHelpers($aData['expand']);
 
-        foreach ($aHelpers as $mTrigger) {
-            if ($mTrigger instanceof Helper\Model\Expand\Group) {
-                $aData['expand'] = array_merge($aData['expand'], $mTrigger->compile());
-            } elseif ($mTrigger instanceof Helper\Model\Expand) {
-                $aData['expand'][] = $mTrigger->compile();
+            foreach ($aHelpers as $mTrigger) {
+                if ($mTrigger instanceof Helper\Model\Expand\Group) {
+                    $aData['expand'] = array_merge($aData['expand'], $mTrigger->compile());
+                } elseif ($mTrigger instanceof Helper\Model\Expand) {
+                    $aData['expand'][] = $mTrigger->compile();
+                }
             }
-        }
 
-        $aData['expand'] = array_values($aData['expand']);
+            $aData['expand'] = array_values($aData['expand']);
+        }
 
         // --------------------------------------------------------------------------
 
