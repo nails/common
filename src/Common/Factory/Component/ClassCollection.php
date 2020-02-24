@@ -21,16 +21,16 @@ use Nails\Common\Helper\Tools;
  *
  * @package Nails\Common\Factory\Component
  */
-final class ClassCollection extends Collection
+class ClassCollection extends Collection
 {
     /**
      * Adds a new item to the collection
      *
-     * @param mixed $mItem
+     * @param mixed $mItem The item to add to the collection
      *
      * @return $this
      */
-    public function add($mItem): self
+    public function add($mItem): Collection
     {
         if (class_exists($mItem)) {
             parent::add($mItem);
