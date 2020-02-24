@@ -536,5 +536,12 @@ return [
                 return new Resource\Entity($oObj);
             }
         },
+        'MetaData'         => function ($oObj = []): Resource\MetaData {
+            if (class_exists('\App\Common\Resource\MetaData')) {
+                return new \App\Common\Resource\MetaData($oObj);
+            } else {
+                return new Resource\MetaData($oObj);
+            }
+        },
     ],
 ];
