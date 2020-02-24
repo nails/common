@@ -15,6 +15,9 @@ use Nails\Functions;
 use Nails\Common\Helper\ArrayHelper;
 
 if (!function_exists('getControllerData')) {
+    /**
+     * @deprecated
+     */
     function &getControllerData()
     {
         return Bootstrap::getControllerData();
@@ -22,6 +25,9 @@ if (!function_exists('getControllerData')) {
 }
 
 if (!function_exists('setControllerData')) {
+    /**
+     * @deprecated
+     */
     function setControllerData($sKey, $mValue)
     {
         Bootstrap::setControllerData($sKey, $mValue);

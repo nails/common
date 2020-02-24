@@ -44,6 +44,7 @@ final class Bootstrap
      *
      * @todo (Pablo - 2018-11-15) - Rework this approach
      * @var array
+     * @deprecated
      */
     public static $aNailsControllerData = [];
 
@@ -603,6 +604,7 @@ final class Bootstrap
      * this function provides an easy interface to this array when it's not in scope.
      *
      * @return array
+     * @deprecated
      **/
     public static function &getControllerData()
     {
@@ -620,6 +622,7 @@ final class Bootstrap
      * @param mixed  $mValue The value to assign
      *
      * @return  void
+     * @deprecated
      **/
     public static function setControllerData($sKey, $mValue)
     {
