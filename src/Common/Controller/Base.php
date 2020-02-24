@@ -17,6 +17,8 @@ use Nails\Auth;
 use Nails\Common\Events;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
+use Nails\Common\Factory\Locale;
+use Nails\Common\Resource\MetaData;
 use Nails\Common\Service\DateTime;
 use Nails\Common\Service\Event;
 use Nails\Common\Service\Input;
@@ -33,9 +35,29 @@ use Nails\Functions;
  */
 abstract class Base extends \MX_Controller
 {
+    /**
+     * The page's locale
+     *
+     * @var Locale
+     */
+    protected $oLocale;
+
+    /**
+     * The page's meta data
+     *
+     * @var MetaData
+     */
+    protected $oMetaData;
+
+    /**
+     *  Items passed to here will be automatically passed to
+     * the View when rendered. Deprecated: pass explicitly using the View service's
+     * setData method.
+     *
+     * @var array
+     * @deprecated
+     */
     protected $data;
-    protected $user;
-    protected $log;
 
     // --------------------------------------------------------------------------
 
@@ -65,9 +87,16 @@ abstract class Base extends \MX_Controller
         // --------------------------------------------------------------------------
 
         //  Populate some standard fields
-        $this->data =& getControllerData();
+        $this->oLocale   = Factory::service('Locale');
+        $this->oMetaData = Factory::resource('MetaData');
+        $this->oMetaData->setLocale($this->oLocale->get());
+
+        //  @todo (Pablo - 2020-02-24) - Remove this/backwards compatability
+        $this->data              =& getControllerData();
+        $this->data['oMetaData'] = $this->oMetaData;
+        $this->data['page']      = $this->oMetaData;
+
         static::populateUserFeedback($this->data);
-        static::populatePageData($this->data);
 
         // --------------------------------------------------------------------------
 
@@ -591,28 +620,6 @@ abstract class Base extends \MX_Controller
         //  @deprecated
         $aData['message'] = $oUserFeedback->get('message') ?: $oSession->getFlashData('message');
         $aData['notice']  = $oUserFeedback->get('notice') ?: $oSession->getFlashData('notice');
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Populates an array with a default object for page and SEO
-     *
-     * @param array $aData The array to populate
-     */
-    public static function populatePageData(array &$aData)
-    {
-        /** @var Locale $oLocale */
-        $oLocale       = Factory::service('Locale');
-        $aData['page'] = (object) [
-            'title'     => '',
-            'html_lang' => $oLocale->get()->getLanguage(),
-            'seo'       => (object) [
-                'title'       => '',
-                'description' => '',
-                'keywords'    => '',
-            ],
-        ];
     }
 
     // --------------------------------------------------------------------------

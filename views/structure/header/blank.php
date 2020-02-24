@@ -1,64 +1,44 @@
 <?php
 
 use Nails\Factory;
+use Nails\Service;
 
-$aPageTitle = [];
-if (!empty($page->seo->title)) {
-    $aPageTitle[] = $page->seo->title;
-} elseif (!empty($page->title)) {
-    $aPageTitle[] = $page->title;
-}
+/**
+ * @var \Nails\Common\Resource\MetaData $oMetaData
+ */
 
-$aPageTitle[] = APP_NAME;
-
-if (!empty($page->html_lang)) {
-    $sHtmlLang = $page->html_lang;
-} else {
-    $sHtmlLang = 'en';
-}
-
-if (!empty($page->html_class) && is_array($page->html_class)) {
-    $aHtmlClass = $page->html_class;
-} elseif (!empty($page->html_class)) {
-    $aHtmlClass = [$page->html_class];
-} else {
-    $aHtmlClass = [];
-}
-
-if (!empty($page->body_class) && is_array($page->body_class)) {
-    $aBodyClass = $page->body_class;
-} elseif (!empty($page->body_class)) {
-    $aBodyClass = [$page->body_class];
-} else {
-    $aBodyClass = [];
-}
+$sHtmlLang    = $oMetaData->getLocale()->getLanguage()->getLabel();
+$sHtmlClasses = $oMetaData->getHtmlClasses()->implode();
+$sBodyClasses = $oMetaData->getBodyClasses()->implode();
 
 ?>
 <!DOCTYPE html>
 <!--[if IE 8 ]>
-<html class="ie ie8 <?=implode(' ', $aHtmlClass)?>" lang="<?=$sHtmlLang?>>"> <![endif]-->
+<html class="ie ie8 <?=$sHtmlClasses?>" lang="<?=$sHtmlLang?>>"> <![endif]-->
 <!--[if (gte IE 9)|!(IE)]><!-->
-<html class="<?=implode(' ', $aHtmlClass)?>" lang="<?=$sHtmlLang?>"> <!--<![endif]-->
+<html class="<?=$sHtmlClasses?>" lang="<?=$sHtmlLang?>"> <!--<![endif]-->
     <head>
         <?php
 
         echo '<title>';
-        echo implode(' - ', $aPageTitle);
+        echo $oMetaData->getTitles()->implode();
         echo '</title>';
 
         // --------------------------------------------------------------------------
 
         //  Meta tags
-        $oMeta = Factory::service('Meta');
-        echo $oMeta->outputStr();
+        /** @var Service\Meta $oMetaService */
+        $oMetaService = Factory::service('Meta');
+        echo $oMetaService->outputStr();
 
         // --------------------------------------------------------------------------
 
         //  Assets
-        $oAsset = Factory::service('Asset');
-        $oAsset->output('CSS');
-        $oAsset->output('CSS-INLINE');
-        $oAsset->output('JS-INLINE-HEADER');
+        /** @var Service\Asset $oAssetService */
+        $oAssetService = Factory::service('Asset');
+        $oAssetService->output('CSS');
+        $oAssetService->output('CSS-INLINE');
+        $oAssetService->output('JS-INLINE-HEADER');
 
         ?>
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -68,4 +48,4 @@ if (!empty($page->body_class) && is_array($page->body_class)) {
         <script src="<?=NAILS_ASSETS_URL . 'bower_components/respond/dest/respond.min.js'?>"></script>
         <![endif]-->
     </head>
-    <body class="<?=implode(' ', $aBodyClass)?>">
+    <body class="<?=$sBodyClasses?>">
