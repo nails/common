@@ -1,7 +1,7 @@
 <?php
 
 use Nails\Factory;
-use Nails\Service;
+use Nails\Common\Service;
 
 /**
  * @var \Nails\Common\Resource\MetaData $oMetaData
