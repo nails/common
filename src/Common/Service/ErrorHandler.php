@@ -334,14 +334,16 @@ class ErrorHandler
      * @param string $sFlashMessage The flash message to display to the user
      * @param string $sReturnUrl    The URL to return to after logging in
      * @param bool   $bLogError     Whether to log the error or not
+     * @param bool   $bForceView    Force the view to render (ratehr than redirect to login)
      */
     public function show401(
         string $sFlashMessage = null,
         string $sReturnUrl = null,
-        bool $bLogError = true
+        bool $bLogError = true,
+        bool $bForceView = false
     ): void {
 
-        if (function_exists('isLoggedIn') && isLoggedIn()) {
+        if ($bForceView || (function_exists('isLoggedIn') && isLoggedIn())) {
 
             if ($bLogError) {
                 $sPage = ArrayHelper::getFromArray('REQUEST_URI', $_SERVER);

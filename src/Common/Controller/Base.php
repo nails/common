@@ -270,7 +270,7 @@ abstract class Base extends \MX_Controller
      *
      * @return void
      */
-    protected function passwordProtected()
+    protected function passwordProtected(): void
     {
         /**
          * To password protect an environment you must create a constant which is
@@ -304,7 +304,6 @@ abstract class Base extends \MX_Controller
                 $bWhitelisted    = isIpInRange($oInput->ipAddress(), $aWhitelsitedIps);
 
             } else {
-
                 $bWhitelisted = false;
             }
 
@@ -326,7 +325,6 @@ abstract class Base extends \MX_Controller
                     }
 
                 } else {
-
                     $this->passwordProtectedRequest();
                 }
             }
@@ -340,14 +338,13 @@ abstract class Base extends \MX_Controller
      *
      * @return void
      */
-    protected function passwordProtectedRequest()
+    protected function passwordProtectedRequest(): void
     {
         $oInput = Factory::service('Input');
         header('WWW-Authenticate: Basic realm="' . APP_NAME . ' - Restricted Area"');
         header($oInput->server('SERVER_PROTOCOL') . ' 401 Unauthorized');
         $oErrorHandler = Factory::service('ErrorHandler');
-        $oErrorHandler->renderErrorView(401);
-        exit(401);
+        $oErrorHandler->show401(null, null, true, true);
     }
 
     // --------------------------------------------------------------------------
