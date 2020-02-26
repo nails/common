@@ -2,9 +2,10 @@
 
 namespace Nails\Common\Service;
 
-use MimeType\MimeType;
 use MimeTyper\Repository\MimeDbRepository;
 use Nails\Common\Helper\ArrayHelper;
+use Symfony\Component\Mime\MimeTypes;
+use Symfony\Component\Mime\MimeTypesInterface;
 
 /**
  * Class Mime
@@ -39,7 +40,7 @@ class Mime
     /**
      * The mime detector
      *
-     * @var MimeType
+     * @var MimeTypesInterface
      */
     protected $oDetector;
 
@@ -62,12 +63,12 @@ class Mime
     /**
      * Mime constructor.
      *
-     * @param MimeDbRepository $oDatabase The mime database to use
-     * @param MimeType         $oDetector The mime detector to use
+     * @param MimeDbRepository   $oDatabase The mime database to use
+     * @param MimeTypesInterface $oDetector The mime detector to use
      */
     public function __construct(
         MimeDbRepository $oDatabase,
-        MimeType $oDetector
+        MimeTypesInterface $oDetector
     ) {
         $this->oDatabase = $oDatabase;
         $this->oDetector = $oDetector;
@@ -107,8 +108,8 @@ class Mime
         $rHandle = finfo_open(FILEINFO_MIME_TYPE);
         $sMime   = finfo_file($rHandle, $sFile);
 
-        if ($sMime === 'application/octet-stream' || empty($sMime)) {
-            $sMime = $this->oDetector->getType($sFile);
+        if (($sMime === 'application/octet-stream' || empty($sMime)) && $this->oDetector->isGuesserSupported()) {
+            $sMime = $this->oDetector->guessMimeType($sFile);
         }
 
         return $sMime ?? 'application/octet-stream';

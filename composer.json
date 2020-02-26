@@ -29,22 +29,22 @@
     "prefer-stable": true,
     "require": {
         "php": ">=7.2",
+        "ext-fileinfo": "*",
         "ext-intl": "*",
         "ext-json": "*",
+        "ext-mbstring": "*",
+        "ext-pdo": "*",
+        "adrienrn/php-mimetyper": "0.*",
+        "annexare/countries-list": "2.*",
+        "axisofstevil/stop-words": "0.*",
+        "behat/transliterator": "1.*",
         "codeigniter/framework": "3.1.11",
-        "pimple/pimple": "3.*",
+        "defuse/php-encryption": "2.*",
         "guzzlehttp/guzzle": "6.*",
         "mustache/mustache": "2.*",
-        "behat/transliterator": "1.*",
+        "pimple/pimple": "3.*",
         "ralouphie/getallheaders": "3.*",
-        "defuse/php-encryption": "2.*",
-        "adrienrn/php-mimetyper": "0.*",
-        "katzien/php-mime-type": "2.*",
-        "axisofstevil/stop-words": "0.*",
-        "annexare/countries-list": "2.*",
-        "ext-pdo": "*",
-        "ext-fileinfo": "*",
-        "ext-mbstring": "*"
+        "symfony/mime": "5.*"
     },
     "require-dev": {
         "phpunit/phpunit": "8.*"

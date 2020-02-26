@@ -1,6 +1,5 @@
 <?php
 
-use MimeType\MimeType;
 use MimeTyper\Repository\MimeDbRepository;
 use Nails\Common\Interfaces;
 use Nails\Common\Service;
@@ -8,6 +7,7 @@ use Nails\Common\Model;
 use Nails\Common\Resource;
 use Nails\Environment;
 use Nails\Factory;
+use Symfony\Component\Mime\MimeTypes;
 
 return [
 
@@ -225,7 +225,7 @@ return [
             }
 
             if (!$oDetector) {
-                $oDetector = new MimeType();
+                $oDetector = new MimeTypes();
             }
 
             if (class_exists('\App\Common\Service\Mime')) {
