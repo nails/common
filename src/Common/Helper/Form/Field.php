@@ -70,19 +70,20 @@ class Field
         //  Prep the containers attributes
         $_field_attributes = [];
 
-        //  Move revealer properties to the container
-        foreach ($_field_data as $attr => $value) {
-            if (
-                in_array($attr, ['revealer', 'reveal-on'])
-                && !in_array($_field_type, [Form::FIELD_DROPDOWN, Form::FIELD_CHECKBOX, Form::FIELD_BOOLEAN])
-            ) {
-                $_field_attributes[] = sprintf(
-                    'data-%s="%s"',
-                    $attr,
-                    $value
-                );
-                unset($_field_data[$attr]);
-            }
+        //  Move revealer properties to the container if both are present
+        //  If only revealer is present then it is a control
+
+        if (array_key_exists('revealer', $_field_data) && array_key_exists('reveal-on', $_field_data)) {
+            $_field_attributes[] = sprintf(
+                'data-%s="%s"',
+                'revealer',
+                $_field_data['revealer']
+            );
+            $_field_attributes[] = sprintf(
+                'data-%s="%s"',
+                'reveal-on',
+                $_field_data['reveal-on']
+            );
         }
 
         $_field_attributes = implode(' ', $_field_attributes);
@@ -607,7 +608,30 @@ EOT;
 
         // --------------------------------------------------------------------------
 
-        $_out = '<div class="field dropdown ' . $_error . ' ' . $_readonly_cls . ' ' . $_field['oddeven'] . '" ' . $_field_id_top . '>';
+        //  Prep the containers attributes
+        $_field_attributes = [];
+
+        //  Move revealer properties to the container if both are present
+        //  If only revealer is present then it is a control
+
+        if (array_key_exists('revealer', $_field['data']) && array_key_exists('reveal-on', $_field['data'])) {
+            $_field_attributes[] = sprintf(
+                'data-%s="%s"',
+                'revealer',
+                $_field['data']['revealer']
+            );
+            $_field_attributes[] = sprintf(
+                'data-%s="%s"',
+                'reveal-on',
+                $_field['data']['reveal-on']
+            );
+        }
+
+        $_field_attributes = implode(' ', $_field_attributes);
+
+        // --------------------------------------------------------------------------
+
+        $_out = '<div class="field dropdown ' . $_error . ' ' . $_readonly_cls . ' ' . $_field['oddeven'] . '" ' . $_field_id_top . ' ' . $_field_attributes . '>';
         $_out .= '<label>';
 
         //  Label
@@ -969,6 +993,7 @@ EOT;
         $_field['class']       = isset($field['class']) ? $field['class'] : false;
         $_field['tip']         = isset($field['tip']) ? $field['tip'] : $tip;
         $_field['options']     = isset($field['options']) ? $field['options'] : $options;
+        $_field['data']        = isset($field['data']) ? $field['data'] : [];
 
         $_tip          = [];
         $_tip['class'] = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
@@ -981,7 +1006,30 @@ EOT;
 
         // --------------------------------------------------------------------------
 
-        $_out = '<div class="field ' . $_field['type'] . ' ' . $_error . ' ' . $_field['oddeven'] . '" ' . $_field_id_top . '>';
+        //  Prep the containers attributes
+        $_field_attributes = [];
+
+        //  Move revealer properties to the container if both are present
+        //  If only revealer is present then it is a control
+
+        if (array_key_exists('revealer', $_field['data']) && array_key_exists('reveal-on', $_field['data'])) {
+            $_field_attributes[] = sprintf(
+                'data-%s="%s"',
+                'revealer',
+                $_field['data']['revealer']
+            );
+            $_field_attributes[] = sprintf(
+                'data-%s="%s"',
+                'reveal-on',
+                $_field['data']['reveal-on']
+            );
+        }
+
+        $_field_attributes = implode(' ', $_field_attributes);
+
+        // --------------------------------------------------------------------------
+
+        $_out = '<div class="field ' . $_field['type'] . ' ' . $_error . ' ' . $_field['oddeven'] . '" ' . $_field_id_top . ' ' . $_field_attributes . '>';
 
         //  First option
         $_out .= '<label>';
