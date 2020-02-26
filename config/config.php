@@ -80,5 +80,5 @@ if (defined('CONF_COOKIE_DOMAIN')) {
 }
 
 //  CSRF
-$config['csrf_token_name']  = 'nailscsrftest';   //  This is hardcoded into nails.api.js
-$config['csrf_cookie_name'] = 'nailscsrftoken'; //  This is hardcoded into nails.api.js
+$config['csrf_token_name']  = 'nailscsrftest';
+$config['csrf_cookie_name'] = 'nailscsrftoken';
