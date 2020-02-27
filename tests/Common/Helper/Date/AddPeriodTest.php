@@ -1,19 +1,34 @@
 <?php
 
-namespace Tests\Common\Helper;
+namespace Tests\Common\Helper\Date;
 
 use DateTime;
 use Nails\Common\Helper\Date;
 use PHPUnit\Framework\TestCase;
 
-class DateTest extends TestCase
+/**
+ * Class AddPeriodTest
+ *
+ * @package Tests\Common\Helper
+ */
+class AddPeriodTest extends TestCase
 {
     /**
-     * Construct DateTest
+     * Set up the test class
      */
     public static function setUpBeforeClass(): void
     {
-        require_once dirname(__FILE__) . '/../../../helpers/date.php';
+        require_once dirname(__FILE__) . '/../../../../helpers/date.php';
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * @covers ::dateAddPeriod
+     */
+    public function test_helper_method_exists()
+    {
+        $this->assertTrue(function_exists('dateAddPeriod'));
     }
 
     // --------------------------------------------------------------------------
