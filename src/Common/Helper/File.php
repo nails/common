@@ -12,6 +12,11 @@
 
 namespace Nails\Common\Helper;
 
+/**
+ * Class File
+ *
+ * @package Nails\Common\Helper
+ */
 class File
 {
     /**
@@ -33,7 +38,7 @@ class File
     // --------------------------------------------------------------------------
 
     /**
-     * Outputs a file in bytesized chunks.
+     * Outputs a file in byte sized chunks.
      * http://teddy.fr/2007/11/28/how-serve-big-files-through-php/
      *
      * @param string  $sFilename  The file to output
@@ -41,7 +46,7 @@ class File
      *
      * @return bool|int
      */
-    public static function readFileChunked($sFilename, $iChunkSize = 1048576)
+    public static function readFileChunked(string $sFilename, int $iChunkSize = 1048576)
     {
         $iBytesRead = 0;
         $rHandle    = fopen($sFilename, 'rb');
@@ -68,7 +73,7 @@ class File
      *
      * @return bool
      */
-    public static function fileExistsCS($sFilename)
+    public static function fileExistsCS(string $sFilename)
     {
         if (empty($sFilename)) {
             return false;
@@ -76,10 +81,10 @@ class File
             return static::$aFileExistsCache[$sFilename];
         }
 
-        $sDirectory = dirname($sFilename);
+        $sDirectory = dirname($sFilename) . DIRECTORY_SEPARATOR;
         $aFiles     = array_map(function ($sFile) {
             return basename($sFile);
-        }, glob($sDirectory . DIRECTORY_SEPARATOR . '*', GLOB_NOSORT));
+        }, static::listDir($sDirectory));
 
         if (in_array(basename($sFilename), $aFiles)) {
             //  Test if the directory exists
@@ -97,17 +102,19 @@ class File
     /**
      * A case-sensitive is_dir
      *
-     * @param string $sDir The directory to trst
+     * @param string $sDir The directory to test
      *
      * @return bool
      */
-    public static function isDirCS($sDir)
+    public static function isDirCS(string $sDir)
     {
-        if (array_key_exists($sDir, static::$aIsDirCache)) {
+        if (empty($sDir)) {
+            return false;
+        } elseif (array_key_exists($sDir, static::$aIsDirCache)) {
             return static::$aIsDirCache[$sDir];
         }
 
-        $aDirBits = explode(DIRECTORY_SEPARATOR, $sDir);
+        $aDirBits = explode(DIRECTORY_SEPARATOR, rtrim($sDir, DIRECTORY_SEPARATOR));
         $bResult  = true;
         while (count($aDirBits) > 1) {
             $sDirectory     = array_pop($aDirBits);
@@ -124,5 +131,24 @@ class File
 
         static::$aIsDirCache[$sDir] = $bResult;
         return $bResult;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * [Quickly] lists the contents of a directory
+     *
+     * @param string $sPath The directory to list
+     *
+     * @return string[]
+     */
+    protected static function listDir(string $sPath): array
+    {
+        return array_map(
+            function ($sFile) use ($sPath) {
+                return $sPath . $sFile;
+            },
+            scandir($sPath)
+        );
     }
 }
