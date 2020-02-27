@@ -144,11 +144,13 @@ class File
      */
     protected static function listDir(string $sPath): array
     {
-        return array_map(
-            function ($sFile) use ($sPath) {
-                return $sPath . $sFile;
-            },
-            scandir($sPath)
-        );
+        return is_dir($sPath)
+            ? array_map(
+                function ($sFile) use ($sPath) {
+                    return $sPath . $sFile;
+                },
+                scandir($sPath)
+            )
+            : [];
     }
 }
