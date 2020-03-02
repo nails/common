@@ -7,6 +7,11 @@ use Nails\Factory;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Class Components
+ *
+ * @package Nails\Common\Console\Command\Install
+ */
 class Components extends Base
 {
     /**
@@ -25,11 +30,10 @@ class Components extends Base
     /**
      * Executes the command
      *
-     * @param  InputInterface  $oInput  The Input Interface provided by Symfony
-     * @param  OutputInterface $oOutput The Output Interface provided by Symfony
+     * @param InputInterface  $oInput  The Input Interface provided by Symfony
+     * @param OutputInterface $oOutput The Output Interface provided by Symfony
      *
      * @return int
-     * @throws \Nails\Common\Exception\FactoryException
      */
     protected function execute(InputInterface $oInput, OutputInterface $oOutput)
     {
