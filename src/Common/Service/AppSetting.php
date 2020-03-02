@@ -16,7 +16,6 @@ use Nails\Common\Exception\EnvironmentException;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Resource;
 use Nails\Common\Traits\ErrorHandling;
-use Nails\Config;
 use Nails\Factory;
 
 /**
@@ -43,7 +42,7 @@ class AppSetting
      */
     public function __construct()
     {
-        $this->sTable = Config::get('NAILS_DB_PREFIX') . 'app_setting';
+        $this->sTable = \Nails\Config::get('NAILS_DB_PREFIX') . 'app_setting';
         $this->load();
     }
 
