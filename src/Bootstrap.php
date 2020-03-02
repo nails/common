@@ -13,7 +13,9 @@ namespace Nails;
 
 use Nails\Common\Events;
 use Nails\Common\Service\ErrorHandler;
+use Nails\Common\Service\FileCache;
 use Nails\Common\Service\Profiler;
+use Nails\Common\Service\Routes;
 
 /**
  * Class Bootstrap
@@ -79,11 +81,12 @@ final class Bootstrap
         self::setErrorHandling();
         self::setRuntime();
         self::loadFunctions();
-        self::checkRoutes();
         self::setupModules();
 
         Factory::setup();
         Factory::autoload();
+
+        self::checkRoutes();
 
         Profiler::mark(Events::SYSTEM_STARTUP);
         Factory::service('Event')
@@ -195,12 +198,6 @@ final class Bootstrap
          * up directory names etc with a missing segment.
          */
         Environment::isValid(ENVIRONMENT);
-
-        //  Cache constants
-        //  @todo (Pablo - 2018-11-16) - Move these to the cache service
-        Config::set('CACHE_PATH', self::$sBaseDirectory . implode(DIRECTORY_SEPARATOR, ['cache', 'private', '']));
-        Config::set('CACHE_PUBLIC_PATH', self::$sBaseDirectory . implode(DIRECTORY_SEPARATOR, ['cache', 'public', '']));
-        Config::set('CACHE_PUBLIC_URL', rtrim(Config::get('BASE_URL'), '/') . '/cache/public/');
 
         //  Database
         //  @todo (Pablo - 2018-11-16) - Move these to the database service
@@ -508,13 +505,15 @@ final class Bootstrap
 
     /**
      * Checks whether the routes file has been generated and sets a constant for
-     * Another part of the system to act upon/
+     * Another part of the system to act upon
      *
      * @todo (Pablo - 2018-11-16) - Rework this approach
      */
     private static function checkRoutes()
     {
-        if (is_file(CACHE_PATH . 'routes_app.php')) {
+        /** @var Routes $oRoutesService */
+        $oRoutesService = Factory::service('Routes');
+        if (is_file($oRoutesService->getRoutesFile())) {
             Config::set('NAILS_STARTUP_GENERATE_APP_ROUTES', false);
         } else {
             //  Not found, crude hook seeing as basically nothing has loaded yet

@@ -448,7 +448,7 @@ abstract class Base extends \MX_Controller
 
             } catch (NailsException $e) {
                 throw new NailsException(
-                    'Failed to generate routes_app.php. ' . $e->getMessage(),
+                    'Failed to generate routes file. ' . $e->getMessage(),
                     500
                 );
             }
