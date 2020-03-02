@@ -18,8 +18,8 @@ use Nails\Common\Events;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Helper\ArrayHelper;
 use Nails\Components;
+use Nails\Config;
 use Nails\Factory;
-use Nails\Functions;
 use stdClass;
 
 /**
@@ -288,7 +288,7 @@ class ErrorHandler
         /**
          * Define a constant for easier identification of 404 pages
          */
-        Functions::define('NAILS_IS_404', true);
+        Config::set('NAILS_IS_404', true);
 
         // --------------------------------------------------------------------------
 

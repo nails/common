@@ -16,8 +16,22 @@ namespace Nails\Common\Service;
 
 use Nails\Factory;
 
+/**
+ * Class Config
+ *
+ * @package Nails\Common\Service
+ */
 class Config
 {
+    /**
+     * --------------------------------------------------------------------------
+     *
+     * The following properties and methods are legacy to support the CodeIgniter
+     * Config class. New functionality should use the Nails\Config class
+     *
+     * --------------------------------------------------------------------------
+     */
+
     /**
      * The database object
      *

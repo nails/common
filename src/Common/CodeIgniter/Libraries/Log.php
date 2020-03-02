@@ -12,6 +12,7 @@
 
 namespace Nails\Common\CodeIgniter\Libraries;
 
+use Nails\Config;
 use Nails\Factory;
 use Nails\Environment;
 use CI_Log;
@@ -55,11 +56,11 @@ class Log extends CI_Log
          * they say only benchmark and hooks class are loaded)
          */
 
-        if (defined('DEPLOY_LOG_DIR')) {
+        if (Config::get('LOG_DIR')) {
 
-            $this->_log_path = DEPLOY_LOG_DIR;
+            $this->_log_path = Config::get('LOG_DIR');
 
-            //  If we haven't already, check to see if DEPLOY_LOG_DIR is writable
+            //  If we haven't already, check to see if Config::get('LOG_DIR') is writable
             if (is_null($this->_enabled)) {
 
                 if (is_writable($this->_log_path)) {

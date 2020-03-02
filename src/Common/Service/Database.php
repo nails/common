@@ -17,8 +17,10 @@
 namespace Nails\Common\Service;
 
 use Nails\Common\Exception\Database\ConnectionException;
+use Nails\Config;
 use Nails\Environment;
 use Nails\Factory;
+use Nails\Testing;
 
 /**
  * Class Database
@@ -166,12 +168,16 @@ class Database
             'db_debug' => true,
 
             //  Potentially vary between deployments
-            'hostname' => Factory::property('DB_HOST'),
-            'username' => Factory::property('DB_USERNAME'),
-            'password' => Factory::property('DB_PASSWORD'),
-            'database' => Factory::property('DB_DATABASE'),
+            'hostname' => Config::get('DB_HOST'),
+            'username' => Config::get('DB_USERNAME'),
+            'password' => Config::get('DB_PASSWORD'),
+            'database' => Environment::is([Environment::ENV_TEST, Environment::ENV_HTTP_TEST])
+                ? Testing::DB_NAME
+                : Config::get('DB_DATABASE'),
             'cachedir' => $oFileCache->getDir(),
         ];
+
+
 
         $sDbPath = BASEPATH . 'database/';
         require_once $sDbPath . 'DB_driver.php';

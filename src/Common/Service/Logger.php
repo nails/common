@@ -14,8 +14,14 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Config;
 use Nails\Factory;
 
+/**
+ * Class Logger
+ *
+ * @package Nails\Common\Service
+ */
 class Logger
 {
     private $oLog;
@@ -157,9 +163,9 @@ class Logger
         if (!empty($sDir) && substr($sDir, 0, 1) === '/') {
             $this->oLog->dir = $sDir;
         } elseif (!empty($sDir)) {
-            $this->oLog->dir = DEPLOY_LOG_DIR . $sDir;
+            $this->oLog->dir = Config::get('LOG_DIR') . $sDir;
         } else {
-            $this->oLog->dir = DEPLOY_LOG_DIR;
+            $this->oLog->dir = Config::get('LOG_DIR');
         }
     }
 

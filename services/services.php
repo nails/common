@@ -13,19 +13,6 @@ return [
 
     'properties' => [
         /**
-         * The database credentials
-         */
-        'DB_HOST'       => defined('DEPLOY_DB_HOST') ? DEPLOY_DB_HOST : null,
-        'DB_USERNAME'   => defined('DEPLOY_DB_USERNAME') ? DEPLOY_DB_USERNAME : null,
-        'DB_PASSWORD'   => defined('DEPLOY_DB_PASSWORD') ? DEPLOY_DB_PASSWORD : null,
-        'DB_DATABASE'   => function () {
-            if (Environment::is([Environment::ENV_TEST, Environment::ENV_HTTP_TEST])) {
-                return \Nails\Testing::DB_NAME;
-            } else {
-                return defined('DEPLOY_DB_DATABASE') ? DEPLOY_DB_DATABASE : null;
-            }
-        },
-        /**
          * The number of days to keep log files
          *
          * @var int

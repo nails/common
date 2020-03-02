@@ -71,6 +71,7 @@ final class Bootstrap
             \App\Events::preSystem();
         }
 
+        //  @todo (Pablo - 2020-03-02) - Remove; app and deploy config files are deprecated
         self::loadConfig('app');
         self::loadConfig('deploy');
         self::setNailsConstants();
@@ -160,32 +161,33 @@ final class Bootstrap
     public static function setNailsConstants()
     {
         //  Generic and branding constants
-        Functions::define('NAILS_PACKAGE_NAME', 'Nails');
-        Functions::define('NAILS_PACKAGE_URL', 'http://nailsapp.co.uk/');
-        Functions::define('NAILS_BRANDING', true);
+        Config::set('NAILS_PACKAGE_NAME', 'Nails');
+        Config::set('NAILS_PACKAGE_URL', 'http://nailsapp.co.uk/');
+        Config::set('NAILS_BRANDING', true);
 
         //  Paths
-        Functions::define('NAILS_PATH', self::$sBaseDirectory . 'vendor/nails/');
-        Functions::define('NAILS_APP_PATH', self::$sBaseDirectory);
-        Functions::define('NAILS_COMMON_PATH', NAILS_PATH . 'common/');
-        Functions::define('NAILS_CI_APP_PATH', self::$sBaseDirectory . 'vendor/codeigniter/framework/application/');
-        Functions::define('NAILS_CI_SYSTEM_PATH', self::$sBaseDirectory . 'vendor/codeigniter/framework/system/');
+        Config::set('NAILS_PATH', self::$sBaseDirectory . 'vendor/nails/');
+        Config::set('NAILS_APP_PATH', self::$sBaseDirectory);
+        Config::set('NAILS_COMMON_PATH', Config::get('NAILS_PATH') . 'common/');
+        Config::set('NAILS_CI_APP_PATH', self::$sBaseDirectory . 'vendor/codeigniter/framework/application/');
+        Config::set('NAILS_CI_SYSTEM_PATH', self::$sBaseDirectory . 'vendor/codeigniter/framework/system/');
 
         //  So CodeIgniter configures itself correctly
-        Functions::define('BASEPATH', NAILS_CI_SYSTEM_PATH);
+        Config::set('BASEPATH', Config::get('NAILS_CI_SYSTEM_PATH'));
 
         //  URLs
-        Functions::define('BASE_URL', '/');
-        Functions::define('SECURE_BASE_URL', preg_replace('/^http:/', 'https:', BASE_URL));
-        Functions::define('NAILS_URL', (Functions::isPageSecure() ? SECURE_BASE_URL : BASE_URL) . 'vendor/nails/');
+        Config::set('DOMAIN', getenv('DOMAIN') ?: '/');
+        Config::set('BASE_URL', sprintf('https://%s/', Config::get('DOMAIN')));
+        Config::set('SECURE_BASE_URL', preg_replace('/^http:/', 'https:', Config::get('BASE_URL')));
+        Config::set('NAILS_URL', (Functions::isPageSecure() ? Config::get('SECURE_BASE_URL') : Config::get('BASE_URL')) . 'vendor/nails/');
 
         //  @todo (Pablo - 2018-11-16) - Move these into the asset service
-        Functions::define('NAILS_ASSETS_URL', NAILS_URL . 'module-asset/assets/');
-        Functions::define('NAILS_ASSETS_PATH', NAILS_PATH . 'module-asset/assets/');
+        Config::set('NAILS_ASSETS_URL', Config::get('NAILS_URL') . 'module-asset/assets/');
+        Config::set('NAILS_ASSETS_PATH', Config::get('NAILS_PATH') . 'module-asset/assets/');
 
         //  Environment
-        Functions::define('ENVIRONMENT', Environment::ENV_DEV);
-        Functions::define('NAILS_TIMEZONE', 'UTC');
+        Config::set('ENVIRONMENT', Environment::ENV_DEV);
+        Config::set('NAILS_TIMEZONE', 'UTC');
 
         /**
          * Test the environment is valid
@@ -196,41 +198,46 @@ final class Bootstrap
 
         //  Cache constants
         //  @todo (Pablo - 2018-11-16) - Move these to the cache service
-        Functions::define('CACHE_PATH', self::$sBaseDirectory . 'cache' . DIRECTORY_SEPARATOR . 'private' . DIRECTORY_SEPARATOR);
-        Functions::define('CACHE_PUBLIC_PATH', self::$sBaseDirectory . 'cache' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR);
-        Functions::define('CACHE_PUBLIC_URL', rtrim(BASE_URL, '/') . '/cache/public/');
+        Config::set('CACHE_PATH', self::$sBaseDirectory . implode(DIRECTORY_SEPARATOR, ['cache', 'private', '']));
+        Config::set('CACHE_PUBLIC_PATH', self::$sBaseDirectory . implode(DIRECTORY_SEPARATOR, ['cache', 'public', '']));
+        Config::set('CACHE_PUBLIC_URL', rtrim(Config::get('BASE_URL'), '/') . '/cache/public/');
 
         //  Database
         //  @todo (Pablo - 2018-11-16) - Move these to the database service
 
         //  Consistent between deployments
-        Functions::define('APP_DB_DRIVER', 'mysqli');
-        Functions::define('APP_DB_GLOBAL_PREFIX', '');
-        Functions::define('APP_DB_PCONNECT', true);
-        Functions::define('APP_DB_CACHE', false);
-        Functions::define('APP_DB_CHARSET', 'utf8mb4');
-        Functions::define('APP_DB_DBCOLLAT', 'utf8mb4_unicode_ci');
-        Functions::define('APP_DB_STRICT', true);
-        Functions::define('NAILS_DB_PREFIX', 'nails_');
-        Functions::define('APP_DB_PREFIX', '');
+        Config::set('APP_DB_DRIVER', 'mysqli');
+        Config::set('APP_DB_GLOBAL_PREFIX', '');
+        Config::set('APP_DB_PCONNECT', true);
+        Config::set('APP_DB_CACHE', false);
+        Config::set('APP_DB_CHARSET', 'utf8mb4');
+        Config::set('APP_DB_DBCOLLAT', 'utf8mb4_unicode_ci');
+        Config::set('APP_DB_STRICT', true);
+        Config::set('NAILS_DB_PREFIX', 'nails_');
+        Config::set('APP_DB_PREFIX', 'app_');
 
         //  Potentially vary between deployments
-        Functions::define('DEPLOY_DB_HOST', 'localhost');
-        Functions::define('DEPLOY_DB_USERNAME', '');
-        Functions::define('DEPLOY_DB_PASSWORD', '');
-        Functions::define('DEPLOY_DB_DATABASE', '');
+        //  @todo (Pablo - 2020-03-02) - Remove, kept for backwards compatability
+        Config::set('DEPLOY_DB_HOST', getenv('DB_HOST'));
+        Config::set('DEPLOY_DB_USERNAME', getenv('DB_USERNAME'));
+        Config::set('DEPLOY_DB_PASSWORD', getenv('DB_PASSWORD'));
+        Config::set('DEPLOY_DB_DATABASE', getenv('DB_DATABASE'));
 
-        //  App Constants
-        Functions::define('APP_PRIVATE_KEY', '');
-        Functions::define('APP_NAME', 'Untitled');
-        Functions::define('APP_NATIVE_LOGIN_USING', 'BOTH');   //  [EMAIL|USERNAME|BOTH]
+        Config::set('DB_HOST', Config::get('DEPLOY_DB_HOST'));
+        Config::set('DB_USERNAME', Config::get('DEPLOY_DB_USERNAME'));
+        Config::set('DB_PASSWORD', Config::get('DEPLOY_DB_PASSWORD'));
+        Config::set('DB_DATABASE', Config::get('DEPLOY_DB_DATABASE'));
 
-        //  Log constants
-        //  @todo (Pablo - 2018-11-16) - Move these to the log service
-        Functions::define('DEPLOY_LOG_DIR', self::$sBaseDirectory . 'application/logs/');
+        //  App
+        Config::set('APP_PRIVATE_KEY', '');
+        Config::set('APP_NAME', 'Untitled');
+        Config::set('APP_NATIVE_LOGIN_USING', 'BOTH');   //  [EMAIL|USERNAME|BOTH]
+
+        //  Logging
+        Config::set('LOG_DIR', Config::get('NAILS_APP_PATH') . implode(DIRECTORY_SEPARATOR, ['application', 'logs', '']));
 
         //  Profiling constants
-        Functions::define('PROFILER_ENABLED', false);
+        Config::set('PROFILER_ENABLED', false);
         if (!PROFILER_ENABLED) {
             Profiler::disable();
         }
@@ -253,7 +260,7 @@ final class Bootstrap
      * - The $system_path variable has been updated to reflect its true location
      * - The working directory is set to self::$sBaseDirectory
      * - Calls to __FILE__ have been replaced with self::$sEntryPoint
-     * - Calls to define() have been replaced with calls to Functions::define()
+     * - Calls to define() have been replaced with calls to Config::set()
      * - Not kicking off CodeIgniter (as it needs to be called in the global scope)
      *
      * @param string $sSystemPath      The path to the CodeIgniter system directory
@@ -395,16 +402,16 @@ final class Bootstrap
          * -------------------------------------------------------------------
          */
         // The name of THIS file
-        Functions::define('SELF', pathinfo(self::$sEntryPoint, PATHINFO_BASENAME));
+        Config::set('SELF', pathinfo(self::$sEntryPoint, PATHINFO_BASENAME));
 
         // Path to the system directory
-        Functions::define('BASEPATH', $system_path);
+        Config::set('BASEPATH', $system_path);
 
         // Path to the front controller (this file) directory
-        Functions::define('FCPATH', dirname(self::$sEntryPoint) . DIRECTORY_SEPARATOR);
+        Config::set('FCPATH', dirname(self::$sEntryPoint) . DIRECTORY_SEPARATOR);
 
         // Name of the "system" directory
-        Functions::define('SYSDIR', basename(BASEPATH));
+        Config::set('SYSDIR', basename(BASEPATH));
 
         // The path to the "application" directory
         if (is_dir($application_folder)) {
@@ -429,7 +436,7 @@ final class Bootstrap
             exit(3); // EXIT_CONFIG
         }
 
-        Functions::define('APPPATH', $application_folder . DIRECTORY_SEPARATOR);
+        Config::set('APPPATH', $application_folder . DIRECTORY_SEPARATOR);
 
         // The path to the "views" directory
         if (!isset($view_folder[0]) && is_dir(APPPATH . 'views' . DIRECTORY_SEPARATOR)) {
@@ -456,7 +463,7 @@ final class Bootstrap
             exit(3); // EXIT_CONFIG
         }
 
-        Functions::define('VIEWPATH', $view_folder . DIRECTORY_SEPARATOR);
+        Config::set('VIEWPATH', $view_folder . DIRECTORY_SEPARATOR);
     }
 
     // --------------------------------------------------------------------------
@@ -476,7 +483,7 @@ final class Bootstrap
      */
     private static function setRuntime()
     {
-        date_default_timezone_set(NAILS_TIMEZONE);
+        date_default_timezone_set(Config::get('NAILS_TIMEZONE'));
     }
 
     // --------------------------------------------------------------------------
@@ -508,10 +515,10 @@ final class Bootstrap
     private static function checkRoutes()
     {
         if (is_file(CACHE_PATH . 'routes_app.php')) {
-            Functions::define('NAILS_STARTUP_GENERATE_APP_ROUTES', false);
+            Config::set('NAILS_STARTUP_GENERATE_APP_ROUTES', false);
         } else {
             //  Not found, crude hook seeing as basically nothing has loaded yet
-            Functions::define('NAILS_STARTUP_GENERATE_APP_ROUTES', true);
+            Config::set('NAILS_STARTUP_GENERATE_APP_ROUTES', true);
         }
     }
 
@@ -563,9 +570,9 @@ final class Bootstrap
         //  Discovered Nails modules
         foreach ($aModules as $oModule) {
             $aModuleLocations[$oModule->path] = implode(
-                    DIRECTORY_SEPARATOR,
-                    ['..', '..', 'vendor', $oModule->name]
-                ) . DIRECTORY_SEPARATOR;
+                DIRECTORY_SEPARATOR,
+                ['..', '..', 'vendor', $oModule->name, '']
+            );
         }
 
         // --------------------------------------------------------------------------

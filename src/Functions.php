@@ -33,6 +33,21 @@ class Functions
     // --------------------------------------------------------------------------
 
     /**
+     * Generates a cryptographically secure key
+     *
+     * @param string|null $sSalt A salt to use
+     *
+     * @return string
+     * @throws \Exception
+     */
+    public static function generateKey(string $sSalt = null)
+    {
+        return base64_encode($sSalt . random_bytes(32));
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Detects whether the current page is secure or not
      *
      * @return bool

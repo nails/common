@@ -24,6 +24,7 @@ use Nails\Common\Service\Event;
 use Nails\Common\Service\Input;
 use Nails\Common\Service\Profiler;
 use Nails\Components;
+use Nails\Config;
 use Nails\Environment;
 use Nails\Factory;
 use Nails\Functions;
@@ -181,7 +182,7 @@ abstract class Base extends \MX_Controller
     {
         if ($force || file_exists(NAILS_APP_PATH . '.MAINTENANCE')) {
 
-            Functions::define('NAILS_MAINTENANCE', true);
+            Config::set('NAILS_MAINTENANCE', true);
 
             /**
              * We're in maintenance mode. This can happen very early so we need to
@@ -368,9 +369,9 @@ abstract class Base extends \MX_Controller
             );
         }
 
-        Functions::define('APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG', $oDefaultDateFormat->slug);
-        Functions::define('APP_DEFAULT_DATETIME_FORMAT_DATE_LABEL', $oDefaultDateFormat->label);
-        Functions::define('APP_DEFAULT_DATETIME_FORMAT_DATE_FORMAT', $oDefaultDateFormat->format);
+        Config::set('APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG', $oDefaultDateFormat->slug);
+        Config::set('APP_DEFAULT_DATETIME_FORMAT_DATE_LABEL', $oDefaultDateFormat->label);
+        Config::set('APP_DEFAULT_DATETIME_FORMAT_DATE_FORMAT', $oDefaultDateFormat->format);
 
         //  Define default time format
         $oDefaultTimeFormat = $oDateTimeService->getTimeFormatDefault();
@@ -381,9 +382,9 @@ abstract class Base extends \MX_Controller
             );
         }
 
-        Functions::define('APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG', $oDefaultTimeFormat->slug);
-        Functions::define('APP_DEFAULT_DATETIME_FORMAT_TIME_LABEL', $oDefaultTimeFormat->label);
-        Functions::define('APP_DEFAULT_DATETIME_FORMAT_TIME_FORMAT', $oDefaultTimeFormat->format);
+        Config::set('APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG', $oDefaultTimeFormat->slug);
+        Config::set('APP_DEFAULT_DATETIME_FORMAT_TIME_LABEL', $oDefaultTimeFormat->label);
+        Config::set('APP_DEFAULT_DATETIME_FORMAT_TIME_FORMAT', $oDefaultTimeFormat->format);
 
         // --------------------------------------------------------------------------
 
@@ -458,7 +459,6 @@ abstract class Base extends \MX_Controller
      */
     protected function instantiateLanguages()
     {
-
         //  Define default language
         $oLanguageService = Factory::service('Language');
         $oDefault         = $oLanguageService->getDefault();
@@ -467,8 +467,8 @@ abstract class Base extends \MX_Controller
             throw new NailsException('No default language has been set, or it\'s been set incorrectly.');
         }
 
-        Functions::define('APP_DEFAULT_LANG_CODE', $oDefault->code);
-        Functions::define('APP_DEFAULT_LANG_LABEL', $oDefault->label);
+        Config::set('APP_DEFAULT_LANG_CODE', $oDefault->code);
+        Config::set('APP_DEFAULT_LANG_LABEL', $oDefault->label);
 
         // --------------------------------------------------------------------------
 
@@ -480,9 +480,9 @@ abstract class Base extends \MX_Controller
         $sUserLangCode = activeUser('language');
 
         if (!empty($sUserLangCode)) {
-            Functions::define('RENDER_LANG_CODE', $sUserLangCode);
+            Config::set('RENDER_LANG_CODE', $sUserLangCode);
         } else {
-            Functions::define('RENDER_LANG_CODE', APP_DEFAULT_LANG_CODE);
+            Config::set('RENDER_LANG_CODE', APP_DEFAULT_LANG_CODE);
         }
 
         //  Set the language config item which CodeIgniter will use.
