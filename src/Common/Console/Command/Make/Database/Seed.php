@@ -2,6 +2,7 @@
 
 namespace Nails\Common\Console\Command\Make\Database;
 
+use Exception;
 use Nails\Common\Exception\Console\SeederExistsException;
 use Nails\Console\Command\BaseMaker;
 use Nails\Factory;
@@ -10,6 +11,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Class Seed
+ *
+ * @package Nails\Common\Console\Command\Make\Database
+ */
 class Seed extends BaseMaker
 {
     const RESOURCE_PATH = NAILS_COMMON_PATH . 'resources/console/';
@@ -49,8 +55,8 @@ class Seed extends BaseMaker
     /**
      * Executes the app
      *
-     * @param  InputInterface  $oInput  The Input Interface provided by Symfony
-     * @param  OutputInterface $oOutput The Output Interface provided by Symfony
+     * @param InputInterface  $oInput  The Input Interface provided by Symfony
+     * @param OutputInterface $oOutput The Output Interface provided by Symfony
      *
      * @return int
      */
@@ -65,7 +71,7 @@ class Seed extends BaseMaker
             $this->createPath(self::SEEDER_PATH);
             //  Create the seeder
             $this->createSeeder();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->abort(
                 self::EXIT_CODE_FAILURE,
                 [$e->getMessage()]
@@ -92,8 +98,8 @@ class Seed extends BaseMaker
     /**
      * Create the Seeder
      *
-     * @throws \Exception
      * @return void
+     * @throws Exception
      */
     private function createSeeder(): void
     {
@@ -128,7 +134,7 @@ class Seed extends BaseMaker
                 $this->oOutput->writeln('<info>done!</info>');
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->oOutput->writeln('<error>failed!</error>');
             //  Clean up created seeders
             if (!empty($aCreated)) {

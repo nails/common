@@ -2,12 +2,18 @@
 
 namespace Nails\Common\Console\Seed;
 
+use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Helper\Form;
 use Nails\Common\Service\Locale;
 use Nails\Common\Traits\Model\Localised;
 use Nails\Factory;
 
+/**
+ * Class DefaultSeed
+ *
+ * @package Nails\Common\Console\Seed
+ */
 class DefaultSeed extends Base
 {
     /**
@@ -52,6 +58,7 @@ class DefaultSeed extends Base
      * Execute the seed
      *
      * @return void
+     * @throws FactoryException
      */
     public function execute()
     {
@@ -94,6 +101,7 @@ class DefaultSeed extends Base
      * @param array $aFields The fields to generate
      *
      * @return array
+     * @throws FactoryException
      */
     protected function generate($aFields)
     {
