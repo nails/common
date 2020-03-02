@@ -597,11 +597,11 @@ abstract class Base extends \MX_Controller
         //  Check if this user is suspended
         if (isLoggedIn() && activeUser('is_suspended')) {
 
-            /** @var Auth\Service\Authentication $oAuthModel */
-            $oAuthModel = Factory::service('Authentication', Auth\Constants::MODULE_SLUG);
+            /** @var Auth\Service\Authentication $oAuthService */
+            $oAuthService = Factory::service('Authentication', Auth\Constants::MODULE_SLUG);
             get_instance()->lang->load('auth/auth');
 
-            $oAuthModel->logout();
+            $oAuthService->logout();
 
             /** @var Auth\Service\Session $oSession */
             $oSession = Factory::service('Session', Auth\Constants::MODULE_SLUG);
