@@ -15,14 +15,23 @@ namespace Nails\Common\Controller;
 
 use Nails\Auth;
 use Nails\Common\Events;
+use Nails\Common\Exception\AssetException;
 use Nails\Common\Exception\FactoryException;
+use Nails\Common\Exception\ModelException;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Factory\Locale;
 use Nails\Common\Resource\MetaData;
+use Nails\Common\Service\Asset;
 use Nails\Common\Service\DateTime;
+use Nails\Common\Service\ErrorHandler;
 use Nails\Common\Service\Event;
 use Nails\Common\Service\Input;
+use Nails\Common\Service\Language;
+use Nails\Common\Service\Meta;
+use Nails\Common\Service\Output;
 use Nails\Common\Service\Profiler;
+use Nails\Common\Service\Uri;
+use Nails\Common\Service\UserFeedback;
 use Nails\Components;
 use Nails\Config;
 use Nails\Environment;
@@ -51,7 +60,7 @@ abstract class Base extends \MX_Controller
     protected $oMetaData;
 
     /**
-     *  Items passed to here will be automatically passed to
+     * Items passed to here will be automatically passed to
      * the View when rendered. Deprecated: pass explicitly using the View service's
      * setData method.
      *
@@ -65,6 +74,9 @@ abstract class Base extends \MX_Controller
     /**
      * Build the main framework. All auto-loaded items have been loaded and
      * instantiated by this point and are safe to use.
+     *
+     * @throws FactoryException
+     * @throws NailsException
      */
     public function __construct()
     {
@@ -92,7 +104,7 @@ abstract class Base extends \MX_Controller
         $this->oMetaData = Factory::resource('MetaData');
         $this->oMetaData->setLocale($this->oLocale->get());
 
-        //  @todo (Pablo - 2020-02-24) - Remove this/backwards compatability
+        //  @todo (Pablo - 2020-02-24) - Remove this/backwards compatibility
         $this->data              =& getControllerData();
         $this->data['oMetaData'] = $this->oMetaData;
         $this->data['page']      = $this->oMetaData;
@@ -163,6 +175,7 @@ abstract class Base extends \MX_Controller
      */
     protected function setContentType()
     {
+        /** @var Output $oOutput */
         $oOutput = Factory::service('Output');
         $oOutput->set_content_type('text/html; charset=utf-8');
     }
@@ -172,15 +185,16 @@ abstract class Base extends \MX_Controller
     /**
      * Checks if Maintenance Mode is enabled, shows the holding page if so.
      *
-     * @param boolean $force  Force maintenance mode on
-     * @param string  $sTitle Override the page title
-     * @param string  $sBody  Override the page body
+     * @param bool   $bForce Force maintenance mode on
+     * @param string $sTitle Override the page title
+     * @param string $sBody  Override the page body
      *
      * @return void
+     * @throws FactoryException
      */
-    protected function maintenanceMode($force = false, $sTitle = '', $sBody = '')
+    protected function maintenanceMode(bool $bForce = false, string $sTitle = '', string $sBody = '')
     {
-        if ($force || file_exists(NAILS_APP_PATH . '.MAINTENANCE')) {
+        if ($bForce || file_exists(Config::get('NAILS_APP_PATH') . '.MAINTENANCE')) {
 
             Config::set('NAILS_MAINTENANCE', true);
 
@@ -190,14 +204,18 @@ abstract class Base extends \MX_Controller
              * exiting whether we like it or not
              */
 
+            /** @var Input $oInput */
             $oInput = Factory::service('Input');
-            $oUri   = Factory::service('Uri');
+            /** @var Uri $oUri */
+            $oUri = Factory::service('Uri');
+            /** @var Output $oOutput */
+            $oOutput = Factory::service('Output');
 
             try {
 
                 //  Load the encryption service. Set the package path so it is loaded correctly
                 //  (this runs early, before the paths are added)
-                get_instance()->load->add_package_path(NAILS_COMMON_PATH);
+                get_instance()->load->add_package_path(Config::get('NAILS_COMMON_PATH'));
                 Factory::service('encrypt');
 
                 $whitelistIp   = (array) appSetting('maintenance_mode_whitelist', 'site');
@@ -221,42 +239,43 @@ abstract class Base extends \MX_Controller
 
                 if (!$oInput::isCli()) {
 
-                    header($oInput->server('SERVER_PROTOCOL') . ' 503 Service Temporarily Unavailable');
-                    header('Status: 503 Service Temporarily Unavailable');
-                    header('Retry-After: 7200');
+                    $oOutput->set_header($oInput->server('SERVER_PROTOCOL') . ' 503 Service Temporarily Unavailable');
+                    $oOutput->set_header('Status: 503 Service Temporarily Unavailable');
+                    $oOutput->set_header('Retry-After: 7200');
 
                     // --------------------------------------------------------------------------
 
                     //  If the request is an AJAX request, or the URL is on the API then spit back JSON
                     if ($oInput::isAjax() || $oUri->segment(1) == 'api') {
 
-                        header('Cache-Control: no-store, no-cache, must-revalidate');
-                        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-                        header('Content-Type: application/json');
-                        header('Pragma: no-cache');
+                        $oOutput->set_header('Cache-Control: no-store, no-cache, must-revalidate');
+                        $oOutput->set_header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+                        $oOutput->set_header('Content-Type: application/json');
+                        $oOutput->set_header('Pragma: no-cache');
 
-                        $_out = ['status' => 503, 'error' => 'Down for Maintenance'];
-
-                        echo json_encode($_out);
+                        echo $oOutput->_display(json_encode([
+                            'status' => 503,
+                            'error'  => $sMaintenanceTitle,
+                        ]));
 
                     } else {
                         //  Otherwise, render some HTML
-                        if (file_exists(NAILS_APP_PATH . 'application/views/errors/html/maintenance.php')) {
+                        if (file_exists(Config::get('NAILS_APP_PATH') . 'application/views/errors/html/maintenance.php')) {
                             //  Look for an app override
-                            require NAILS_APP_PATH . 'application/views/errors/html/maintenance.php';
+                            require Config::get('NAILS_APP_PATH') . 'application/views/errors/html/maintenance.php';
                         } else {
                             //  Fall back to the Nails maintenance page
-                            require NAILS_COMMON_PATH . 'views/errors/html/maintenance.php';
+                            require Config::get('NAILS_COMMON_PATH') . 'views/errors/html/maintenance.php';
                         }
                     }
 
                 } else {
-                    if (file_exists(NAILS_APP_PATH . 'application/views/errors/cli/maintenance.php')) {
+                    if (file_exists(Config::get('NAILS_APP_PATH') . 'application/views/errors/cli/maintenance.php')) {
                         //  Look for an app override
-                        require NAILS_APP_PATH . 'application/views/errors/cli/maintenance.php';
+                        require Config::get('NAILS_APP_PATH') . 'application/views/errors/cli/maintenance.php';
                     } else {
                         //  Fall back to the Nails maintenance page
-                        require NAILS_COMMON_PATH . 'views/errors/cli/maintenance.php';
+                        require Config::get('NAILS_COMMON_PATH') . 'views/errors/cli/maintenance.php';
                     }
                 }
                 exit(0);
@@ -269,29 +288,15 @@ abstract class Base extends \MX_Controller
     /**
      * Checks if credentials should be requested for staging environments
      *
+     * @link https://docs.nailsapp.co.uk/key-concepts/environments#protecting-environments
      * @return void
+     * @throws FactoryException
      */
     protected function passwordProtected(): void
     {
-        /**
-         * To password protect an environment you must create a constant which is
-         * a JSON string of key/value pairs (where the key is the username and the
-         * value is a sha1 hash of the password):
-         *
-         *     {
-         *         'john': '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
-         *         'amy': '3fc9b689459d738f8c88a3a48aa9e33542016b7a4052e001aaa536fca74813cb'
-         *     }
-         *
-         * You may also whitelist IP/IP Ranges by providing an array of IP Ranges
-         *
-         *      [
-         *          '123.456.789.123',
-         *          '123.456/789'
-         *      ]
-         */
+        /** @var Input $oInput */
+        $oInput = Factory::service('Input');
 
-        $oInput                 = Factory::service('Input');
         $sConstantName          = 'APP_USER_PASS_' . Environment::get();
         $sConstantNameWhitelist = 'APP_USER_PASS_WHITELIST_' . Environment::get();
 
@@ -300,9 +305,8 @@ abstract class Base extends \MX_Controller
             //  On the whitelist?
             if (defined($sConstantNameWhitelist)) {
 
-                $oInput          = Factory::service('Input');
-                $aWhitelsitedIps = @json_decode(constant($sConstantNameWhitelist));
-                $bWhitelisted    = isIpInRange($oInput->ipAddress(), $aWhitelsitedIps);
+                $aWhitelistedIps = @json_decode(constant($sConstantNameWhitelist));
+                $bWhitelisted    = isIpInRange($oInput->ipAddress(), $aWhitelistedIps);
 
             } else {
                 $bWhitelisted = false;
@@ -338,13 +342,20 @@ abstract class Base extends \MX_Controller
      * Requests staging credentials
      *
      * @return void
+     * @throws FactoryException
      */
     protected function passwordProtectedRequest(): void
     {
+        /** @var Input $oInput */
         $oInput = Factory::service('Input');
-        header('WWW-Authenticate: Basic realm="' . APP_NAME . ' - Restricted Area"');
-        header($oInput->server('SERVER_PROTOCOL') . ' 401 Unauthorized');
+        /** @var Output $oOutput */
+        $oOutput = Factory::service('Output');
+        /** @var ErrorHandler $oErrorHandler */
         $oErrorHandler = Factory::service('ErrorHandler');
+
+        $oOutput->set_header('WWW-Authenticate: Basic realm="' . Config::get('APP_NAME') . ' - Restricted Area"');
+        $oOutput->set_header($oInput->server('SERVER_PROTOCOL') . ' 401 Unauthorized');
+
         $oErrorHandler->show401(null, null, true, true);
     }
 
@@ -406,10 +417,10 @@ abstract class Base extends \MX_Controller
 
         //  Set the user date/time formats
         $sFormatDate = activeUser('datetime_format_date');
-        $sFormatDate = $sFormatDate ? $sFormatDate : APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG;
+        $sFormatDate = $sFormatDate ? $sFormatDate : Config::get('APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG');
 
         $sFormatTime = activeUser('datetime_format_time');
-        $sFormatTime = $sFormatTime ? $sFormatTime : APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG;
+        $sFormatTime = $sFormatTime ? $sFormatTime : Config::get('APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG');
 
         $oDateTimeService->setUserFormats($sFormatDate, $sFormatTime);
 
@@ -426,11 +437,10 @@ abstract class Base extends \MX_Controller
      * Checks if routes need to be generated as part of the startup request
      *
      * @throws NailsException
-     * @throws FactoryException
      */
     protected function generateRoutes()
     {
-        if (defined('NAILS_STARTUP_GENERATE_APP_ROUTES') && NAILS_STARTUP_GENERATE_APP_ROUTES) {
+        if (Config::get('NAILS_STARTUP_GENERATE_APP_ROUTES')) {
             try {
 
                 /** @var Event $oEventService */
@@ -456,10 +466,12 @@ abstract class Base extends \MX_Controller
      * Sets up language handling
      *
      * @return void
+     * @throws FactoryException
+     * @throws NailsException
      */
     protected function instantiateLanguages()
     {
-        //  Define default language
+        /** @var Language $oLanguageService */
         $oLanguageService = Factory::service('Language');
         $oDefault         = $oLanguageService->getDefault();
 
@@ -482,12 +494,13 @@ abstract class Base extends \MX_Controller
         if (!empty($sUserLangCode)) {
             Config::set('RENDER_LANG_CODE', $sUserLangCode);
         } else {
-            Config::set('RENDER_LANG_CODE', APP_DEFAULT_LANG_CODE);
+            Config::set('RENDER_LANG_CODE', Config::get('APP_DEFAULT_LANG_CODE'));
         }
 
         //  Set the language config item which CodeIgniter will use.
+        /** @var \Nails\Common\Service\Config $oConfig */
         $oConfig = Factory::service('Config');
-        $oConfig->set_item('language', RENDER_LANG_CODE);
+        $oConfig->set_item('language', Config::get('RENDER_LANG_CODE'));
 
         //  Load the Nails. generic lang file
         get_instance()->lang->load('nails');
@@ -513,13 +526,15 @@ abstract class Base extends \MX_Controller
          */
 
         //  Reset
-        $oConfig                = Factory::service('Config');
+        /** @var \Nails\Common\Service\Config $oConfig */
+        $oConfig = Factory::service('Config');
+
         $oConfig->_config_paths = [];
 
         $aPaths = [];
 
         //  Nails Common
-        $aPaths[] = NAILS_COMMON_PATH;
+        $aPaths[] = Config::get('NAILS_COMMON_PATH');
 
         //  Available Modules
         $aAvailableModules = Components::modules();
@@ -529,7 +544,7 @@ abstract class Base extends \MX_Controller
         }
 
         //  The Application
-        $aPaths[] = NAILS_APP_PATH . 'application';
+        $aPaths[] = Config::get('NAILS_APP_PATH') . 'application';
 
         foreach ($aPaths as $sPath) {
             get_instance()->load->add_package_path($sPath);
@@ -554,6 +569,8 @@ abstract class Base extends \MX_Controller
      * Set up the active user
      *
      * @return void
+     * @throws FactoryException
+     * @throws ModelException
      */
     protected function instantiateUser()
     {
@@ -562,6 +579,7 @@ abstract class Base extends \MX_Controller
          * the user's cookies and set's up the session for an existing or new user.
          */
 
+        /** @var Auth\Model\User $oUserModel */
         $oUserModel = Factory::model('User', Auth\Constants::MODULE_SLUG);
         $oUserModel->init();
     }
@@ -572,24 +590,21 @@ abstract class Base extends \MX_Controller
      * Determines whether the active user is suspended and, if so, logs them out.
      *
      * @return void
+     * @throws FactoryException
      */
     protected function isUserSuspended()
     {
         //  Check if this user is suspended
         if (isLoggedIn() && activeUser('is_suspended')) {
 
-            //  Load models and langs
-            $oAuthModel = Factory::model('Auth', Auth\Constants::MODULE_SLUG);
+            /** @var Auth\Service\Authentication $oAuthModel */
+            $oAuthModel = Factory::service('Authentication', Auth\Constants::MODULE_SLUG);
             get_instance()->lang->load('auth/auth');
 
-            //  Log the user out
             $oAuthModel->logout();
 
-            //  Create a new session
+            /** @var Auth\Service\Session $oSession */
             $oSession = Factory::service('Session', Auth\Constants::MODULE_SLUG);
-            $oSession->sess_create();
-
-            //  Give them feedback
             $oSession->setFlashData('error', lang('auth_login_fail_suspended'));
             redirect('/');
         }
@@ -601,12 +616,17 @@ abstract class Base extends \MX_Controller
      * Populates an array from the UserFeedback and session classes
      *
      * @param array $aData The array to populate
+     *
+     * @throws FactoryException
      */
     public static function populateUserFeedback(array &$aData)
     {
         //  Set User Feedback alerts for the views
-        $oSession          = Factory::service('Session', Auth\Constants::MODULE_SLUG);
-        $oUserFeedback     = Factory::service('UserFeedback');
+        /** @var Auth\Service\Session $oSession */
+        $oSession = Factory::service('Session', Auth\Constants::MODULE_SLUG);
+        /** @var UserFeedback $oUserFeedback */
+        $oUserFeedback = Factory::service('UserFeedback');
+
         $aData['error']    = $oUserFeedback->get('error') ?: $oSession->getFlashData('error');
         $aData['negative'] = $oUserFeedback->get('negative') ?: $oSession->getFlashData('negative');
         $aData['success']  = $oUserFeedback->get('success') ?: $oSession->getFlashData('success');
@@ -630,7 +650,15 @@ abstract class Base extends \MX_Controller
      */
     protected function setCommonMeta(array $aMeta = [])
     {
+        /** @var Meta $oMeta */
         $oMeta = Factory::service('Meta');
+
+        $sAppName     = $this->oMetaData->getTitles()->implode();
+        $sDescription = $this->oMetaData->getDescription();
+
+        // --------------------------------------------------------------------------
+
+        //  Generic meta
         $oMeta
             ->addRaw([
                 'charset' => 'utf-8',
@@ -640,6 +668,69 @@ abstract class Base extends \MX_Controller
                 'content' => 'width=device-width, initial-scale=1',
             ]);
 
+        // --------------------------------------------------------------------------
+
+        // Open graph meta
+        $oMeta
+            ->addRaw([
+                'tag'      => 'meta',
+                'property' => 'og:title',
+                'content'  => $sAppName,
+            ])
+            ->addRaw([
+                'tag'      => 'meta',
+                'property' => 'og:type',
+                'content'  => 'website',
+            ])
+            ->addRaw([
+                'tag'      => 'meta',
+                'property' => 'og:locale',
+                'content'  => (string) $this->oMetaData->getLocale(),
+            ])
+            ->addRaw([
+                'tag'      => 'meta',
+                'property' => 'og:site_name',
+                'content'  => $sAppName,
+            ])
+            ->addRaw([
+                'tag'      => 'meta',
+                'property' => 'og:url',
+                'content'  => siteUrl(),
+            ])
+            ->addRaw([
+                'tag'      => 'meta',
+                'property' => 'og:description',
+                'content'  => $sDescription,
+            ]);
+
+        // --------------------------------------------------------------------------
+
+        // Twitter card config
+        $oMeta
+            ->addRaw([
+                'name'    => 'twitter:title',
+                'content' => $sAppName,
+            ])
+            ->addRaw([
+                'name'    => 'twitter:description',
+                'content' => $sDescription,
+            ])
+            ->addRaw([
+                'name'    => 'twitter:card',
+                'content' => 'summary_large_image',
+            ]);
+
+        // --------------------------------------------------------------------------
+
+        //  Other meta tags
+        $oMeta
+            ->add('apple-mobile-web-app-title', $sAppName)
+            ->add('application-name', $sAppName)
+            ->add('description', $sDescription);
+
+        // --------------------------------------------------------------------------
+
+        //  Any passed meta
         foreach ($aMeta as $aItem) {
             $oMeta->addRaw($aItem);
         }
@@ -659,7 +750,7 @@ abstract class Base extends \MX_Controller
             'ENVIRONMENT' => Environment::get(),
             'SITE_URL'    => siteUrl('', Functions::isPageSecure()),
             'NAILS'       => (object) [
-                'URL'  => NAILS_ASSETS_URL,
+                'URL'  => Config::get('NAILS_ASSETS_URL'),
                 'LANG' => (object) [],
                 'USER' => (object) [
                     'ID'    => activeUser('id') ? activeUser('id') : null,
@@ -680,9 +771,12 @@ abstract class Base extends \MX_Controller
      * Sets global JS
      *
      * @throws FactoryException
+     * @throws NailsException
+     * @throws AssetException
      */
     protected function setGlobalJs()
     {
+        /** @var Asset $oAsset */
         $oAsset    = Factory::service('Asset');
         $sCustomJs = appSetting('site_custom_js', 'site');
         if (!empty($sCustomJs)) {
@@ -713,10 +807,13 @@ abstract class Base extends \MX_Controller
     /**
      * Sets global CSS
      *
+     * @throws AssetException
      * @throws FactoryException
+     * @throws NailsException
      */
     protected function setGlobalCss()
     {
+        /** @var Asset $oAsset */
         $oAsset     = Factory::service('Asset');
         $sCustomCss = appSetting('site_custom_css', 'site');
         if (!empty($sCustomCss)) {

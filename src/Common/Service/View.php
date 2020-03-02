@@ -12,6 +12,7 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Exception\ViewNotFoundCaseException;
 use Nails\Common\Exception\ViewNotFoundException;
@@ -19,6 +20,11 @@ use Nails\Common\Traits\Caching;
 use Nails\Components;
 use Nails\Factory;
 
+/**
+ * Class View
+ *
+ * @package Nails\Common\Service
+ */
 class View
 {
     use Caching;
@@ -65,9 +71,9 @@ class View
         $this->aData        = &getControllerData();
         $this->iBufferLevel = ob_get_level();
         $this->aViewPaths   = [
-            NAILS_APP_PATH . 'application/modules/',
-            NAILS_APP_PATH . 'application/',
-            NAILS_COMMON_PATH,
+            \Nails\Config::get('NAILS_APP_PATH') . 'application/modules/',
+            \Nails\Config::get('NAILS_APP_PATH') . 'application/',
+            \Nails\Config::get('NAILS_COMMON_PATH'),
         ];
 
         foreach (Components::modules() as $oModule) {
@@ -105,6 +111,7 @@ class View
      * @param string|array $mKey   The key, or keys (in a key value pair), to set
      * @param mixed        $mValue The value to set
      *
+     * @return View
      * @throws \Exception
      * @returns $this
      */
@@ -155,6 +162,8 @@ class View
      * @param boolean      $bReturn Whether to return the view(s) or not
      *
      * @return mixed
+     * @throws ViewNotFoundException
+     * @throws FactoryException
      */
     public function load($mView, $aData = [], $bReturn = false)
     {
@@ -198,6 +207,7 @@ class View
             } elseif (ob_get_level() > $this->iBufferLevel + 1) {
                 ob_end_flush();
             } else {
+                /** @var Output $oOutput */
                 $oOutput = Factory::service('Output');
                 $oOutput->append_output(ob_get_contents());
                 @ob_end_clean();
@@ -219,6 +229,7 @@ class View
      * @return bool|string
      * @throws ViewNotFoundException
      * @throws ViewNotFoundCaseException
+     * @throws FactoryException
      */
     public function resolvePath($sView)
     {
@@ -310,7 +321,7 @@ class View
     // --------------------------------------------------------------------------
 
     /**
-     * Backwards compatability with CodeIgniter; allows views to load items using $this
+     * Backwards compatibility with CodeIgniter; allows views to load items using $this
      *
      * @param string $sProperty The property being requested
      *
@@ -326,9 +337,10 @@ class View
     /**
      * Determines if a view has previous been loaded or not
      *
-     * @param string $sView The view to checl
+     * @param string $sView The view to check
      *
      * @return bool
+     * @throws FactoryException
      */
     public function isLoaded(string $sView): bool
     {

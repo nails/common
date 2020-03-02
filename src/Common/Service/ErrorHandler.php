@@ -16,10 +16,12 @@ use Nails\Auth;
 use Nails\Common\Controller\Nails404Controller;
 use Nails\Common\Events;
 use Nails\Common\Exception\FactoryException;
+use Nails\Common\Exception\ViewNotFoundException;
 use Nails\Common\Helper\ArrayHelper;
 use Nails\Components;
 use Nails\Config;
 use Nails\Factory;
+use ReflectionException;
 use stdClass;
 
 /**
@@ -215,6 +217,9 @@ class ErrorHandler
      * @param stdClass $oDetails Breakdown of the error which occurred
      *
      * @return void
+     * @throws FactoryException
+     * @throws ReflectionException
+     * @throws ViewNotFoundException
      */
     public function showFatalErrorScreen($sSubject = '', $sMessage = '', $oDetails = null)
     {
@@ -260,6 +265,8 @@ class ErrorHandler
      * @param bool $bLogError Whether to log the error
      *
      * @throws FactoryException
+     * @throws ReflectionException
+     * @throws ViewNotFoundException
      */
     public function show404($bLogError = true)
     {
@@ -295,7 +302,7 @@ class ErrorHandler
         /**
          * If the SYSTEM_READY event hasn't been fired then we know that the app's controller hasn't been executed.
          * Instantiate this controller to allow the full application stack to execute, this allows the 404 views to
-         * make use of variables defined by /App/Sontroller/Base. Also, load CI's core services as they might not
+         * make use of variables defined by /App/Controller/Base. Also, load CI's core services as they might not
          * have been loaded.
          */
 
@@ -335,6 +342,10 @@ class ErrorHandler
      * @param string $sReturnUrl    The URL to return to after logging in
      * @param bool   $bLogError     Whether to log the error or not
      * @param bool   $bForceView    Force the view to render (ratehr than redirect to login)
+     *
+     * @throws FactoryException
+     * @throws ReflectionException
+     * @throws ViewNotFoundException
      */
     public function show401(
         string $sFlashMessage = null,
@@ -414,6 +425,10 @@ class ErrorHandler
      * @param string  $sView        The view to load
      * @param array   $aData        Data to make available to the view
      * @param boolean $bFlushBuffer Whether to flush the output buffer or not
+     *
+     * @throws FactoryException
+     * @throws ViewNotFoundException
+     * @throws ReflectionException
      */
     public static function renderErrorView(
         $sView,
@@ -453,7 +468,7 @@ class ErrorHandler
 
         //  App generic
         $aPaths[] = implode(DIRECTORY_SEPARATOR, [
-            NAILS_APP_PATH . 'application',
+            Config::get('NAILS_APP_PATH') . 'application',
             'views',
             'errors',
             $sType,
@@ -462,7 +477,7 @@ class ErrorHandler
 
         //  Nails
         $aPaths[] = implode(DIRECTORY_SEPARATOR, [
-            rtrim(NAILS_COMMON_PATH, DIRECTORY_SEPARATOR),
+            rtrim(Config::get('NAILS_COMMON_PATH'), DIRECTORY_SEPARATOR),
             'views',
             'errors',
             $sType,

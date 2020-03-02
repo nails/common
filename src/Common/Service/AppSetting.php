@@ -12,9 +12,16 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Common\Exception\EnvironmentException;
+use Nails\Common\Exception\FactoryException;
 use Nails\Common\Traits\ErrorHandling;
 use Nails\Factory;
 
+/**
+ * Class AppSetting
+ *
+ * @package Nails\Common\Service
+ */
 class AppSetting
 {
     use ErrorHandling;
@@ -31,7 +38,7 @@ class AppSetting
      */
     public function __construct()
     {
-        $this->sTable    = NAILS_DB_PREFIX . 'app_setting';
+        $this->sTable    = \Nails\Config::get('NAILS_DB_PREFIX') . 'app_setting';
         $this->aSettings = [];
     }
 
@@ -40,11 +47,12 @@ class AppSetting
     /**
      * Gets settings associated with a particular group/key
      *
-     * @param  string  $sKey          The key to retrieve
-     * @param  string  $sGrouping     The group the key belongs to
-     * @param  boolean $bForceRefresh Whether to force a group refresh
+     * @param string  $sKey          The key to retrieve
+     * @param string  $sGrouping     The group the key belongs to
+     * @param boolean $bForceRefresh Whether to force a group refresh
      *
-     * @return array
+     * @return mixed
+     * @throws FactoryException
      */
     public function get($sKey = null, $sGrouping = 'app', $bForceRefresh = false)
     {
@@ -87,40 +95,38 @@ class AppSetting
      * Set a group/key either by passing an array of key=>value pairs as the $key
      * or by passing a string to $key and setting $value
      *
-     * @param  mixed   $mKey      The key to set, or an array of key => value pairs
-     * @param  string  $sGrouping The grouping to store the keys under
-     * @param  mixed   $mValue    The data to store, only used if $mKey is a string
-     * @param  boolean $bEncrypt  Whether to encrypt the data or not
+     * @param mixed   $mKey      The key to set, or an array of key => value pairs
+     * @param string  $sGrouping The grouping to store the keys under
+     * @param mixed   $mValue    The data to store, only used if $mKey is a string
+     * @param boolean $bEncrypt  Whether to encrypt the data or not
      *
      * @return boolean
+     * @throws FactoryException
      */
     public function set($mKey, $sGrouping = 'app', $mValue = null, $bEncrypt = false)
     {
+        /** @var Database $oDb */
         $oDb = Factory::service('Database');
         $oDb->trans_begin();
 
         if (is_array($mKey)) {
 
             foreach ($mKey as $sKey => $mValue) {
-
                 $this->doSet($sKey, $sGrouping, $mValue, $bEncrypt);
             }
 
         } else {
-
             $this->doSet($mKey, $sGrouping, $mValue, $bEncrypt);
         }
 
         if ($oDb->trans_status() === false) {
 
             $oDb->trans_rollback();
-
             return false;
 
         } else {
 
             $oDb->trans_commit();
-
             return true;
         }
     }
@@ -136,6 +142,8 @@ class AppSetting
      * @param boolean $bEncrypt  Whether to encrypt the data or not
      *
      * @return void
+     * @throws FactoryException
+     * @throws EnvironmentException
      */
     protected function doSet($sKey, $sGrouping, $mValue, $bEncrypt)
     {
@@ -143,10 +151,12 @@ class AppSetting
         $bEncrypt = (bool) $bEncrypt;
 
         if ($bEncrypt) {
+            /** @var Encrypt $oEncrypt */
             $oEncrypt = Factory::service('Encrypt');
             $sValue   = $oEncrypt->encode($sValue);
         }
 
+        /** @var Database $oDb */
         $oDb = Factory::service('Database');
         $oDb->where('key', $sKey);
         $oDb->where('grouping', $sGrouping);
@@ -178,9 +188,11 @@ class AppSetting
      * @param string $sGrouping The key's grouping
      *
      * @return bool
+     * @throws FactoryException
      */
     public function delete($mKey, $sGrouping)
     {
+        /** @var Database $oDb */
         $oDb = Factory::service('Database');
         $oDb->trans_begin();
 
@@ -191,20 +203,17 @@ class AppSetting
             }
 
         } else {
-
             $this->doDelete($mKey, $sGrouping);
         }
 
         if ($oDb->trans_status() === false) {
 
             $oDb->trans_rollback();
-
             return false;
 
         } else {
 
             $oDb->trans_commit();
-
             return true;
         }
     }
@@ -214,13 +223,15 @@ class AppSetting
     /**
      * Actually performs the deletion of the row.
      *
-     * @param  string $sKey      The key to delete
-     * @param  string $sGrouping They key's grouping
+     * @param string $sKey      The key to delete
+     * @param string $sGrouping They key's grouping
      *
      * @return bool
+     * @throws FactoryException
      */
     protected function doDelete($sKey, $sGrouping)
     {
+        /** @var Database $oDb */
         $oDb = Factory::service('Database');
         $oDb->where('key', $sKey);
         $oDb->where('grouping', $sGrouping);
@@ -233,12 +244,14 @@ class AppSetting
     /**
      * Deletes all keys for a particular group.
      *
-     * @param  string $sGrouping The group to delete
+     * @param string $sGrouping The group to delete
      *
      * @return bool
+     * @throws FactoryException
      */
     public function deleteGroup($sGrouping)
     {
+        /** @var Database $oDb */
         $oDb = Factory::service('Database');
         $oDb->where('grouping', $sGrouping);
 
@@ -249,6 +262,7 @@ class AppSetting
 
     /**
      * Returns the table name used by app settings
+     *
      * @return string
      */
     public function getTableName()
