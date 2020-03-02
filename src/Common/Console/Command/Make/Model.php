@@ -2,20 +2,30 @@
 
 namespace Nails\Common\Console\Command\Make;
 
+use Exception;
 use Nails\Common\Exception\Database\ConnectionException;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Service\Database;
+use Nails\Common\Service\Locale;
+use Nails\Common\Service\PDODatabase;
 use Nails\Common\Traits\Model\Localised;
 use Nails\Components;
+use Nails\Config;
 use Nails\Console\Command\BaseMaker;
 use Nails\Console\Exception\Path;
 use Nails\Factory;
+use stdClass;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Class Model
+ *
+ * @package Nails\Common\Console\Command\Make
+ */
 class Model extends BaseMaker
 {
     const SERVICE_TOKEN          = 'MODELS';
@@ -108,7 +118,7 @@ class Model extends BaseMaker
                         $e->getMessage(),
                     ]
                 );
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 return $this->abort(
                     self::EXIT_CODE_FAILURE,
                     [
@@ -124,7 +134,7 @@ class Model extends BaseMaker
         try {
             $this
                 /**
-                 * Validate the services file for resources first, so that the corrcet
+                 * Validate the services file for resources first, so that the correct
                  * values are set on the second call.
                  */
                 ->validateServiceFile(static::SERVICE_RESOURCE_TOKEN)
@@ -135,7 +145,7 @@ class Model extends BaseMaker
                 $this->createPath(self::ADMIN_PATH);
             }
             $this->createModel();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->abort(
                 self::EXIT_CODE_FAILURE,
                 [$e->getMessage()]
@@ -163,7 +173,7 @@ class Model extends BaseMaker
      * Create the Model
      *
      * @return $this
-     * @throws \Exception
+     * @throws NailsException
      */
     private function createModel(): self
     {
@@ -228,8 +238,9 @@ class Model extends BaseMaker
 
             } else {
 
+                /** @var PDODatabase $oDb */
                 $oDb        = Factory::service('PDODatabase');
-                $sAppPrefix = defined('APP_DB_PREFIX') ? APP_DB_PREFIX : '';
+                $sAppPrefix = Config::get('APP_DB_PREFIX');
                 $oTables    = $oDb->query('SHOW TABLES LIKE "' . $sAppPrefix . '%";');
                 $aTables    = $oTables->fetchAll(\PDO::FETCH_NUM);
 
@@ -303,14 +314,14 @@ class Model extends BaseMaker
                             $bSkipSeeder
                         );
                     } elseif ($bLocalised && !$this->modelExists($oModel)) {
-                        list($sServiceDefinition, $sResourceDefinition) = $this->createLocalisedModel(
+                        [$sServiceDefinition, $sResourceDefinition] = $this->createLocalisedModel(
                             $oModel,
                             $bSkipDb,
                             $bAdmin,
                             $bSkipSeeder
                         );
                     } else {
-                        list($sServiceDefinition, $sResourceDefinition) = $this->createNormalModel(
+                        [$sServiceDefinition, $sResourceDefinition] = $this->createNormalModel(
                             $oModel,
                             $bSkipDb,
                             $bAdmin,
@@ -347,7 +358,7 @@ class Model extends BaseMaker
                 }
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if (!empty($aModelData)) {
                 foreach ($aModelData as $oModel) {
                     @unlink($oModel->path . '/' . $oModel->filename);
@@ -369,14 +380,14 @@ class Model extends BaseMaker
      *
      * @param string $sModelName The name of the model
      *
-     * @return \stdClass
-     * @throws \Exception
+     * @return stdClass
+     * @throws Exception
      */
-    private function prepareModelName($sModelName): \stdClass
+    private function prepareModelName($sModelName): stdClass
     {
         //  Prepare the supplied model name and test
-        $sModelName = preg_replace('/[^a-zA-Z\/ ]/', '', $sModelName);
-        $sModelName = preg_replace('/\//', ' \\ ', $sModelName);
+        $sModelName = preg_replace('/[^a-zA-Z\/\\\ ]/', '', $sModelName);
+        $sModelName = preg_replace('/(\/|\\\\)/', ' \\ ', $sModelName);
         $sModelName = ucwords($sModelName);
 
         //  Prepare the database table name
@@ -431,11 +442,11 @@ class Model extends BaseMaker
     /**
      * Determines whether a model exists already
      *
-     * @param \stdClass $oModel The model definition
+     * @param stdClass $oModel The model definition
      *
      * @return bool
      */
-    private function modelExists(\stdClass $oModel): bool
+    private function modelExists(stdClass $oModel): bool
     {
         return file_exists($oModel->path . $oModel->filename);
     }
@@ -443,15 +454,16 @@ class Model extends BaseMaker
     // --------------------------------------------------------------------------
 
     /**
-     * Detemine whether a particular table exists already
+     * Determine whether a particular table exists already
      *
-     * @param \stdClass $oModel The model definition
+     * @param stdClass $oModel The model definition
      *
      * @return bool
-     * @throws \Nails\Common\Exception\FactoryException
+     * @throws FactoryException
      */
-    private function tableExists(\stdClass $oModel): bool
+    private function tableExists(stdClass $oModel): bool
     {
+        /** @var PDODatabase $oDb */
         $oDb     = Factory::service('PDODatabase');
         $oResult = $oDb->query('SHOW TABLES LIKE "' . $oModel->table_with_prefix . '"');
         return $oResult->rowCount() > 0;
@@ -462,13 +474,15 @@ class Model extends BaseMaker
     /**
      * Orchestrates the conversion of a normal model to a localised model
      *
-     * @param \stdClass $oModel      The model being converted
-     * @param bool      $bSkipDb     Whether to skip table creation
-     * @param bool      $bAdmin      Whether to create an admin controller or not
-     * @param bool      $bSkipSeeder Whether to skip seeder creation
+     * @param stdClass $oModel      The model being converted
+     * @param bool     $bSkipDb     Whether to skip table creation
+     * @param bool     $bAdmin      Whether to create an admin controller or not
+     * @param bool     $bSkipSeeder Whether to skip seeder creation
+     *
+     * @throws FactoryException
      */
     private function convertExistingModelToLocalised(
-        \stdClass $oModel,
+        stdClass $oModel,
         bool $bSkipDb,
         bool $bAdmin,
         bool $bSkipSeeder
@@ -483,15 +497,20 @@ class Model extends BaseMaker
     /**
      * Orchestrates the creation of a localised model
      *
-     * @param \stdClass $oModel      The model being created
-     * @param bool      $bSkipDb     Whether to skip table creation
-     * @param bool      $bAdmin      Whether to create an admin controller or not
-     * @param bool      $bSkipSeeder Whether to skip seeder creation
+     * @param stdClass $oModel      The model being created
+     * @param bool     $bSkipDb     Whether to skip table creation
+     * @param bool     $bAdmin      Whether to create an admin controller or not
+     * @param bool     $bSkipSeeder Whether to skip seeder creation
      *
      * @return array
+     * @throws FactoryException
+     * @throws NailsException
+     * @throws Path\DoesNotExistException
+     * @throws Path\IsNotWritableException
+     * @throws Exception
      */
     private function createLocalisedModel(
-        \stdClass $oModel,
+        stdClass $oModel,
         bool $bSkipDb,
         bool $bAdmin,
         bool $bSkipSeeder
@@ -520,15 +539,20 @@ class Model extends BaseMaker
     /**
      * Orchestrates the creation of a  model
      *
-     * @param \stdClass $oModel      The model being created
-     * @param bool      $bSkipDb     Whether to skip table creation
-     * @param bool      $bAdmin      Whether to create an admin controller or not
-     * @param bool      $bSkipSeeder Whether to skip seeder creation
+     * @param stdClass $oModel      The model being created
+     * @param bool     $bSkipDb     Whether to skip table creation
+     * @param bool     $bAdmin      Whether to create an admin controller or not
+     * @param bool     $bSkipSeeder Whether to skip seeder creation
      *
      * @return array
+     * @throws FactoryException
+     * @throws NailsException
+     * @throws Path\DoesNotExistException
+     * @throws Path\IsNotWritableException
+     * @throws Exception
      */
     private function createNormalModel(
-        \stdClass $oModel,
+        stdClass $oModel,
         bool $bSkipDb,
         bool $bAdmin,
         bool $bSkipSeeder
@@ -558,15 +582,15 @@ class Model extends BaseMaker
     /**
      * Creates the model file
      *
-     * @param \stdClass $oModel    The model being created
-     * @param string    $sTemplate The template to use
+     * @param stdClass $oModel    The model being created
+     * @param string   $sTemplate The template to use
      *
      * @return $this
      * @throws NailsException
      * @throws Path\DoesNotExistException
      * @throws Path\IsNotWritableException
      */
-    private function createModelFile(\stdClass $oModel, string $sTemplate): self
+    private function createModelFile(stdClass $oModel, string $sTemplate): self
     {
         $this->oOutput->write('Creating model <comment>' . $oModel->class_path . '</comment>... ');
         $this->createPath($oModel->path);
@@ -584,15 +608,15 @@ class Model extends BaseMaker
     /**
      * Creates the resource file
      *
-     * @param \stdClass $oModel    The model being created
-     * @param string    $sTemplate The template to use
+     * @param stdClass $oModel    The model being created
+     * @param string   $sTemplate The template to use
      *
      * @return $this
      * @throws NailsException
      * @throws Path\DoesNotExistException
      * @throws Path\IsNotWritableException
      */
-    private function createResource(\stdClass $oModel, string $sTemplate): self
+    private function createResource(stdClass $oModel, string $sTemplate): self
     {
         $this->oOutput->write('Creating resource <comment>' . $oModel->resource_class_path . '</comment>... ');
         $this->createPath($oModel->resource_path);
@@ -610,18 +634,20 @@ class Model extends BaseMaker
     /**
      * Creates the database table
      *
-     * @param \stdClass $oModel    The model being created
-     * @param string    $sTemplate The template to use
+     * @param stdClass $oModel    The model being created
+     * @param string   $sTemplate The template to use
      *
      * @return $this
      * @throws NailsException
      * @throws FactoryException
      */
-    private function createDatabaseTable(\stdClass $oModel, string $sTemplate): self
+    private function createDatabaseTable(stdClass $oModel, string $sTemplate): self
     {
+        /** @var PDODatabase $oDb */
+        $oDb = Factory::service('PDODatabase');
+
         $this->oOutput->write('Adding database table... ');
-        $oModel->nails_db_prefix = NAILS_DB_PREFIX;
-        $oDb                     = Factory::service('PDODatabase');
+        $oModel->nails_db_prefix = Config::get('NAILS_DB_PREFIX');
         $oDb->query($this->getResource('template/' . $sTemplate . '.php', (array) $oModel));
         $this->oOutput->writeln('<info>done!</info>');
 
@@ -633,12 +659,12 @@ class Model extends BaseMaker
     /**
      * Creates an admin controller
      *
-     * @param \stdClass $oModel The model being created
+     * @param stdClass $oModel The model being created
      *
      * @return $this
-     * @throws \Exception
+     * @throws Exception
      */
-    private function createAdminController(\stdClass $oModel): self
+    private function createAdminController(stdClass $oModel): self
     {
         $this->oOutput->write('Creating admin controller... ');
         //  Execute the create command, non-interactively and silently
@@ -665,12 +691,12 @@ class Model extends BaseMaker
     /**
      * Creates a seeder
      *
-     * @param \stdClass $oModel The model being created
+     * @param stdClass $oModel The model being created
      *
      * @return $this
-     * @throws \Exception
+     * @throws Exception
      */
-    private function createSeeder(\stdClass $oModel)
+    private function createSeeder(stdClass $oModel)
     {
         $this->oOutput->write('Creating seeder... ');
         //  Execute the create command, non-interactively and silently
@@ -695,13 +721,13 @@ class Model extends BaseMaker
     // --------------------------------------------------------------------------
 
     /**
-     * Genenrates the service file definitions for a model
+     * Generates the service file definitions for a model
      *
-     * @param \stdClass $oModel The model being created
+     * @param stdClass $oModel The model being created
      *
      * @return string[]
      */
-    private function generateServiceDefinitions(\stdClass $oModel): array
+    private function generateServiceDefinitions(stdClass $oModel): array
     {
         return [
             //  Service definition
@@ -725,11 +751,11 @@ class Model extends BaseMaker
     /**
      * Adds a `use Localised` statement to a model
      *
-     * @param \stdClass $oModel The model being converted
+     * @param stdClass $oModel The model being converted
      *
      * @return $this
      */
-    private function addLocalisedUseStatement(\stdClass $oModel): self
+    private function addLocalisedUseStatement(stdClass $oModel): self
     {
         $sFile = file_get_contents($oModel->path . $oModel->filename);
 
@@ -794,15 +820,16 @@ class Model extends BaseMaker
     /**
      * Converts existing non-localised model tables to a localised version
      *
-     * @param \stdClass $oModel The model being converted
+     * @param stdClass $oModel The model being converted
      *
      * @return $this
+     * @throws FactoryException
      */
-    private function convertTablesToLocalised(\stdClass $oModel): self
+    private function convertTablesToLocalised(stdClass $oModel): self
     {
         /** @var Database $oDb */
         $oDb = Factory::service('Database');
-        /** @var \Nails\Common\Service\Locale $locale */
+        /** @var Locale $locale */
         $oLocale = Factory::service('Locale');
 
         $aQueries = [
