@@ -23,7 +23,7 @@ class DefaultSeed extends Base
      * @var string
      */
     const CONFIG_MODEL_NAME     = '';
-    const CONFIG_MODEL_PROVIDER = '';
+    const CONFIG_MODEL_PROVIDER = 'app';
 
     /**
      * Defines the priority of the seeder, useful for ordering

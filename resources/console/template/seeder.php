@@ -19,8 +19,7 @@ use Nails\Common\Console\Seed\DefaultSeed;
  */
 class {{MODEL_NAME}} extends DefaultSeed
 {
-    const CONFIG_MODEL_NAME     = '{{MODEL_NAME}}';
-    const CONFIG_MODEL_PROVIDER = 'app';
+    const CONFIG_MODEL_NAME = '{{MODEL_NAME}}';
 }
 
 EOD;

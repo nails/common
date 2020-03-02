@@ -195,7 +195,7 @@ abstract class Base
      *
      * @var string
      */
-    const RESOURCE_PROVIDER = null;
+    const RESOURCE_PROVIDER = 'app';
 
     // --------------------------------------------------------------------------
 
