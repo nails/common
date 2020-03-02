@@ -272,6 +272,13 @@ return [
                 return new Service\Security();
             }
         },
+        'Session'                        => function (): Service\Session {
+            if (class_exists('\App\Common\Service\Session')) {
+                return new \App\Common\Service\Session();
+            } else {
+                return new Service\Session();
+            }
+        },
         'Typography'                     => function (): Service\Typography {
             if (class_exists('\App\Common\Service\Typography')) {
                 return new \App\Common\Service\Typography();
