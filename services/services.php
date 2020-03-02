@@ -460,6 +460,13 @@ return [
     ],
 
     'resources' => [
+        'AppSetting'       => function ($oObj): Resource\AppSetting {
+            if (class_exists('\App\Common\Resource\AppSetting')) {
+                return new \App\Common\Resource\AppSetting($oObj);
+            } else {
+                return new Resource\AppSetting($oObj);
+            }
+        },
         'Cookie'           => function ($oObj): Resource\Cookie {
             if (class_exists('\App\Common\Resource\Cookie')) {
                 return new \App\Common\Resource\Cookie($oObj);

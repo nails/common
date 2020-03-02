@@ -14,7 +14,9 @@ namespace Nails\Common\Service;
 
 use Nails\Common\Exception\EnvironmentException;
 use Nails\Common\Exception\FactoryException;
+use Nails\Common\Resource;
 use Nails\Common\Traits\ErrorHandling;
+use Nails\Config;
 use Nails\Factory;
 
 /**
@@ -28,18 +30,44 @@ class AppSetting
 
     // --------------------------------------------------------------------------
 
+    /** @var string */
     protected $sTable;
-    protected $aSettings;
+
+    /** @var array */
+    protected $aSettings = [];
 
     // --------------------------------------------------------------------------
 
     /**
-     * Construct the setting model, set defaults
+     * AppSetting constructor.
      */
     public function __construct()
     {
-        $this->sTable    = \Nails\Config::get('NAILS_DB_PREFIX') . 'app_setting';
-        $this->aSettings = [];
+        $this->sTable = Config::get('NAILS_DB_PREFIX') . 'app_setting';
+        $this->load();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Loads app settings from the database
+     *
+     * @return $this
+     * @throws FactoryException
+     */
+    protected function load(): self
+    {
+        /** @var Database $oDb */
+        $oDb = Factory::service('Database');
+
+        $this->aSettings = array_map(
+            function (\stdClass $oSetting) {
+                return Factory::resource('AppSetting', null, $oSetting);
+            },
+            $oDb->get($this->sTable)->result()
+        );
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -47,45 +75,38 @@ class AppSetting
     /**
      * Gets settings associated with a particular group/key
      *
-     * @param string  $sKey          The key to retrieve
-     * @param string  $sGrouping     The group the key belongs to
-     * @param boolean $bForceRefresh Whether to force a group refresh
+     * @param string $sKey          The key to retrieve
+     * @param string $sGrouping     The group the key belongs to
+     * @param bool   $bForceRefresh Whether to force a group refresh
      *
-     * @return mixed
+     * @return Resource\AppSetting[]|Resource\AppSetting|null
      * @throws FactoryException
      */
-    public function get($sKey = null, $sGrouping = 'app', $bForceRefresh = false)
+    public function get(string $sKey = null, string $sGrouping = 'app', bool $bForceRefresh = false)
     {
-        if (!isset($this->aSettings[$sGrouping]) || $bForceRefresh) {
-
-            $oDb = Factory::service('Database');
-            $oDb->where('grouping', $sGrouping);
-            $aSettings = $oDb->get($this->sTable)->result();
-
-            $this->aSettings[$sGrouping] = [];
-
-            foreach ($aSettings as $oSetting) {
-
-                $sValue = $oSetting->value;
-
-                if (!empty($oSetting->is_encrypted)) {
-                    $oEncrypt = Factory::service('Encrypt');
-                    $sValue   = $oEncrypt->decode($sValue);
-                }
-
-                $this->aSettings[$sGrouping][$oSetting->key] = json_decode($sValue);
-            }
+        if ($bForceRefresh) {
+            $this->load();
         }
 
-        // --------------------------------------------------------------------------
+        $aSettings = array_values(
+            array_filter(
+                $this->aSettings,
+                function (Resource\AppSetting $oSetting) use ($sGrouping) {
+                    return $oSetting->grouping === $sGrouping;
+                }
+            )
+        );
 
         if (empty($sKey)) {
-
-            return $this->aSettings[$sGrouping];
-
+            return $aSettings;
         } else {
-
-            return isset($this->aSettings[$sGrouping][$sKey]) ? $this->aSettings[$sGrouping][$sKey] : null;
+            $aSettings = array_filter(
+                $aSettings,
+                function (Resource\AppSetting $oSetting) use ($sKey) {
+                    return $oSetting->key === $sKey;
+                }
+            );
+            return reset($aSettings) ?: null;
         }
     }
 
@@ -95,39 +116,35 @@ class AppSetting
      * Set a group/key either by passing an array of key=>value pairs as the $key
      * or by passing a string to $key and setting $value
      *
-     * @param mixed   $mKey      The key to set, or an array of key => value pairs
-     * @param string  $sGrouping The grouping to store the keys under
-     * @param mixed   $mValue    The data to store, only used if $mKey is a string
-     * @param boolean $bEncrypt  Whether to encrypt the data or not
+     * @param string|string[] $mKey      The key to set, or an array of key => value pairs
+     * @param string          $sGrouping The grouping to store the keys under
+     * @param mixed           $mValue    The data to store, only used if $mKey is a string
+     * @param bool            $bEncrypt  Whether to encrypt the data or not
      *
-     * @return boolean
+     * @return bool
      * @throws FactoryException
      */
-    public function set($mKey, $sGrouping = 'app', $mValue = null, $bEncrypt = false)
+    public function set($mKey, string $sGrouping = 'app', $mValue = null, bool $bEncrypt = false): bool
     {
         /** @var Database $oDb */
         $oDb = Factory::service('Database');
         $oDb->trans_begin();
 
-        if (is_array($mKey)) {
+        try {
 
-            foreach ($mKey as $sKey => $mValue) {
-                $this->doSet($sKey, $sGrouping, $mValue, $bEncrypt);
+            if (is_array($mKey)) {
+                foreach ($mKey as $sKey => $mValue) {
+                    $this->doSet($sKey, $sGrouping, $mValue, $bEncrypt);
+                }
+            } else {
+                $this->doSet($mKey, $sGrouping, $mValue, $bEncrypt);
             }
-
-        } else {
-            $this->doSet($mKey, $sGrouping, $mValue, $bEncrypt);
-        }
-
-        if ($oDb->trans_status() === false) {
-
-            $oDb->trans_rollback();
-            return false;
-
-        } else {
-
             $oDb->trans_commit();
             return true;
+
+        } catch (\Exception $e) {
+            $oDb->trans_rollback();
+            return false;
         }
     }
 
@@ -136,19 +153,18 @@ class AppSetting
     /**
      * Inserts/Updates a group/key value
      *
-     * @param string  $sKey      The key to set
-     * @param string  $sGrouping The key's grouping
-     * @param mixed   $mValue    The value of the group/key
-     * @param boolean $bEncrypt  Whether to encrypt the data or not
+     * @param string $sKey      The key to set
+     * @param string $sGrouping The key's grouping
+     * @param mixed  $mValue    The value of the setting
+     * @param bool   $bEncrypt  Whether to encrypt the data or not
      *
      * @return void
      * @throws FactoryException
      * @throws EnvironmentException
      */
-    protected function doSet($sKey, $sGrouping, $mValue, $bEncrypt)
+    protected function doSet(string $sKey, string $sGrouping, $mValue, bool $bEncrypt): void
     {
-        $sValue   = json_encode($mValue);
-        $bEncrypt = (bool) $bEncrypt;
+        $sValue = json_encode($mValue);
 
         if ($bEncrypt) {
             /** @var Encrypt $oEncrypt */
@@ -182,39 +198,36 @@ class AppSetting
     // --------------------------------------------------------------------------
 
     /**
-     * Deletes a key for a particular group
+     * Deletes a key(s) for a particular group
      *
-     * @param mixed  $mKey      The key to delete
-     * @param string $sGrouping The key's grouping
+     * @param string|string[] $mKey      The key to delete
+     * @param string          $sGrouping The key's grouping
      *
      * @return bool
      * @throws FactoryException
      */
-    public function delete($mKey, $sGrouping)
+    public function delete($mKey, string $sGrouping): bool
     {
         /** @var Database $oDb */
         $oDb = Factory::service('Database');
         $oDb->trans_begin();
 
-        if (is_array($mKey)) {
+        try {
 
-            foreach ($mKey as $sKey) {
-                $this->doDelete($sKey, $sGrouping);
+            if (is_array($mKey)) {
+                foreach ($mKey as $sKey) {
+                    $this->doDelete($sKey, $sGrouping);
+                }
+            } else {
+                $this->doDelete($mKey, $sGrouping);
             }
-
-        } else {
-            $this->doDelete($mKey, $sGrouping);
-        }
-
-        if ($oDb->trans_status() === false) {
-
-            $oDb->trans_rollback();
-            return false;
-
-        } else {
 
             $oDb->trans_commit();
             return true;
+
+        } catch (\Exception $e) {
+            $oDb->trans_rollback();
+            return false;
         }
     }
 
@@ -229,7 +242,7 @@ class AppSetting
      * @return bool
      * @throws FactoryException
      */
-    protected function doDelete($sKey, $sGrouping)
+    protected function doDelete(string $sKey, string $sGrouping): bool
     {
         /** @var Database $oDb */
         $oDb = Factory::service('Database');
@@ -249,7 +262,7 @@ class AppSetting
      * @return bool
      * @throws FactoryException
      */
-    public function deleteGroup($sGrouping)
+    public function deleteGroup(string $sGrouping): bool
     {
         /** @var Database $oDb */
         $oDb = Factory::service('Database');
@@ -265,7 +278,7 @@ class AppSetting
      *
      * @return string
      */
-    public function getTableName()
+    public function getTableName(): string
     {
         return $this->sTable;
     }
