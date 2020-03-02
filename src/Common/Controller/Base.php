@@ -30,6 +30,7 @@ use Nails\Common\Service\Language;
 use Nails\Common\Service\Meta;
 use Nails\Common\Service\Output;
 use Nails\Common\Service\Profiler;
+use Nails\Common\Service\Session;
 use Nails\Common\Service\Uri;
 use Nails\Common\Service\UserFeedback;
 use Nails\Components;
@@ -603,8 +604,8 @@ abstract class Base extends \MX_Controller
 
             $oAuthService->logout();
 
-            /** @var Auth\Service\Session $oSession */
-            $oSession = Factory::service('Session', Auth\Constants::MODULE_SLUG);
+            /** @var Session $oSession */
+            $oSession = Factory::service('Session');
             $oSession->setFlashData('error', lang('auth_login_fail_suspended'));
             redirect('/');
         }
@@ -622,8 +623,8 @@ abstract class Base extends \MX_Controller
     public static function populateUserFeedback(array &$aData)
     {
         //  Set User Feedback alerts for the views
-        /** @var Auth\Service\Session $oSession */
-        $oSession = Factory::service('Session', Auth\Constants::MODULE_SLUG);
+        /** @var Session $oSession */
+        $oSession = Factory::service('Session');
         /** @var UserFeedback $oUserFeedback */
         $oUserFeedback = Factory::service('UserFeedback');
 

@@ -390,8 +390,8 @@ class ErrorHandler
 
         } else {
 
-            /** @var Auth\Service\Session $oSession */
-            $oSession = Factory::service('Session', Auth\Constants::MODULE_SLUG);
+            /** @var Session $oSession */
+            $oSession = Factory::service('Session');
             /** @var Input $oInput */
             $oInput = Factory::service('Input');
 

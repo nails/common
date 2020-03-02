@@ -9,13 +9,13 @@
  * @author      Nails Dev Team
  * @link
  *
- * @todo Add "actions" to messages (i.e. buttons)
- * @todo Match the naming convention of Bootstrap Alerts
+ * @todo        Add "actions" to messages (i.e. buttons)
+ * @todo        Match the naming convention of Bootstrap Alerts
  */
 
 namespace Nails\Common\Service;
 
-use Nails\Auth;
+use Nails\Common\Exception\FactoryException;
 use Nails\Factory;
 
 /**
@@ -25,31 +25,40 @@ use Nails\Factory;
  */
 class UserFeedback
 {
+    /** @var string */
     private $sSessionKey;
+
+    /** @var Session */
     private $oSession;
+
+    /** @var array */
     private $aMessages;
 
     // --------------------------------------------------------------------------
 
     /**
-     * Construct the class
+     * UserFeedback constructor.
+     *
+     * @throws FactoryException
      */
     public function __construct()
     {
         $this->sSessionKey = 'NailsUserFeedback';
-        $this->oSession    = Factory::service('Session', Auth\Constants::MODULE_SLUG);
-        $this->aMessages   = $this->oSession->getFlashData($this->sSessionKey) ?: array();
+        $this->oSession    = Factory::service('Session');
+        $this->aMessages   = $this->oSession->getFlashData($this->sSessionKey) ?: [];
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Set a feedback message
-     * @param  string $sType    The type of message to set
-     * @param  string $sMessage The message to set
-     * @return Object
+     *
+     * @param string $sType    The type of message to set
+     * @param string $sMessage The message to set
+     *
+     * @return $this
      */
-    public function set($sType, $sMessage)
+    public function set($sType, $sMessage): self
     {
         $sType    = strtoupper(trim($sType));
         $sMessage = trim($sMessage);
@@ -63,11 +72,15 @@ class UserFeedback
 
     /**
      * Persist the messages until the next page load
-     * @return object
+     *
+     * @return $this
      */
-    public function persist()
+    public function persist(): self
     {
-        $this->oSession->setFlashData($this->sSessionKey, $this->aMessages);
+        $this->oSession->setFlashData(
+            $this->sSessionKey,
+            $this->aMessages
+        );
         return $this;
     }
 
@@ -75,50 +88,47 @@ class UserFeedback
 
     /**
      * Return a feedack message
-     * @param  string $sType The type of feedback to return
+     *
+     * @param string $sType The type of feedback to return
+     *
      * @return string
      */
-    public function get($sType)
+    public function get($sType): string
     {
         $sType = strtoupper(trim($sType));
-
-        if (!empty($this->aMessages[$sType])) {
-
-            return $this->aMessages[$sType];
-
-        } else {
-
-            return '';
-        }
+        return $this->aMessages[$sType] ?? '';
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Clear feedback messages
-     * @param  string $sType The type of feedback to clear
-     * @return
+     *
+     * @param string $sType The type of feedback to clear
+     *
+     * @return $this
      */
-    public function clear($sType = '')
+    public function clear($sType = ''): self
     {
         if (empty($sType)) {
-
-            $this->aMessages[$sType] = array();
-
+            $this->aMessages[$sType] = [];
         } else {
-
             $this->aMessages[$sType] = '';
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Set a "success" feedback message
-     * @param  string $sMessage The message to set
-     * @return Object
+     *
+     * @param string $sMessage The message to set
+     *
+     * @return $this
      */
-    public function success($sMessage)
+    public function success($sMessage): self
     {
         return $this->set('success', $sMessage);
     }
@@ -127,9 +137,10 @@ class UserFeedback
 
     /**
      * Return the "success" feedback message
+     *
      * @return string
      */
-    public function getSuccess()
+    public function getSuccess(): string
     {
         return $this->get('success');
     }
@@ -138,10 +149,12 @@ class UserFeedback
 
     /**
      * Set a "positive" feedback message
-     * @param  string $sMessage The message to set
-     * @return Object
+     *
+     * @param string $sMessage The message to set
+     *
+     * @return $this
      */
-    public function positive($sMessage)
+    public function positive($sMessage): self
     {
         return $this->set('positive', $sMessage);
     }
@@ -150,9 +163,10 @@ class UserFeedback
 
     /**
      * Return the "positive" feedback message
+     *
      * @return string
      */
-    public function getPositive()
+    public function getPositive(): string
     {
         return $this->get('positive');
     }
@@ -161,10 +175,12 @@ class UserFeedback
 
     /**
      * Set a "error" feedback message
-     * @param  string $sMessage The message to set
-     * @return Object
+     *
+     * @param string $sMessage The message to set
+     *
+     * @return $this
      */
-    public function error($sMessage)
+    public function error($sMessage): self
     {
         return $this->set('error', $sMessage);
     }
@@ -173,9 +189,10 @@ class UserFeedback
 
     /**
      * Return the "error" feedback message
+     *
      * @return string
      */
-    public function getError()
+    public function getError(): string
     {
         return $this->get('error');
     }
@@ -184,10 +201,12 @@ class UserFeedback
 
     /**
      * Set a "negative" feedback message
-     * @param  string $sMessage The message to set
-     * @return Object
+     *
+     * @param string $sMessage The message to set
+     *
+     * @return $this
      */
-    public function negative($sMessage)
+    public function negative($sMessage): self
     {
         return $this->set('negative', $sMessage);
     }
@@ -196,9 +215,10 @@ class UserFeedback
 
     /**
      * Return the "negative" feedback message
+     *
      * @return string
      */
-    public function getNegative()
+    public function getNegative(): string
     {
         return $this->get('negative');
     }
@@ -207,11 +227,13 @@ class UserFeedback
 
     /**
      * Set a "message" feedback message
+     *
+     * @param string $sMessage The message to set
+     *
+     * @return $this
      * @deprecated
-     * @param  string $sMessage The message to set
-     * @return Object
      */
-    public function message($sMessage)
+    public function message($sMessage): self
     {
         return $this->set('message', $sMessage);
     }
@@ -220,10 +242,11 @@ class UserFeedback
 
     /**
      * Return the "message" feedback message
-     * @deprecated
+     *
      * @return string
+     * @deprecated
      */
-    public function getMessage()
+    public function getMessage(): string
     {
         return $this->get('message');
     }
@@ -232,10 +255,12 @@ class UserFeedback
 
     /**
      * Set a "warning" feedback message
-     * @param  string $sMessage The message to set
-     * @return Object
+     *
+     * @param string $sMessage The message to set
+     *
+     * @return $this
      */
-    public function warning($sMessage)
+    public function warning($sMessage): self
     {
         return $this->set('warning', $sMessage);
     }
@@ -244,9 +269,10 @@ class UserFeedback
 
     /**
      * Return the "warning" feedback message
+     *
      * @return string
      */
-    public function getWarning()
+    public function getWarning(): string
     {
         return $this->get('message');
     }
@@ -255,11 +281,13 @@ class UserFeedback
 
     /**
      * Set a "notice" feedback message
+     *
+     * @param string $sMessage The message to set
+     *
+     * @return $this
      * @deprecated
-     * @param  string $sMessage The message to set
-     * @return Object
      */
-    public function notice($sMessage)
+    public function notice($sMessage): self
     {
         return $this->set('notice', $sMessage);
     }
@@ -268,10 +296,11 @@ class UserFeedback
 
     /**
      * Return the "notice" feedback message
-     * @deprecated
+     *
      * @return string
+     * @deprecated
      */
-    public function getNotice()
+    public function getNotice(): string
     {
         return $this->get('notice');
     }
@@ -280,10 +309,12 @@ class UserFeedback
 
     /**
      * Set a "info" feedback message
-     * @param  string $sMessage The message to set
-     * @return Object
+     *
+     * @param string $sMessage The message to set
+     *
+     * @return $this
      */
-    public function info($sMessage)
+    public function info($sMessage): self
     {
         return $this->set('info', $sMessage);
     }
@@ -292,9 +323,10 @@ class UserFeedback
 
     /**
      * Return the "notice" feedback message
+     *
      * @return string
      */
-    public function getInfo()
+    public function getInfo(): string
     {
         return $this->get('info');
     }
