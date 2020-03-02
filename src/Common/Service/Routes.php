@@ -18,11 +18,23 @@ use Nails\Components;
 use Nails\Factory;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Class Routes
+ *
+ * @package Nails\Common\Service
+ */
 class Routes
 {
     use ErrorHandling;
 
     // --------------------------------------------------------------------------
+
+    /**
+     * Where the routes file should be written to
+     *
+     * @var string
+     */
+    protected $sRoutesDir;
 
     /**
      * Whether the routes can be written
@@ -43,12 +55,7 @@ class Routes
      *
      * @var array
      */
-    protected $aRoutes;
-
-    /**
-     * Where to store the routes file
-     */
-    const ROUTES_DIR = CACHE_PATH;
+    protected $aRoutes = [];
 
     /**
      * The name to give the routes file
@@ -63,13 +70,26 @@ class Routes
     public function __construct()
     {
         //  Set Defaults
-        $this->bCanWriteRoutes = null;
-        $this->aRoutes         = [];
+        /** @var FileCache $oFileCache */
+        $oFileCache       = Factory::service('FileCache');
+        $this->sRoutesDir = $oFileCache->getDir();
 
         if (!$this->canWriteRoutes()) {
             $this->sCantWriteReason = $this->lastError();
             $this->clearErrors();
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the file to use for saving routes
+     *
+     * @return string
+     */
+    public function getRoutesFile(): string
+    {
+        return $this->sRoutesDir . static::ROUTES_FILE;
     }
 
     // --------------------------------------------------------------------------
@@ -177,7 +197,7 @@ class Routes
         $sData .= ' * next time the app routes are generated.' . "\n";
         $sData .= ' *' . "\n";
         $sData .= ' * See Nails docs for instructions on how to utilise the' . "\n";
-        $sData .= ' * routes_app.php file' . "\n";
+        $sData .= ' * ' . static::ROUTES_FILE . ' file' . "\n";
         $sData .= ' *' . "\n";
         $sData .= ' **/' . "\n\n";
 
@@ -193,13 +213,14 @@ class Routes
             }
         }
 
+        /** @var \DateTime $oDate */
         $oDate = Factory::factory('DateTime');
         $sData .= "\n" . '//LAST GENERATED: ' . $oDate->format('Y-m-d H:i:s');
         $sData .= "\n";
 
         // --------------------------------------------------------------------------
 
-        $fHandle = @fopen(static::ROUTES_DIR . static::ROUTES_FILE, 'w');
+        $fHandle = @fopen($this->getRoutesFile(), 'w');
 
         if (!$fHandle) {
             $this->setError('Unable to open routes file for writing.');
@@ -229,10 +250,12 @@ class Routes
             return $this->bCanWriteRoutes;
         }
 
-        //  First, test if file exists, if it does is it writable?
-        if (file_exists(static::ROUTES_DIR . static::ROUTES_FILE)) {
+        $sFile = $this->getRoutesFile();
 
-            if (is_writable(static::ROUTES_DIR . static::ROUTES_FILE)) {
+        //  First, test if file exists, if it does is it writable?
+        if (file_exists($sFile)) {
+
+            if (is_writable($sFile)) {
 
                 $this->bCanWriteRoutes = true;
                 return true;
@@ -240,7 +263,7 @@ class Routes
             } else {
 
                 //  Attempt to chmod the file
-                if (@chmod(static::ROUTES_DIR . static::ROUTES_FILE, FILE_WRITE_MODE)) {
+                if (@chmod($sFile, FILE_WRITE_MODE)) {
 
                     $this->bCanWriteRoutes = true;
                     return true;
@@ -253,7 +276,7 @@ class Routes
                 }
             }
 
-        } elseif (is_writable(static::ROUTES_DIR)) {
+        } elseif (is_writable($this->sRoutesDir)) {
 
             $this->bCanWriteRoutes = true;
             return true;
@@ -261,14 +284,14 @@ class Routes
         } else {
 
             //  Attempt to chmod the directory
-            if (@chmod(static::ROUTES_DIR, DIR_WRITE_MODE)) {
+            if (@chmod($this->sRoutesDir, DIR_WRITE_MODE)) {
 
                 $this->bCanWriteRoutes = true;
                 return true;
 
             } else {
 
-                $this->setError('The route directory is not writable. <small>' . static::ROUTES_DIR . '</small>');
+                $this->setError('The route directory is not writable. <small>' . $this->sRoutesDir . '</small>');
                 $this->bCanWriteRoutes = false;
                 return false;
             }
