@@ -177,8 +177,6 @@ class Database
             'cachedir' => $oFileCache->getDir(),
         ];
 
-
-
         $sDbPath = BASEPATH . 'database/';
         require_once $sDbPath . 'DB_driver.php';
         require_once $sDbPath . 'DB_query_builder.php';
