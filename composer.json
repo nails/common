@@ -44,7 +44,8 @@
         "mustache/mustache": "2.*",
         "pimple/pimple": "3.*",
         "ralouphie/getallheaders": "3.*",
-        "symfony/mime": "5.*"
+        "symfony/mime": "5.*",
+        "symfony/http-foundation": "^5.0"
     },
     "require-dev": {
         "phpunit/phpunit": "8.*"
