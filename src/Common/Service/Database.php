@@ -212,6 +212,11 @@ class Database
 
         // --------------------------------------------------------------------------
 
+        //  Make sure the database is running on UTC
+        $this->query('SET time_zone = \'+0:00\'');
+
+        // --------------------------------------------------------------------------
+
         /**
          * If we're testing then define a global transaction which will be rolled back
          * at the end of the request. This is to ensure that the request does not make

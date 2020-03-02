@@ -424,12 +424,6 @@ abstract class Base extends \MX_Controller
         $sFormatTime = $sFormatTime ? $sFormatTime : Config::get('APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG');
 
         $oDateTimeService->setUserFormats($sFormatDate, $sFormatTime);
-
-        // --------------------------------------------------------------------------
-
-        //  Make sure the database is running on UTC
-        $oDb = Factory::service('Database');
-        $oDb->query('SET time_zone = \'+0:00\'');
     }
 
     // --------------------------------------------------------------------------
