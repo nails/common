@@ -39,6 +39,13 @@ class {{CLASS_NAME}} extends Base
      * @var string
      */
     const RESOURCE_NAME = '{{SERVICE_NAME}}';
+
+    /**
+     * The provider of the resource to use (as passed to \Nails\Factory::resource())
+     *
+     * @var string
+     */
+    const RESOURCE_PROVIDER = 'app';
 }
 
 EOD;
