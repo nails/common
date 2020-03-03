@@ -16,6 +16,11 @@ use Nails\Common\Exception\NailsException;
 use Nails\Components;
 use Nails\Factory;
 
+/**
+ * Class BaseComponent
+ *
+ * @package Nails\Common\Model
+ */
 abstract class BaseComponent
 {
     protected $sComponentType;
