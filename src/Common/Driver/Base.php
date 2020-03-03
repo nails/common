@@ -14,6 +14,11 @@ namespace Nails\Common\Driver;
 
 use Nails\Components;
 
+/**
+ * Class Base
+ *
+ * @package Nails\Common\Driver
+ */
 abstract class Base
 {
     protected $sSlug;

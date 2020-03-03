@@ -97,7 +97,8 @@ abstract class BaseComponent
         if ($this->bEnableMultiple) {
 
             $this->mEnabled = [];
-            $aEnabled       = json_decode(appSetting($this->sEnabledSetting, $this->sModule)) ?: [];
+            $oSetting       = appSetting($this->sEnabledSetting, $this->sModule);
+            $aEnabled       = $oSetting ? ($oSetting->getValue() ?: []) : [];
 
             foreach ($this->aComponents as $oComponent) {
                 if (in_array($oComponent->slug, $aEnabled)) {
@@ -181,7 +182,7 @@ abstract class BaseComponent
     /**
      * Get a component by it's slug
      *
-     * @param  string $sSlug The components's slug
+     * @param string $sSlug The components's slug
      *
      * @return \stdClass
      */
@@ -215,8 +216,8 @@ abstract class BaseComponent
      *
      * @param array|string $mSlug The slug to set as enabled, or array of slugs if bEnableMultiple is true
      *
-     * @throws NailsException
      * @return $this
+     * @throws NailsException
      */
     public function saveEnabled($mSlug)
     {
@@ -249,8 +250,8 @@ abstract class BaseComponent
     /**
      * Recursively gets all the settings from the settings array
      *
-     * @param  array  $aSettings The array of field sets and/or settings
-     * @param  string $sSlug     The components's slug
+     * @param array  $aSettings The array of field sets and/or settings
+     * @param string $sSlug     The components's slug
      *
      * @return array
      */
@@ -273,7 +274,8 @@ abstract class BaseComponent
 
             } else {
 
-                $sValue = appSetting($oSetting->key, $sSlug);
+                $oValue = appSetting($oSetting->key, $sSlug);
+                $sValue = $oValue ? $oValue->getValue() : null;
                 if (is_null($sValue) && isset($oSetting->default)) {
                     $sValue = $oSetting->default;
                 }

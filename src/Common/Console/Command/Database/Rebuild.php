@@ -2,6 +2,7 @@
 
 namespace Nails\Common\Console\Command\Database;
 
+use Nails\Common\Service\AppSetting;
 use Nails\Console\Command\Base;
 use Nails\Config;
 use Nails\Environment;
@@ -163,6 +164,14 @@ class Rebuild extends Base
         //  Cleaning up
         $oOutput->writeln('');
         $oOutput->writeln('<comment>Cleaning up...</comment>');
+
+        /**
+         * Reload app settings; rebuilding the database might have changed these and
+         * any code called after this will want the latests ettings loaded.
+         */
+        /** @var AppSetting $oAppSettingService */
+        $oAppSettingService = Factory::service('AppSetting');
+        $oAppSettingService->load();
 
         // --------------------------------------------------------------------------
 

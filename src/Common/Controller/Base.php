@@ -381,9 +381,9 @@ abstract class Base extends \MX_Controller
             );
         }
 
-        Config::set('APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG', $oDefaultDateFormat->slug);
-        Config::set('APP_DEFAULT_DATETIME_FORMAT_DATE_LABEL', $oDefaultDateFormat->label);
-        Config::set('APP_DEFAULT_DATETIME_FORMAT_DATE_FORMAT', $oDefaultDateFormat->format);
+        Config::default('APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG', $oDefaultDateFormat->slug);
+        Config::default('APP_DEFAULT_DATETIME_FORMAT_DATE_LABEL', $oDefaultDateFormat->label);
+        Config::default('APP_DEFAULT_DATETIME_FORMAT_DATE_FORMAT', $oDefaultDateFormat->format);
 
         //  Define default time format
         $oDefaultTimeFormat = $oDateTimeService->getTimeFormatDefault();
@@ -394,9 +394,9 @@ abstract class Base extends \MX_Controller
             );
         }
 
-        Config::set('APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG', $oDefaultTimeFormat->slug);
-        Config::set('APP_DEFAULT_DATETIME_FORMAT_TIME_LABEL', $oDefaultTimeFormat->label);
-        Config::set('APP_DEFAULT_DATETIME_FORMAT_TIME_FORMAT', $oDefaultTimeFormat->format);
+        Config::default('APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG', $oDefaultTimeFormat->slug);
+        Config::default('APP_DEFAULT_DATETIME_FORMAT_TIME_LABEL', $oDefaultTimeFormat->label);
+        Config::default('APP_DEFAULT_DATETIME_FORMAT_TIME_FORMAT', $oDefaultTimeFormat->format);
 
         // --------------------------------------------------------------------------
 
@@ -474,8 +474,8 @@ abstract class Base extends \MX_Controller
             throw new NailsException('No default language has been set, or it\'s been set incorrectly.');
         }
 
-        Config::set('APP_DEFAULT_LANG_CODE', $oDefault->code);
-        Config::set('APP_DEFAULT_LANG_LABEL', $oDefault->label);
+        Config::default('APP_DEFAULT_LANG_CODE', $oDefault->code);
+        Config::default('APP_DEFAULT_LANG_LABEL', $oDefault->label);
 
         // --------------------------------------------------------------------------
 
@@ -487,9 +487,9 @@ abstract class Base extends \MX_Controller
         $sUserLangCode = activeUser('language');
 
         if (!empty($sUserLangCode)) {
-            Config::set('RENDER_LANG_CODE', $sUserLangCode);
+            Config::default('RENDER_LANG_CODE', $sUserLangCode);
         } else {
-            Config::set('RENDER_LANG_CODE', Config::get('APP_DEFAULT_LANG_CODE'));
+            Config::default('RENDER_LANG_CODE', Config::get('APP_DEFAULT_LANG_CODE'));
         }
 
         //  Set the language config item which CodeIgniter will use.

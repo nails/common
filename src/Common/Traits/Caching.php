@@ -13,10 +13,16 @@
 
 namespace Nails\Common\Traits;
 
+/**
+ * Trait Caching
+ *
+ * @package Nails\Common\Traits
+ */
 trait Caching
 {
     /**
      * Globally turn caching on or off for this model
+     *
      * @var bool
      */
     protected static $CACHING_ENABLED = true;
@@ -148,17 +154,17 @@ trait Caching
     /**
      * Fetches an item from the cache
      *
-     * @param string  $sKey         The cache key
-     * @param boolean $bReturnValue Whether to return the value, or the index in the cache array
+     * @param string $sKey         The cache key
+     * @param bool   $bReturnValue Whether to return the value, or the index in the cache array
      *
      * @return mixed
      */
     protected function getCache($sKey, $bReturnValue = true)
     {
         if (!static::$CACHING_ENABLED) {
-            return false;
+            return null;
         } elseif (empty($sKey)) {
-            return false;
+            return null;
         }
 
         $sCacheKey = $this->getCachePrefix() . $sKey;
@@ -176,9 +182,9 @@ trait Caching
     /**
      * Deletes an item from the cache
      *
-     * @param  string $sKey The cache key
+     * @param string $sKey The cache key
      *
-     * @return boolean
+     * @return bool
      */
     protected function unsetCache($sKey)
     {
@@ -267,6 +273,7 @@ trait Caching
     /**
      * In order to avoid collisions between classes a prefix is used; this method
      * defines the cache key prefix using the calling class' name.
+     *
      * @return string
      */
     protected function getCachePrefix()

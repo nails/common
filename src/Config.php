@@ -40,7 +40,47 @@ final class Config
     // --------------------------------------------------------------------------
 
     /**
-     * Sets a config value
+     * Sets a config value if it is not already set
+     *
+     * @param string $sKey     The key to set
+     * @param null   $mDefault The value to default to
+     */
+    public static function default(string $sKey, $mDefault = null): void
+    {
+        if (!static::isSet($sKey)) {
+            static::set($sKey, $mDefault);
+        }
+
+        //  (Pablo - 2020-03-02) - Set as a constant as well, for backwards compatability
+        Functions::define($sKey, static::get($sKey));
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Determines whether a config value has been set
+     *
+     * @param string $sKey
+     *
+     * @return bool
+     */
+    public static function isSet(string $sKey): bool
+    {
+        if (array_key_exists($sKey, static::$aConfig)) {
+            return true;
+        } elseif (defined($sKey)) {
+            return true;
+        } elseif (array_key_exists($sKey, $_ENV)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Forcibly sets a config value
      *
      * @param string $sKey   The key to set
      * @param mixed  $mValue The value to set

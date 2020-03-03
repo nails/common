@@ -52,16 +52,15 @@ class AppSetting extends Resource
     // --------------------------------------------------------------------------
 
     /**
-     * Returns the setting's value,decoding it if necessary
+     * Returns the setting's value, decoding it if necessary
      *
      * @return string
      * @throws DecodeException
      * @throws EnvironmentException
      * @throws FactoryException
      */
-    public function __toString()
+    public function getValue()
     {
-        // TODO: Implement __toString() method.
         if ($this->isEncrypted()) {
             if (!$this->is_decrypted) {
 
@@ -70,9 +69,9 @@ class AppSetting extends Resource
 
                 $this->value_decrypted = $oEncrypt->decode($this->value);
             }
-            return $this->value_decrypted;
+            return json_decode($this->value_decrypted);
         } else {
-            return $this->value;
+            return json_decode($this->value);
         }
     }
 }

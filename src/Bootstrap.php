@@ -164,34 +164,34 @@ final class Bootstrap
     public static function setNailsConstants()
     {
         //  Generic and branding constants
-        Config::set('NAILS_PACKAGE_NAME', 'Nails');
-        Config::set('NAILS_PACKAGE_URL', 'https://nailsapp.co.uk/');
-        Config::set('NAILS_BRANDING', true);
+        Config::default('NAILS_PACKAGE_NAME', 'Nails');
+        Config::default('NAILS_PACKAGE_URL', 'https://nailsapp.co.uk/');
+        Config::default('NAILS_BRANDING', true);
 
         //  Paths
-        Config::set('NAILS_PATH', self::$sBaseDirectory . 'vendor/nails/');
-        Config::set('NAILS_APP_PATH', self::$sBaseDirectory);
-        Config::set('NAILS_COMMON_PATH', Config::get('NAILS_PATH') . 'common/');
-        Config::set('NAILS_CI_APP_PATH', self::$sBaseDirectory . 'vendor/codeigniter/framework/application/');
-        Config::set('NAILS_CI_SYSTEM_PATH', self::$sBaseDirectory . 'vendor/codeigniter/framework/system/');
+        Config::default('NAILS_PATH', self::$sBaseDirectory . 'vendor/nails/');
+        Config::default('NAILS_APP_PATH', self::$sBaseDirectory);
+        Config::default('NAILS_COMMON_PATH', Config::get('NAILS_PATH') . 'common/');
+        Config::default('NAILS_CI_APP_PATH', self::$sBaseDirectory . 'vendor/codeigniter/framework/application/');
+        Config::default('NAILS_CI_SYSTEM_PATH', self::$sBaseDirectory . 'vendor/codeigniter/framework/system/');
 
         //  So CodeIgniter configures itself correctly
-        Config::set('BASEPATH', Config::get('NAILS_CI_SYSTEM_PATH'));
+        Config::default('BASEPATH', Config::get('NAILS_CI_SYSTEM_PATH'));
 
         //  URLs
-        Config::set('DOMAIN', getenv('DOMAIN') ?: '/');
-        Config::set('DEFAULT_PROTOCOL', 'https');
-        Config::set('BASE_URL', sprintf('%s://%s/', Config::get('DEFAULT_PROTOCOL'), Config::get('DOMAIN')));
-        Config::set('SECURE_BASE_URL', preg_replace('/^http:/', 'https:', Config::get('BASE_URL')));
-        Config::set('NAILS_URL', (Functions::isPageSecure() ? Config::get('SECURE_BASE_URL') : Config::get('BASE_URL')) . 'vendor/nails/');
+        Config::default('DOMAIN', getenv('DOMAIN') ?: '/');
+        Config::default('DEFAULT_PROTOCOL', 'https');
+        Config::default('BASE_URL', sprintf('%s://%s/', Config::get('DEFAULT_PROTOCOL'), Config::get('DOMAIN')));
+        Config::default('SECURE_BASE_URL', preg_replace('/^http:/', 'https:', Config::get('BASE_URL')));
+        Config::default('NAILS_URL', (Functions::isPageSecure() ? Config::get('SECURE_BASE_URL') : Config::get('BASE_URL')) . 'vendor/nails/');
 
         //  @todo (Pablo - 2018-11-16) - Move these into the asset service
-        Config::set('NAILS_ASSETS_URL', Config::get('NAILS_URL') . 'module-asset/assets/');
-        Config::set('NAILS_ASSETS_PATH', Config::get('NAILS_PATH') . 'module-asset/assets/');
+        Config::default('NAILS_ASSETS_URL', Config::get('NAILS_URL') . 'module-asset/assets/');
+        Config::default('NAILS_ASSETS_PATH', Config::get('NAILS_PATH') . 'module-asset/assets/');
 
         //  Environment
-        Config::set('ENVIRONMENT', Environment::ENV_DEV);
-        Config::set('NAILS_TIMEZONE', 'UTC');
+        Config::default('ENVIRONMENT', Environment::ENV_DEV);
+        Config::default('NAILS_TIMEZONE', 'UTC');
 
         /**
          * Test the environment is valid
@@ -204,38 +204,38 @@ final class Bootstrap
         //  @todo (Pablo - 2018-11-16) - Move these to the database service
 
         //  Consistent between deployments
-        Config::set('APP_DB_DRIVER', 'mysqli');
-        Config::set('APP_DB_GLOBAL_PREFIX', '');
-        Config::set('APP_DB_PCONNECT', true);
-        Config::set('APP_DB_CACHE', false);
-        Config::set('APP_DB_CHARSET', 'utf8mb4');
-        Config::set('APP_DB_DBCOLLAT', 'utf8mb4_unicode_ci');
-        Config::set('APP_DB_STRICT', true);
-        Config::set('NAILS_DB_PREFIX', 'nails_');
-        Config::set('APP_DB_PREFIX', 'app_');
+        Config::default('APP_DB_DRIVER', 'mysqli');
+        Config::default('APP_DB_GLOBAL_PREFIX', '');
+        Config::default('APP_DB_PCONNECT', true);
+        Config::default('APP_DB_CACHE', false);
+        Config::default('APP_DB_CHARSET', 'utf8mb4');
+        Config::default('APP_DB_DBCOLLAT', 'utf8mb4_unicode_ci');
+        Config::default('APP_DB_STRICT', true);
+        Config::default('NAILS_DB_PREFIX', 'nails_');
+        Config::default('APP_DB_PREFIX', 'app_');
 
         //  Potentially vary between deployments
         //  @todo (Pablo - 2020-03-02) - Remove, kept for backwards compatability
-        Config::set('DEPLOY_DB_HOST', getenv('DB_HOST'));
-        Config::set('DEPLOY_DB_USERNAME', getenv('DB_USERNAME'));
-        Config::set('DEPLOY_DB_PASSWORD', getenv('DB_PASSWORD'));
-        Config::set('DEPLOY_DB_DATABASE', getenv('DB_DATABASE'));
+        Config::default('DEPLOY_DB_HOST', getenv('DB_HOST'));
+        Config::default('DEPLOY_DB_USERNAME', getenv('DB_USERNAME'));
+        Config::default('DEPLOY_DB_PASSWORD', getenv('DB_PASSWORD'));
+        Config::default('DEPLOY_DB_DATABASE', getenv('DB_DATABASE'));
 
-        Config::set('DB_HOST', Config::get('DEPLOY_DB_HOST'));
-        Config::set('DB_USERNAME', Config::get('DEPLOY_DB_USERNAME'));
-        Config::set('DB_PASSWORD', Config::get('DEPLOY_DB_PASSWORD'));
-        Config::set('DB_DATABASE', Config::get('DEPLOY_DB_DATABASE'));
+        Config::default('DB_HOST', Config::get('DEPLOY_DB_HOST'));
+        Config::default('DB_USERNAME', Config::get('DEPLOY_DB_USERNAME'));
+        Config::default('DB_PASSWORD', Config::get('DEPLOY_DB_PASSWORD'));
+        Config::default('DB_DATABASE', Config::get('DEPLOY_DB_DATABASE'));
 
         //  App
-        Config::set('APP_PRIVATE_KEY', '');
-        Config::set('APP_NAME', 'Nails');
-        Config::set('APP_NATIVE_LOGIN_USING', 'BOTH');   //  [EMAIL|USERNAME|BOTH]
+        Config::default('APP_PRIVATE_KEY', '');
+        Config::default('APP_NAME', 'Nails');
+        Config::default('APP_NATIVE_LOGIN_USING', 'BOTH');   //  [EMAIL|USERNAME|BOTH]
 
         //  Logging
-        Config::set('LOG_DIR', Config::get('NAILS_APP_PATH') . implode(DIRECTORY_SEPARATOR, ['application', 'logs', '']));
+        Config::default('LOG_DIR', Config::get('NAILS_APP_PATH') . implode(DIRECTORY_SEPARATOR, ['application', 'logs', '']));
 
         //  Profiling constants
-        Config::set('PROFILER_ENABLED', false);
+        Config::default('PROFILER_ENABLED', false);
         if (!PROFILER_ENABLED) {
             Profiler::disable();
         }
@@ -258,7 +258,7 @@ final class Bootstrap
      * - The $system_path variable has been updated to reflect its true location
      * - The working directory is set to self::$sBaseDirectory
      * - Calls to __FILE__ have been replaced with self::$sEntryPoint
-     * - Calls to define() have been replaced with calls to Config::set()
+     * - Calls to define() have been replaced with calls to Config::default()
      * - Not kicking off CodeIgniter (as it needs to be called in the global scope)
      *
      * @param string $sSystemPath      The path to the CodeIgniter system directory
@@ -400,16 +400,16 @@ final class Bootstrap
          * -------------------------------------------------------------------
          */
         // The name of THIS file
-        Config::set('SELF', pathinfo(self::$sEntryPoint, PATHINFO_BASENAME));
+        Config::default('SELF', pathinfo(self::$sEntryPoint, PATHINFO_BASENAME));
 
         // Path to the system directory
-        Config::set('BASEPATH', $system_path);
+        Config::default('BASEPATH', $system_path);
 
         // Path to the front controller (this file) directory
-        Config::set('FCPATH', dirname(self::$sEntryPoint) . DIRECTORY_SEPARATOR);
+        Config::default('FCPATH', dirname(self::$sEntryPoint) . DIRECTORY_SEPARATOR);
 
         // Name of the "system" directory
-        Config::set('SYSDIR', basename(BASEPATH));
+        Config::default('SYSDIR', basename(BASEPATH));
 
         // The path to the "application" directory
         if (is_dir($application_folder)) {
@@ -434,7 +434,7 @@ final class Bootstrap
             exit(3); // EXIT_CONFIG
         }
 
-        Config::set('APPPATH', $application_folder . DIRECTORY_SEPARATOR);
+        Config::default('APPPATH', $application_folder . DIRECTORY_SEPARATOR);
 
         // The path to the "views" directory
         if (!isset($view_folder[0]) && is_dir(APPPATH . 'views' . DIRECTORY_SEPARATOR)) {
@@ -461,7 +461,7 @@ final class Bootstrap
             exit(3); // EXIT_CONFIG
         }
 
-        Config::set('VIEWPATH', $view_folder . DIRECTORY_SEPARATOR);
+        Config::default('VIEWPATH', $view_folder . DIRECTORY_SEPARATOR);
     }
 
     // --------------------------------------------------------------------------
@@ -515,10 +515,10 @@ final class Bootstrap
         /** @var Routes $oRoutesService */
         $oRoutesService = Factory::service('Routes');
         if (is_file($oRoutesService->getRoutesFile())) {
-            Config::set('NAILS_STARTUP_GENERATE_APP_ROUTES', false);
+            Config::default('NAILS_STARTUP_GENERATE_APP_ROUTES', false);
         } else {
             //  Not found, crude hook seeing as basically nothing has loaded yet
-            Config::set('NAILS_STARTUP_GENERATE_APP_ROUTES', true);
+            Config::default('NAILS_STARTUP_GENERATE_APP_ROUTES', true);
         }
     }
 

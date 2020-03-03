@@ -15,7 +15,9 @@ namespace Nails\Common\Service;
 use Nails\Common\Exception\EnvironmentException;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Resource;
+use Nails\Common\Traits\Caching;
 use Nails\Common\Traits\ErrorHandling;
+use Nails\Config;
 use Nails\Factory;
 
 /**
@@ -26,6 +28,7 @@ use Nails\Factory;
 class AppSetting
 {
     use ErrorHandling;
+    use Caching;
 
     // --------------------------------------------------------------------------
 
@@ -54,7 +57,7 @@ class AppSetting
      * @return $this
      * @throws FactoryException
      */
-    protected function load(): self
+    public function load(): self
     {
         /** @var Database $oDb */
         $oDb = Factory::service('Database');
@@ -66,7 +69,16 @@ class AppSetting
             $oDb->get($this->sTable)->result()
         );
 
+        $this->clearCache();
+
         return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    protected function generateCacheKey(string $sKey, string $sGrouping): string
+    {
+        return md5($sKey, $sGrouping);
     }
 
     // --------------------------------------------------------------------------
@@ -87,6 +99,12 @@ class AppSetting
             $this->load();
         }
 
+        $sCacheKey = $this->generateCacheKey($sKey, $sGrouping);
+        $oCache    = $this->getCache($sCacheKey);
+        if (isset($oCache)) {
+            return $oCache;
+        }
+
         $aSettings = array_values(
             array_filter(
                 $this->aSettings,
@@ -97,6 +115,7 @@ class AppSetting
         );
 
         if (empty($sKey)) {
+            $this->setCache($sCacheKey, $aSettings);
             return $aSettings;
         } else {
             $aSettings = array_filter(
@@ -105,7 +124,10 @@ class AppSetting
                     return $oSetting->key === $sKey;
                 }
             );
-            return reset($aSettings) ?: null;
+
+            $mOut = reset($aSettings) ?: null;
+            $this->setCache($sCacheKey, $mOut);
+            return $mOut;
         }
     }
 
@@ -192,6 +214,10 @@ class AppSetting
             $oDb->set('is_encrypted', $bEncrypt);
             $oDb->insert($this->sTable);
         }
+
+        $this->unsetCache(
+            $this->generateCacheKey($sKey, $sGrouping)
+        );
     }
 
     // --------------------------------------------------------------------------
