@@ -2396,7 +2396,7 @@ abstract class Base
      * @return $this
      * @throws ModelException
      */
-    protected function addExpandableField(array $aOptions)
+    protected function addExpandableField(array $aOptions): self
     {
         //  Validation
         if (!array_key_exists('trigger', $aOptions)) {
@@ -2471,6 +2471,64 @@ abstract class Base
         ];
 
         return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Utility method for defining on-to-one relationships
+     *
+     * @param string      $sTrigger     The trigger word
+     * @param string      $sModel       The related model
+     * @param string      $sProvider    The provider of the related model
+     * @param string|null $sLocalColumn The local column contianing the foreign ID
+     *
+     * @return $this
+     * @throws ModelException
+     */
+    protected function hasOne(
+        string $sTrigger,
+        string $sModel,
+        string $sProvider = 'app',
+        string $sLocalColumn = null
+    ): self {
+        return $this
+            ->addExpandableField([
+                'type'      => static::EXPANDABLE_TYPE_SINGLE,
+                'trigger'   => $sTrigger,
+                'model'     => $sModel,
+                'provider'  => $sProvider,
+                'id_column' => $sLocalColumn ?? sprintf('%s_id', $sTrigger),
+            ]);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Utility method for defining ont-to-many relationships
+     *
+     * @param string $sTrigger       The trigger word
+     * @param string $sModel         The related model
+     * @param string $sForeignColumn The foreign column contianing the local ID
+     * @param string $sProvider      The provider of the related model
+     *
+     * @return $this
+     * @throws ModelException
+     */
+    protected function hasMany(
+        string $sTrigger,
+        string $sModel,
+        string $sForeignColumn,
+        string $sProvider = 'app'
+    ): self {
+        return $this
+            ->addExpandableField([
+                'type'      => static::EXPANDABLE_TYPE_MANY,
+                'trigger'   => $sTrigger,
+                'model'     => $sModel,
+                'provider'  => $sProvider,
+                'id_column' => $sForeignColumn,
+            ]);
     }
 
     // --------------------------------------------------------------------------
