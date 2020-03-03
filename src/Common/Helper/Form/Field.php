@@ -1070,7 +1070,7 @@ EOT;
         } else {
             //  Normal field, continue as normal Mr Norman!
             if ($oInput->post($_field['key'])) {
-                $_selected = $oInput->post($_field['key']) == $_field['options'][0]['value'] ? true : false;
+                $_selected = $oInput->post($_field['key']) == $_field['options'][0]['value'];
             } else {
                 $_selected = isset($_field['options'][0]['selected']) ? $_field['options'][0]['selected'] : false;
             }
@@ -1141,7 +1141,7 @@ EOT;
             } else {
                 //  Normal field, continue as normal Mr Norman!
                 if ($oInput->post($_field['key'])) {
-                    $_selected = $oInput->post($_field['key']) == $_field['options'][$i]['value'] ? true : false;
+                    $_selected = $oInput->post($_field['key']) == $_field['options'][$i]['value'];
                 } else {
                     $_selected = isset($_field['options'][$i]['selected']) ? $_field['options'][$i]['selected'] : false;
                 }

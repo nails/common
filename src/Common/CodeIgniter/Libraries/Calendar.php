@@ -87,7 +87,7 @@ class Calendar extends CI_Calendar
         $cur_month = date("m", $this->local_time);
         $cur_day   = date("j", $this->local_time);
 
-        $is_current_month = ($cur_year == $year && $cur_month == $month) ? true : false;
+        $is_current_month = $cur_year == $year && $cur_month == $month;
 
         // Generate the template data array
         $this->parse_template();
