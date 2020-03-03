@@ -122,10 +122,10 @@ class Config
             return $sUri;
         } else {
 
-            if ($bUseSecure && defined('SECURE_BASE_URL')) {
-                $sBaseUrl = rtrim(SECURE_BASE_URL, '/') . '/';
+            if ($bUseSecure) {
+                $sBaseUrl = rtrim(\Nails\Config::get('SECURE_BASE_URL'), '/') . '/';
             } else {
-                $sBaseUrl = rtrim(BASE_URL, '/') . '/';
+                $sBaseUrl = rtrim(\Nails\Config::get('BASE_URL'), '/') . '/';
             }
 
             if (is_file($sUri) || is_dir($sUri)) {

@@ -298,15 +298,15 @@ abstract class Base extends \MX_Controller
         /** @var Input $oInput */
         $oInput = Factory::service('Input');
 
-        $sConstantName          = 'APP_USER_PASS_' . Environment::get();
-        $sConstantNameWhitelist = 'APP_USER_PASS_WHITELIST_' . Environment::get();
+        $sConfigKey          = 'APP_USER_PASS_' . Environment::get();
+        $sConfigKeyWhitelist = 'APP_USER_PASS_WHITELIST_' . Environment::get();
 
-        if (!$oInput::isCli() && defined($sConstantName)) {
+        if (!$oInput::isCli() && Config::get($sConfigKey)) {
 
             //  On the whitelist?
-            if (defined($sConstantNameWhitelist)) {
+            if (Config::get($sConfigKeyWhitelist)) {
 
-                $aWhitelistedIps = @json_decode(constant($sConstantNameWhitelist));
+                $aWhitelistedIps = @json_decode(constant($sConfigKeyWhitelist));
                 $bWhitelisted    = isIpInRange($oInput->ipAddress(), $aWhitelistedIps);
 
             } else {
@@ -315,7 +315,7 @@ abstract class Base extends \MX_Controller
 
             if (!$bWhitelisted) {
 
-                $oCredentials = @json_decode(constant($sConstantName));
+                $oCredentials = @json_decode(constant($sConfigKey));
 
                 if (empty($_SERVER['PHP_AUTH_USER'])) {
                     $this->passwordProtectedRequest();

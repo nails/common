@@ -4,6 +4,7 @@ namespace Nails\Common\Console\Command\Make\Database;
 
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Exception\Console\MigrationExistsException;
+use Nails\Config;
 use Nails\Console\Command\BaseMaker;
 use Nails\Factory;
 use Symfony\Component\Console\Input\InputArgument;
@@ -153,7 +154,7 @@ class Migration extends BaseMaker
                 foreach ($aResult as $oResult) {
                     $aResult = (array) $oResult;
                     $sTable  = reset($aResult);
-                    if (!preg_match('/^' . NAILS_DB_PREFIX . '/', $sTable) || $sTable == NAILS_DB_PREFIX . 'user_meta_app') {
+                    if (!preg_match('/^' . Config::get('NAILS_DB_PREFIX') . '/', $sTable) || $sTable == Config::get('NAILS_DB_PREFIX') . 'user_meta_app') {
                         $aResult    = (array) $oDb->query('SHOW CREATE TABLE ' . $sTable)->row();
                         $aCreates[] = 'DROP TABLE IF EXISTS ' . $aResult['Table'] . ';' . "\n" . $aResult['Create Table'];
                     }
@@ -181,8 +182,8 @@ class Migration extends BaseMaker
                 }
 
                 $aFields['QUERIES'] = trim($aFields['QUERIES']);
-                $aFields['QUERIES'] = str_replace(NAILS_DB_PREFIX, '{{NAILS_DB_PREFIX}}', $aFields['QUERIES']);
-                $aFields['QUERIES'] = str_replace(APP_DB_PREFIX, '{{APP_DB_PREFIX}}', $aFields['QUERIES']);
+                $aFields['QUERIES'] = str_replace(Config::get('NAILS_DB_PREFIX'), '{{NAILS_DB_PREFIX}}', $aFields['QUERIES']);
+                $aFields['QUERIES'] = str_replace(Config::get('APP_DB_PREFIX'), '{{APP_DB_PREFIX}}', $aFields['QUERIES']);
                 $aFields['QUERIES'] = preg_replace('/AUTO_INCREMENT=\d+ /', '', $aFields['QUERIES']);
 
             } else {

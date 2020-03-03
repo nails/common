@@ -393,11 +393,7 @@ class Model extends BaseMaker
         //  Prepare the database table name
         $sTableName = preg_replace('/[^a-z ]/', '', strtolower($sModelName));
         $sTableName = preg_replace('/ +/', '_', $sTableName);
-        if (defined('APP_DB_PREFIX')) {
-            $sTableNameWithPrefix = APP_DB_PREFIX . $sTableName;
-        } else {
-            $sTableNameWithPrefix = $sTableName;
-        }
+        $sTableNameWithPrefix = Config::get('APP_DB_PREFIX') . $sTableName;
 
         //  Prepare the model name, namespace, filename etc
         $sModelName = 'App\Model\\' . preg_replace('/ /', '', $sModelName);

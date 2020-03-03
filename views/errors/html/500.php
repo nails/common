@@ -173,7 +173,7 @@ if (Environment::not(Environment::ENV_PROD)) {
             <div class="dev-only">
                 This page is viewable in development environments only.
                 <a href="http://docs.nailsapp.co.uk">
-                    <img src="<?=NAILS_ASSETS_URL?>img/nails/icon/icon@2x.png" id="nailsLogo"/>
+                    <img src="<?=\Nails\Config::get('NAILS_ASSETS_URL')?>img/nails/icon/icon@2x.png" id="nailsLogo"/>
                 </a>
             </div>
             <header>
@@ -258,11 +258,11 @@ if (Environment::not(Environment::ENV_PROD)) {
     <!DOCTYPE html>
     <html lang="en">
         <head>
-            <title>An Error Occurred - <?=APP_NAME?></title>
+            <title>An Error Occurred - <?=\Nails\Config::get('APP_NAME')?></title>
             <meta name="viewport" content="width=device-width, initial-scale=1">
             <?php
 
-            include NAILS_COMMON_PATH . 'views/errors/components/styles.php';
+            include \Nails\Config::get('NAILS_COMMON_PATH') . 'views/errors/components/styles.php';
 
             ?>
         </head>
@@ -270,7 +270,7 @@ if (Environment::not(Environment::ENV_PROD)) {
             <div id="container">
                 <?php
 
-                include NAILS_COMMON_PATH . 'views/errors/components/header.php';
+                include \Nails\Config::get('NAILS_COMMON_PATH') . 'views/errors/components/header.php';
 
                 ?>
                 <p>
@@ -279,7 +279,7 @@ if (Environment::not(Environment::ENV_PROD)) {
                 </p>
                 <?php
 
-                include NAILS_COMMON_PATH . 'views/errors/components/footer.php';
+                include \Nails\Config::get('NAILS_COMMON_PATH') . 'views/errors/components/footer.php';
 
                 ?>
             </div>

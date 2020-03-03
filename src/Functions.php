@@ -14,6 +14,7 @@ namespace Nails;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Service\ErrorHandler;
 use Nails\Common\Service\Input;
+use Nails\Config;
 
 class Functions
 {
@@ -59,13 +60,13 @@ class Functions
             //  Page is being served through HTTPS
             return true;
 
-        } elseif (isset($_SERVER['SERVER_NAME']) && isset($_SERVER['REQUEST_URI']) && SECURE_BASE_URL != BASE_URL) {
+        } elseif (isset($_SERVER['SERVER_NAME']) && isset($_SERVER['REQUEST_URI']) && Config::get('SECURE_BASE_URL') != Config::get('BASE_URL')) {
 
             //  Not being served through HTTPS, but does the URL of the page begin
             //  with SECURE_BASE_URL (when BASE_URL is different)
 
             $sUrl = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
-            return (bool) preg_match('#^' . SECURE_BASE_URL . '.*#', $sUrl);
+            return (bool) preg_match('#^' . Config::get('SECURE_BASE_URL') . '.*#', $sUrl);
         }
 
         //  Unknown, assume not

@@ -4,12 +4,12 @@ ERROR:   Maintenance
 -->
 <html lang="en">
     <head>
-        <title>Down For Maintenance - <?=APP_NAME?></title>
+        <title>Down For Maintenance - <?=\Nails\Config::get('APP_NAME')?></title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta http-equiv="refresh" content="10">
         <?php
 
-        include NAILS_COMMON_PATH . 'views/errors/components/styles.php';
+        include \Nails\Config::get('NAILS_COMMON_PATH') . 'views/errors/components/styles.php';
 
         ?>
     </head>
@@ -17,7 +17,7 @@ ERROR:   Maintenance
         <div id="container">
             <?php
 
-            include NAILS_COMMON_PATH . 'views/errors/components/header.php';
+            include \Nails\Config::get('NAILS_COMMON_PATH') . 'views/errors/components/header.php';
 
             if (empty($sMaintenanceTitle)) {
                 echo '<p>We are currently updating our website</p>';
@@ -31,7 +31,7 @@ ERROR:   Maintenance
                 echo $sMaintenanceBody;
             }
 
-            include NAILS_COMMON_PATH . 'views/errors/components/footer.php';
+            include \Nails\Config::get('NAILS_COMMON_PATH') . 'views/errors/components/footer.php';
 
             ?>
         </div>

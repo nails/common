@@ -13,33 +13,34 @@
 namespace Nails\Common\Helper;
 
 use Nails\Components;
+use Nails\Config;
 
 class Logo
 {
     const PATHS = [
         [
-            NAILS_APP_PATH . 'assets/img/logo.png',
-            BASE_URL . 'assets/img/logo.png',
+            Config::get('NAILS_APP_PATH') . 'assets/img/logo.png',
+            Config::get('BASE_URL') . 'assets/img/logo.png',
         ],
         [
-            NAILS_APP_PATH . 'assets/img/logo.jpg',
-            BASE_URL . 'assets/img/logo.jpg',
+            Config::get('NAILS_APP_PATH') . 'assets/img/logo.jpg',
+            Config::get('BASE_URL') . 'assets/img/logo.jpg',
         ],
         [
-            NAILS_APP_PATH . 'assets/img/logo.gif',
-            BASE_URL . 'assets/img/logo.gif',
+            Config::get('NAILS_APP_PATH') . 'assets/img/logo.gif',
+            Config::get('BASE_URL') . 'assets/img/logo.gif',
         ],
         [
-            NAILS_APP_PATH . 'assets/img/logo/logo.png',
-            BASE_URL . 'assets/img/logo/logo.png',
+            Config::get('NAILS_APP_PATH') . 'assets/img/logo/logo.png',
+            Config::get('BASE_URL') . 'assets/img/logo/logo.png',
         ],
         [
-            NAILS_APP_PATH . 'assets/img/logo/logo.jpg',
-            BASE_URL . 'assets/img/logo/logo.jpg',
+            Config::get('NAILS_APP_PATH') . 'assets/img/logo/logo.jpg',
+            Config::get('BASE_URL') . 'assets/img/logo/logo.jpg',
         ],
         [
-            NAILS_APP_PATH . 'assets/img/logo/logo.gif',
-            BASE_URL . 'assets/img/logo/logo.gif',
+            Config::get('NAILS_APP_PATH') . 'assets/img/logo/logo.gif',
+            Config::get('BASE_URL') . 'assets/img/logo/logo.gif',
         ],
     ];
 
@@ -57,8 +58,8 @@ class Logo
 
         if (property_exists($oAppData, 'logo_url')) {
             return $oAppData->logo_url;
-        } elseif (defined('APP_LOGO_URL')) {
-            return APP_LOGO_URL;
+        } elseif (Config::get('APP_LOGO_URL')) {
+            return Config::get('APP_LOGO_URL');
         }
 
         //  Go huntin'
@@ -68,8 +69,8 @@ class Logo
             }
         }
 
-        if (NAILS_BRANDING) {
-            return NAILS_URL . 'module-asset/assets/img/nails/icon/icon@2x.png';
+        if (Config::get('NAILS_BRANDING') {
+            return Config::get('NAILS_URL') . 'module-asset/assets/img/nails/icon/icon@2x.png';
         }
 
         return null;

@@ -12,6 +12,7 @@ namespace Nails\Common\Service;
 
 use Nails\Common\Exception\Database\ConnectionException;
 use Nails\Common\Exception\Database\TransactionException;
+use Nails\Config;
 
 class PDODatabase
 {
@@ -57,10 +58,10 @@ class PDODatabase
             $this->oDb = null;
         }
 
-        $sDbHost = !empty($sDbHost) ? $sDbHost : (defined('DEPLOY_DB_HOST') ? DEPLOY_DB_HOST : '');
-        $sDbUser = !empty($sDbUser) ? $sDbUser : (defined('DEPLOY_DB_USERNAME') ? DEPLOY_DB_USERNAME : '');
-        $sDbPass = !empty($sDbPass) ? $sDbPass : (defined('DEPLOY_DB_PASSWORD') ? DEPLOY_DB_PASSWORD : '');
-        $sDbName = !empty($sDbName) ? $sDbName : (defined('DEPLOY_DB_DATABASE') ? DEPLOY_DB_DATABASE : '');
+        $sDbHost = !empty($sDbHost) ? $sDbHost : Config::get('DB_HOST');
+        $sDbUser = !empty($sDbUser) ? $sDbUser : Config::get('DB_USERNAME');
+        $sDbPass = !empty($sDbPass) ? $sDbPass : Config::get('DB_PASSWORD');
+        $sDbName = !empty($sDbName) ? $sDbName : Config::get('DB_DATABASE');
 
         try {
 

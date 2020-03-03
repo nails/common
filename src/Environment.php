@@ -12,6 +12,7 @@
 namespace Nails;
 
 use Nails\Common\Exception\EnvironmentException;
+use Nails\Config;
 
 /**
  * Class Environment
@@ -49,13 +50,7 @@ final class Environment
     {
         if (empty(self::$sEnvironment)) {
 
-            if (!empty($_ENV['ENVIRONMENT'])) {
-                self::set($_ENV['ENVIRONMENT']);
-            } elseif (defined('ENVIRONMENT')) {
-                self::set(ENVIRONMENT);
-            } else {
-                self::set(self::ENV_DEV);
-            }
+            self::set(Config::get('ENVIRONMENT', self::ENV_DEV));
 
             try {
 

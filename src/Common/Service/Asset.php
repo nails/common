@@ -14,6 +14,7 @@ namespace Nails\Common\Service;
 
 use Nails\Common\Exception\AssetException;
 use Nails\Common\Exception\NailsException;
+use Nails\Config;
 use Nails\Factory;
 use Nails\Functions;
 
@@ -56,29 +57,29 @@ class Asset
         $this->aJs             = [];
         $this->aJsInlineHeader = [];
         $this->aJsInlineFooter = [];
-        $this->sCacheBuster    = defined('DEPLOY_REVISION') ? DEPLOY_REVISION : '';
+        $this->sCacheBuster    = Config::get('DEPLOY_REVISION');
 
-        $this->sBaseUrl       = defined('DEPLOY_ASSET_BASE_URL') ? DEPLOY_ASSET_BASE_URL : 'assets/build';
+        $this->sBaseUrl       = Config::get('DEPLOY_ASSET_BASE_URL', 'assets/build');
         $this->sBaseUrl       = siteUrl($this->sBaseUrl);
         $this->sBaseUrl       = addTrailingSlash($this->sBaseUrl);
-        $this->sBaseUrlSecure = defined('DEPLOY_ASSET_BASE_URL_SECURE') ? DEPLOY_ASSET_BASE_URL_SECURE : 'assets/build';
+        $this->sBaseUrlSecure = Config::get('DEPLOY_ASSET_BASE_URL_SECURE', 'assets/build');
         $this->sBaseUrlSecure = siteUrl($this->sBaseUrlSecure);
         $this->sBaseUrlSecure = addTrailingSlash($this->sBaseUrlSecure);
 
-        $this->sBaseModuleUrl       = defined('DEPLOY_ASSET_BASE_MODULE_URL') ? DEPLOY_ASSET_BASE_MODULE_URL : 'vendor';
+        $this->sBaseModuleUrl       = Config::get('DEPLOY_ASSET_BASE_MODULE_URL', 'vendor');
         $this->sBaseModuleUrl       = siteUrl($this->sBaseModuleUrl);
         $this->sBaseModuleUrl       = addTrailingSlash($this->sBaseModuleUrl);
-        $this->sBaseModuleUrlSecure = defined('DEPLOY_ASSET_BASE_MODULE_URL_SECURE') ? DEPLOY_ASSET_BASE_MODULE_URL_SECURE : 'vendor';
+        $this->sBaseModuleUrlSecure = Config::get('DEPLOY_ASSET_BASE_MODULE_URL_SECURE', 'vendor');
         $this->sBaseModuleUrlSecure = siteUrl($this->sBaseModuleUrlSecure);
         $this->sBaseModuleUrlSecure = addTrailingSlash($this->sBaseModuleUrlSecure);
 
-        $this->sBowerDir = defined('DEPLOY_ASSET_BOWER_DIR') ? DEPLOY_ASSET_BOWER_DIR : 'bower_components';
+        $this->sBowerDir = Config::get('DEPLOY_ASSET_BOWER_DIR', 'bower_components');
         $this->sBowerDir = addTrailingSlash($this->sBowerDir);
 
-        $this->sCssDir = defined('DEPLOY_ASSET_CSS_DIR') ? DEPLOY_ASSET_CSS_DIR : 'css';
+        $this->sCssDir = Config::get('DEPLOY_ASSET_CSS_DIR', 'css');
         $this->sCssDir = addTrailingSlash($this->sCssDir);
 
-        $this->sJsDir = defined('DEPLOY_ASSET_JS_DIR') ? DEPLOY_ASSET_CJS_DIR : 'js';
+        $this->sJsDir = Config::get('DEPLOY_ASSET_JS_DIR', 'js');
         $this->sJsDir = addTrailingSlash($this->sJsDir);
 
     }

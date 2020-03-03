@@ -3,6 +3,7 @@
 namespace Nails\Common\Console\Command\Database;
 
 use Nails\Console\Command\Base;
+use Nails\Config;
 use Nails\Environment;
 use Nails\Factory;
 use Symfony\Component\Console\Input\InputInterface;
@@ -80,10 +81,10 @@ class Rebuild extends Base
         // --------------------------------------------------------------------------
 
         //  Work out the DB credentials to use
-        $sDbHost = $oInput->getOption('dbHost') ?: (defined('DEPLOY_DB_HOST') ? DEPLOY_DB_HOST : '');
-        $sDbUser = $oInput->getOption('dbUser') ?: (defined('DEPLOY_DB_USERNAME') ? DEPLOY_DB_USERNAME : '');
-        $sDbPass = $oInput->getOption('dbPass') ?: (defined('DEPLOY_DB_PASSWORD') ? DEPLOY_DB_PASSWORD : '');
-        $sDbName = $oInput->getOption('dbName') ?: (defined('DEPLOY_DB_DATABASE') ? DEPLOY_DB_DATABASE : '');
+        $sDbHost = $oInput->getOption('dbHost') ?: Config::get('DB_HOST');
+        $sDbUser = $oInput->getOption('dbUser') ?: Config::get('DB_USERNAME');
+        $sDbPass = $oInput->getOption('dbPass') ?: Config::get('DB_PASSWORD');
+        $sDbName = $oInput->getOption('dbName') ?: Config::get('DB_DATABASE');
 
         //  Check we have a database to connect to
         if (empty($sDbName)) {
@@ -103,7 +104,7 @@ class Rebuild extends Base
         $aTables  = [];
         foreach ($aResults as $aResult) {
             $sTable = reset($aResult);
-            if (preg_match('/^(' . NAILS_DB_PREFIX . '|' . APP_DB_PREFIX . ')/', $sTable)) {
+            if (preg_match('/^(' . Config::get('NAILS_DB_PREFIX') . '|' . Config::get('APP_DB_PREFIX') . ')/', $sTable)) {
                 $aTables[] = $sTable;
             }
         }

@@ -7,6 +7,7 @@ use Nails\Common\Helper\Directory;
 use Nails\Common\Resource\FileCache\Item;
 use Nails\Common\Service\FileCache;
 use Nails\Common\Service\FileCache\Driver;
+use Nails\Config;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -369,11 +370,11 @@ class FileCacheTest extends TestCase
     public function testPublicCacheReturnsValidUrl()
     {
         $this->assertEquals(
-            BASE_URL . 'cache/public',
+            Config::get('BASE_URL') . 'cache/public',
             static::$oCache->public()->getUrl()
         );
         $this->assertEquals(
-            BASE_URL . 'cache/public/existing-file.txt',
+            Config::get('BASE_URL') . 'cache/public/existing-file.txt',
             static::$oCache->public()->getUrl('existing-file.txt')
         );
     }

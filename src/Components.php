@@ -16,6 +16,7 @@ use Nails\Common\Exception\NailsException;
 use Nails\Common\Factory\Component;
 use Nails\Common\Helper\ArrayHelper;
 use Nails\Common\Service\ErrorHandler;
+use Nails\Config;
 
 /**
  * Class Components
@@ -376,9 +377,9 @@ final class Components
 
             //  Provide a url field for the skin
             if (Functions::isPageSecure()) {
-                $oSkin->url = SECURE_BASE_URL . $oSkin->relativePath;
+                $oSkin->url = Config::get('SECURE_BASE_URL') . $oSkin->relativePath;
             } else {
-                $oSkin->url = BASE_URL . $oSkin->relativePath;
+                $oSkin->url = Config::get('BASE_URL') . $oSkin->relativePath;
             }
 
             if ($oSkin->forModule == $sModule) {

@@ -15,6 +15,7 @@ use GuzzleHttp\Client;
 use Nails\Auth\Resource\User;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Helper\ArrayHelper;
+use Nails\Config;
 use Nails\Environment;
 use Nails\Factory;
 use Nails\Testing;
@@ -174,7 +175,7 @@ abstract class HttpRequest
      */
     public function baseUri($sBaseUri)
     {
-        $this->sBaseUri = $sBaseUri ?: BASE_URL;
+        $this->sBaseUri = $sBaseUri ?: Config::get('BASE_URL');
         return $this;
     }
 

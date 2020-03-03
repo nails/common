@@ -4,6 +4,7 @@ namespace Nails\Common\Console\Command\Database;
 
 use Nails\Common\Factory\Component;
 use Nails\Common\Service\Database;
+use Nails\Config;
 use Nails\Components;
 use Nails\Console\Command\Base;
 use Nails\Environment;
@@ -102,10 +103,10 @@ class Migrate extends Base
         // --------------------------------------------------------------------------
 
         //  Work out the DB credentials to use
-        $sDbHost = $oInput->getOption('dbHost') ?: (defined('DEPLOY_DB_HOST') ? DEPLOY_DB_HOST : '');
-        $sDbUser = $oInput->getOption('dbUser') ?: (defined('DEPLOY_DB_USERNAME') ? DEPLOY_DB_USERNAME : '');
-        $sDbPass = $oInput->getOption('dbPass') ?: (defined('DEPLOY_DB_PASSWORD') ? DEPLOY_DB_PASSWORD : '');
-        $sDbName = $oInput->getOption('dbName') ?: (defined('DEPLOY_DB_DATABASE') ? DEPLOY_DB_DATABASE : '');
+        $sDbHost = $oInput->getOption('dbHost') ?: Config::get('DB_HOST');
+        $sDbUser = $oInput->getOption('dbUser') ?: Config::get('DB_USERNAME');
+        $sDbPass = $oInput->getOption('dbPass') ?: Config::get('DB_PASSWORD');
+        $sDbName = $oInput->getOption('dbName') ?: Config::get('DB_DATABASE');
 
         //  Check we have a database to connect to
         if (empty($sDbName)) {
@@ -116,16 +117,12 @@ class Migrate extends Base
         $this->oDb = Factory::service('PDODatabase');
         $this->oDb->connect($sDbHost, $sDbUser, $sDbPass, $sDbName);
 
-        if (!defined('NAILS_DB_PREFIX')) {
-            define('NAILS_DB_PREFIX', 'nails_');
-        }
-
         //  Test the db
-        $iResult = $this->oDb->query('SHOW Tables LIKE \'' . NAILS_DB_PREFIX . 'migration\'')->rowCount();
+        $iResult = $this->oDb->query('SHOW Tables LIKE \'' . Config::get('NAILS_DB_PREFIX') . 'migration\'')->rowCount();
         if (!$iResult) {
 
             //  Create the migrations table
-            $sSql = "CREATE TABLE `" . NAILS_DB_PREFIX . "migration` (
+            $sSql = "CREATE TABLE `" . Config::get('NAILS_DB_PREFIX') . "migration` (
               `module` VARCHAR(100) NOT NULL DEFAULT '',
               `version` INT(11) UNSIGNED DEFAULT NULL,
               PRIMARY KEY (`module`)
@@ -144,7 +141,7 @@ class Migrate extends Base
 
         //  Backwards compatability - ensure that the vendor prefix is correct
         $this->oDb->query(
-            'UPDATE `' . NAILS_DB_PREFIX . 'migration` SET `module` = REPLACE(`module`, "nailsapp/", "nails/");'
+            'UPDATE `' . Config::get('NAILS_DB_PREFIX') . 'migration` SET `module` = REPLACE(`module`, "nailsapp/", "nails/");'
         );
 
         // --------------------------------------------------------------------------
@@ -294,13 +291,13 @@ class Migrate extends Base
             // --------------------------------------------------------------------------
 
             //  Work out the current version
-            $sSql    = "SELECT `version` FROM `" . NAILS_DB_PREFIX . "migration` WHERE `module` = '$oComponent->slug';";
+            $sSql    = "SELECT `version` FROM `" . Config::get('NAILS_DB_PREFIX') . "migration` WHERE `module` = '$oComponent->slug';";
             $oResult = $this->oDb->query($sSql);
 
             if ($oResult->rowCount() === 0) {
 
                 //  Add a row for the module
-                $sSql = "INSERT INTO `" . NAILS_DB_PREFIX . "migration` (`module`, `version`) VALUES ('$oComponent->slug', NULL);";
+                $sSql = "INSERT INTO `" . Config::get('NAILS_DB_PREFIX') . "migration` (`module`, `version`) VALUES ('$oComponent->slug', NULL);";
                 $this->oDb->query($sSql);
 
                 $iCurrentVersion = null;
@@ -385,7 +382,7 @@ class Migrate extends Base
             }
 
             //  Mark this migration as complete
-            $sSql    = "UPDATE `" . NAILS_DB_PREFIX . "migration` SET `version` = " . $aMigration['index'] . " WHERE `module` = '" . $oModule->name . "'";
+            $sSql    = "UPDATE `" . Config::get('NAILS_DB_PREFIX') . "migration` SET `version` = " . $aMigration['index'] . " WHERE `module` = '" . $oModule->name . "'";
             $oResult = $this->oDb->query($sSql);
         }
 

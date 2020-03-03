@@ -94,7 +94,7 @@ class Log extends CI_Log
                         }
 
                         $msg     = strtoupper($level) . ' ' . ((strtoupper($level) == 'INFO') ? ' -' : '-') . ' ' . date($this->_date_fmt) . ' --> ' . $msg . "\n";
-                        $appname = defined('APP_NAME') ? APP_NAME : '[Could not determine app name]';
+                        $appname = Config::get('APP_NAME');
 
                         $subject = 'Log folders are not writable on ' . $appname;
                         $message = 'I just tried to write to the log folder for ' . $appname . ' and found them not to be writable.' . "\n";

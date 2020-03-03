@@ -165,7 +165,7 @@ final class Bootstrap
     {
         //  Generic and branding constants
         Config::set('NAILS_PACKAGE_NAME', 'Nails');
-        Config::set('NAILS_PACKAGE_URL', 'http://nailsapp.co.uk/');
+        Config::set('NAILS_PACKAGE_URL', 'https://nailsapp.co.uk/');
         Config::set('NAILS_BRANDING', true);
 
         //  Paths
@@ -180,7 +180,8 @@ final class Bootstrap
 
         //  URLs
         Config::set('DOMAIN', getenv('DOMAIN') ?: '/');
-        Config::set('BASE_URL', sprintf('https://%s/', Config::get('DOMAIN')));
+        Config::set('DEFAULT_PROTOCOL', 'https');
+        Config::set('BASE_URL', sprintf('%s://%s/', Config::get('DEFAULT_PROTOCOL'), Config::get('DOMAIN')));
         Config::set('SECURE_BASE_URL', preg_replace('/^http:/', 'https:', Config::get('BASE_URL')));
         Config::set('NAILS_URL', (Functions::isPageSecure() ? Config::get('SECURE_BASE_URL') : Config::get('BASE_URL')) . 'vendor/nails/');
 
@@ -197,7 +198,7 @@ final class Bootstrap
          * If ENVIRONMENT is empty then CI will roll over with unhelpful issues as it tries to look
          * up directory names etc with a missing segment.
          */
-        Environment::isValid(ENVIRONMENT);
+        Environment::isValid(Config::get('ENVIRONMENT'));
 
         //  Database
         //  @todo (Pablo - 2018-11-16) - Move these to the database service
@@ -227,7 +228,7 @@ final class Bootstrap
 
         //  App
         Config::set('APP_PRIVATE_KEY', '');
-        Config::set('APP_NAME', 'Untitled');
+        Config::set('APP_NAME', 'Nails');
         Config::set('APP_NATIVE_LOGIN_USING', 'BOTH');   //  [EMAIL|USERNAME|BOTH]
 
         //  Logging

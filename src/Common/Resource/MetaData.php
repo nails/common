@@ -4,6 +4,7 @@ namespace Nails\Common\Resource;
 
 use Nails\Common\Factory\Locale;
 use Nails\Common\Resource;
+use Nails\Config;
 
 /**
  * Class MetaData
@@ -78,7 +79,7 @@ class MetaData extends Resource
                         $this->aTitles,
                         array_filter([
                             $this->title,
-                            APP_NAME,
+                            Config::get('APP_NAME'),
                         ])
                     )
                 )

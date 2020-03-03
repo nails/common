@@ -1,14 +1,19 @@
 <?php
 
+use Nails\Common\Service\FileCache;
+use Nails\Config;
+use Nails\Factory;
+use Nails\Functions;
+
 /* Load the base config file from the CodeIgniter package */
-require NAILS_CI_APP_PATH . 'config/config.php';
+require Config::get('NAILS_CI_APP_PATH') . 'config/config.php';
 
 /**
  * Override some of the CI defaults
  */
 
 //  Base Site URL
-$config['base_url'] = BASE_URL;
+$config['base_url'] = Config::get('BASE_URL');
 
 //  Remove index.php from URL's
 $config['index_page'] = '';
@@ -26,12 +31,12 @@ $config['permitted_uri_chars'] = 'a-z 0-9~%.:_\-+@';
 $config['log_threshold'] = 1;
 
 //  Cache directory
-/** @var \Nails\Common\Service\FileCache $oFileCache */
-$oFileCache           = \Nails\Factory::service('FileCache');
+/** @var FileCache $oFileCache */
+$oFileCache           = Factory::service('FileCache');
 $config['cache_path'] = $oFileCache->getDir();
 
 //  The encryption key
-$config['encryption_key'] = md5(APP_PRIVATE_KEY);
+$config['encryption_key'] = md5(Config::get('APP_PRIVATE_KEY'));
 
 //  Session variables
 $config['sess_driver']             = 'database';
@@ -45,10 +50,10 @@ $config['sess_regenerate_destroy'] = false;
 //  Cookie related variables
 $config['cookie_httponly'] = true;
 
-if (defined('CONF_COOKIE_DOMAIN')) {
+if (Config::get('CONF_COOKIE_DOMAIN')) {
 
     //  The developer has specified the specific domain to use for cookies
-    $config['cookie_domain'] = CONF_COOKIE_DOMAIN;
+    $config['cookie_domain'] = Config::get('CONF_COOKIE_DOMAIN');
 } else {
 
     /**
@@ -63,8 +68,8 @@ if (defined('CONF_COOKIE_DOMAIN')) {
      * if not then...
      */
 
-    $baseDomain       = \Nails\Functions::getDomainFromUrl($config['base_url']);
-    $secureBaseDomain = \Nails\Functions::getDomainFromUrl(SECURE_BASE_URL);
+    $baseDomain       = Functions::getDomainFromUrl($config['base_url']);
+    $secureBaseDomain = Functions::getDomainFromUrl(Config::get('SECURE_BASE_URL'));
 
     if ($baseDomain == $secureBaseDomain) {
 
@@ -77,7 +82,7 @@ if (defined('CONF_COOKIE_DOMAIN')) {
         $_ERROR .= 'constants do not share the same domain, this can cause issues ';
         $_ERROR .= 'with sessions.';
 
-        include NAILS_COMMON_PATH . 'errors/startup_error.php';
+        include Config::get('NAILS_COMMON_PATH') . 'errors/startup_error.php';
     }
 }
 

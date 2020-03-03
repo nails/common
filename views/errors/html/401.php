@@ -5,11 +5,11 @@ MESSAGE: <?=$sMessage?>
 -->
 <html lang="en">
     <head>
-        <title>401 Unauthorised - <?=APP_NAME?></title>
+        <title>401 Unauthorised - <?=\Nails\Config::get('APP_NAME')?></title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <?php
 
-        include NAILS_COMMON_PATH . 'views/errors/components/styles.php';
+        include \Nails\Config::get('NAILS_COMMON_PATH') . 'views/errors/components/styles.php';
 
         ?>
     </head>
@@ -17,9 +17,9 @@ MESSAGE: <?=$sMessage?>
         <div id="container">
             <?php
 
-            include NAILS_COMMON_PATH . 'views/errors/components/header.php';
+            include \Nails\Config::get('NAILS_COMMON_PATH') . 'views/errors/components/header.php';
             echo $sMessage;
-            include NAILS_COMMON_PATH . 'views/errors/components/footer.php';
+            include \Nails\Config::get('NAILS_COMMON_PATH') . 'views/errors/components/footer.php';
 
             ?>
         </div>

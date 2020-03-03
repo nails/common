@@ -7,9 +7,9 @@ use Nails\Factory;
     <div class="row">
         <p class="text-center">
             <small>
-                &copy; <?=APP_NAME . ' ' . date('Y')?>
+                &copy; <?=\Nails\Config::get('APP_NAME') . ' ' . date('Y')?>
                 <br />
-                <?=lang('nails_footer_powered_by', array(NAILS_PACKAGE_URL, NAILS_PACKAGE_NAME))?>
+                <?=lang('nails_footer_powered_by', array(\Nails\Config::get('NAILS_PACKAGE_URL'), \Nails\Config::get('NAILS_PACKAGE_NAME'))?>
             </small>
         </p>
     </div>
