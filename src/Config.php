@@ -26,8 +26,8 @@ final class Config
      */
     public static function get(string $sKey, $mDefault = null)
     {
-        if (array_key_exists($sKey, static::$aConfig)) {
-            return static::$aConfig[$sKey];
+        if (array_key_exists($sKey, self::$aConfig)) {
+            return self::$aConfig[$sKey];
         } elseif (defined($sKey)) {
             return constant($sKey);
         } elseif (array_key_exists($sKey, $_ENV)) {
@@ -43,7 +43,7 @@ final class Config
      * Sets a config value if it is not already set
      *
      * @param string $sKey     The key to set
-     * @param null   $mDefault The value to default to
+     * @param mixed  $mDefault The value to default to
      */
     public static function default(string $sKey, $mDefault = null): void
     {
@@ -66,7 +66,7 @@ final class Config
      */
     public static function isSet(string $sKey): bool
     {
-        if (array_key_exists($sKey, static::$aConfig)) {
+        if (array_key_exists($sKey, self::$aConfig)) {
             return true;
         } elseif (defined($sKey)) {
             return true;
@@ -87,7 +87,7 @@ final class Config
      */
     public static function set(string $sKey, $mValue): void
     {
-        static::$aConfig[$sKey] = $mValue;
+        self::$aConfig[$sKey] = $mValue;
 
         //  (Pablo - 2020-03-02) - Set as a constant as well, for backwards compatability
         Functions::define($sKey, $mValue);

@@ -97,8 +97,7 @@ abstract class BaseComponent
         if ($this->bEnableMultiple) {
 
             $this->mEnabled = [];
-            $oSetting       = appSetting($this->sEnabledSetting, $this->sModule);
-            $aEnabled       = $oSetting ? ($oSetting->getValue() ?: []) : [];
+            $aEnabled       = appSetting($this->sEnabledSetting, $this->sModule, []);
 
             foreach ($this->aComponents as $oComponent) {
                 if (in_array($oComponent->slug, $aEnabled)) {
@@ -108,7 +107,7 @@ abstract class BaseComponent
 
         } else {
 
-            $sEnabled = appSetting($this->sEnabledSetting, $this->sModule) ?: null;
+            $sEnabled = appSetting($this->sEnabledSetting, $this->sModule);
             foreach ($this->aComponents as $oComponent) {
                 if ($oComponent->slug === (string) $sEnabled) {
                     $this->mEnabled = $oComponent;
@@ -274,12 +273,11 @@ abstract class BaseComponent
 
             } else {
 
-                $oValue = appSetting($oSetting->key, $sSlug);
-                $sValue = $oValue ? $oValue->getValue() : null;
-                if (is_null($sValue) && isset($oSetting->default)) {
-                    $sValue = $oSetting->default;
+                $mValue = appSetting($oSetting->key, $sSlug);
+                if (is_null($mValue) && isset($oSetting->default)) {
+                    $mValue = $oSetting->default;
                 }
-                $aOut[$oSetting->key] = $sValue;
+                $aOut[$oSetting->key] = $mValue;
             }
         }
 

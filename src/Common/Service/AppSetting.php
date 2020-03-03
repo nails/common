@@ -17,7 +17,6 @@ use Nails\Common\Exception\FactoryException;
 use Nails\Common\Resource;
 use Nails\Common\Traits\Caching;
 use Nails\Common\Traits\ErrorHandling;
-use Nails\Config;
 use Nails\Factory;
 
 /**
@@ -86,9 +85,9 @@ class AppSetting
     /**
      * Gets settings associated with a particular group/key
      *
-     * @param string $sKey          The key to retrieve
-     * @param string $sGrouping     The group the key belongs to
-     * @param bool   $bForceRefresh Whether to force a group refresh
+     * @param string|null $sKey          The key to retrieve
+     * @param string      $sGrouping     The group the key belongs to
+     * @param bool        $bForceRefresh Whether to force a group refresh
      *
      * @return Resource\AppSetting[]|Resource\AppSetting|null
      * @throws FactoryException
