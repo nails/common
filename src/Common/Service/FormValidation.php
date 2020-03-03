@@ -233,6 +233,70 @@ class FormValidation
     // --------------------------------------------------------------------------
 
     /**
+     * Sets a rule
+     *
+     * @param string|array $mKey   The key to set, or an array of key/value pairs
+     * @param string|array $mRule  The rule to set
+     * @param string|null  $sLabel The field being validated, human friendly
+     *
+     * @return $this;
+     */
+    public function setRule($mKey, string $mRule, string $sLabel = null): self
+    {
+        if (is_array($mKey)) {
+            foreach ($mKey as $sKey => $mRule) {
+                if (is_array($mRule)) {
+                    foreach ($mRule as $sRule) {
+                        $this->oFormValidation->set_rules($sKey, null, $sRule);
+                    }
+                } else {
+                    $this->oFormValidation->set_rules($sKey, null, $mRule);
+                }
+            }
+        } else {
+            if (is_array($mRule)) {
+                foreach ($mRule as $sRule) {
+                    $this->oFormValidation->set_rules($mKey, null, $sRule);
+                }
+            } else {
+                $this->oFormValidation->set_rules($mKey, $sLabel, $sRule);
+            }
+        }
+
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets a rule message
+     *
+     * @param string $sRule    The rule to set the message for
+     * @param string $sMessage The message to set
+     *
+     * @return $this
+     */
+    public function setMessage(string $sRule, string $sMessage): self
+    {
+        $this->oFormValidation->set_message($sRule, $sMessage);
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns validation errors
+     *
+     * @return array
+     */
+    public function errors(): array
+    {
+        return $this->oFormValidation->error_array();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Pass any property "sets" to the CodeIgniter FormValidation class
      *
      * @param string $sProperty The property to set
