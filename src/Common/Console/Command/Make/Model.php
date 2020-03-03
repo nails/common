@@ -250,7 +250,7 @@ class Model extends BaseMaker
                     $aTables = array_filter(
                         $aTables,
                         function ($aTable) {
-                            return !preg_match('/^' . NAILS_DB_PREFIX . '/', $aTable[0]);
+                            return !preg_match('/^' . Config::get('NAILS_DB_PREFIX') . '/', $aTable[0]);
                         }
                     );
                     $aTables = array_values($aTables);

@@ -13,7 +13,6 @@
 namespace Nails\Common\CodeIgniter\Core;
 
 use MX_Config;
-use Nails\Config;
 use Nails\Functions;
 
 /* load the MX Config class */
@@ -45,7 +44,7 @@ class Config extends MX_Config
         }
 
         if ($bForceSecure || Functions::isPageSecure()) {
-            $sUrl = preg_replace('#^' . Config::get('BASE_URL') . '#', Config::get('SECURE_BASE_URL'), $sUrl);
+            $sUrl = preg_replace('#^' . \Nails\Config::get('BASE_URL') . '#', \Nails\Config::get('SECURE_BASE_URL'), $sUrl);
         }
 
         return $sUrl;
@@ -65,6 +64,6 @@ class Config extends MX_Config
      */
     function secure_base_url($uri = '')
     {
-        return Config::get('SECURE_BASE_URL') . ltrim($this->_uri_string($uri), '/');
+        return \Nails\Config::get('SECURE_BASE_URL') . ltrim($this->_uri_string($uri), '/');
     }
 }

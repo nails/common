@@ -69,7 +69,7 @@ class Logo
             }
         }
 
-        if (Config::get('NAILS_BRANDING') {
+        if (Config::get('NAILS_BRANDING')) {
             return Config::get('NAILS_URL') . 'module-asset/assets/img/nails/icon/icon@2x.png';
         }
 

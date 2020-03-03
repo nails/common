@@ -9,7 +9,7 @@ use Nails\Factory;
             <small>
                 &copy; <?=\Nails\Config::get('APP_NAME') . ' ' . date('Y')?>
                 <br />
-                <?=lang('nails_footer_powered_by', array(\Nails\Config::get('NAILS_PACKAGE_URL'), \Nails\Config::get('NAILS_PACKAGE_NAME'))?>
+                <?=lang('nails_footer_powered_by', [\Nails\Config::get('NAILS_PACKAGE_URL'), \Nails\Config::get('NAILS_PACKAGE_NAME')])?>
             </small>
         </p>
     </div>
