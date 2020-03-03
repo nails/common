@@ -97,7 +97,7 @@ abstract class BaseComponent
         if ($this->bEnableMultiple) {
 
             $this->mEnabled = [];
-            $aEnabled       = appSetting($this->sEnabledSetting, $this->sModule) ?: [];
+            $aEnabled       = json_decode(appSetting($this->sEnabledSetting, $this->sModule)) ?: [];
 
             foreach ($this->aComponents as $oComponent) {
                 if (in_array($oComponent->slug, $aEnabled)) {
@@ -109,7 +109,7 @@ abstract class BaseComponent
 
             $sEnabled = appSetting($this->sEnabledSetting, $this->sModule) ?: null;
             foreach ($this->aComponents as $oComponent) {
-                if ($oComponent->slug == $sEnabled) {
+                if ($oComponent->slug === (string) $sEnabled) {
                     $this->mEnabled = $oComponent;
                     break;
                 }
