@@ -19,28 +19,28 @@ class Logo
 {
     const PATHS = [
         [
-            Config::get('NAILS_APP_PATH') . 'assets/img/logo.png',
-            Config::get('BASE_URL') . 'assets/img/logo.png',
+            NAILS_APP_PATH . 'assets/img/logo.png',
+            BASE_URL . 'assets/img/logo.png',
         ],
         [
-            Config::get('NAILS_APP_PATH') . 'assets/img/logo.jpg',
-            Config::get('BASE_URL') . 'assets/img/logo.jpg',
+            NAILS_APP_PATH . 'assets/img/logo.jpg',
+            BASE_URL . 'assets/img/logo.jpg',
         ],
         [
-            Config::get('NAILS_APP_PATH') . 'assets/img/logo.gif',
-            Config::get('BASE_URL') . 'assets/img/logo.gif',
+            NAILS_APP_PATH . 'assets/img/logo.gif',
+            BASE_URL . 'assets/img/logo.gif',
         ],
         [
-            Config::get('NAILS_APP_PATH') . 'assets/img/logo/logo.png',
-            Config::get('BASE_URL') . 'assets/img/logo/logo.png',
+            NAILS_APP_PATH . 'assets/img/logo/logo.png',
+            BASE_URL . 'assets/img/logo/logo.png',
         ],
         [
-            Config::get('NAILS_APP_PATH') . 'assets/img/logo/logo.jpg',
-            Config::get('BASE_URL') . 'assets/img/logo/logo.jpg',
+            NAILS_APP_PATH . 'assets/img/logo/logo.jpg',
+            BASE_URL . 'assets/img/logo/logo.jpg',
         ],
         [
-            Config::get('NAILS_APP_PATH') . 'assets/img/logo/logo.gif',
-            Config::get('BASE_URL') . 'assets/img/logo/logo.gif',
+            NAILS_APP_PATH . 'assets/img/logo/logo.gif',
+            BASE_URL . 'assets/img/logo/logo.gif',
         ],
     ];
 
