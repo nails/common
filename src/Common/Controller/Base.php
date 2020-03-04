@@ -349,13 +349,12 @@ abstract class Base extends \MX_Controller
     {
         /** @var Input $oInput */
         $oInput = Factory::service('Input');
-        /** @var Output $oOutput */
-        $oOutput = Factory::service('Output');
         /** @var ErrorHandler $oErrorHandler */
         $oErrorHandler = Factory::service('ErrorHandler');
 
-        $oOutput->set_header('WWW-Authenticate: Basic realm="' . Config::get('APP_NAME') . ' - Restricted Area"');
-        $oOutput->set_header($oInput->server('SERVER_PROTOCOL') . ' 401 Unauthorized');
+        //  Send headers immediately
+        header('WWW-Authenticate: Basic realm="' . Config::get('APP_NAME') . ' - Restricted Area"');
+        header($oInput->server('SERVER_PROTOCOL') . ' 401 Unauthorized');
 
         $oErrorHandler->show401(null, null, true, true);
     }
