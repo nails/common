@@ -301,32 +301,27 @@ abstract class Base extends \MX_Controller
         $sConfigKey          = 'APP_USER_PASS_' . Environment::get();
         $sConfigKeyWhitelist = 'APP_USER_PASS_WHITELIST_' . Environment::get();
 
-        if (!$oInput::isCli() && Config::get($sConfigKey)) {
+        $aCredentials    = (array) Config::get($sConfigKey);
+        $aWhitelistedIps = (array) Config::get($sConfigKeyWhitelist);
 
-            //  On the whitelist?
-            if (Config::get($sConfigKeyWhitelist)) {
+        if (!$oInput::isCli() && !empty($aCredentials)) {
 
-                $aWhitelistedIps = @json_decode(constant($sConfigKeyWhitelist));
-                $bWhitelisted    = isIpInRange($oInput->ipAddress(), $aWhitelistedIps);
-
-            } else {
-                $bWhitelisted = false;
-            }
+            $bWhitelisted = !empty($aWhitelistedIps) && isIpInRange($oInput->ipAddress(), $aWhitelistedIps);
 
             if (!$bWhitelisted) {
 
-                $oCredentials = @json_decode(constant($sConfigKey));
+                $sAuthUser = $oInput->server('PHP_AUTH_USER');
+                $sAuthPass = $oInput->server('PHP_AUTH_PW');
 
-                if (empty($_SERVER['PHP_AUTH_USER'])) {
+                if (empty($sAuthUser)) {
                     $this->passwordProtectedRequest();
                 }
 
-                if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
+                if (!empty($sAuthUser) && !empty($sAuthPass)) {
 
-                    //  Determine the users
-                    $bIsSet   = isset($oCredentials->{$_SERVER['PHP_AUTH_USER']});
-                    $bIsEqual = $bIsSet && $oCredentials->{$_SERVER['PHP_AUTH_USER']} == hash('sha256', $_SERVER['PHP_AUTH_PW']);
-                    if (!$bIsSet || !$bIsEqual) {
+                    $bExists  = array_key_exists($sAuthUser, $aCredentials);
+                    $bIsEqual = $bExists && $aCredentials[$sAuthUser] == hash('sha256', $sAuthPass);
+                    if (!$bExists || !$bIsEqual) {
                         $this->passwordProtectedRequest();
                     }
 
