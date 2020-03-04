@@ -142,10 +142,12 @@ abstract class Collection implements \Iterator
     public function filter(callable $cFilter): self
     {
         return new static(
-            array_filter(
-                $this->aCollection,
-                $cFilter
-            ) ?? []
+            array_values(
+                array_filter(
+                    $this->aCollection,
+                    $cFilter
+                ) ?? []
+            )
         );
     }
 }
