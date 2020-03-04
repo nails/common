@@ -27,14 +27,37 @@ final class Config
     public static function get(string $sKey, $mDefault = null)
     {
         if (array_key_exists($sKey, self::$aConfig)) {
-            return self::$aConfig[$sKey];
+            $sValue = self::$aConfig[$sKey];
         } elseif (defined($sKey)) {
-            return constant($sKey);
+            $sValue = constant($sKey);
         } elseif (array_key_exists($sKey, $_ENV)) {
-            return $_ENV[$sKey];
+            $sValue = $_ENV[$sKey];
         } else {
-            return $mDefault;
+            $sValue = $mDefault;
         }
+
+        return is_string($sValue) && static::isJson($sValue)
+            ? json_decode($sValue)
+            : $sValue;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Detects if a value is JSON
+     *
+     * @param mixed $mValue The value to test
+     *
+     * @return bool
+     */
+    private static function isJson($mValue): bool
+    {
+        if (!is_string($mValue)) {
+            return false;
+        }
+
+        json_decode($mValue);
+        return json_last_error() === JSON_ERROR_NONE;
     }
 
     // --------------------------------------------------------------------------
