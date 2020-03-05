@@ -110,6 +110,7 @@ class Migrate extends Base
 
         //  Check we have a database to connect to
         if (empty($sDbName)) {
+            $oOutput->writeln('<error>No database defined</error>');
             return $this->abort(static::EXIT_CODE_NO_DB);
         }
 
@@ -131,7 +132,7 @@ class Migrate extends Base
             if (!(bool) $this->oDb->query($sSql)) {
 
                 $oOutput->writeln('');
-                $oOutput->writeln('Database isn\'t ready for migrations.');
+                $oOutput->writeln('<error>Database isn\'t ready for migrations.</error>');
 
                 return $this->abort(static::EXIT_CODE_DB_NOT_READY);
             }
