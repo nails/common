@@ -216,10 +216,10 @@ final class Bootstrap
 
         //  Potentially vary between deployments
         //  @todo (Pablo - 2020-03-02) - Remove, kept for backwards compatability
-        Config::default('DEPLOY_DB_HOST', getenv('DB_HOST'));
-        Config::default('DEPLOY_DB_USERNAME', getenv('DB_USERNAME'));
-        Config::default('DEPLOY_DB_PASSWORD', getenv('DB_PASSWORD'));
-        Config::default('DEPLOY_DB_DATABASE', getenv('DB_DATABASE'));
+        Config::default('DEPLOY_DB_HOST', '127.0.0.1');
+        Config::default('DEPLOY_DB_USERNAME');
+        Config::default('DEPLOY_DB_PASSWORD');
+        Config::default('DEPLOY_DB_DATABASE');
 
         Config::default('DB_HOST', Config::get('DEPLOY_DB_HOST'));
         Config::default('DB_USERNAME', Config::get('DEPLOY_DB_USERNAME'));
