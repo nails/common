@@ -32,6 +32,8 @@ final class Config
             $sValue = constant($sKey);
         } elseif (array_key_exists($sKey, $_ENV)) {
             $sValue = $_ENV[$sKey];
+        } elseif (array_key_exists($sKey, $_SERVER)) {
+            $sValue = $_SERVER[$sKey];
         } else {
             $sValue = $mDefault;
         }
