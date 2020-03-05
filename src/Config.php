@@ -97,6 +97,8 @@ final class Config
             return true;
         } elseif (array_key_exists($sKey, $_ENV)) {
             return true;
+        } elseif (array_key_exists($sKey, $_SERVER)) {
+            return true;
         } else {
             return false;
         }
