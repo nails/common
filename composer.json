@@ -6,7 +6,7 @@
         "CodeIgniter"
     ],
     "homepage": "http://nailsapp.co.uk",
-    "description": "Nails is a framework for CodeIgniter designed to make building interactive web applications fast.",
+    "description": "Nails is a PHP framework to make building hand-crafted, exhilarating web apps fast and painless.",
     "license": "MIT",
     "authors": [
         {
