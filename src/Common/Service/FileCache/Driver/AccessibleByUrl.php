@@ -2,6 +2,7 @@
 
 namespace Nails\Common\Service\FileCache\Driver;
 
+use Nails\Common\Helper\Strings;
 use Nails\Common\Interfaces;
 use Nails\Common\Service\FileCache\Driver;
 
@@ -13,28 +14,18 @@ use Nails\Common\Service\FileCache\Driver;
 class AccessibleByUrl extends Driver implements Interfaces\Service\FileCache\Driver\AccessibleByUrl
 {
     /**
-     * The directory to use for the cache
-     *
-     * @var string
-     */
-    protected $sDir = NAILS_APP_PATH . 'cache' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR;
-
-    /**
      * The URL for accessing the public cache
      *
      * @var string
      */
-    protected $sUrl = BASE_URL . 'cache/public';
+    protected $sUrl;
 
     // --------------------------------------------------------------------------
 
     public function __construct(string $sDir = null, string $sUrl = null)
     {
         parent::__construct($sDir);
-
-        if (!is_null($sUrl)) {
-            $this->sUrl = $sUrl;
-        }
+        $this->sUrl = Strings::addTrailingSlash($sUrl);
     }
 
     // --------------------------------------------------------------------------

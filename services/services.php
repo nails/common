@@ -5,6 +5,7 @@ use Nails\Common\Interfaces;
 use Nails\Common\Service;
 use Nails\Common\Model;
 use Nails\Common\Resource;
+use Nails\Config;
 use Nails\Environment;
 use Nails\Factory;
 use Symfony\Component\Mime\MimeTypes;
@@ -115,7 +116,16 @@ return [
 
             return $oFileCache;
         },
-        'FileCacheDriver'                => function (string $sDir = null): Service\FileCache\Driver {
+        'FileCacheDriver'                => function (
+            string $sDir = null
+        ): Service\FileCache\Driver {
+
+            $sDir = $sDir
+                ?? Config::get(
+                    'CACHE_PRIVATE_DIR',
+                    Config::get('NAILS_APP_PATH') . implode(DIRECTORY_SEPARATOR, ['cache', 'private', ''])
+                );
+
             if (class_exists('\App\Common\Service\FileCache\Driver')) {
                 /** @var Service\FileCache\Driver $oDriver */
                 $oDriver = new \App\Common\Service\FileCache\Driver($sDir);
@@ -126,7 +136,22 @@ return [
 
             return $oDriver;
         },
-        'FileCacheDriverAccessibleByUrl' => function (string $sDir = null, string $sUrl = null): Service\FileCache\Driver\AccessibleByUrl {
+        'FileCacheDriverAccessibleByUrl' => function (
+            string $sDir = null,
+            string $sUrl = null
+        ): Service\FileCache\Driver\AccessibleByUrl {
+
+            $sDir = $sDir
+                ?? Config::get(
+                    'CACHE_PUBLIC_DIR',
+                    Config::get('NAILS_APP_PATH') . implode(DIRECTORY_SEPARATOR, ['cache', 'public', ''])
+                );
+            $sUrl = $sUrl
+                ?? Config::get(
+                    'CACHE_PUBLIC_URL',
+                    Config::get('BASE_URL') . 'cache/public'
+                );
+
             if (class_exists('\App\Common\Service\FileCache\Driver\AccessibleByUrl')) {
                 /** @var Service\FileCache\Driver\AccessibleByUrl $oDriver */
                 $oDriver = new \App\Common\Service\FileCache\Driver\AccessibleByUrl($sDir, $sUrl);

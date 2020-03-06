@@ -22,7 +22,7 @@ class Driver implements Interfaces\Service\FileCache\Driver
      *
      * @var string
      */
-    protected $sDir = NAILS_APP_PATH . 'cache' . DIRECTORY_SEPARATOR . 'private' . DIRECTORY_SEPARATOR;
+    protected $sDir;
 
     // --------------------------------------------------------------------------
 
@@ -36,9 +36,7 @@ class Driver implements Interfaces\Service\FileCache\Driver
      */
     public function __construct(string $sDir = null)
     {
-        if (!is_null($sDir)) {
-            $this->sDir = Strings::addTrailingSlash($sDir);
-        }
+        $this->sDir = Strings::addTrailingSlash($sDir);
 
         if (!is_dir($this->getDir())) {
             throw new DirectoryDoesNotExistException(
