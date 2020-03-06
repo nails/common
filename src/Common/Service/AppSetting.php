@@ -75,7 +75,7 @@ class AppSetting
 
     // --------------------------------------------------------------------------
 
-    protected function generateCacheKey(string $sKey, string $sGrouping): string
+    protected function generateCacheKey(?string $sKey, string $sGrouping): string
     {
         return md5($sKey, $sGrouping);
     }

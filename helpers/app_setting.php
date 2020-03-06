@@ -32,7 +32,13 @@ if (!function_exists('appSetting')) {
         /** @var AppSetting $oAppSettingService */
         $oAppSettingService = Factory::service('AppSetting');
         $oSetting           = $oAppSettingService->get($sKey, $sGrouping, $bForceRefresh);
-        return $oSetting ? $oSetting->getValue() : $mDefault;
+        if (is_array($oSetting)) {
+            return array_map(function ($oSetting) {
+                return $oSetting->getValue();
+            }, $oSetting);
+        } else {
+            return $oSetting ? $oSetting->getValue() : $mDefault;
+        }
     }
 }
 
