@@ -298,15 +298,12 @@ abstract class Base extends \MX_Controller
         /** @var Input $oInput */
         $oInput = Factory::service('Input');
 
-        $sConfigKey          = 'APP_USER_PASS_' . Environment::get();
-        $sConfigKeyWhitelist = 'APP_USER_PASS_WHITELIST_' . Environment::get();
-
-        $aCredentials    = (array) Config::get($sConfigKey);
-        $aWhitelistedIps = (array) Config::get($sConfigKeyWhitelist);
+        $aCredentials = $this->passwordProtectedIpCredentials();
 
         if (!$oInput::isCli() && !empty($aCredentials)) {
 
-            $bWhitelisted = !empty($aWhitelistedIps) && isIpInRange($oInput->ipAddress(), $aWhitelistedIps);
+            $aWhitelistedIps = $this->passwordProtectedIpWhitelist();
+            $bWhitelisted    = !empty($aWhitelistedIps) && isIpInRange($oInput->ipAddress(), $aWhitelistedIps);
 
             if (!$bWhitelisted) {
 
@@ -330,6 +327,42 @@ abstract class Base extends \MX_Controller
                 }
             }
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns an array of key/value pairs for password protection
+     *
+     * @return array
+     */
+    protected function passwordProtectedIpCredentials(): array
+    {
+        $mConfig = Config::get('APP_USER_PASS_' . Environment::get());
+        $sFile   = 'protect.' . strtolower(Environment::get()) . '.users.json';
+        if ($mConfig === null && file_exists($sFile)) {
+            $mConfig = @json_decode(file_get_contents($sFile)) ?? [];
+        }
+
+        return (array) $mConfig;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns an array of whitelisted IPs for password protection
+     *
+     * @return array
+     */
+    protected function passwordProtectedIpWhitelist(): array
+    {
+        $mConfig = Config::get('APP_USER_PASS_WHITELIST_' . Environment::get());
+        $sFile   = 'protect.' . strtolower(Environment::get()) . '.whitelist.json';
+        if ($mConfig === null && file_exists($sFile)) {
+            $mConfig = @json_decode(file_get_contents($sFile)) ?? [];
+        }
+
+        return (array) $mConfig;
     }
 
     // --------------------------------------------------------------------------
