@@ -27,6 +27,8 @@ class FileCacheTest extends TestCase
      */
     protected static $sDirPublic;
 
+    /** @var string */
+    protected static $sUrlPublic;
 
     /**
      * @var FileCache\Driver
@@ -56,6 +58,7 @@ class FileCacheTest extends TestCase
 
         static::$sDirPrivate = Directory::tempdir();
         static::$sDirPublic  = Directory::tempdir();
+        static::$sUrlPublic  = Config::get('BASE_URL') . 'cache/public';
 
         //  Place a existing-file file in the cache
         file_put_contents(static::$sDirPrivate . 'existing-file.txt', 'Some data');
@@ -65,7 +68,8 @@ class FileCacheTest extends TestCase
             static::$sDirPrivate
         );
         static::$oCachePublic  = new Driver\AccessibleByUrl(
-            static::$sDirPublic
+            static::$sDirPublic,
+            static::$sUrlPublic
         );
 
         static::$oCache = new FileCache(
@@ -370,11 +374,11 @@ class FileCacheTest extends TestCase
     public function testPublicCacheReturnsValidUrl()
     {
         $this->assertEquals(
-            Config::get('BASE_URL') . 'cache/public',
+            static::$sUrlPublic,
             static::$oCache->public()->getUrl()
         );
         $this->assertEquals(
-            Config::get('BASE_URL') . 'cache/public/existing-file.txt',
+            static::$sUrlPublic . '/existing-file.txt',
             static::$oCache->public()->getUrl('existing-file.txt')
         );
     }
