@@ -17,32 +17,22 @@ use PHPUnit\Framework\TestCase;
  */
 class FileCacheTest extends TestCase
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected static $sDirPrivate;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected static $sDirPublic;
 
     /** @var string */
     protected static $sUrlPublic;
 
-    /**
-     * @var FileCache\Driver
-     */
+    /** @var FileCache\Driver */
     protected static $oCachePrivate;
 
-    /**
-     * @var FileCache\Driver\AccessibleByUrl
-     */
+    /** @var FileCache\Driver\AccessibleByUrl */
     protected static $oCachePublic;
 
-    /**
-     * @var FileCache
-     */
+    /** @var FileCache */
     protected static $oCache;
 
     // --------------------------------------------------------------------------
