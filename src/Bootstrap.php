@@ -179,9 +179,18 @@ final class Bootstrap
         Config::default('BASEPATH', Config::get('NAILS_CI_SYSTEM_PATH'));
 
         //  URLs
-        Config::default('DOMAIN', getenv('DOMAIN') ?: '/');
+        Config::default('DOMAIN', '/');
         Config::default('DEFAULT_PROTOCOL', 'https');
-        Config::default('BASE_URL', sprintf('%s://%s/', Config::get('DEFAULT_PROTOCOL'), Config::get('DOMAIN')));
+        Config::default(
+            'BASE_URL',
+            Config::get('DOMAIN') !== '/'
+             ? sprintf(
+                    '%s://%s/',
+                    Config::get('DEFAULT_PROTOCOL'),
+                    Config::get('DOMAIN')
+                )
+             : Config::get('DOMAIN')
+        );
         Config::default('SECURE_BASE_URL', preg_replace('/^http:/', 'https:', Config::get('BASE_URL')));
         Config::default('NAILS_URL', (Functions::isPageSecure() ? Config::get('SECURE_BASE_URL') : Config::get('BASE_URL')) . 'vendor/nails/');
 
