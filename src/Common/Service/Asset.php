@@ -3,17 +3,19 @@
 /**
  * The class provides a convenient way to load assets
  *
- * @package     Nails
- * @subpackage  common
- * @category    Library
- * @author      Nails Dev Team
- * @link
+ * @package    Nails
+ * @subpackage common
+ * @category   Service
+ * @author     Nails Dev Team
  */
+
+//  @todo (Pablo - 2020-03-08) - Remove support for Bower
 
 namespace Nails\Common\Service;
 
 use Nails\Common\Exception\AssetException;
 use Nails\Common\Exception\NailsException;
+use Nails\Common\Helper\Strings;
 use Nails\Factory;
 use Nails\Functions;
 
@@ -24,64 +26,210 @@ use Nails\Functions;
  */
 class Asset
 {
-    protected $oCi;
-    protected $aCss;
-    protected $aCssInline;
-    protected $aJs;
-    protected $aJsInlineHeader;
-    protected $aJsInlineFooter;
+    /**
+     * The cachebuster string
+     *
+     * @var string
+     */
     protected $sCacheBuster;
+
+    /**
+     * The base URL where assets are stored
+     *
+     * @var string
+     */
     protected $sBaseUrl;
+
+    /**
+     * The secure version of the base URL
+     *
+     * @var string
+     */
     protected $sBaseUrlSecure;
+
+    /**
+     * The base URL where module assets are stored
+     *
+     * @var string
+     */
     protected $sBaseModuleUrl;
+
+    /**
+     * The secure version of the base module URL
+     *
+     * @var string
+     */
     protected $sBaseModuleUrlSecure;
-    protected $sBowerDir;
+
+    /**
+     * Where compiled CSS is stored
+     *
+     * @var string
+     */
     protected $sCssDir;
+
+    /**
+     * Where compiled JS is stored
+     *
+     * @var string
+     */
     protected $sJsDir;
+
+    /**
+     * Where bower assets are stored
+     *
+     * @var string
+     */
+    protected $sBowerDir;
+
+    /**
+     * Loaded CSS files
+     *
+     * @var array
+     */
+    protected $aCss = [];
+
+    /**
+     * Loaded inline CSS
+     *
+     * @var array
+     */
+    protected $aCssInline = [];
+
+    /**
+     * Loaded JS files
+     *
+     * @var array
+     */
+    protected $aJs = [];
+
+    /**
+     * Loaded inline JS for the header
+     *
+     * @var array
+     */
+    protected $aJsInlineHeader = [];
+
+    /**
+     * Loaded inline JS for the footer
+     *
+     * @var array
+     */
+    protected $aJsInlineFooter = [];
 
     // --------------------------------------------------------------------------
 
     /**
-     * Construct the library
+     * Asset constructor.
      *
-     * @return  void
-     **/
-    public function __construct()
-    {
-        $this->oCi =& get_instance();
-        Factory::helper('string');
+     * @param string $sCacheBuster         The cachebuster string
+     * @param string $sBaseUrl             The base URL where assets are stored
+     * @param string $sBaseUrlSecure       The secure base URL where assets are stored
+     * @param string $sBaseModuleUrl       The base URL where modules are
+     * @param string $sBaseModuleUrlSecure The secure base URL where modules are
+     * @param string $sCssDir              Where compiled CSS is stored
+     * @param string $sJsDir               Where compiled JS is stored
+     * @param string $sBowerDir            Where bower assets are stored
+     */
+    public function __construct(
+        string $sCacheBuster,
+        string $sBaseUrl,
+        string $sBaseUrlSecure,
+        string $sBaseModuleUrl,
+        string $sBaseModuleUrlSecure,
+        string $sCssDir,
+        string $sJsDir,
+        string $sBowerDir
+    ) {
 
-        $this->aCss            = [];
-        $this->aCssInline      = [];
-        $this->aJs             = [];
-        $this->aJsInlineHeader = [];
-        $this->aJsInlineFooter = [];
-        $this->sCacheBuster    = \Nails\Config::get('DEPLOY_REVISION');
+        $this->sCacheBuster = $sCacheBuster;
 
-        $this->sBaseUrl       = \Nails\Config::get('DEPLOY_ASSET_BASE_URL', 'assets/build');
-        $this->sBaseUrl       = siteUrl($this->sBaseUrl);
-        $this->sBaseUrl       = addTrailingSlash($this->sBaseUrl);
-        $this->sBaseUrlSecure = \Nails\Config::get('DEPLOY_ASSET_BASE_URL_SECURE', 'assets/build');
-        $this->sBaseUrlSecure = siteUrl($this->sBaseUrlSecure);
-        $this->sBaseUrlSecure = addTrailingSlash($this->sBaseUrlSecure);
+        $this->setBaseUrls(
+            $sBaseUrl,
+            $sBaseModuleUrl,
+            $sBaseUrlSecure,
+            $sBaseModuleUrlSecure
+        );
 
-        $this->sBaseModuleUrl       = \Nails\Config::get('DEPLOY_ASSET_BASE_MODULE_URL', 'vendor');
-        $this->sBaseModuleUrl       = siteUrl($this->sBaseModuleUrl);
-        $this->sBaseModuleUrl       = addTrailingSlash($this->sBaseModuleUrl);
-        $this->sBaseModuleUrlSecure = \Nails\Config::get('DEPLOY_ASSET_BASE_MODULE_URL_SECURE', 'vendor');
-        $this->sBaseModuleUrlSecure = siteUrl($this->sBaseModuleUrlSecure);
-        $this->sBaseModuleUrlSecure = addTrailingSlash($this->sBaseModuleUrlSecure);
-
-        $this->sBowerDir = \Nails\Config::get('DEPLOY_ASSET_BOWER_DIR', 'bower_components');
-        $this->sBowerDir = addTrailingSlash($this->sBowerDir);
-
-        $this->sCssDir = \Nails\Config::get('DEPLOY_ASSET_CSS_DIR', 'css');
-        $this->sCssDir = addTrailingSlash($this->sCssDir);
-
-        $this->sJsDir = \Nails\Config::get('DEPLOY_ASSET_JS_DIR', 'js');
-        $this->sJsDir = addTrailingSlash($this->sJsDir);
-
+        $this->sCssDir   = Strings::addTrailingSlash($sCssDir);
+        $this->sJsDir    = Strings::addTrailingSlash($sJsDir);
+        $this->sBowerDir = Strings::addTrailingSlash($sBowerDir);
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Set the base URLs
+     *
+     * @param string      $sBaseUrl             The base URL
+     * @param string      $sBaseModuleUrl       The base Module URL
+     * @param string|null $sBaseUrlSecure       The secure base URL
+     * @param string|null $sBaseModuleUrlSecure The secure base module URL
+     *
+     * @return $this
+     */
+    public function setBaseUrls(
+        string $sBaseUrl,
+        string $sBaseModuleUrl,
+        string $sBaseUrlSecure = null,
+        string $sBaseModuleUrlSecure = null
+    ): self {
+
+        $this->sBaseUrl = siteUrl($sBaseUrl);
+        $this->sBaseUrl = Strings::addTrailingSlash($this->sBaseUrl);
+
+        $this->sBaseModuleUrl = siteUrl($sBaseModuleUrl);
+        $this->sBaseModuleUrl = Strings::addTrailingSlash($this->sBaseModuleUrl);
+
+        $this->sBaseUrlSecure = $sBaseUrlSecure ?? preg_replace('/^http/', 'https', $this->sBaseUrl);
+        $this->sBaseUrlSecure = Strings::addTrailingSlash($this->sBaseUrlSecure);
+
+        $this->sBaseModuleUrlSecure = $sBaseModuleUrlSecure ?? preg_replace('/^http/', 'https', $this->sBaseModuleUrl);
+        $this->sBaseModuleUrlSecure = Strings::addTrailingSlash($this->sBaseModuleUrlSecure);
+
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the base URL appropriate for the page
+     *
+     * @return string
+     */
+    public function getBaseUrl(): string
+    {
+        return Functions::isPageSecure()
+            ? $this->sBaseUrlSecure
+            : $this->sBaseUrl;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the base module URL appropriate for the page
+     *
+     * @return string
+     */
+    public function getBaseModuleUrl(): string
+    {
+        return Functions::isPageSecure()
+            ? $this->sBaseModuleUrlSecure
+            : $this->sBaseModuleUrl;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the URL for the Nails assets module
+     *
+     * @return string
+     */
+    public function getNailsAssetUrl(): string
+    {
+        return \Nails\Config::get('NAILS_ASSETS_URL');
+    }
+
 
     // --------------------------------------------------------------------------
 
@@ -109,39 +257,32 @@ class Asset
         switch (strtoupper($sAssetLocation)) {
 
             case 'NAILS-BOWER':
-
                 $sAssetLocationMethod = 'loadNailsBower';
                 break;
 
             case 'NAILS-PACKAGE':
-
                 $sAssetLocationMethod = 'loadNailsPackage';
                 break;
 
             case 'NAILS':
-
                 $sAssetLocationMethod = 'loadNails';
                 break;
 
             case 'APP-BOWER':
             case 'BOWER':
-
                 $sAssetLocationMethod = 'loadAppBower';
                 break;
 
             case 'APP-PACKAGE':
             case 'PACKAGE':
-
                 $sAssetLocationMethod = 'loadAppPackage';
                 break;
 
             case 'APP':
-
                 $sAssetLocationMethod = 'loadApp';
                 break;
 
             default:
-
                 $sAssetLocationMethod = 'loadModule';
                 break;
         }
@@ -149,17 +290,11 @@ class Asset
         // --------------------------------------------------------------------------
 
         foreach ($aAssets as $sAsset) {
-
             if (preg_match('#^https?://#', $sAsset)) {
-
                 $this->loadUrl($sAsset, $sForceType);
-
             } elseif (substr($sAsset, 0, 0) == '/') {
-
                 $this->loadAbsolute(substr($sAsset, 1), $sForceType);
-
             } else {
-
                 $this->{$sAssetLocationMethod}($sAsset, $sForceType, $sAssetLocation);
             }
         }
@@ -186,12 +321,10 @@ class Asset
         switch ($sType) {
 
             case 'CSS':
-
                 $this->aCss['URL-' . $sAsset] = $sAsset;
                 break;
 
             case 'JS':
-
                 $this->aJs['URL-' . $sAsset] = $sAsset;
                 break;
         }
@@ -214,13 +347,11 @@ class Asset
         switch ($sType) {
 
             case 'CSS':
-
-                $this->aCss['ABSOLUTE-' . $sAsset] = $this->sBaseUrl . $sAsset;
+                $this->aCss['ABSOLUTE-' . $sAsset] = $this->getBaseUrl() . $sAsset;
                 break;
 
             case 'JS':
-
-                $this->aJs['ABSOLUTE-' . $sAsset] = $this->sBaseUrl . $sAsset;
+                $this->aJs['ABSOLUTE-' . $sAsset] = $this->getBaseUrl() . $sAsset;
                 break;
         }
     }
@@ -237,26 +368,13 @@ class Asset
      */
     protected function loadNails($sAsset, $sForceType)
     {
-        $sType = $this->determineType($sAsset, $sForceType);
-
-        switch ($sType) {
-
-            case 'CSS':
-
-                $this->aCss['NAILS-' . $sAsset] = NAILS_ASSETS_URL . $this->sCssDir . $sAsset;
-                break;
-
-            case 'JS':
-
-                $this->aJs['NAILS-' . $sAsset] = NAILS_ASSETS_URL . $this->sJsDir . $sAsset;
-                break;
-        }
+        $this->loadModule($sAsset, $sForceType, 'nails/module-asset');
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Loads a Bower asset from the NAils asset module's bower_components directory
+     * Loads a Bower asset from the Nails asset module's bower_components directory
      *
      * @param string $sAsset     The asset to load
      * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
@@ -270,13 +388,11 @@ class Asset
         switch ($sType) {
 
             case 'CSS':
-
-                $this->aCss['NAILS-BOWER-' . $sAsset] = NAILS_ASSETS_URL . $this->sBowerDir . $sAsset;
+                $this->aCss['NAILS-BOWER-' . $sAsset] = $this->getNailsAssetUrl() . $this->sBowerDir . $sAsset;
                 break;
 
             case 'JS':
-
-                $this->aJs['NAILS-BOWER-' . $sAsset] = NAILS_ASSETS_URL . $this->sBowerDir . $sAsset;
+                $this->aJs['NAILS-BOWER-' . $sAsset] = $this->getNailsAssetUrl() . $this->sBowerDir . $sAsset;
                 break;
         }
     }
@@ -284,7 +400,7 @@ class Asset
     // --------------------------------------------------------------------------
 
     /**
-     * Loads a Nails package asset (as a relative url from NAILS_ASSETS_URL . 'packages/')
+     * Loads a Nails package asset (as a relative url from $this->getNailsAssetUrl() . 'packages/')
      *
      * @param string $sAsset     The asset to load
      * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
@@ -298,13 +414,11 @@ class Asset
         switch ($sType) {
 
             case 'CSS':
-
-                $this->aCss['NAILS-PACKAGE-' . $sAsset] = NAILS_ASSETS_URL . 'packages/' . $sAsset;
+                $this->aCss['NAILS-PACKAGE-' . $sAsset] = $this->getNailsAssetUrl() . 'packages/' . $sAsset;
                 break;
 
             case 'JS':
-
-                $this->aJs['NAILS-PACKAGE-' . $sAsset] = NAILS_ASSETS_URL . 'packages/' . $sAsset;
+                $this->aJs['NAILS-PACKAGE-' . $sAsset] = $this->getNailsAssetUrl() . 'packages/' . $sAsset;
                 break;
         }
     }
@@ -326,13 +440,11 @@ class Asset
         switch ($sType) {
 
             case 'CSS':
-
-                $this->aCss['APP-BOWER-' . $sAsset] = $this->sBaseUrl . $this->sBowerDir . $sAsset;
+                $this->aCss['APP-BOWER-' . $sAsset] = $this->getBaseUrl() . $this->sBowerDir . $sAsset;
                 break;
 
             case 'JS':
-
-                $this->aJs['APP-BOWER-' . $sAsset] = $this->sBaseUrl . $this->sBowerDir . $sAsset;
+                $this->aJs['APP-BOWER-' . $sAsset] = $this->getBaseUrl() . $this->sBowerDir . $sAsset;
                 break;
         }
     }
@@ -354,13 +466,11 @@ class Asset
         switch ($sType) {
 
             case 'CSS':
-
-                $this->aCss['APP-PACKAGE-' . $sAsset] = $this->sBaseUrl . 'packages/' . $sAsset;
+                $this->aCss['APP-PACKAGE-' . $sAsset] = $this->getBaseUrl() . 'packages/' . $sAsset;
                 break;
 
             case 'JS':
-
-                $this->aJs['APP-PACKAGE-' . $sAsset] = $this->sBaseUrl . 'packages/' . $sAsset;
+                $this->aJs['APP-PACKAGE-' . $sAsset] = $this->getBaseUrl() . 'packages/' . $sAsset;
                 break;
         }
     }
@@ -382,13 +492,11 @@ class Asset
         switch ($sType) {
 
             case 'CSS':
-
-                $this->aCss['APP-' . $sAsset] = $this->sBaseUrl . $this->sCssDir . $sAsset;
+                $this->aCss['APP-' . $sAsset] = $this->getBaseUrl() . $this->sCssDir . $sAsset;
                 break;
 
             case 'JS':
-
-                $this->aJs['APP-' . $sAsset] = $this->sBaseUrl . $this->sJsDir . $sAsset;
+                $this->aJs['APP-' . $sAsset] = $this->getBaseUrl() . $this->sJsDir . $sAsset;
                 break;
         }
     }
@@ -409,9 +517,7 @@ class Asset
         if (is_array($mModule)) {
             $sModule   = !empty($mModule[0]) ? $mModule[0] : null;
             $sLocation = !empty($mModule[1]) ? $mModule[1] : null;
-
         } else {
-
             $sModule   = $mModule;
             $sLocation = null;
         }
@@ -422,7 +528,6 @@ class Asset
         switch ($sType) {
 
             case 'CSS':
-
                 if ($sLocation == 'BOWER') {
                     $this->aCss[$sKey] = $this->sBaseModuleUrl . $sModule . '/assets/bower_components/' . $sAsset;
                 } else {
@@ -431,7 +536,6 @@ class Asset
                 break;
 
             case 'JS':
-
                 if ($sLocation == 'BOWER') {
                     $this->aJs[$sKey] = $this->sBaseModuleUrl . $sModule . '/assets/bower_components/' . $sAsset;
                 } else {
@@ -467,39 +571,32 @@ class Asset
         switch (strtoupper($sAssetLocation)) {
 
             case 'NAILS-BOWER':
-
                 $sAssetLocationMethod = 'unloadNailsBower';
                 break;
 
             case 'NAILS-PACKAGE':
-
                 $sAssetLocationMethod = 'unloadNailsPackage';
                 break;
 
             case 'NAILS':
-
                 $sAssetLocationMethod = 'unloadNails';
                 break;
 
             case 'APP-BOWER':
             case 'BOWER':
-
                 $sAssetLocationMethod = 'unloadAppBower';
                 break;
 
             case 'APP-PACKAGE':
             case 'PACKAGE':
-
                 $sAssetLocationMethod = 'unloadAppPackage';
                 break;
 
             case 'APP':
-
                 $sAssetLocationMethod = 'unloadApp';
                 break;
 
             default:
-
                 $sAssetLocationMethod = 'unloadModule';
                 break;
         }
@@ -507,17 +604,11 @@ class Asset
         // --------------------------------------------------------------------------
 
         foreach ($aAssets as $sAsset) {
-
             if (preg_match('#^https?://#', $sAsset)) {
-
                 $this->unloadUrl($sAsset, $sForceType);
-
             } elseif (substr($sAsset, 0, 0) == '/') {
-
                 $this->unloadAbsolute($sAsset, $sForceType);
-
             } else {
-
                 $this->{$sAssetLocationMethod}($sAsset, $sForceType, $sAssetLocation);
             }
         }
@@ -544,12 +635,10 @@ class Asset
         switch ($sType) {
 
             case 'CSS':
-
                 unset($this->aCss['URL-' . $sAsset]);
                 break;
 
             case 'JS':
-
                 unset($this->aJs['URL-' . $sAsset]);
                 break;
         }
@@ -572,12 +661,10 @@ class Asset
         switch ($sType) {
 
             case 'CSS':
-
                 unset($this->aCss['ABSOLUTE-' . $sAsset]);
                 break;
 
             case 'JS':
-
                 unset($this->aJs['ABSOLUTE-' . $sAsset]);
                 break;
         }
@@ -595,20 +682,7 @@ class Asset
      */
     protected function unloadNails($sAsset, $sForceType)
     {
-        $sType = $this->determineType($sAsset, $sForceType);
-
-        switch ($sType) {
-
-            case 'CSS':
-
-                unset($this->aCss['NAILS-' . $sAsset]);
-                break;
-
-            case 'JS':
-
-                unset($this->aJs['NAILS-' . $sAsset]);
-                break;
-        }
+        $this->unloadModule($sAsset, $sForceType, 'nails/module-asset');
     }
 
     // --------------------------------------------------------------------------
@@ -628,12 +702,10 @@ class Asset
         switch ($sType) {
 
             case 'CSS':
-
                 unset($this->aCss['NAILS-BOWER-' . $sAsset]);
                 break;
 
             case 'JS':
-
                 unset($this->aJs['NAILS-BOWER-' . $sAsset]);
                 break;
         }
@@ -642,7 +714,7 @@ class Asset
     // --------------------------------------------------------------------------
 
     /**
-     * Unloads a Nails package asset (as a relative url from NAILS_ASSETS_URL . 'packages/')
+     * Unloads a Nails package asset (as a relative url from $this->getNailsAssetUrl() . 'packages/')
      *
      * @param string $sAsset     The asset to unload
      * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
@@ -656,12 +728,10 @@ class Asset
         switch ($sType) {
 
             case 'CSS':
-
                 unset($this->aCss['NAILS-PACKAGE-' . $sAsset]);
                 break;
 
             case 'JS':
-
                 unset($this->aJs['NAILS-PACKAGE-' . $sAsset]);
                 break;
         }
@@ -684,12 +754,10 @@ class Asset
         switch ($sType) {
 
             case 'CSS':
-
                 unset($this->aCss['APP-BOWER-' . $sAsset]);
                 break;
 
             case 'JS':
-
                 unset($this->aJs['APP-BOWER-' . $sAsset]);
                 break;
         }
@@ -712,12 +780,10 @@ class Asset
         switch ($sType) {
 
             case 'CSS':
-
                 unset($this->aCss['APP-PACKAGE-' . $sAsset]);
                 break;
 
             case 'JS':
-
                 unset($this->aJs['APP-PACKAGE-' . $sAsset]);
                 break;
         }
@@ -740,12 +806,10 @@ class Asset
         switch ($sType) {
 
             case 'CSS':
-
                 unset($this->aCss['APP-' . $sAsset]);
                 break;
 
             case 'JS':
-
                 unset($this->aJs['APP-' . $sAsset]);
                 break;
         }
@@ -768,12 +832,10 @@ class Asset
         switch ($sType) {
 
             case 'CSS':
-
                 unset($this->aCss['MODULE-' . $sModule . '-' . $sAsset]);
                 break;
 
             case 'JS':
-
                 unset($this->aJs['MODULE-' . $sModule . '-' . $sAsset]);
                 break;
         }
@@ -815,13 +877,11 @@ class Asset
 
                 case 'CSS-INLINE':
                 case 'CSS':
-
                     $this->aCssInline['INLINE-CSS-' . $sHash] = $sScript;
                     break;
 
                 case 'JS-INLINE':
                 case 'JS':
-
                     if ($sJsLocation == 'FOOTER') {
                         $this->aJsInlineFooter['INLINE-JS-' . $sHash] = $sScript;
                     } else {
@@ -863,13 +923,11 @@ class Asset
 
                 case 'CSS-INLINE':
                 case 'CSS':
-
                     unset($this->aCssInline['INLINE-CSS-' . md5($sScript)]);
                     break;
 
                 case 'JS-INLINE':
                 case 'JS':
-
                     if ($sJsLocation == 'FOOTER') {
                         unset($this->aJsInlineFooter['INLINE-JS-' . md5($sScript)]);
                     } else {
@@ -896,7 +954,6 @@ class Asset
         switch (strtoupper($sLibrary)) {
 
             case 'CKEDITOR':
-
                 $this->load(
                     [
                         'ckeditor/ckeditor.js',
@@ -907,7 +964,6 @@ class Asset
                 break;
 
             case 'JQUERYUI':
-
                 $this->load(
                     [
                         'jquery-ui/jquery-ui.min.js',
@@ -917,7 +973,6 @@ class Asset
                     ],
                     'NAILS-BOWER'
                 );
-
                 $this->load(
                     'jquery.ui.extra.css',
                     'NAILS'
@@ -925,7 +980,6 @@ class Asset
                 break;
 
             case 'CMSWIDGETEDITOR':
-
                 $this->library('JQUERYUI');
                 $this->load(
                     [
@@ -937,7 +991,6 @@ class Asset
                 break;
 
             case 'UPLOADIFY':
-
                 $this->load(
                     [
                         'uploadify/uploadify.css',
@@ -948,7 +1001,6 @@ class Asset
                 break;
 
             case 'CHOSEN':
-
                 $this->load(
                     [
                         'chosen/chosen.min.css',
@@ -959,7 +1011,6 @@ class Asset
                 break;
 
             case 'SELECT2':
-
                 $this->load(
                     [
                         'select2/select2.css',
@@ -970,7 +1021,6 @@ class Asset
                 break;
 
             case 'ZEROCLIPBOARD':
-
                 $this->load(
                     [
                         'zeroclipboard/dist/ZeroClipboard.min.js',
@@ -980,7 +1030,6 @@ class Asset
                 break;
 
             case 'KNOCKOUT':
-
                 $this->load(
                     [
                         'knockout/dist/knockout.js',
@@ -990,7 +1039,6 @@ class Asset
                 break;
 
             case 'MUSTACHE':
-
                 $this->load(
                     [
                         'mustache.js/mustache.js',
@@ -1000,7 +1048,6 @@ class Asset
                 break;
 
             case 'MOMENT':
-
                 $this->load(
                     [
                         'moment/moment.js',
@@ -1039,12 +1086,13 @@ class Asset
      */
     public function getLoaded()
     {
-        $oLoaded                 = new \stdClass();
-        $oLoaded->css            = $this->aCss;
-        $oLoaded->cssInline      = $this->aCssInline;
-        $oLoaded->js             = $this->aJs;
-        $oLoaded->jsInlineHeader = $this->aJsInlineHeader;
-        $oLoaded->jsInlineFooter = $this->aJsInlineFooter;
+        $oLoaded = (object) [
+            'css'            => $this->aCss,
+            'cssInline'      => $this->aCssInline,
+            'js'             => $this->aJs,
+            'jsInlineHeader' => $this->aJsInlineHeader,
+            'jsInlineFooter' => $this->aJsInlineFooter,
+        ];
 
         return $oLoaded;
     }
@@ -1066,7 +1114,6 @@ class Asset
 
         //  Linked Stylesheets
         if (!empty($this->aCss) && ($sType == 'CSS' || $sType == 'ALL')) {
-
             foreach ($this->aCss as $sAsset) {
                 $sAsset = $this->addCacheBuster($sAsset);
                 $aOut[] = link_tag($sAsset);
@@ -1077,7 +1124,6 @@ class Asset
 
         //  Linked JS
         if (!empty($this->aJs) && ($sType == 'JS' || $sType == 'ALL')) {
-
             foreach ($this->aJs as $sAsset) {
                 $sAsset = $this->addCacheBuster($sAsset);
                 $aOut[] = '<script src="' . $sAsset . '"></script>';
@@ -1132,15 +1178,6 @@ class Asset
 
         // --------------------------------------------------------------------------
 
-        //  Force SSL for assets if page is secure
-        if (Functions::isPageSecure()) {
-            foreach ($aOut as &$sLine) {
-                $sLine = str_replace($this->sBaseUrl, $this->sBaseUrlSecure, $sLine);
-            }
-        }
-
-        // --------------------------------------------------------------------------
-
         if ($bOutput) {
             echo implode("\n", $aOut);
         }
@@ -1162,11 +1199,8 @@ class Asset
             $aParsedUrl = parse_url($sAsset);
 
             if (empty($aParsedUrl['query'])) {
-
                 $sAsset .= '?';
-
             } else {
-
                 $sAsset .= '&';
             }
 
@@ -1190,7 +1224,6 @@ class Asset
     {
         //  Override if nessecary
         if (!empty($sForceType)) {
-
             return $sForceType;
         }
 
@@ -1198,7 +1231,6 @@ class Asset
 
         //  Look for <style></style>
         if (preg_match('/^<style.*?>.*?<\/style>$/si', $sAsset)) {
-
             return 'CSS-INLINE';
         }
 
@@ -1206,7 +1238,6 @@ class Asset
 
         //  Look for <script></script>
         if (preg_match('/^<script.*?>.*?<\/script>$/si', $sAsset)) {
-
             return 'JS-INLINE';
         }
 
@@ -1214,7 +1245,6 @@ class Asset
 
         //  Look for .css
         if (substr($sAsset, strrpos($sAsset, '.')) == '.css') {
-
             return 'CSS';
         }
 
@@ -1222,7 +1252,6 @@ class Asset
 
         //  Look for .js
         if (substr($sAsset, strrpos($sAsset, '.')) == '.js') {
-
             return 'JS';
         }
     }

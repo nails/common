@@ -30,10 +30,40 @@ return [
             }
         },
         'Asset'                          => function (): Service\Asset {
+
+            //  @todo (Pablo - 2020-03-08) - Remove DEPLOY_REVISION
+            //  @todo (Pablo - 2020-03-08) - Remove bower support
+            $sCacheBuster         = Config::get('ASSET_REVISION', Config::get('DEPLOY_REVISION'));
+            $sBaseUrl             = Config::get('ASSET_URL', '/assets');
+            $sBaseUrlSecure       = Config::get('ASSET_URL_SECURE', $sBaseUrl);
+            $sBaseModuleUrl       = Config::get('ASSET_MODULE_URL', '/vendor');
+            $sBaseModuleUrlSecure = Config::get('ASSET_MODULE_URL_SECURE', $sBaseModuleUrl);
+            $sCssDir              = Config::get('ASSET_CSS_DIR', 'build/css');
+            $sJsDir               = Config::get('ASSET_JS_DIR', 'build/js');
+            $sBowerDir            = Config::get('ASSET_BOWER_DIR', 'bower_components');
+
             if (class_exists('\App\Common\Service\Asset')) {
-                return new \App\Common\Service\Asset();
+                return new \App\Common\Service\Asset(
+                    $sCacheBuster,
+                    $sBaseUrl,
+                    $sBaseUrlSecure,
+                    $sBaseModuleUrl,
+                    $sBaseModuleUrlSecure,
+                    $sCssDir,
+                    $sJsDir,
+                    $sBowerDir
+                );
             } else {
-                return new Service\Asset();
+                return new Service\Asset(
+                    $sCacheBuster,
+                    $sBaseUrl,
+                    $sBaseUrlSecure,
+                    $sBaseModuleUrl,
+                    $sBaseModuleUrlSecure,
+                    $sCssDir,
+                    $sJsDir,
+                    $sBowerDir
+                );
             }
         },
         'CodeIgniter'                    => function () {
@@ -202,7 +232,7 @@ return [
             Service\Input $oInput = null
         ): Service\Locale {
 
-            $oInput = $oInput ?? \Nails\Factory::service('Input');
+            $oInput = $oInput ?? Factory::service('Input');
 
             if (class_exists('\App\Common\Service\Locale')) {
                 return new \App\Common\Service\Locale(
