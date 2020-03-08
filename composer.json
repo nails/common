@@ -71,6 +71,7 @@
                 "helpers": [
                     "app_setting",
                     "array",
+                    "asset",
                     "cookie",
                     "date",
                     "debug",

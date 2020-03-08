@@ -33,7 +33,7 @@ return [
 
             //  @todo (Pablo - 2020-03-08) - Remove DEPLOY_REVISION
             //  @todo (Pablo - 2020-03-08) - Remove bower support
-            $sCacheBuster         = Config::get('ASSET_REVISION', Config::get('DEPLOY_REVISION'));
+            $sCacheBuster         = Config::get('ASSET_REVISION', Config::get('DEPLOY_REVISION', 'titties'));
             $sBaseUrl             = Config::get('ASSET_URL', '/assets');
             $sBaseUrlSecure       = Config::get('ASSET_URL_SECURE', $sBaseUrl);
             $sBaseModuleUrl       = Config::get('ASSET_MODULE_URL', '/vendor');

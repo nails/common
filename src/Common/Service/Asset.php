@@ -181,10 +181,10 @@ class Asset
         $this->sBaseModuleUrl = siteUrl($sBaseModuleUrl);
         $this->sBaseModuleUrl = Strings::addTrailingSlash($this->sBaseModuleUrl);
 
-        $this->sBaseUrlSecure = $sBaseUrlSecure ?? preg_replace('/^http/', 'https', $this->sBaseUrl);
+        $this->sBaseUrlSecure = site_url($sBaseUrlSecure);
         $this->sBaseUrlSecure = Strings::addTrailingSlash($this->sBaseUrlSecure);
 
-        $this->sBaseModuleUrlSecure = $sBaseModuleUrlSecure ?? preg_replace('/^http/', 'https', $this->sBaseModuleUrl);
+        $this->sBaseModuleUrlSecure = siteUrl($sBaseModuleUrlSecure);
         $this->sBaseModuleUrlSecure = Strings::addTrailingSlash($this->sBaseModuleUrlSecure);
 
         return $this;
@@ -202,6 +202,45 @@ class Asset
         return Functions::isPageSecure()
             ? $this->sBaseUrlSecure
             : $this->sBaseUrl;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Builds the URL, with base URL and cachebuster
+     *
+     * @param string $sItem The item being loaded
+     *
+     * @return string
+     */
+    public function buildUrl(string $sItem): string
+    {
+        return $this->addCacheBuster($this->getBaseUrl() . $sItem);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Appends the cacheBuster string to the asset name, accounts for existing query strings
+     *
+     * @param string $sAsset The asset's url to append
+     */
+    protected function addCacheBuster(string $sAsset): string
+    {
+        if ($this->sCacheBuster) {
+
+            $aParsedUrl = parse_url($sAsset);
+
+            if (empty($aParsedUrl['query'])) {
+                $sAsset .= '?';
+            } else {
+                $sAsset .= '&';
+            }
+
+            $sAsset .= 'revision=' . $this->sCacheBuster;
+        }
+
+        return $sAsset;
     }
 
     // --------------------------------------------------------------------------
@@ -347,11 +386,11 @@ class Asset
         switch ($sType) {
 
             case 'CSS':
-                $this->aCss['ABSOLUTE-' . $sAsset] = $this->getBaseUrl() . $sAsset;
+                $this->aCss['ABSOLUTE-' . $sAsset] = $this->buildUrl($sAsset);
                 break;
 
             case 'JS':
-                $this->aJs['ABSOLUTE-' . $sAsset] = $this->getBaseUrl() . $sAsset;
+                $this->aJs['ABSOLUTE-' . $sAsset] = $this->buildUrl($sAsset);
                 break;
         }
     }
@@ -440,11 +479,11 @@ class Asset
         switch ($sType) {
 
             case 'CSS':
-                $this->aCss['APP-BOWER-' . $sAsset] = $this->getBaseUrl() . $this->sBowerDir . $sAsset;
+                $this->aCss['APP-BOWER-' . $sAsset] = $this->buildUrl($this->sBowerDir . $sAsset);
                 break;
 
             case 'JS':
-                $this->aJs['APP-BOWER-' . $sAsset] = $this->getBaseUrl() . $this->sBowerDir . $sAsset;
+                $this->aJs['APP-BOWER-' . $sAsset] = $this->buildUrl($this->sBowerDir . $sAsset);
                 break;
         }
     }
@@ -466,11 +505,11 @@ class Asset
         switch ($sType) {
 
             case 'CSS':
-                $this->aCss['APP-PACKAGE-' . $sAsset] = $this->getBaseUrl() . 'packages/' . $sAsset;
+                $this->aCss['APP-PACKAGE-' . $sAsset] = $this->buildUrl('packages/' . $sAsset);
                 break;
 
             case 'JS':
-                $this->aJs['APP-PACKAGE-' . $sAsset] = $this->getBaseUrl() . 'packages/' . $sAsset;
+                $this->aJs['APP-PACKAGE-' . $sAsset] = $this->buildUrl('packages/' . $sAsset);
                 break;
         }
     }
@@ -492,11 +531,11 @@ class Asset
         switch ($sType) {
 
             case 'CSS':
-                $this->aCss['APP-' . $sAsset] = $this->getBaseUrl() . $this->sCssDir . $sAsset;
+                $this->aCss['APP-' . $sAsset] = $this->buildUrl($this->sCssDir . $sAsset);
                 break;
 
             case 'JS':
-                $this->aJs['APP-' . $sAsset] = $this->getBaseUrl() . $this->sJsDir . $sAsset;
+                $this->aJs['APP-' . $sAsset] = $this->buildUrl($this->sJsDir . $sAsset);
                 break;
         }
     }
@@ -1115,7 +1154,6 @@ class Asset
         //  Linked Stylesheets
         if (!empty($this->aCss) && ($sType == 'CSS' || $sType == 'ALL')) {
             foreach ($this->aCss as $sAsset) {
-                $sAsset = $this->addCacheBuster($sAsset);
                 $aOut[] = link_tag($sAsset);
             }
         }
@@ -1125,7 +1163,6 @@ class Asset
         //  Linked JS
         if (!empty($this->aJs) && ($sType == 'JS' || $sType == 'ALL')) {
             foreach ($this->aJs as $sAsset) {
-                $sAsset = $this->addCacheBuster($sAsset);
                 $aOut[] = '<script src="' . $sAsset . '"></script>';
             }
         }
@@ -1183,31 +1220,6 @@ class Asset
         }
 
         return $aOut;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Appends the cacheBuster string to the asset name, accounts for existing query strings
-     *
-     * @param string $sAsset The asset's url to append
-     */
-    protected function addCacheBuster($sAsset)
-    {
-        if ($this->sCacheBuster) {
-
-            $aParsedUrl = parse_url($sAsset);
-
-            if (empty($aParsedUrl['query'])) {
-                $sAsset .= '?';
-            } else {
-                $sAsset .= '&';
-            }
-
-            $sAsset .= 'revision=' . $this->sCacheBuster;
-        }
-
-        return $sAsset;
     }
 
     // --------------------------------------------------------------------------
