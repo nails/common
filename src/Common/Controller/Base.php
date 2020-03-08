@@ -307,8 +307,8 @@ abstract class Base extends \MX_Controller
 
             if (!$bWhitelisted) {
 
-                $sAuthUser = $oInput->server('PHP_AUTH_USER');
-                $sAuthPass = $oInput->server('PHP_AUTH_PW');
+                $sAuthUser = $oInput->server('PHP_AUTH_USER') ?: $oInput->header('X-Auth-User');
+                $sAuthPass = $oInput->server('PHP_AUTH_PW') ?: $oInput->header('X-Auth-Password');
 
                 if (empty($sAuthUser)) {
                     $this->passwordProtectedRequest();
