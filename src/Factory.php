@@ -145,8 +145,8 @@ class Factory
             // --------------------------------------------------------------------------
 
             /**
-             * FACTORIES
-             * All factories are wrapped in a closure, this is so that on fetch we can
+             * Resources
+             * All resources are wrapped in a closure, this is so that on fetch we can
              * pass in any additional arguments as parameters which can be used in the
              * item's constructor
              */
@@ -433,6 +433,7 @@ class Factory
     public static function helper(string $sHelperName, ?string $sComponentName = ''): void
     {
         $sComponentName = empty($sComponentName) ? 'nails/common' : $sComponentName;
+        $oComponent     = Components::getBySlug($sComponentName);
 
         if (empty(self::$aLoadedHelpers[$sComponentName][$sHelperName])) {
 
@@ -440,40 +441,24 @@ class Factory
                 self::$aLoadedHelpers[$sComponentName] = [];
             }
 
-            /**
-             * If we're only interested in the app version of the helper then we change things
-             * around a little as the paths and reliance of a "component" based helper aren't the same
-             */
-            if ($sComponentName == static::$oAppSlug) {
+            $aPaths = [
+                $oComponent->path . static::compilePath(['application', 'helpers', $sHelperName . '.php']),
+                $oComponent->path . static::compilePath(['helpers', $sHelperName . '.php']),
+            ];
 
-                $sAppPath = NAILS_APP_PATH . 'application/helpers/' . $sHelperName . '.php';
 
-                if (!File::fileExistsCS($sAppPath)) {
-                    throw new FactoryException(
-                        'Helper "' . $sComponentName . '/' . $sHelperName . '" does not exist.',
-                        1
-                    );
+            $iNumLoaded = 0;
+            foreach ($aPaths as $sPath) {
+                if (File::fileExistsCS($sPath)) {
+                    $iNumLoaded++;
+                    require_once $sPath;
                 }
+            }
 
-                require_once $sAppPath;
-
-            } else {
-
-                $sComponentPath = NAILS_APP_PATH . 'vendor/' . $sComponentName . '/helpers/' . $sHelperName . '.php';
-                $sAppPath       = NAILS_APP_PATH . 'application/helpers/' . $sComponentName . '/' . $sHelperName . '.php';
-
-                if (!File::fileExistsCS($sComponentPath)) {
-                    throw new FactoryException(
-                        'Helper "' . $sComponentName . '/' . $sHelperName . '" does not exist.',
-                        1
-                    );
-                }
-
-                if (File::fileExistsCS($sAppPath)) {
-                    require_once $sAppPath;
-                }
-
-                require_once $sComponentPath;
+            if (!$iNumLoaded) {
+                throw new FactoryException(
+                    'Helper "' . $sComponentName . '/' . $sHelperName . '" does not exist.'
+                );
             }
 
             self::$aLoadedHelpers[$sComponentName][$sHelperName] = true;
