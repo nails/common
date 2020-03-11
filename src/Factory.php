@@ -185,10 +185,13 @@ class Factory
             array_filter([
                 $sPath . static::compilePath(['services', 'services.php']),
                 $oComponent->fromApp
-                    ? $sPath . static::compilePath(['application', 'services', $sSlug, 'services.php'])
+                    ? $sPath . static::compilePath(['application', 'services', 'services.php'])
                     : null,
                 $oComponent->fromApp
                     ? $sPath . static::compilePath(['vendor', $sSlug, 'services', 'services.php'])
+                    : null,
+                $oComponent->fromApp
+                    ? $sPath . static::compilePath(['application', 'services', $sSlug, 'services.php'])
                     : null,
             ])
         );
@@ -445,7 +448,6 @@ class Factory
                 $oComponent->path . static::compilePath(['application', 'helpers', $sHelperName . '.php']),
                 $oComponent->path . static::compilePath(['helpers', $sHelperName . '.php']),
             ];
-
 
             $iNumLoaded = 0;
             foreach ($aPaths as $sPath) {
