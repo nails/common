@@ -13,6 +13,7 @@
 namespace Nails;
 
 use Nails\Common\Exception\FactoryException;
+use Nails\Common\Factory\Component;
 use Nails\Common\Helper\File;
 use Nails\Common\Model\Base;
 use Nails\Common\Resource;
@@ -61,16 +62,12 @@ class Factory
         $aComponents          = Components::available();
         self::$aContainers    = [];
         self::$aLoadedHelpers = [];
-        $aDiscoveredServices  = [
-            'nails/common' => self::findServicesForComponent('nails/common'),
-        ];
+        $aDiscoveredServices  = [];
 
         foreach ($aComponents as $oComponent) {
-            $aDiscoveredServices[$oComponent->slug] = self::findServicesForComponent($oComponent->slug);
+            $aDiscoveredServices[$oComponent->slug] = self::findServicesForComponent($oComponent);
         }
-
-        $aDiscoveredServices[static::$oAppSlug] = self::findServicesForApp();
-        $aDiscoveredServices                    = array_filter($aDiscoveredServices);
+        $aDiscoveredServices = array_filter($aDiscoveredServices);
 
         foreach ($aDiscoveredServices as $sComponentName => $aComponentServices) {
 
@@ -175,16 +172,40 @@ class Factory
     /**
      * Look for a components's services.php file, allowing for app and/or environment overrides
      *
-     * @param string $sComponentName The component name to search for
+     * @param Component $oComponent The component name to search for
      *
      * @return array
      */
-    private static function findServicesForComponent(string $sComponentName): array
+    private static function findServicesForComponent(Component $oComponent): array
     {
-        return self::findServicesAtPaths([
-            NAILS_APP_PATH . 'application/services/' . $sComponentName . '/services.php',
-            NAILS_APP_PATH . 'vendor/' . $sComponentName . '/services/services.php',
-        ]);
+        $sPath = $oComponent->path;
+        $sSlug = $oComponent->slug;
+
+        return self::findServicesAtPaths(
+            array_filter([
+                $sPath . static::compilePath(['services', 'services.php']),
+                $oComponent->fromApp
+                    ? $sPath . static::compilePath(['application', 'services', $sSlug, 'services.php'])
+                    : null,
+                $oComponent->fromApp
+                    ? $sPath . static::compilePath(['vendor', $sSlug, 'services', 'services.php'])
+                    : null,
+            ])
+        );
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Compiles an array into a path
+     *
+     * @param string[] $aPath An array of path segments
+     *
+     * @return string
+     */
+    private static function compilePath(array $aPath): string
+    {
+        return implode(DIRECTORY_SEPARATOR, $aPath);
     }
 
     // --------------------------------------------------------------------------
@@ -516,7 +537,7 @@ class Factory
             if (!empty($oModule->autoload->helpers)) {
                 foreach ($oModule->autoload->helpers as $sHelper) {
                     if (is_array($sHelper)) {
-                        list($sName, $sProvider) = $sHelper;
+                        [$sName, $sProvider] = $sHelper;
                         self::helper($sName, $sProvider);
                     } else {
                         self::helper($sHelper, $oModule->slug);
@@ -527,7 +548,7 @@ class Factory
             if (!empty($oModule->autoload->services)) {
                 foreach ($oModule->autoload->services as $sService) {
                     if (is_array($sHelper)) {
-                        list($sName, $sProvider) = $sService;
+                        [$sName, $sProvider] = $sService;
                         self::service($sName, $sProvider);
                     } else {
                         self::service($sService, $oModule->slug);

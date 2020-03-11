@@ -294,16 +294,26 @@ final class Components
 
         $aComposer = (array) $oComposer;
         $aNails    = !empty($oComposer->extra->nails) ? (array) $oComposer->extra->nails : [];
-        $oOut      = new Component(
+
+        $oOut = new Component(
             (object) [
-                'slug'        => static::$oAppSlug,
-                'name'        => static::$oAppSlug,
+                /**
+                 * When a module is the App (e.g. in tests) then this ensures that the relationship
+                 * in the factory is set properly, so loading from the factory does what you'd expect.
+                 */
+                'slug' => array_key_exists('moduleName', $aNails)
+                    ? $aComposer['name']
+                    : static::$oAppSlug,
+                'name' => array_key_exists('moduleName', $aNails)
+                    ? $aComposer['name']
+                    : static::$oAppSlug,
+
                 'description' => ArrayHelper::getFromArray('description', $aNails, ArrayHelper::getFromArray('description', $aComposer)),
                 'homepage'    => ArrayHelper::getFromArray('homepage', $aNails, ArrayHelper::getFromArray('homepage', $aComposer)),
                 'authors'     => ArrayHelper::getFromArray('authors', $aNails, ArrayHelper::getFromArray('authors', $aComposer)),
                 'extra'       => (object) [
                     'nails' => (object) [
-                        'namespace'  => static::$oAppNamespace,
+                        'namespace'  => $aNails['namespace'] ?? static::$oAppNamespace,
                         'moduleName' => ArrayHelper::getFromArray('moduleName', $aNails, ''),
                         'data'       => ArrayHelper::getFromArray('data', $aNails, (object) []),
                         'autoload'   => ArrayHelper::getFromArray('autoload', $aNails, (object) []),
@@ -311,7 +321,7 @@ final class Components
                 ],
             ],
             NAILS_APP_PATH,
-            './',
+            '.' . DIRECTORY_SEPARATOR,
             true
         );
 
@@ -501,7 +511,6 @@ final class Components
         }
 
         foreach (static::available() as $oComponent) {
-
             if ($oComponent->slug === static::$oAppSlug) {
                 continue;
             } elseif (preg_match('/^' . preg_quote($oComponent->path, '/') . '/', $sPath)) {

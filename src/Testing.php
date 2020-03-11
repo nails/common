@@ -119,5 +119,7 @@ class Testing
             realpath(dirname($sFile) . '/../vendor/codeigniter/framework/system'),
             realpath(dirname($sFile) . '/../vendor/codeigniter/framework/application')
         );
+        Factory::setup();
+        Factory::autoload();
     }
 }
