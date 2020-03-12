@@ -285,7 +285,9 @@ class Database
             ['ar_order', false],
         ];
 
-        return $this->resetProperties($aProperties);
+        $this->resetProperties($aProperties);
+        $this->oDb->reset_query();
+        return $this;
     }
 
     // --------------------------------------------------------------------------
