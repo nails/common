@@ -132,7 +132,7 @@ class Asset
      * @param string $sBowerDir            Where bower assets are stored
      */
     public function __construct(
-        string $sCacheBuster,
+        ?string $sCacheBuster,
         string $sBaseUrl,
         string $sBaseUrlSecure,
         string $sBaseModuleUrl,
