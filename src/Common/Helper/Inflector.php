@@ -12,6 +12,8 @@
 
 namespace Nails\Common\Helper;
 
+use Nails\Factory;
+
 class Inflector
 {
     /**
@@ -67,6 +69,7 @@ class Inflector
         if ($iValue == 1) {
             return $sSingular;
         } else {
+            Factory::helper('inflector');
             return $sSpecified ?: plural($sSingular);
         }
     }
