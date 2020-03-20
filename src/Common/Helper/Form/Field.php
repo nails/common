@@ -1313,4 +1313,20 @@ EOT;
     {
         return \Nails\Admin\Helper\Form::form_field_dynamic_table($aField);
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * This function renders an address field
+     *
+     * @param array $aField The configuration array
+     *
+     * @return string
+     *
+     * @todo (Pablo - 2020-03-19) - Remove this when \Nails\Admin\Service\Form is complete
+     */
+    public static function address(array $aField): string
+    {
+        return \Nails\Address\Helper\Form::address($aField);
+    }
 }
