@@ -18,6 +18,7 @@ use Nails\Common\Exception\ModelException;
 use Nails\Common\Factory\Model\Field;
 use Nails\Common\Helper;
 use Nails\Common\Resource;
+use Nails\Common\Service\Database;
 use Nails\Common\Service\FormValidation;
 use Nails\Common\Service\Locale;
 use Nails\Common\Traits\Caching;
@@ -1947,6 +1948,50 @@ abstract class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Saves an associated single item
+     *
+     * @param int    $iItemId                  The ID of the main item
+     * @param array  $aAssociatedData          The data to save
+     * @param string $sAssociatedItemIdColumn  The name of the ID column in the associated table
+     * @param string $sAssociatedModel         The name of the model which is responsible for associated items
+     * @param string $sAssociatedModelProvider What module provide the associated item model
+     *
+     * @return mixed
+     * @throws FactoryException
+     * @throws ModelException
+     */
+    protected function saveAssociatedItem(
+        int $iItemId,
+        array $aAssociatedData,
+        string $sAssociatedItemIdColumn,
+        string $sAssociatedModel,
+        string $sAssociatedModelProvider
+    ): bool {
+
+        if (empty($aAssociatedData)) {
+            return true;
+        }
+
+        /** @var Database $oDb */
+        $oDb                  = Factory::service('Database');
+        $oAssociatedItemModel = Factory::model($sAssociatedModel, $sAssociatedModelProvider);
+
+        $iId = $oAssociatedItemModel->create($aAssociatedData);
+
+        $oDb->set($sAssociatedItemIdColumn, $iId);
+        $oDb->where('id', $iItemId);
+        if (!$oDb->update($this->getTableName())) {
+            throw new ModelException(
+                'Failed to update associated item (' . $sAssociatedModelProvider . ':' . $sAssociatedModel . ') ' . $oAssociatedItemModel->lastError()
+            );
+        }
+
+        return true;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Save associated items for an object
      *
      * @param int    $iItemId                  The ID of the main item
@@ -1959,12 +2004,13 @@ abstract class Base
      * @throws ModelException
      */
     protected function saveAssociatedItems(
-        $iItemId,
+        int $iItemId,
         array $aAssociatedItems,
-        $sAssociatedItemIdColumn,
-        $sAssociatedModel,
-        $sAssociatedModelProvider
-    ) {
+        string $sAssociatedItemIdColumn,
+        string $sAssociatedModel,
+        string $sAssociatedModelProvider
+    ): bool {
+
         $oAssociatedItemModel = Factory::model($sAssociatedModel, $sAssociatedModelProvider);
         $aTouchedIds          = [];
         $aExistingItemIds     = [];
@@ -2407,16 +2453,6 @@ abstract class Base
             $aOptions['type'] = static::EXPANDABLE_TYPE_SINGLE;
         }
 
-        if ($aOptions['type'] == static::EXPANDABLE_TYPE_SINGLE && !empty($aOptions['auto_save'])) {
-            throw new ModelException(
-                'Auto saving an expandable field is incompatible with type static::EXPANDABLE_TYPE_SINGLE'
-            );
-        } elseif ($aOptions['type'] == static::EXPANDABLE_TYPE_MANY) {
-            $bAutoSave = array_key_exists('auto_save', $aOptions) ? !empty($aOptions['auto_save']) : true;
-        } else {
-            $bAutoSave = false;
-        }
-
         if (!array_key_exists('model', $aOptions)) {
             throw new ModelException('Expandable fields must define a "model".');
         }
@@ -2467,7 +2503,7 @@ abstract class Base
 
             //  Whether to automatically save expanded objects when the trigger is
             //  passed as a key to the create or update methods
-            'auto_save'   => $bAutoSave,
+            'auto_save'   => array_key_exists('auto_save', $aOptions) ? !empty($aOptions['auto_save']) : true,
         ];
 
         return $this;
@@ -2546,6 +2582,21 @@ abstract class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Determines whether a string is an expandable field trigger
+     *
+     * @param string $sTrigger
+     *
+     * @return bool
+     */
+    public function isExpandableFieldTrigger(string $sTrigger): bool
+    {
+        $aTriggers = arrayExtractProperty($this->getExpandableFields(), 'trigger');
+        return array_search($sTrigger, $aTriggers) !== false;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Extracts any autosaveable expandable fields and unsets them from the main array
      *
      * @param array $aData The data passed to create() or update()
@@ -2587,13 +2638,23 @@ abstract class Base
     {
         foreach ($aExpandableFields as $oField) {
             $aData = array_filter((array) $oField->data);
-            $this->saveAssociatedItems(
-                $iId,
-                $aData,
-                $oField->id_column,
-                $oField->model,
-                $oField->provider
-            );
+            if ($oField->type === static::EXPANDABLE_TYPE_MANY) {
+                $this->saveAssociatedItems(
+                    $iId,
+                    $aData,
+                    $oField->id_column,
+                    $oField->model,
+                    $oField->provider
+                );
+            } elseif ($oField->type === static::EXPANDABLE_TYPE_SINGLE) {
+                $this->saveAssociatedItem(
+                    $iId,
+                    $aData,
+                    $oField->id_column,
+                    $oField->model,
+                    $oField->provider
+                );
+            }
         }
     }
 
