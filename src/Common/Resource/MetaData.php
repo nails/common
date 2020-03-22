@@ -213,13 +213,13 @@ class MetaData extends Resource
     /**
      * Sets the Image width
      *
-     * @param int $sImageWidth The image width to set
+     * @param int $iImageWidth The image width to set
      *
      * @return $this
      */
-    public function setImageWidth(int $sImageWidth): self
+    public function setImageWidth(int $iImageWidth): self
     {
-        $this->sImageWidth = $sImageWidth;
+        $this->iImageWidth = $iImageWidth;
         return $this;
     }
 
@@ -232,7 +232,7 @@ class MetaData extends Resource
      */
     public function getImageWidth(): int
     {
-        return $this->sImageWidth;
+        return $this->iImageWidth;
     }
 
     // --------------------------------------------------------------------------
@@ -240,13 +240,13 @@ class MetaData extends Resource
     /**
      * Sets the Image height
      *
-     * @param int $sImageHeight The image height to set
+     * @param int $iImageHeight The image height to set
      *
      * @return $this
      */
-    public function setImageHeight(int $sImageHeight): self
+    public function setImageHeight(int $iImageHeight): self
     {
-        $this->sImageHeight = $sImageHeight;
+        $this->iImageHeight = $iImageHeight;
         return $this;
     }
 
@@ -259,7 +259,7 @@ class MetaData extends Resource
      */
     public function getImageHeight(): int
     {
-        return $this->sImageHeight;
+        return $this->iImageHeight;
     }
 
     // --------------------------------------------------------------------------
