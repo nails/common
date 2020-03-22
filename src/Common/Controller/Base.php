@@ -738,6 +738,10 @@ abstract class Base extends \MX_Controller
                 'content' => $sDescription,
             ])
             ->addRaw([
+                'name'    => 'twitter:site',
+                'content' => siteUrl(),
+            ])
+            ->addRaw([
                 'name'    => 'twitter:card',
                 'content' => 'summary_large_image',
             ]);
