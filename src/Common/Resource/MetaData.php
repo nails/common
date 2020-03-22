@@ -120,7 +120,7 @@ class MetaData extends Resource
     /**
      * Gets the SEO locale
      *
-     * @return string
+     * @return Locale
      */
     public function getLocale(): Locale
     {
@@ -160,6 +160,8 @@ class MetaData extends Resource
      * Sets the SEO keywords
      *
      * @param string[] $aKeywords The keywords to set
+     *
+     * @return $this
      */
     public function setKeywords(array $aKeywords): self
     {
@@ -293,6 +295,8 @@ class MetaData extends Resource
      * Sets the HTML classes
      *
      * @param string[] $aHtmlClasses The classes to set
+     *
+     * @return $this
      */
     public function setHtmlClasses(array $aHtmlClasses): self
     {
@@ -318,6 +322,8 @@ class MetaData extends Resource
      * Sets the Body classes
      *
      * @param string[] $aBodyClasses The classes to set
+     *
+     * @return $this
      */
     public function setBodyClasses(array $aBodyClasses): self
     {
