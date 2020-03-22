@@ -25,6 +25,15 @@ class MetaData extends Resource
     /** @var string[] */
     protected $aKeywords = [];
 
+    /** @var string */
+    protected $sImageUrl = '';
+
+    /** @var int */
+    protected $iImageWidth = null;
+
+    /** @var int */
+    protected $iImageHeight = null;
+
     /** @var string[] */
     protected $aHtmlClasses = [];
 
@@ -165,6 +174,87 @@ class MetaData extends Resource
     public function getKeywords(): array
     {
         return $this->aKeywords;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets the Image URL
+     *
+     * @param string $sImageUrl The image URL to set
+     *
+     * @return $this
+     */
+    public function setImageUrl(string $sImageUrl): self
+    {
+        $this->sImageUrl = $sImageUrl;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Gets the Image URL
+     *
+     * @return string
+     */
+    public function getImageUrl(): string
+    {
+        return $this->sImageUrl;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets the Image width
+     *
+     * @param int $sImageWidth The image width to set
+     *
+     * @return $this
+     */
+    public function setImageWidth(int $sImageWidth): self
+    {
+        $this->sImageWidth = $sImageWidth;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Gets the Image width
+     *
+     * @return int
+     */
+    public function getImageWidth(): int
+    {
+        return $this->sImageWidth;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets the Image height
+     *
+     * @param int $sImageHeight The image height to set
+     *
+     * @return $this
+     */
+    public function setImageHeight(int $sImageHeight): self
+    {
+        $this->sImageHeight = $sImageHeight;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Gets the Image height
+     *
+     * @return int
+     */
+    public function getImageHeight(): int
+    {
+        return $this->sImageHeight;
     }
 
     // --------------------------------------------------------------------------

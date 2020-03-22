@@ -748,6 +748,40 @@ abstract class Base extends \MX_Controller
 
         // --------------------------------------------------------------------------
 
+        // Image tags
+        if ($this->oMetaData->getImageUrl()) {
+            $oMeta
+                ->addRaw([
+                    'tag'      => 'meta',
+                    'property' => 'og:image',
+                    'content'  => $this->oMetaData->getImageUrl(),
+                ])
+                ->addRaw([
+                    'name'    => 'twitter:image',
+                    'content' => $this->oMetaData->getImageUrl(),
+                ]);
+
+            if ($this->oMetaData->getImageWidth()) {
+                $oMeta
+                    ->addRaw([
+                        'tag'      => 'meta',
+                        'property' => 'og:image:width',
+                        'content'  => $this->oMetaData->getImageWidth(),
+                    ]);
+            }
+
+            if ($this->oMetaData->getImageHeight()) {
+                $oMeta
+                    ->addRaw([
+                        'tag'      => 'meta',
+                        'property' => 'og:image:height',
+                        'content'  => $this->oMetaData->getImageHeight(),
+                    ]);
+            }
+        }
+
+        // --------------------------------------------------------------------------
+
         //  Other meta tags
         $oMeta
             ->add('apple-mobile-web-app-title', $sAppName)
