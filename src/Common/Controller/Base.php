@@ -788,6 +788,19 @@ abstract class Base extends \MX_Controller
             ->add('application-name', $sAppName)
             ->add('description', $sDescription);
 
+        if ($this->oMetaData->getThemeColour()) {
+            $oMeta
+                ->add(
+                    'theme-color',
+                    $this->oMetaData->getThemeColour()
+                )
+                ->addRaw([
+                    'tag'     => 'meta',
+                    'name'    => 'theme-color',
+                    'content' => $this->oMetaData->getThemeColour(),
+                ]);
+        }
+
         // --------------------------------------------------------------------------
 
         //  Any passed meta

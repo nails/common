@@ -34,6 +34,9 @@ class MetaData extends Resource
     /** @var int */
     protected $iImageHeight = null;
 
+    /** @var string */
+    protected $sThemeColour = '';
+
     /** @var string[] */
     protected $aHtmlClasses = [];
 
@@ -255,6 +258,33 @@ class MetaData extends Resource
     public function getImageHeight(): int
     {
         return $this->sImageHeight;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets the theme colour
+     *
+     * @param string $sThemeColour The theme colour to set
+     *
+     * @return $this
+     */
+    public function setThemeColour(string $sThemeColour): self
+    {
+        $this->sThemeColour = $sThemeColour;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Gets the theme colour
+     *
+     * @return string
+     */
+    public function getThemeColour(): string
+    {
+        return $this->sThemeColour;
     }
 
     // --------------------------------------------------------------------------
