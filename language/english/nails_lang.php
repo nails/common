@@ -145,6 +145,8 @@ $lang['fv_supportedLocale']             = 'This field is not a supported locale'
 $lang['fv_supportedLocale_field']       = 'The {field} field is not a supported locale';
 $lang['fv_is']                          = 'This field must be exactly "{param}"';
 $lang['fv_is_field']                    = 'The {field} field must be exactly "{param}"';
+$lang['fv_integer']                     = 'This field must be an integer';
+$lang['fv_integer_field']               = 'The {field} field must be an integr';
 
 //  @todo (Pablo - 2019-12-16) - Deprecate/remove/move these
 $lang['cdnObjectPickerMultiObjectRequired']         = 'All items must have a file set.';
