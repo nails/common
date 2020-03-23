@@ -278,10 +278,11 @@ class Asset
      * @param mixed  $mAssets        The asset to load, can be an array or a string
      * @param string $sAssetLocation The asset's location
      * @param string $sForceType     The asset's file type (e.g., JS or CSS)
+     * @param bool   $bAsync         Whether to load the asset asynchronously
      *
      * @return $this
      */
-    public function load($mAssets, $sAssetLocation = 'APP', $sForceType = null): self
+    public function load($mAssets, $sAssetLocation = 'APP', $sForceType = null, bool $bAsync = false): self
     {
         //  Cast as an array
         $aAssets = (array) $mAssets;
@@ -330,11 +331,11 @@ class Asset
 
         foreach ($aAssets as $sAsset) {
             if (preg_match('#^https?://#', $sAsset)) {
-                $this->loadUrl($sAsset, $sForceType);
+                $this->loadUrl($sAsset, $sForceType, $bAsync);
             } elseif (substr($sAsset, 0, 0) == '/') {
-                $this->loadAbsolute(substr($sAsset, 1), $sForceType);
+                $this->loadAbsolute(substr($sAsset, 1), $sForceType, $bAsync);
             } else {
-                $this->{$sAssetLocationMethod}($sAsset, $sForceType, $sAssetLocation);
+                $this->{$sAssetLocationMethod}($sAsset, $sForceType, $bAsync, $sAssetLocation);
             }
         }
 
@@ -350,10 +351,11 @@ class Asset
      *
      * @param string $sAsset     The asset to load
      * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param bool   $bAsync     Whether to load the asset asynchronously
      *
      * @return void
      */
-    protected function loadUrl($sAsset, $sForceType)
+    protected function loadUrl($sAsset, $sForceType, bool $bAsync)
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -364,7 +366,7 @@ class Asset
                 break;
 
             case 'JS':
-                $this->aJs['URL-' . $sAsset] = $sAsset;
+                $this->aJs['URL-' . $sAsset] = [$sAsset, $bAsync];
                 break;
         }
     }
@@ -376,10 +378,11 @@ class Asset
      *
      * @param string $sAsset     The asset to load
      * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param bool   $bAsync     Whether to load the asset asynchronously
      *
      * @return void
      */
-    protected function loadAbsolute($sAsset, $sForceType)
+    protected function loadAbsolute($sAsset, $sForceType, bool $bAsync)
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -390,7 +393,7 @@ class Asset
                 break;
 
             case 'JS':
-                $this->aJs['ABSOLUTE-' . $sAsset] = $this->buildUrl($sAsset);
+                $this->aJs['ABSOLUTE-' . $sAsset] = [$this->buildUrl($sAsset), $bAsync];
                 break;
         }
     }
@@ -402,12 +405,13 @@ class Asset
      *
      * @param string $sAsset     The asset to load
      * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param bool   $bAsync     Whether to load the asset asynchronously
      *
      * @return void
      */
-    protected function loadNails($sAsset, $sForceType)
+    protected function loadNails($sAsset, $sForceType, bool $bAsync)
     {
-        $this->loadModule($sAsset, $sForceType, 'nails/module-asset');
+        $this->loadModule($sAsset, $sForceType, 'nails/module-asset', $bAsync);
     }
 
     // --------------------------------------------------------------------------
@@ -417,10 +421,11 @@ class Asset
      *
      * @param string $sAsset     The asset to load
      * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param bool   $bAsync     Whether to load the asset asynchronously
      *
      * @return void
      */
-    protected function loadNailsBower($sAsset, $sForceType)
+    protected function loadNailsBower($sAsset, $sForceType, bool $bAsync)
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -431,7 +436,10 @@ class Asset
                 break;
 
             case 'JS':
-                $this->aJs['NAILS-BOWER-' . $sAsset] = $this->getNailsAssetUrl() . $this->sBowerDir . $sAsset;
+                $this->aJs['NAILS-BOWER-' . $sAsset] = [
+                    $this->getNailsAssetUrl() . $this->sBowerDir . $sAsset,
+                    $bAsync,
+                ];
                 break;
         }
     }
@@ -443,10 +451,11 @@ class Asset
      *
      * @param string $sAsset     The asset to load
      * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param bool   $bAsync     Whether to load the asset asynchronously
      *
      * @return void
      */
-    protected function loadNailsPackage($sAsset, $sForceType)
+    protected function loadNailsPackage($sAsset, $sForceType, bool $bAsync)
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -457,7 +466,7 @@ class Asset
                 break;
 
             case 'JS':
-                $this->aJs['NAILS-PACKAGE-' . $sAsset] = $this->getNailsAssetUrl() . 'packages/' . $sAsset;
+                $this->aJs['NAILS-PACKAGE-' . $sAsset] = [$this->getNailsAssetUrl() . 'packages/' . $sAsset, $bAsync];
                 break;
         }
     }
@@ -469,10 +478,11 @@ class Asset
      *
      * @param string $sAsset     The asset to load
      * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param bool   $bAsync     Whether to load the asset asynchronously
      *
      * @return void
      */
-    protected function loadAppBower($sAsset, $sForceType)
+    protected function loadAppBower($sAsset, $sForceType, bool $bAsync)
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -483,7 +493,7 @@ class Asset
                 break;
 
             case 'JS':
-                $this->aJs['APP-BOWER-' . $sAsset] = $this->buildUrl($this->sBowerDir . $sAsset);
+                $this->aJs['APP-BOWER-' . $sAsset] = [$this->buildUrl($this->sBowerDir . $sAsset), $bAsync];
                 break;
         }
     }
@@ -495,10 +505,11 @@ class Asset
      *
      * @param string $sAsset     The asset to load
      * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param bool   $bAsync     Whether to load the asset asynchronously
      *
      * @return void
      */
-    protected function loadAppPackage($sAsset, $sForceType)
+    protected function loadAppPackage($sAsset, $sForceType, bool $bAsync)
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -509,7 +520,7 @@ class Asset
                 break;
 
             case 'JS':
-                $this->aJs['APP-PACKAGE-' . $sAsset] = $this->buildUrl('packages/' . $sAsset);
+                $this->aJs['APP-PACKAGE-' . $sAsset] = [$this->buildUrl('packages/' . $sAsset), $bAsync];
                 break;
         }
     }
@@ -521,10 +532,11 @@ class Asset
      *
      * @param string $sAsset     The asset to load
      * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param bool   $bAsync     Whether to load the asset asynchronously
      *
      * @return void
      */
-    protected function loadApp($sAsset, $sForceType)
+    protected function loadApp($sAsset, $sForceType, bool $bAsync)
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -535,7 +547,7 @@ class Asset
                 break;
 
             case 'JS':
-                $this->aJs['APP-' . $sAsset] = $this->buildUrl($this->sJsDir . $sAsset);
+                $this->aJs['APP-' . $sAsset] = [$this->buildUrl($this->sJsDir . $sAsset), $bAsync];
                 break;
         }
     }
@@ -546,12 +558,13 @@ class Asset
      * Loads an asset from a module's asset directory
      *
      * @param string $sAsset     The asset to load
-     * @param mixed  $mModule    The module to load from
      * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param bool   $bAsync     Whether to load the asset asynchronously
+     * @param mixed  $mModule    The module to load from
      *
      * @return void
      */
-    protected function loadModule($sAsset, $sForceType, $mModule)
+    protected function loadModule($sAsset, $sForceType, bool $bAsync, $mModule)
     {
         if (is_array($mModule)) {
             $sModule   = !empty($mModule[0]) ? $mModule[0] : null;
@@ -576,9 +589,12 @@ class Asset
 
             case 'JS':
                 if ($sLocation == 'BOWER') {
-                    $this->aJs[$sKey] = $this->sBaseModuleUrl . $sModule . '/assets/bower_components/' . $sAsset;
+                    $this->aJs[$sKey] = [
+                        $this->sBaseModuleUrl . $sModule . '/assets/bower_components/' . $sAsset,
+                        $bAsync,
+                    ];
                 } else {
-                    $this->aJs[$sKey] = $this->sBaseModuleUrl . $sModule . '/assets/js/' . $sAsset;
+                    $this->aJs[$sKey] = [$this->sBaseModuleUrl . $sModule . '/assets/js/' . $sAsset, $bAsync];
                 }
                 break;
         }
@@ -1162,8 +1178,9 @@ class Asset
 
         //  Linked JS
         if (!empty($this->aJs) && ($sType == 'JS' || $sType == 'ALL')) {
-            foreach ($this->aJs as $sAsset) {
-                $aOut[] = '<script src="' . $sAsset . '"></script>';
+            foreach ($this->aJs as $aAsset) {
+                [$sAsset, $bAsync] = $aAsset;
+                $aOut[] = '<script ' . ($bAsync ? 'async ' : '') . 'src="' . $sAsset . '"></script>';
             }
         }
 
