@@ -147,8 +147,8 @@ $lang['fv_is']                          = 'This field must be exactly "{param}"'
 $lang['fv_is_field']                    = 'The {field} field must be exactly "{param}"';
 
 //  @todo (Pablo - 2019-12-16) - Deprecate/remove/move these
-$lang['cdnObjectPickerMultiObjectRequired']       = 'All items must have a file set.';
-$lang['cdnObjectPickerMultiObjectRequired_field'] = 'All items must have a file set.';
+$lang['cdnObjectPickerMultiObjectRequired']         = 'All items must have a file set.';
+$lang['cdnObjectPickerMultiObjectRequired_field']   = 'All items must have a file set.';
 $lang['fv_cdnObjectPickerMultiLabelRequired']       = 'All items must have a label set.';
 $lang['fv_cdnObjectPickerMultiLabelRequired_field'] = 'All items must have a label set.';
 $lang['fv_cdnObjectPickerMultiAllRequired']         = 'All items must have a file and a label set.';
