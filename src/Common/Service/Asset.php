@@ -411,7 +411,7 @@ class Asset
      */
     protected function loadNails($sAsset, $sForceType, bool $bAsync)
     {
-        $this->loadModule($sAsset, $sForceType, 'nails/module-asset', $bAsync);
+        $this->loadModule($sAsset, $sForceType, $bAsync, 'nails/module-asset');
     }
 
     // --------------------------------------------------------------------------
