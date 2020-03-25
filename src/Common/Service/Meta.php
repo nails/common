@@ -21,6 +21,7 @@ class Meta
 
     /**
      * Returns the raw entries array
+     *
      * @return Array
      */
     public function getEntries()
@@ -51,7 +52,7 @@ class Meta
     /**
      * Adds a meta tag
      *
-     * @param  array $aAttr An array of attributes which make up the entry
+     * @param array $aAttr An array of attributes which make up the entry
      */
     public function removeRaw($aAttr)
     {
@@ -135,6 +136,7 @@ class Meta
 
     /**
      * Compiles the elements into an array of strings
+     *
      * @return array
      */
     public function outputAr()
@@ -160,6 +162,7 @@ class Meta
 
     /**
      * Renders the output as a string
+     *
      * @return string
      */
     public function outputStr()
