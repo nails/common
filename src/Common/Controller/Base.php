@@ -20,7 +20,6 @@ use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\ModelException;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Factory\Locale;
-use Nails\Common\Resource\MetaData;
 use Nails\Common\Service\Asset;
 use Nails\Common\Service\DateTime;
 use Nails\Common\Service\ErrorHandler;
@@ -28,6 +27,7 @@ use Nails\Common\Service\Event;
 use Nails\Common\Service\Input;
 use Nails\Common\Service\Language;
 use Nails\Common\Service\Meta;
+use Nails\Common\Service\MetaData;
 use Nails\Common\Service\Output;
 use Nails\Common\Service\Profiler;
 use Nails\Common\Service\Session;
@@ -103,7 +103,7 @@ abstract class Base extends \MX_Controller
 
         //  Populate some standard fields
         $this->oLocale   = Factory::service('Locale');
-        $this->oMetaData = Factory::resource('MetaData');
+        $this->oMetaData = Factory::service('MetaData');
         $this->oMetaData->setLocale($this->oLocale->get());
 
         //  @todo (Pablo - 2020-02-24) - Remove this/backwards compatibility

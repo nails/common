@@ -10,12 +10,12 @@
  * @link
  */
 
-namespace Nails\Common\Resource\MetaData;
+namespace Nails\Common\Service\MetaData;
 
 /**
  * Class Collection
  *
- * @package Nails\Common\Resource\MetaData
+ * @package Nails\Common\Service\MetaData
  */
 final class Collection extends \Nails\Common\Factory\Collection
 {

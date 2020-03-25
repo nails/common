@@ -1,17 +1,17 @@
 <?php
 
-namespace Nails\Common\Resource;
+namespace Nails\Common\Service;
 
 use Nails\Common\Factory\Locale;
-use Nails\Common\Resource;
+use Nails\Common\Service;
 use Nails\Config;
 
 /**
  * Class MetaData
  *
- * @package Nails\Common\Resource
+ * @package Nails\Common\Service
  */
-class MetaData extends Resource
+class MetaData
 {
     /** @var string[] */
     protected $aTitles = [];
@@ -82,11 +82,11 @@ class MetaData extends Resource
     /**
      * Gets the SEO title
      *
-     * @return Resource\MetaData\Collection
+     * @return Service\MetaData\Collection
      */
-    public function getTitles(): Resource\MetaData\Collection
+    public function getTitles(): Service\MetaData\Collection
     {
-        return new Resource\MetaData\Collection(
+        return new Service\MetaData\Collection(
             array_filter(
                 array_map(
                     'trim',
@@ -339,11 +339,11 @@ class MetaData extends Resource
     /**
      * Gets the HTML classes
      *
-     * @return Resource\MetaData\Collection
+     * @return Service\MetaData\Collection
      */
-    public function getHtmlClasses(): Resource\MetaData\Collection
+    public function getHtmlClasses(): Service\MetaData\Collection
     {
-        return new Resource\MetaData\Collection($this->aHtmlClasses, $this->sClassSeparator);
+        return new Service\MetaData\Collection($this->aHtmlClasses, $this->sClassSeparator);
     }
 
     // --------------------------------------------------------------------------
@@ -366,10 +366,10 @@ class MetaData extends Resource
     /**
      * Gets the Body classes
      *
-     * @return Resource\MetaData\Collection
+     * @return Service\MetaData\Collection
      */
-    public function getBodyClasses(): Resource\MetaData\Collection
+    public function getBodyClasses(): Service\MetaData\Collection
     {
-        return new Resource\MetaData\Collection($this->aBodyClasses, $this->sClassSeparator);
+        return new Service\MetaData\Collection($this->aBodyClasses, $this->sClassSeparator);
     }
 }

@@ -260,6 +260,13 @@ return [
                 return new Service\Meta();
             }
         },
+        'MetaData'                       => function ($oObj = []): Service\MetaData {
+            if (class_exists('\App\Common\Service\MetaData')) {
+                return new \App\Common\Service\MetaData($oObj);
+            } else {
+                return new Service\MetaData($oObj);
+            }
+        },
         'Mime'                           => function ($oDatabase = null, $oDetector = null): Service\Mime {
 
             if (!$oDatabase) {
@@ -590,13 +597,6 @@ return [
                 return new \App\Common\Resource\Entity($oObj);
             } else {
                 return new Resource\Entity($oObj);
-            }
-        },
-        'MetaData'         => function ($oObj = []): Resource\MetaData {
-            if (class_exists('\App\Common\Resource\MetaData')) {
-                return new \App\Common\Resource\MetaData($oObj);
-            } else {
-                return new Resource\MetaData($oObj);
             }
         },
     ],
