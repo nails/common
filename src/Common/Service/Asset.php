@@ -16,6 +16,8 @@ namespace Nails\Common\Service;
 use Nails\Common\Exception\AssetException;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Helper\Strings;
+use Nails\Config;
+use Nails\Environment;
 use Nails\Factory;
 use Nails\Functions;
 
@@ -1283,5 +1285,38 @@ class Asset
         if (substr($sAsset, strrpos($sAsset, '.')) == '.js') {
             return 'JS';
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Compiles global assets
+     *
+     * @return $this
+     * @throws AssetException
+     * @throws NailsException
+     */
+    public function compileGlobalData(): self
+    {
+        $aVariables = [
+            'ENVIRONMENT' => Environment::get(),
+            'SITE_URL'    => siteUrl('', Functions::isPageSecure()),
+            'NAILS'       => (object) [
+                'URL'  => Config::get('NAILS_ASSETS_URL'),
+                'LANG' => (object) [],
+                'USER' => (object) [
+                    'ID'    => activeUser('id') ? activeUser('id') : null,
+                    'FNAME' => activeUser('first_name'),
+                    'LNAME' => activeUser('last_name'),
+                    'EMAIL' => activeUser('email'),
+                ],
+            ],
+        ];
+
+        foreach ($aVariables as $sKey => $mValue) {
+            $this->inline('window.' . $sKey . ' = ' . json_encode($mValue) . ';', 'JS', 'HEADER');
+        }
+
+        return $this;
     }
 }

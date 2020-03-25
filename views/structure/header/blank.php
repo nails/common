@@ -29,6 +29,7 @@ $sBodyClasses = $oMetaData->getBodyClasses()->implode();
         //  Meta tags
         /** @var Service\Meta $oMetaService */
         $oMetaService = Factory::service('Meta');
+        $oMetaService->compileFromMetaData($oMetaData);
         echo $oMetaService->outputStr();
 
         // --------------------------------------------------------------------------
