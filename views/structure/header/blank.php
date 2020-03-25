@@ -13,10 +13,7 @@ $sBodyClasses = $oMetaData->getBodyClasses()->implode();
 
 ?>
 <!DOCTYPE html>
-<!--[if IE 8 ]>
-<html class="ie ie8 <?=$sHtmlClasses?>" lang="<?=$sHtmlLang?>>"> <![endif]-->
-<!--[if (gte IE 9)|!(IE)]><!-->
-<html class="<?=$sHtmlClasses?>" lang="<?=$sHtmlLang?>"> <!--<![endif]-->
+<html class="<?=$sHtmlClasses?>" lang="<?=$sHtmlLang?>">
     <head>
         <?php
 
@@ -42,11 +39,5 @@ $sBodyClasses = $oMetaData->getBodyClasses()->implode();
         $oAssetService->output('JS-INLINE-HEADER');
 
         ?>
-        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-        <!--[if lt IE 9]>
-        <script src="<?=NAILS_ASSETS_URL . 'bower_components/html5shiv/dist/html5shiv.js'?>"></script>
-        <script src="<?=NAILS_ASSETS_URL . 'bower_components/respond/dest/respond.min.js'?>"></script>
-        <![endif]-->
     </head>
     <body class="<?=$sBodyClasses?>">
