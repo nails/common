@@ -34,6 +34,7 @@ $sBodyClasses = $oMetaData->getBodyClasses()->implode();
         //  Assets
         /** @var Service\Asset $oAssetService */
         $oAssetService = Factory::service('Asset');
+        $oAssetService->compileGlobalData();
         $oAssetService->output('CSS');
         $oAssetService->output('CSS-INLINE');
         $oAssetService->output('JS-INLINE-HEADER');
