@@ -86,17 +86,18 @@ abstract class Base extends \MX_Controller
 
         // --------------------------------------------------------------------------
 
-        $this->maintenanceMode();
-        $this->setErrorReporting();
-        $this->setContentType();
-        $this->definePackages();
-        $this->passwordProtected();
-        $this->initiateDatabase();
-        $this->instantiateUser();
-        $this->instantiateLanguages();
-        $this->isUserSuspended();
-        $this->instantiateDateTime();
-        $this->generateRoutes();
+        $this
+            ->maintenanceMode()
+            ->setErrorReporting()
+            ->setContentType()
+            ->definePackages()
+            ->passwordProtected()
+            ->initiateDatabase()
+            ->instantiateUser()
+            ->instantiateLanguages()
+            ->isUserSuspended()
+            ->instantiateDateTime()
+            ->generateRoutes();
 
         // --------------------------------------------------------------------------
 
@@ -123,10 +124,11 @@ abstract class Base extends \MX_Controller
 
         // --------------------------------------------------------------------------
 
-        $this->setCommonMeta();
-        $this->setNailsJs();
-        $this->setGlobalJs();
-        $this->setGlobalCss();
+        static::setNailsJs();
+        $this
+            ->setCommonMeta()
+            ->setGlobalJs()
+            ->setGlobalCss();
 
         // --------------------------------------------------------------------------
 
@@ -141,9 +143,9 @@ abstract class Base extends \MX_Controller
     /**
      * Sets the appropriate error reporting values and handlers
      *
-     * @return void
+     * @return $this
      */
-    protected function setErrorReporting()
+    protected function setErrorReporting(): self
     {
         /**
          * Configure how verbose PHP is; Everything except E_STRICT and E_ERROR;
@@ -165,6 +167,8 @@ abstract class Base extends \MX_Controller
                     break;
             }
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -172,13 +176,16 @@ abstract class Base extends \MX_Controller
     /**
      * Sets the content type to use for the request to UTF-8
      *
+     * @return $this
      * @throws FactoryException
      */
-    protected function setContentType()
+    protected function setContentType(): self
     {
         /** @var Output $oOutput */
         $oOutput = Factory::service('Output');
         $oOutput->set_content_type('text/html; charset=utf-8');
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -190,10 +197,10 @@ abstract class Base extends \MX_Controller
      * @param string $sTitle Override the page title
      * @param string $sBody  Override the page body
      *
-     * @return void
+     * @return $this
      * @throws FactoryException
      */
-    protected function maintenanceMode(bool $bForce = false, string $sTitle = '', string $sBody = '')
+    protected function maintenanceMode(bool $bForce = false, string $sTitle = '', string $sBody = ''): self
     {
         if ($bForce || file_exists(Config::get('NAILS_APP_PATH') . '.MAINTENANCE')) {
 
@@ -282,6 +289,8 @@ abstract class Base extends \MX_Controller
                 exit(0);
             }
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -290,10 +299,10 @@ abstract class Base extends \MX_Controller
      * Checks if credentials should be requested for staging environments
      *
      * @link https://docs.nailsapp.co.uk/key-concepts/environments#protecting-environments
-     * @return void
+     * @return $this
      * @throws FactoryException
      */
-    protected function passwordProtected(): void
+    protected function passwordProtected(): self
     {
         /** @var Input $oInput */
         $oInput = Factory::service('Input');
@@ -327,6 +336,8 @@ abstract class Base extends \MX_Controller
                 }
             }
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -392,9 +403,10 @@ abstract class Base extends \MX_Controller
     /**
      * Sets up date & time handling
      *
+     * @return $this
      * @throws NailsException
      */
-    protected function instantiateDateTime()
+    protected function instantiateDateTime(): self
     {
         /** @var DateTime $oDateTimeService */
         $oDateTimeService = Factory::service('DateTime');
@@ -451,6 +463,10 @@ abstract class Base extends \MX_Controller
         $sFormatTime = $sFormatTime ? $sFormatTime : Config::get('APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG');
 
         $oDateTimeService->setUserFormats($sFormatDate, $sFormatTime);
+
+        // --------------------------------------------------------------------------
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -458,9 +474,10 @@ abstract class Base extends \MX_Controller
     /**
      * Checks if routes need to be generated as part of the startup request
      *
+     * @return $this
      * @throws NailsException
      */
-    protected function generateRoutes()
+    protected function generateRoutes(): self
     {
         if (Config::get('NAILS_STARTUP_GENERATE_APP_ROUTES')) {
             try {
@@ -480,6 +497,8 @@ abstract class Base extends \MX_Controller
                 );
             }
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -487,11 +506,11 @@ abstract class Base extends \MX_Controller
     /**
      * Sets up language handling
      *
-     * @return void
+     * @return $this
      * @throws FactoryException
      * @throws NailsException
      */
-    protected function instantiateLanguages()
+    protected function instantiateLanguages(): self
     {
         /** @var Language $oLanguageService */
         $oLanguageService = Factory::service('Language');
@@ -526,14 +545,18 @@ abstract class Base extends \MX_Controller
 
         //  Load the Nails. generic lang file
         get_instance()->lang->load('nails');
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Defines all the package paths
+     *
+     * @return $this
      */
-    protected function definePackages()
+    protected function definePackages(): self
     {
         /**
          * This is an important part. Here we are defining all the packages to load.
@@ -571,6 +594,8 @@ abstract class Base extends \MX_Controller
         foreach ($aPaths as $sPath) {
             get_instance()->load->add_package_path($sPath);
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -578,11 +603,14 @@ abstract class Base extends \MX_Controller
     /**
      * Initiate the database connection; needs done early so all services properly connect
      *
+     * @return $this
      * @throws FactoryException
      */
-    protected function initiateDatabase()
+    protected function initiateDatabase(): self
     {
         Factory::service('Database');
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -590,11 +618,11 @@ abstract class Base extends \MX_Controller
     /**
      * Set up the active user
      *
-     * @return void
+     * @return $this
      * @throws FactoryException
      * @throws ModelException
      */
-    protected function instantiateUser()
+    protected function instantiateUser(): self
     {
         /**
          * Find a remembered user and initialise the user model; this routine checks
@@ -604,6 +632,8 @@ abstract class Base extends \MX_Controller
         /** @var Auth\Model\User $oUserModel */
         $oUserModel = Factory::model('User', Auth\Constants::MODULE_SLUG);
         $oUserModel->init();
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -611,10 +641,10 @@ abstract class Base extends \MX_Controller
     /**
      * Determines whether the active user is suspended and, if so, logs them out.
      *
-     * @return void
+     * @return $this
      * @throws FactoryException
      */
-    protected function isUserSuspended()
+    protected function isUserSuspended(): self
     {
         //  Check if this user is suspended
         if (isLoggedIn() && activeUser('is_suspended')) {
@@ -630,6 +660,8 @@ abstract class Base extends \MX_Controller
             $oSession->setFlashData('error', lang('auth_login_fail_suspended'));
             redirect('/');
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -639,9 +671,10 @@ abstract class Base extends \MX_Controller
      *
      * @param array $aData The array to populate
      *
+     * @return void
      * @throws FactoryException
      */
-    public static function populateUserFeedback(array &$aData)
+    public static function populateUserFeedback(array &$aData): void
     {
         //  Set User Feedback alerts for the views
         /** @var Session $oSession */
@@ -668,9 +701,10 @@ abstract class Base extends \MX_Controller
      *
      * @param array $aMeta Any additional meta items to set
      *
+     * @return $this
      * @throws FactoryException
      */
-    protected function setCommonMeta(array $aMeta = [])
+    protected function setCommonMeta(array $aMeta = []): self
     {
         /** @var Meta $oMeta */
         $oMeta = Factory::service('Meta');
@@ -817,6 +851,10 @@ abstract class Base extends \MX_Controller
         foreach ($aMeta as $aItem) {
             $oMeta->addRaw($aItem);
         }
+
+        // --------------------------------------------------------------------------
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -824,9 +862,10 @@ abstract class Base extends \MX_Controller
     /**
      * Sets a global Nails JS object
      *
+     * @return void
      * @throws FactoryException
      */
-    public static function setNailsJs()
+    public static function setNailsJs(): void
     {
         $oAsset     = Factory::service('Asset');
         $aVariables = [
@@ -843,6 +882,7 @@ abstract class Base extends \MX_Controller
                 ],
             ],
         ];
+
         foreach ($aVariables as $sKey => $mValue) {
             $oAsset->inline('window.' . $sKey . ' = ' . json_encode($mValue) . ';', 'JS', 'HEADER');
         }
@@ -853,11 +893,12 @@ abstract class Base extends \MX_Controller
     /**
      * Sets global JS
      *
+     * @return $this
      * @throws FactoryException
      * @throws NailsException
      * @throws AssetException
      */
-    protected function setGlobalJs()
+    protected function setGlobalJs(): self
     {
         /** @var Asset $oAsset */
         $oAsset    = Factory::service('Asset');
@@ -886,6 +927,10 @@ abstract class Base extends \MX_Controller
                 gtag(\'config\', \'' . $sGoogleAnalyticsProfile . '\');
             ', 'JS');
         }
+
+        // --------------------------------------------------------------------------
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -893,11 +938,12 @@ abstract class Base extends \MX_Controller
     /**
      * Sets global CSS
      *
+     * @return $this
      * @throws AssetException
      * @throws FactoryException
      * @throws NailsException
      */
-    protected function setGlobalCss()
+    protected function setGlobalCss(): self
     {
         /** @var Asset $oAsset */
         $oAsset     = Factory::service('Asset');
@@ -905,5 +951,7 @@ abstract class Base extends \MX_Controller
         if (!empty($sCustomCss)) {
             $oAsset->inline($sCustomCss, 'CSS');
         }
+
+        return $this;
     }
 }
