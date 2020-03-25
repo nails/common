@@ -803,6 +803,16 @@ abstract class Base extends \MX_Controller
 
         // --------------------------------------------------------------------------
 
+        //  Canonical URL
+        $oMeta
+            ->addRaw([
+                'tag'  => 'link',
+                'rel'  => 'canonical',
+                'href' => $this->oMetaData->getCanonicalUrl() ?: current_url(),
+            ]);
+
+        // --------------------------------------------------------------------------
+
         //  Any passed meta
         foreach ($aMeta as $aItem) {
             $oMeta->addRaw($aItem);

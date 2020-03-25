@@ -22,6 +22,9 @@ class MetaData extends Resource
     /** @var string */
     protected $sDescription = '';
 
+    /** @var string */
+    protected $sCanonicalUrl = '';
+
     /** @var string[] */
     protected $aKeywords = [];
 
@@ -152,6 +155,33 @@ class MetaData extends Resource
     public function getDescription(): string
     {
         return $this->sDescription;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets the canonical URL
+     *
+     * @param string $sCanonicalUrl The canonical URL to set
+     *
+     * @return $this
+     */
+    public function setCanonicalUrl(string $sCanonicalUrl): self
+    {
+        $this->sCanonicalUrl = $sCanonicalUrl;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Gets the canonical URL
+     *
+     * @return string
+     */
+    public function getCanonicalUrl(): string
+    {
+        return $this->sCanonicalUrl;
     }
 
     // --------------------------------------------------------------------------
