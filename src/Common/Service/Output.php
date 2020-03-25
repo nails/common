@@ -13,6 +13,10 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Common\Events;
+use Nails\Common\Exception\FactoryException;
+use Nails\Factory;
+
 /**
  * Class Output
  *
@@ -62,18 +66,33 @@ class Output
         $this->oOutput = $oCi->output;
 
         // --------------------------------------------------------------------------
+        /**
+         * Overload the display function
+         */
+        $oCi->hooks->addHook(
+            'display_override',
+            [
+                'classref' => $this,
+                'method'   => 'display',
+                'params'   => [],
+            ]
+        );
+    }
 
-        //  If a display method has been defined, configure CodeIgniter to use it
-        if (method_exists($this, 'display')) {
-            get_instance()->hooks->addHook(
-                'display_override',
-                [
-                    'classref' => $this,
-                    'method'   => 'display',
-                    'params'   => [],
-                ]
-            );
-        }
+    // --------------------------------------------------------------------------
+
+    /**
+     * Renders
+     *
+     * @throws FactoryException
+     */
+    public function display()
+    {
+        /** @var Event $oEventService */
+        $oEventService = Factory::service('Event');
+        $oEventService->trigger(Events::OUTPUT_PRE);
+        $this->oOutput->_display();
+        $oEventService->trigger(Events::OUTPUT_POST);
     }
 
     // --------------------------------------------------------------------------

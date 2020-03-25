@@ -39,6 +39,16 @@ class Events extends Base
      */
     const ROUTES_UPDATE = 'ROUTES:UPDATE';
 
+    /**
+     * Fired immediately before output is sent to the browser
+     */
+    const OUTPUT_PRE = 'OUTPUT:PRE';
+
+    /**
+     * Fired immediate after output is sent to the browser
+     */
+    const OUTPUT_POST = 'OUTPUT:POST';
+
     // --------------------------------------------------------------------------
 
     /**
