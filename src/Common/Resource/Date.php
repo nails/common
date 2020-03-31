@@ -2,7 +2,12 @@
 
 namespace Nails\Common\Resource;
 
+use DateInterval;
+use DateTimeInterface;
+use Exception;
+use Nails\Common\Exception\FactoryException;
 use Nails\Common\Resource;
+use Nails\Factory;
 
 /**
  * Class Date
@@ -19,7 +24,7 @@ class Date extends Resource
     public $raw = '';
 
     /**
-     * The formatted date (as per actvie user's settings)
+     * The formatted date (as per active user's settings)
      *
      * @var string
      */
@@ -38,6 +43,8 @@ class Date extends Resource
      * Date constructor.
      *
      * @param array $mObj
+     *
+     * @throws Exception
      */
     public function __construct($mObj = [])
     {
@@ -77,12 +84,12 @@ class Date extends Resource
     /**
      * Returns the difference between two DateTime objects
      *
-     * @param \DateTimeInterface $oDateTime The date to compare to.
-     * @param bool               $bAbsolute Should the interval be forced to be positive?
+     * @param DateTimeInterface $oDateTime The date to compare to.
+     * @param bool              $bAbsolute Should the interval be forced to be positive?
      *
-     * @return \DateInterval|false
+     * @return DateInterval|false
      */
-    public function diff(\DateTimeInterface $oDateTime, bool $bAbsolute = false)
+    public function diff(DateTimeInterface $oDateTime, bool $bAbsolute = false)
     {
         return $this->getDateTimeObject()
             ? $this->getDateTimeObject()->diff($oDateTime, $bAbsolute)
@@ -155,5 +162,102 @@ class Date extends Resource
     public function __wakeup()
     {
         $this->oDateObj->__wakeup();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns whether the date is before the supplied date
+     *
+     * @param \DateTime|self $oCompareWith The date to compare with
+     *
+     * @return bool
+     */
+    public function isBefore($oCompareWith): bool
+    {
+        if (!$this->raw) {
+            return true;
+        } elseif ($oCompareWith instanceof \DateTime) {
+            //  Nothing to do
+        } elseif ($oCompareWith instanceof self) {
+            $oCompareWith = $oCompareWith->getDateTimeObject();
+        } else {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Expected object of type %s or %s, got %s',
+                    \DateTime::class,
+                    self::class,
+                    gettype($oCompareWith)
+                )
+            );
+        }
+
+        return $this->getDateTimeObject() < $oCompareWith;
+
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns whether the date is after the supplied date
+     *
+     * @param \DateTime|self $oCompareWith The date to compare with
+     *
+     * @return bool
+     */
+    public function isAfter($oCompareWith): bool
+    {
+        if (!$this->raw) {
+            return false;
+        } elseif ($oCompareWith instanceof \DateTime) {
+            //  Nothing to do
+        } elseif ($oCompareWith instanceof self) {
+            $oCompareWith = $oCompareWith->getDateTimeObject();
+        } else {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Expected object of type %s or %s, got %s',
+                    \DateTime::class,
+                    self::class,
+                    gettype($oCompareWith)
+                )
+            );
+        }
+
+        return $this->getDateTimeObject() > $oCompareWith;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns whether the date time is in the past
+     *
+     * @param \DateTime|self|null $oCompareWith The date to compare with
+     *
+     * @return bool
+     * @throws FactoryException
+     */
+    public function isPast($oCompareWith = null): bool
+    {
+        /** @var \DateTime|self $oCompareWith */
+        $oCompareWith = $oCompareWith ?? Factory::factory('DateTime');
+        return $this->isBefore($oCompareWith);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns whether the date time is in the future
+     *
+     * @param \DateTime|self|null $oCompareWith The date to compare with
+     *
+     * @return bool
+     * @throws FactoryException
+     */
+    public function isFuture($oCompareWith = null): bool
+    {
+        /** @var \DateTime|self $oCompareWith */
+        $oCompareWith = $oCompareWith ?? Factory::factory('DateTime');
+        return $this->isAfter($oCompareWith);
     }
 }
