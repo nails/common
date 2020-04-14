@@ -13,6 +13,7 @@ namespace Nails\Common\Factory;
 
 use GuzzleHttp\Client;
 use Nails\Auth\Resource\User;
+use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Helper\ArrayHelper;
 use Nails\Config;
@@ -245,7 +246,7 @@ abstract class HttpRequest
      * Configures and executes the HTTP request
      *
      * @return HttpResponse
-     * @throws \Nails\Common\Exception\FactoryException
+     * @throws FactoryException
      */
     public function execute(): HttpResponse
     {
