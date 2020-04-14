@@ -45,7 +45,7 @@ class HttpResponse
      *
      * @return Response
      */
-    public function getResponse()
+    public function getResponse(): Response
     {
         return $this->oResponse;
     }
@@ -57,7 +57,7 @@ class HttpResponse
      *
      * @return array
      */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->oResponse->getHeaders();
     }
@@ -83,7 +83,7 @@ class HttpResponse
      *
      * @return int
      */
-    public function getStatusCode()
+    public function getStatusCode(): int
     {
         return $this->oResponse->getStatusCode();
     }
@@ -95,7 +95,7 @@ class HttpResponse
      *
      * @return string
      */
-    public function getReasonPhrase()
+    public function getReasonPhrase(): string
     {
         return $this->oResponse->getReasonPhrase();
     }

@@ -38,7 +38,7 @@ class Post extends Get
      *
      * @return $this
      */
-    public function params(array $aParams = [])
+    public function params(array $aParams = []): self
     {
         $this->aFormParams = $aParams;
         return $this;

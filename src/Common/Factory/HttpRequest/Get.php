@@ -46,7 +46,7 @@ class Get extends HttpRequest
      *
      * @return $this
      */
-    public function query(array $aQuery = [])
+    public function query(array $aQuery = []): self
     {
         $this->aQuery = $aQuery;
         return $this;
@@ -60,7 +60,7 @@ class Get extends HttpRequest
      * @param array $aClientConfig   The config array for the HTTP Client
      * @param array $aRequestOptions The options for the request
      */
-    protected function compile(array &$aClientConfig, array &$aRequestOptions)
+    protected function compile(array &$aClientConfig, array &$aRequestOptions): void
     {
         $aRequestOptions['query'] = $this->aQuery;
     }

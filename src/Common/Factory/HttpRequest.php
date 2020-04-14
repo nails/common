@@ -102,7 +102,7 @@ abstract class HttpRequest
      *
      * @return $this
      */
-    public function setHeader($sHeader, $mValue)
+    public function setHeader($sHeader, $mValue): self
     {
         if (empty($this->aHeaders)) {
             $this->aHeaders = [];
@@ -119,7 +119,7 @@ abstract class HttpRequest
      *
      * @return array
      */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return isset($this->aHeaders) ? $this->aHeaders : [];
     }
@@ -147,7 +147,7 @@ abstract class HttpRequest
      *
      * @return $this
      */
-    public function asUser($oUser)
+    public function asUser($oUser): self
     {
         if ($oUser === null) {
             return $this;
@@ -173,7 +173,7 @@ abstract class HttpRequest
      *
      * @return $this
      */
-    public function baseUri($sBaseUri)
+    public function baseUri($sBaseUri): self
     {
         $this->sBaseUri = $sBaseUri ?: Config::get('BASE_URL');
         return $this;
@@ -188,7 +188,7 @@ abstract class HttpRequest
      *
      * @return $this
      */
-    public function path($sPath)
+    public function path($sPath): self
     {
         $this->sPath = $sPath;
         return $this;
@@ -203,7 +203,7 @@ abstract class HttpRequest
      *
      * @return $this
      */
-    public function userAgent($sUserAgent)
+    public function userAgent($sUserAgent): self
     {
         return $this->setHeader('User-Agent', $sUserAgent);
     }
@@ -216,7 +216,7 @@ abstract class HttpRequest
      * @return HttpResponse
      * @throws \Nails\Common\Exception\FactoryException
      */
-    public function execute()
+    public function execute(): HttpResponse
     {
         $aClientConfig   = [
             'base_uri'        => $this->sBaseUri,
@@ -247,5 +247,5 @@ abstract class HttpRequest
      * @param array $aClientConfig   The config array for the HTTP Client
      * @param array $aRequestOptions The options for the request
      */
-    abstract protected function compile(array &$aClientConfig, array &$aRequestOptions);
+    abstract protected function compile(array &$aClientConfig, array &$aRequestOptions): void;
 }
