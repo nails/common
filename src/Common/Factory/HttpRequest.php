@@ -64,6 +64,20 @@ abstract class HttpRequest
      */
     protected $sUserAgent = 'Nails';
 
+    /**
+     * Basic auth username
+     *
+     * @var string
+     */
+    protected $sAuthUsername = '';
+
+    /**
+     * Basic auth password
+     *
+     * @var string
+     */
+    protected $sAuthPassword = '';
+
     // --------------------------------------------------------------------------
 
     /**
@@ -211,6 +225,23 @@ abstract class HttpRequest
     // --------------------------------------------------------------------------
 
     /**
+     * Sets basic auth credentials
+     *
+     * @param string $sUsername The basic auth username
+     * @param string $sPassword The basic auth password
+     *
+     * @return $this
+     */
+    public function auth(string $sUsername, string $sPassword): self
+    {
+        $this->sAuthUsername = $sUsername;
+        $this->sAuthPassword = $sPassword;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Configures and executes the HTTP request
      *
      * @return HttpResponse
@@ -227,6 +258,13 @@ abstract class HttpRequest
         $aRequestOptions = [
             'headers' => $this->aHeaders,
         ];
+
+        if (!empty($this->sAuthUsername)) {
+            $aRequestOptions['auth'] = [
+                $this->sAuthUsername,
+                $this->sAuthPassword,
+            ];
+        }
 
         $this->compile($aClientConfig, $aRequestOptions);
 
