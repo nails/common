@@ -269,13 +269,10 @@ abstract class HttpRequest
 
         $this->compile($aClientConfig, $aRequestOptions);
 
-        $oClient = Factory::factory('HttpClient', '', $aClientConfig);
+        $oClient   = Factory::factory('HttpClient', '', $aClientConfig);
+        $oResponse = $oClient->request(static::HTTP_METHOD, $this->sPath, $aRequestOptions);
 
-        return Factory::factory(
-            'HttpResponse',
-            '',
-            $oClient->request(static::HTTP_METHOD, $this->sPath, $aRequestOptions)
-        );
+        return Factory::factory('HttpResponse', '', $oResponse);
     }
 
     // --------------------------------------------------------------------------
