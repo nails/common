@@ -23,7 +23,7 @@ if (!function_exists('_LOG')) {
      */
     function _LOG($sLine = ''): void
     {
-        /** @var \Nails\Common\Service\Logger $oLogger */a
+        /** @var \Nails\Common\Service\Logger $oLogger */
         $oLogger = Factory::service('Logger');
         $oLogger->line($sLine);
     }
