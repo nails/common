@@ -16,39 +16,16 @@ if (!function_exists('_LOG')) {
 
     /**
      * Writes a line to the log
-     * @param  string $sLine The line to write
+     *
+     * @param string $sLine The line to write
+     *
      * @return void
      */
-    function _LOG($sLine = '')
+    function _LOG($sLine = ''): void
     {
+        /** @var \Nails\Common\Service\Logger $oLogger */a
         $oLogger = Factory::service('Logger');
-        return $oLogger->line($sLine);
-    }
-}
-
-if (!function_exists('_LOG_DIR')) {
-
-    /**
-     * Set the log directory which is being written to
-     * @param string $sDir The directory to write to
-     */
-    function _LOG_DIR($sDir = '')
-    {
-        $oLogger = Factory::service('Logger');
-        return $oLogger->setDir($sDir);
-    }
-}
-
-if (!function_exists('_LOG_FILE')) {
-
-    /**
-     * Set the filename which is being written to
-     * @param string $sFile The file to write to
-     */
-    function _LOG_FILE($sFile = '')
-    {
-        $oLogger = Factory::service('Logger');
-        return $oLogger->setFile($sFile);
+        $oLogger->line($sLine);
     }
 }
 
@@ -56,13 +33,16 @@ if (!function_exists('_LOG_MUTE_OUTPUT')) {
 
     /**
      * Temporarily mute logging
-     * @param  bool $bMute Whether mute is on or off
+     *
+     * @param bool $bMute Whether mute is on or off
+     *
      * @return void
      */
-    function _LOG_MUTE_OUTPUT($bMute = true)
+    function _LOG_MUTE_OUTPUT(bool $bMute = true): void
     {
+        /** @var \Nails\Common\Service\Logger $oLogger */
         $oLogger = Factory::service('Logger');
-        $oLogger->bMute = (bool) $bMute;
+        $oLogger->mute($bMute);
     }
 }
 
@@ -70,12 +50,15 @@ if (!function_exists('_LOG_DUMMY_MODE')) {
 
     /**
      * Switch the logger into dummy mode
-     * @param  boolean $bDummy Whether dummy mode is on or off
+     *
+     * @param boolean $bDummy Whether dummy mode is on or off
+     *
      * @return void
      */
-    function _LOG_DUMMY_MODE($bDummy = true)
+    function _LOG_DUMMY_MODE(bool $bDummy = true): void
     {
+        /** @var \Nails\Common\Service\Logger $oLogger */
         $oLogger = Factory::service('Logger');
-        $oLogger->bDummy = (bool) $bDummy;
+        $oLogger->dummy($bDummy);
     }
 }

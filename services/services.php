@@ -505,6 +505,13 @@ return [
                 return new \Nails\Common\Factory\Locale\Script($sLabel);
             }
         },
+        'Logger'                  => function (): \Nails\Common\Factory\Logger {
+            if (class_exists('\App\Common\Factory\Logger')) {
+                return new \App\Common\Factory\Logger();
+            } else {
+                return new \Nails\Common\Factory\Logger();
+            }
+        },
         'ModelField'              => function (): \Nails\Common\Factory\Model\Field {
             if (class_exists('\App\Common\Factory\Model\Field')) {
                 return new \App\Common\Factory\Model\Field();

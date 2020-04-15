@@ -78,6 +78,7 @@
                     "directory",
                     "email",
                     "exception",
+                    "file",
                     "form",
                     "form_field",
                     "html",

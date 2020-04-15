@@ -7,13 +7,14 @@
  *
  * @package     Nails
  * @subpackage  common
- * @category    Library
+ * @category    Service
  * @author      Nails Dev Team
- * @link
+ * @link        https://docs.nailsapp.co.uk/core-services/logger
  */
 
 namespace Nails\Common\Service;
 
+use Nails\Common\Exception\FactoryException;
 use Nails\Config;
 use Nails\Factory;
 
@@ -24,172 +25,100 @@ use Nails\Factory;
  */
 class Logger
 {
-    private $oLog;
-    public  $bMute;
-    public  $bDummy;
+    /** @var \Nails\Common\Factory\Logger */
+    protected $oLogger;
 
     // --------------------------------------------------------------------------
 
     /**
-     * Construct the library
+     * Logger constructor.
+     *
+     * @throws FactoryException
      */
     public function __construct()
     {
-        //  Load helper
-        Factory::helper('file');
-
-        // --------------------------------------------------------------------------
-
-        //  Define defaults
-        $this->oLog   = new \stdClass();
-        $this->bMute  = false;
-        $this->bDummy = false;
-
-        $this->setFile();
-        $this->setDir();
+        $this->oLogger = Factory::factory('Logger');
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Writes a line to the log
+     * Writes a line to the app log
      *
-     * @param string $sLine The line to write
+     * @param string $sLine The line to write to the log
      *
-     * @return void
+     * @return $this
+     * @throws FactoryException
      */
-    public function line($sLine = '')
+    public function line($sLine = ''): self
     {
-        //  Is dummy mode enabled? If it is then don't do anything.
-        if ($this->bDummy) {
-            return;
-        }
-
-        // --------------------------------------------------------------------------
-
-        $sLogPath = $this->oLog->dir . $this->oLog->file;
-        $oDate    = Factory::factory('DateTime');
-
-        // --------------------------------------------------------------------------
-
-        //  If the log file doesn't exist (or we haven't checked already), attempt to create it
-        if (!$this->oLog->exists) {
-
-            if (!file_exists($sLogPath)) {
-
-                //  Check directory is there
-                $sDir = dirname($sLogPath);
-
-                if (!is_dir($sDir)) {
-
-                    //  Create structure
-                    mkdir($sDir, 0750, true);
-                }
-
-                // --------------------------------------------------------------------------
-
-                $sFirstLine = '<?php die(\'Unauthorised\'); ?>' . "\n\n";
-                if (write_file($sLogPath, $sFirstLine)) {
-                    $this->oLog->exists = true;
-                } else {
-                    $this->oLog->exists = false;
-                }
-
-            } else {
-                $this->oLog->exists = true;
-            }
-        }
-
-        // --------------------------------------------------------------------------
-
-        if ($this->oLog->exists) {
-
-            if (empty($sLine)) {
-                write_file($sLogPath, "\n", 'a');
-            } else {
-                write_file($sLogPath, 'INFO - ' . $oDate->format('Y-m-d H:i:s') . ' --> ' . trim($sLine) . "\n", 'a');
-            }
-        }
+        $this->oLogger->line($sLine);
+        return $this;
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Set the filename which is being written to
-     *
-     * @param string $sFile The file to write to
-     */
-    public function setFile($sFile = '')
-    {
-        //  Reset the log exists var so that line() checks again
-        $this->oLog->exists = false;
-
-        // --------------------------------------------------------------------------
-
-        if (!empty($sFile)) {
-            $this->oLog->file = $sFile;
-        } else {
-            $oDate            = Factory::factory('DateTime');
-            $this->oLog->file = 'log-' . $oDate->format('Y-m-d') . '.php';
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Return the active log file
+     * Returns the current log file
      *
      * @return string
      */
     public function getFile(): string
     {
-        return $this->oLog->file;
+        return $this->oLogger->getFile();
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Set the log directory which is being written to
-     *
-     * @param string $sDir The directory to write to
-     */
-    public function setDir($sDir = '')
-    {
-        //  Reset the log exists var so that line() checks again
-        $this->oLog->exists = false;
-
-        // --------------------------------------------------------------------------
-
-        if (!empty($sDir) && substr($sDir, 0, 1) === '/') {
-            $this->oLog->dir = $sDir;
-        } elseif (!empty($sDir)) {
-            $this->oLog->dir = Config::get('LOG_DIR') . $sDir;
-        } else {
-            $this->oLog->dir = Config::get('LOG_DIR');
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Return the active log directory
+     * Returns the current log directory
      *
      * @return string
      */
     public function getDir(): string
     {
-        return $this->oLog->dir;
+        return $this->oLogger->getDir();
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Returns a stream handle for the active log file
+     * Returns a stream to the current log file
      *
      * @return bool|resource
      */
     public function getStream()
     {
-        return fopen($this->getDir() . $this->getFile(), 'a', false);
+        return $this->oLogger->getStream();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Mute or unmute the log
+     *
+     * @param bool $sMute Whether to mute the log or not
+     *
+     * @return $this
+     */
+    public function mute(bool $sMute = true): self
+    {
+        $this->oLogger->bMute = $sMute;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Enable or disable dummy mode
+     *
+     * @param bool $sEnabled Whether dummy mode is enabled
+     *
+     * @return $this
+     */
+    public function dummy($sEnabled = true): self
+    {
+        $this->oLogger->bDummy = $sMute;
+        return $this;
     }
 }
