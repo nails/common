@@ -444,7 +444,7 @@ abstract class Base
      */
     public function create(array $aData = [], $bReturnObject = false)
     {
-        $this->triggerEvent(static::EVENT_CREATING, [$aData]);
+        $this->triggerEvent(static::EVENT_CREATING, [$aData, $this]);
 
         $oDb    = Factory::service('Database');
         $sTable = $this->getTableName();
@@ -481,7 +481,7 @@ abstract class Base
             }
 
             $this->autoSaveExpandableFieldsSave($iId, $aAutoSaveExpandableFields);
-            $this->triggerEvent(static::EVENT_CREATED, [$iId]);
+            $this->triggerEvent(static::EVENT_CREATED, [$iId, $this]);
 
             return $bReturnObject ? $this->getById($iId) : $iId;
 
@@ -532,7 +532,7 @@ abstract class Base
      */
     public function update($iId, array $aData = []): bool
     {
-        $this->triggerEvent(static::EVENT_UPDATING, [$aData]);
+        $this->triggerEvent(static::EVENT_UPDATING, [$aData, $this]);
 
         $sAlias = $this->getTableAlias(true);
         $sTable = $this->getTableName(true);
@@ -572,7 +572,7 @@ abstract class Base
                 $this->unsetCachePrefix($sKey);
             }
 
-            $this->triggerEvent(static::EVENT_UPDATED, [$iId]);
+            $this->triggerEvent(static::EVENT_UPDATED, [$iId, $this]);
 
             return true;
 
@@ -857,7 +857,7 @@ abstract class Base
             return false;
         }
 
-        $this->triggerEvent(static::EVENT_DELETING, [$oItem]);
+        $this->triggerEvent(static::EVENT_DELETING, [$oItem, $this]);
 
         if ($this->isDestructiveDelete()) {
             $bResult = $this->destroy($iId);
@@ -866,7 +866,7 @@ abstract class Base
         }
 
         if ($bResult) {
-            $this->triggerEvent(static::EVENT_DELETED, [$iId, $oItem]);
+            $this->triggerEvent(static::EVENT_DELETED, [$iId, $oItem, $this]);
         }
 
         return $bResult;
@@ -928,12 +928,12 @@ abstract class Base
      */
     public function restore($iId): bool
     {
-        $this->triggerEvent(static::EVENT_RESTORING, [$iId]);
+        $this->triggerEvent(static::EVENT_RESTORING, [$iId, $this]);
 
         if ($this->isDestructiveDelete()) {
             return null;
         } elseif ($this->update($iId, [$this->tableDeletedColumn => false])) {
-            $this->triggerEvent(static::EVENT_RESTORED, [$iId]);
+            $this->triggerEvent(static::EVENT_RESTORED, [$iId, $this]);
             return true;
         }
 
@@ -956,7 +956,7 @@ abstract class Base
      */
     public function destroy($iId): bool
     {
-        $this->triggerEvent(static::EVENT_DESTROYING, [$iId]);
+        $this->triggerEvent(static::EVENT_DESTROYING, [$iId, $this]);
 
         $oDb    = Factory::service('Database');
         $sTable = $this->getTableName();
@@ -965,7 +965,7 @@ abstract class Base
 
         $oDb->where('id', $iId);
         if ($oDb->delete($sTable)) {
-            $this->triggerEvent(static::EVENT_DESTROYED, [$iId]);
+            $this->triggerEvent(static::EVENT_DESTROYED, [$iId, $this]);
             return true;
         }
 
