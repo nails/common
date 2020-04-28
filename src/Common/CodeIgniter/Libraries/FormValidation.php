@@ -1234,4 +1234,24 @@ class FormValidation extends CI_Form_validation
 
         return true;
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Determines whether a field is a valid timecode or not
+     *
+     * @param $sTimecode The timecode to test
+     *
+     * @return bool
+     */
+    public function valid_timecode($sTimecode)
+    {
+        if (!preg_match('/^\d+\d:[0-5]\d:[0-5]\d$/', $sTimecode)) {
+            if (!array_key_exists('valid_timecode', $this->_error_messages)) {
+                $this->set_message('valid_timecode', lang('fv_valid_timecode_field'));
+            }
+            return false;
+        }
+        return true;
+    }
 }
