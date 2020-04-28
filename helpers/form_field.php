@@ -135,6 +135,13 @@ if (!function_exists('form_field_checkbox')) {
     }
 }
 
+if (!function_exists('form_field_timecode')) {
+    function form_field_timecode($aField, $aOptions = null, $sTip = '')
+    {
+        return Form\Field::timecode($aField, $aOptions, $sTip);
+    }
+}
+
 if (!function_exists('form_field_submit')) {
     function form_field_submit($aField)
     {

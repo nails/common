@@ -1237,6 +1237,28 @@ EOT;
     // --------------------------------------------------------------------------
 
     /**
+     * This function renders a timecode input
+     *
+     * @param array $aField The configuration array
+     *
+     * @return string
+     */
+    public static function timecode(array $aField): string
+    {
+        $sKey     = getFromArray('key', $aField);
+        $sDefault = getFromArray('default', $aField);
+
+        $aField['html'] =
+            form_input('', '', 'class="js-timecode" placeholder="hh:mm:ss"') .
+            '<input type="hidden" name="' . $sKey . '" value="' . $sDefault . '" class="js-timecode-input">' .
+            '<div class="js-timecode-error"></div>';
+
+        return static::html($aField);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Generates a form field containing the media manager to select a file.
      *
      * @param array $aField The config array
