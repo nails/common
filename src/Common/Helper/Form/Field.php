@@ -1249,10 +1249,7 @@ EOT;
         $sDefault = getFromArray('default', $aField);
         $sDefault = set_value($sKey, $sDefault);
 
-        $aField['html'] =
-            form_input('', '', 'class="js-timecode" placeholder="hh:mm:ss"') .
-            '<input type="hidden" name="' . $sKey . '" value="' . $sDefault . '" class="js-timecode-input">' .
-            '<div class="js-timecode-error"></div>';
+        $aField['html'] = Form::timecode($sKey, $sDefault);
 
         return static::html($aField);
     }

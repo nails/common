@@ -47,6 +47,7 @@ class Form
     const FIELD_TEXT              = 'text';
     const FIELD_TEXTAREA          = 'textarea';
     const FIELD_TIME              = 'time';
+    const FIELD_TIMECODE          = 'timecode';
     const FIELD_UPLOAD            = 'upload';
     const FIELD_URL               = 'url';
 
@@ -520,5 +521,25 @@ class Form
     public static function upload($data = '', $value = '', $extra = '')
     {
         return form_upload($data, $value, $extra);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Renders a timecode
+     *
+     * @param string      $sKey     The input's key
+     * @param string|null $sDefault The default value to set
+     *
+     * @return string
+     */
+    public static function timecode(string $sKey, string $sDefault = null): string
+    {
+        return
+            '<div class="admin-js-timecode">' .
+            form_input('', '', 'class="js-timecode" placeholder="hh:mm:ss"') .
+            '<input type="hidden" name="' . $sKey . '" value="' . $sDefault . '" class="js-timecode-input">' .
+            '<div class="js-timecode-error"></div>' .
+            '</div>';
     }
 }
