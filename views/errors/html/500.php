@@ -8,8 +8,8 @@ if (Environment::not(Environment::ENV_PROD)) {
     /**
      * Renders a data section
      *
-     * @param  string $title The title to give the section
-     * @param  mixed  $data  The data to display
+     * @param string $title The title to give the section
+     * @param mixed  $data  The data to display
      *
      * @return string
      */
@@ -24,44 +24,44 @@ if (Environment::not(Environment::ENV_PROD)) {
                 <div class="table-responsive">
                     <table>
                         <tbody>
-                        <?php
+                            <?php
 
-                        if (!empty($data)) {
+                            if (!empty($data)) {
 
-                            foreach ($data as $k => $v) {
+                                foreach ($data as $k => $v) {
+
+                                    ?>
+                                    <tr>
+                                        <td class="key">
+                                            <?=$k?>
+                                        </td>
+                                        <td class="value" width="100%">
+                                            <?php
+
+                                            if (is_string($v) || is_numeric($v)) {
+                                                echo $v;
+                                            } else {
+                                                echo json_encode($v, JSON_PRETTY_PRINT);
+                                            }
+
+                                            ?>
+                                        </td>
+                                    </tr>
+                                    <?php
+                                }
+
+                            } else {
 
                                 ?>
                                 <tr>
-                                    <td class="key">
-                                        <?=$k?>
-                                    </td>
-                                    <td class="value" width="100%">
-                                        <?php
-
-                                        if (is_string($v) || is_numeric($v)) {
-                                            echo $v;
-                                        } else {
-                                            echo json_encode($v, JSON_PRETTY_PRINT);
-                                        }
-
-                                        ?>
+                                    <td class="no-data">
+                                        No Data
                                     </td>
                                 </tr>
                                 <?php
                             }
 
-                        } else {
-
                             ?>
-                            <tr>
-                                <td class="no-data">
-                                    No Data
-                                </td>
-                            </tr>
-                            <?php
-                        }
-
-                        ?>
                         </tbody>
                     </table>
                 </div>
@@ -173,7 +173,7 @@ if (Environment::not(Environment::ENV_PROD)) {
             <div class="dev-only">
                 This page is viewable in development environments only.
                 <a href="http://docs.nailsapp.co.uk">
-                    <img src="<?=\Nails\Config::get('NAILS_ASSETS_URL')?>img/nails/icon/icon@2x.png" id="nailsLogo"/>
+                    <img src="<?=\Nails\Config::get('NAILS_ASSETS_URL')?>img/nails/icon/icon@2x.png" id="nailsLogo" />
                 </a>
             </div>
             <header>
@@ -181,7 +181,6 @@ if (Environment::not(Environment::ENV_PROD)) {
                 <h2><?=$sMessage?></h2>
                 <?=!empty($oDetails->url) ? anchor($oDetails->url, null, 'target="_blank"') : ''?>
             </header>
-
             <?php
 
             //  Error Variables
