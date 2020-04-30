@@ -108,7 +108,7 @@ use Nails\Factory;
  * @method valid_email($str)
  * @method valid_postcode($str)
  * @method valid_time($sTime, $sFormat)
- * @method valid_timecode($sTimecode)
+ * @method validTimecode($sTimecode)
  */
 class FormValidation
 {
@@ -170,7 +170,7 @@ class FormValidation
     const RULE_VALID_IP              = 'valid_ip';
     const RULE_VALID_POSTCODE        = 'valid_postcode';
     const RULE_VALID_TIME            = 'valid_time';
-    const RULE_VALID_TIMECODE        = 'valid_timecode';
+    const RULE_VALID_TIMECODE        = 'validTimecode';
     const RULE_VALID_URL             = 'valid_url';
 
     //  @todo (Pablo - 2019-12-16) - Deprecate/remove/move these rules

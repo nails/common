@@ -147,8 +147,8 @@ $lang['fv_is']                          = 'This field must be exactly "{param}"'
 $lang['fv_is_field']                    = 'The {field} field must be exactly "{param}"';
 $lang['fv_integer']                     = 'This field must be an integer';
 $lang['fv_integer_field']               = 'The {field} field must be an integr';
-$lang['fv_valid_timecode']              = 'This field must be a valid timecode (expected format: hh:mm:ss)';
-$lang['fv_valid_timecode_field']        = 'The {field} field must be a valid timecode (expected format: hh:mm:ss)';
+$lang['fv_validTimecode']               = 'This field must be a valid timecode (expected format: hh:mm:ss)';
+$lang['fv_validTimecode_field']         = 'The {field} field must be a valid timecode (expected format: hh:mm:ss)';
 
 //  @todo (Pablo - 2019-12-16) - Deprecate/remove/move these
 $lang['cdnObjectPickerMultiObjectRequired']         = 'All items must have a file set.';

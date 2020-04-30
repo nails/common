@@ -1244,11 +1244,11 @@ class FormValidation extends CI_Form_validation
      *
      * @return bool
      */
-    public function valid_timecode($sTimecode)
+    public function validTimecode($sTimecode)
     {
         if (!preg_match('/^\d+\d:[0-5]\d:[0-5]\d$/', $sTimecode)) {
-            if (!array_key_exists('valid_timecode', $this->_error_messages)) {
-                $this->set_message('valid_timecode', lang('fv_valid_timecode_field'));
+            if (!array_key_exists('validTimecode', $this->_error_messages)) {
+                $this->set_message('validTimecode', lang('fv_validTimecode_field'));
             }
             return false;
         }
