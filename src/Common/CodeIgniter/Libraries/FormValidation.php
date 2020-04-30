@@ -1254,4 +1254,25 @@ class FormValidation extends CI_Form_validation
         }
         return true;
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Determines whether a value exceeds the maximum number of words
+     *
+     * @param $sValue    The value to test
+     * @param $iMaxWords The maximum number of words allowed
+     *
+     * @return bool
+     */
+    public function maxWords($sValue, $iMaxWords)
+    {
+        if (str_word_count($sValue) > (int) $iMaxWords) {
+            if (!array_key_exists('max_words', $this->_error_messages)) {
+                $this->set_message('max_words', lang('fv_maxWords_field'));
+            }
+            return false;
+        }
+        return true;
+    }
 }

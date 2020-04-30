@@ -149,6 +149,7 @@ class FormValidation
     const RULE_LESS_THAN_EQUAL_TO    = 'less_than_equal_to';
     const RULE_MATCHES               = 'matches';
     const RULE_MAX_LENGTH            = 'max_length';
+    const RULE_MAX_WORDS             = 'maxWords';
     const RULE_MIN_LENGTH            = 'min_length';
     const RULE_NUMERIC               = 'numeric';
     const RULE_PREP_FOR_FORM         = 'prep_for_form';

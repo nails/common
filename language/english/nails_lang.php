@@ -149,6 +149,8 @@ $lang['fv_integer']                     = 'This field must be an integer';
 $lang['fv_integer_field']               = 'The {field} field must be an integr';
 $lang['fv_validTimecode']               = 'This field must be a valid timecode (expected format: hh:mm:ss)';
 $lang['fv_validTimecode_field']         = 'The {field} field must be a valid timecode (expected format: hh:mm:ss)';
+$lang['fv_maxWords']                    = 'This field is too long, maximum {param} words.';
+$lang['fv_maxWords_field']              = 'The {field} field is too long, maximum {param} words.';
 
 //  @todo (Pablo - 2019-12-16) - Deprecate/remove/move these
 $lang['cdnObjectPickerMultiObjectRequired']         = 'All items must have a file set.';
