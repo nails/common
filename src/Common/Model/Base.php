@@ -2104,6 +2104,12 @@ abstract class Base
 
         // --------------------------------------------------------------------------
 
+        if (!empty($aData['keywords'])) {
+            $this->applySearchConditionals($aData, $aData['keywords']);
+        }
+
+        // --------------------------------------------------------------------------
+
         //  Apply common items
         $this->getCountCommon($aData);
 

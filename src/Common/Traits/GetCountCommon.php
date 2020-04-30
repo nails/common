@@ -26,42 +26,6 @@ trait GetCountCommon
      **/
     protected function getCountCommon(array $aData = []): void
     {
-        //  @deprecated - searching should use the search() method, but this in place
-        //  as a quick fix for loads of admin controllers
-        if (!empty($aData['keywords']) && !empty($this->searchableFields)) {
-            if (empty($aData['or_like'])) {
-                $aData['or_like'] = [];
-            }
-
-            $sAlias = $this->getTableAlias(true);
-
-            foreach ($this->searchableFields as $mField) {
-
-                //  If the field is an array then search across the columns concatenated together
-                if (is_array($mField)) {
-
-                    $sMappedFields = array_map(function ($sInput) use ($sAlias) {
-                        if (strpos($sInput, '.') !== false) {
-                            return $sInput;
-                        } else {
-                            return $sAlias . $sInput;
-                        }
-                    }, $mField);
-
-                    $aData['or_like'][] = ['CONCAT_WS(" ", ' . implode(',', $sMappedFields) . ')', $aData['keywords']];
-
-                } else {
-                    if (strpos($mField, '.') !== false) {
-                        $aData['or_like'][] = [$mField, $aData['keywords']];
-                    } else {
-                        $aData['or_like'][] = [$sAlias . $mField, $aData['keywords']];
-                    }
-                }
-            }
-        }
-
-        // --------------------------------------------------------------------------
-
         $this->getCountCommonCompileSelect($aData);
         $this->getCountCommonCompileFilters($aData);
         $this->getCountCommonCompileWheres($aData);
