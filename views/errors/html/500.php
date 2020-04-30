@@ -79,9 +79,11 @@ if (Environment::not(Environment::ENV_PROD)) {
     <!DOCTYPE html>
     <!--
 
-    ERROR:   FATAL
-    SUBJECT: <?=strip_tags($sSubject)?>
-    MESSAGE: <?=strip_tags($sMessage)?>
+    ERROR:   <?=$oDetails->type . "\n"?>
+    SUBJECT: <?=strip_tags($sSubject) . "\n"?>
+    MESSAGE: <?=strip_tags($sMessage) . "\n"?>
+    FILE:    <?=$oDetails->file . "\n"?>
+    LINE:    <?=$oDetails->line . "\n"?>
 
     -->
     <html>
