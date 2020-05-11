@@ -2623,6 +2623,21 @@ abstract class Base
 
         foreach ($aData as $sKey => $mValue) {
             if (array_key_exists($sKey, $aFields)) {
+
+                /**
+                 * For single type expandable fields, we only want to auto-save using the related
+                 * model if  the item being passed is an object or an array (i.e data to create/update
+                 * the related item with) – if it's anything else (typically a numeric) we can conider
+                 * this an ID and update the current tabke rather than the target, related, table.
+                 */
+                if (
+                    $aFields[$sKey]->type === static::EXPANDABLE_TYPE_SINGLE
+                    && !is_object($mValue)
+                    && !is_array($mValue)
+                ) {
+                    continue;
+                }
+
                 $aOut[$sKey]       = $aFields[$sKey];
                 $aOut[$sKey]->data = $mValue;
                 unset($aData[$sKey]);
