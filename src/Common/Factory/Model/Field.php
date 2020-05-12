@@ -437,7 +437,7 @@ class Field
      */
     public function addData(string $sKey, $mValue): self
     {
-        $this->validation[$sKey] = $mValue;
+        $this->data[$sKey] = $mValue;
         return $this;
     }
 }
