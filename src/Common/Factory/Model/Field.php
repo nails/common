@@ -42,9 +42,9 @@ class Field
     /**
      * The field's default value
      *
-     * @var string
+     * @var mixed
      */
-    public $default = '';
+    public $default;
 
     /**
      * The field's options (applicable to dropdowns only)
@@ -241,9 +241,9 @@ class Field
     /**
      * Get the default property
      *
-     * @return string
+     * @return mixed
      */
-    public function getDefault(): string
+    public function getDefault(): ?string
     {
         return $this->default;
     }
@@ -253,11 +253,11 @@ class Field
     /**
      * Set the default property
      *
-     * @param string $sDefault The value to set
+     * @param mixed $sDefault The value to set
      *
      * @return $this
      */
-    public function setDefault(string $sDefault): self
+    public function setDefault($sDefault): self
     {
         $this->default = $sDefault;
         return $this;
