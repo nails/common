@@ -2800,34 +2800,37 @@ abstract class Base
                 }, $aSupportedLocales)
             );
 
-            $oTemp             = Factory::factory('ModelField');
-            $oTemp->key        = 'locale';
-            $oTemp->label      = 'Locale';
-            $oTemp->type       = Helper\Form::FIELD_DROPDOWN;
-            $oTemp->allow_null = false;
-            $oTemp->validation = [
-                FormValidation::RULE_REQUIRED,
-                FormValidation::RULE_SUPPORTED_LOCALE,
-            ];
-            $oTemp->options    = $aOptions;
-            $oTemp->class      = 'select2';
-            $oTemp->info       = 'This field specifies what language the item is written in.';
-            $oTemp->default    = $oLocale->getDefautLocale();
+            /** @var Field $oTemp */
+            $oTemp = Factory::factory('ModelField');
+            $oTemp
+                ->setKey('locale')
+                ->setLabel('Locale')
+                ->setType(Helper\Form::FIELD_DROPDOWN)
+                ->setAllowNull(false)
+                ->setValidation([
+                    FormValidation::RULE_REQUIRED,
+                    FormValidation::RULE_SUPPORTED_LOCALE,
+                ])
+                ->setOptions($aOptions)
+                ->setClass('select2')
+                ->setInfo('This field specifies what language the item is written in.')
+                ->setDefault($oLocale->getDefautLocale());
 
             $aFields['locale'] = $oTemp;
         }
 
         foreach ($aResult as $oField) {
 
-            $oTemp             = Factory::factory('ModelField');
-            $oTemp->key        = $oField->Field;
-            $oTemp->label      = $this->describeFieldsPrepareLabel($oField->Field);
-            $oTemp->allow_null = $oField->Null === 'YES';
-            $oTemp->validation = [];
+            /** @var Field $oTemp */
+            $oTemp = Factory::factory('ModelField');
+            $oTemp
+                ->setKey($oField->Field)
+                ->setLabel($this->describeFieldsPrepareLabel($oField->Field))
+                ->setAllowNull($oField->Null === 'YES');
 
-            //  Guess the field's type and some basic validation
-            $this->describeFieldsGuessType($oTemp, $oField->Type);
-            $this->describeFieldsGuessValidation($oTemp, $oField->Type);
+            $this
+                ->describeFieldsGuessType($oTemp, $oField->Type)
+                ->describeFieldsGuessValidation($oTemp, $oField->Type);
 
             $aFields[$oTemp->key] = $oTemp;
         }
@@ -2851,7 +2854,7 @@ abstract class Base
      *
      * @return string
      */
-    protected function describeFieldsPrepareLabel($sLabel)
+    protected function describeFieldsPrepareLabel(string $sLabel): string
     {
         $aPatterns = [
             //  Common words
@@ -2873,10 +2876,12 @@ abstract class Base
     /**
      * Guesses the field's type and sets it accordingly
      *
-     * @param \stdClass $oField The field object
-     * @param string    $sType  The database type
+     * @param Field  $oField The field object
+     * @param string $sType  The database type
+     *
+     * @return $this
      */
-    protected function describeFieldsGuessType(&$oField, $sType)
+    protected function describeFieldsGuessType(Field &$oField, string $sType): self
     {
         preg_match('/^(.*?)(\((.+?)\)(.*))?$/', $sType, $aMatches);
 
@@ -2893,7 +2898,8 @@ abstract class Base
             case 'mediumint':
             case 'bigint':
                 //  @todo (Pablo - 2019-11-28) - This is only number to match the form type, and could be misleading
-                $oField->type = Helper\Form::FIELD_NUMBER;
+                $oField
+                    ->setType(Helper\Form::FIELD_NUMBER);
                 break;
 
             /**
@@ -2903,34 +2909,40 @@ abstract class Base
             case 'tinyint':
             case 'bool':
             case 'boolean':
-                $oField->type = $iLength == 1 ? Helper\Form::FIELD_BOOLEAN : Helper\Form::FIELD_NUMBER;
+                $oField
+                    ->setType($iLength == 1 ? Helper\Form::FIELD_BOOLEAN : Helper\Form::FIELD_NUMBER);
                 break;
 
             /**
              * String
              */
             case 'varchar':
-                $oField->type       = Helper\Form::FIELD_TEXT;
-                $oField->max_length = $iLength ?: null;
+                $oField
+                    ->setType(Helper\Form::FIELD_TEXT)
+                    ->setMaxLength($iLength ?: null);
                 break;
             case 'tinytext':
             case 'text':
             case 'mediumtext':
             case 'longtext':
-                $oField->type = Helper\Form::FIELD_TEXTAREA;
+                $oField
+                    ->setType(Helper\Form::FIELD_TEXTAREA);
                 break;
 
             /**
              * Date and time
              */
             case 'date':
-                $oField->type = Helper\Form::FIELD_DATE;
+                $oField
+                    ->setType(Helper\Form::FIELD_DATE);
                 break;
             case 'datetime':
-                $oField->type = Helper\Form::FIELD_DATETIME;
+                $oField
+                    ->setType(Helper\Form::FIELD_DATETIME);
                 break;
             case 'time':
-                $oField->type = Helper\Form::FIELD_TIME;
+                $oField
+                    ->setType(Helper\Form::FIELD_TIME);
                 break;
 
             /**
@@ -2939,24 +2951,30 @@ abstract class Base
             case 'enum':
             case 'set':
                 if ($sType === 'enum') {
-                    $oField->type = Helper\Form::FIELD_DROPDOWN;
+                    $oField
+                        ->setType(Helper\Form::FIELD_DROPDOWN);
                 } else {
-                    $oField->type = Helper\Form::FIELD_DROPDOWN_MULTIPLE;
-                    $oField->key  .= '[]';
+                    $oField->key .= '[]';
+                    $oField
+                        ->setType(Helper\Form::FIELD_DROPDOWN_MULTIPLE);
                 }
-                $oField->class   = 'select2';
-                $aOptions        = explode("','", substr($sTypeConfig, 1, -1));
-                $oField->options = array_combine($aOptions, $aOptions);
+                $aOptions = explode("','", substr($sTypeConfig, 1, -1));
+                $oField
+                    ->setOptions(array_combine($aOptions, $aOptions))
+                    ->setClass('select2');;
                 break;
 
             /**
              * Default to basic string
              */
             default:
-                $oField->type       = Helper\Form::FIELD_TEXT;
-                $oField->max_length = $iLength ?: null;
+                $oField
+                    ->setType(Helper\Form::FIELD_TEXT)
+                    ->setMaxLength($iLength ?: null);
                 break;
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -2964,10 +2982,12 @@ abstract class Base
     /**
      * Guesses the field's validation rules based on it's type
      *
-     * @param \stdClass $oField The field object
-     * @param string    $sType  The database type
+     * @param Field  $oField The field object
+     * @param string $sType  The database type
+     *
+     * @return $this
      */
-    protected function describeFieldsGuessValidation(&$oField, $sType)
+    protected function describeFieldsGuessValidation(Field &$oField, string $sType): self
     {
         preg_match('/^(.*?)(\((.+?)\)(.*))?$/', $sType, $aMatches);
 
@@ -2981,19 +3001,23 @@ abstract class Base
              * Numeric
              */
             case 'int':
-                $oField->validation[] = FormValidation::RULE_INTEGER;
+                $oField
+                    ->addValidation(FormValidation::RULE_INTEGER);
 
                 if ($sExtra === 'unsigned') {
                     //  @todo (Pablo - 2019-12-18) - Use FormValidation::rule when CI is no longer a dependency
-                    $oField->validation[] = sprintf('%s[%s]', FormValidation::RULE_GREATER_THAN, -1);
+                    $oField
+                        ->addValidation(sprintf('%s[%s]', FormValidation::RULE_GREATER_THAN, -1));
                 }
                 break;
 
             case 'tinyint':
                 if ($oField->type === 'boolean') {
-                    $oField->validation[] = FormValidation::RULE_IS_BOOL;
+                    $oField
+                        ->addValidation(FormValidation::RULE_IS_BOOL);
                 } else {
-                    $oField->validation[] = FormValidation::RULE_INTEGER;
+                    $oField
+                        ->addValidation(FormValidation::RULE_INTEGER);
                 }
                 break;
 
@@ -3003,7 +3027,8 @@ abstract class Base
             case 'varchar':
                 if ($iLength) {
                     //  @todo (Pablo - 2019-12-18) - Use FormValidation::rule when CI is no longer a dependency
-                    $oField->validation[] = sprintf('%s[%s]', FormValidation::RULE_MAX_LENGTH, $iLength);
+                    $oField
+                        ->addValidation(sprintf('%s[%s]', FormValidation::RULE_MAX_LENGTH, $iLength));
                 }
                 break;
 
@@ -3011,11 +3036,13 @@ abstract class Base
              * Date and time
              */
             case 'date':
-                $oField->validation[] = FormValidation::RULE_VALID_DATE;
+                $oField
+                    ->addValidation(FormValidation::RULE_VALID_DATE);
                 break;
 
             case 'datetime':
-                $oField->validation[] = FormValidation::RULE_VALID_DATETIME;
+                $oField
+                    ->addValidation(FormValidation::RULE_VALID_DATETIME);
                 break;
 
             /**
@@ -3024,7 +3051,14 @@ abstract class Base
             case 'enum':
             case 'set':
                 //  @todo (Pablo - 2019-12-18) - Use FormValidation::rule when CI is no longer a dependency
-                $oField->validation[] = sprintf('%s[%s]', FormValidation::RULE_IN_LIST, implode(',', array_keys($oField->options)));
+                $oField
+                    ->addValidation(
+                        sprintf(
+                            '%s[%s]',
+                            FormValidation::RULE_IN_LIST,
+                            implode(',', array_keys($oField->options))
+                        )
+                    );
                 break;
 
             /**
@@ -3033,14 +3067,24 @@ abstract class Base
             default:
                 if ($iLength) {
                     //  @todo (Pablo - 2019-12-18) - Use FormValidation::rule when CI is no longer a dependency
-                    $oField->validation[] = sprintf('%s[%s]', FormValidation::RULE_MAX_LENGTH, $iLength);
+                    $oField
+                        ->addValidation(
+                            sprintf(
+                                '%s[%s]',
+                                FormValidation::RULE_MAX_LENGTH,
+                                $iLength
+                            )
+                        );
                 }
                 break;
         }
 
         if ($this->isAutoSetSlugs() && $oField->key == $this->getColumn('label')) {
-            $oField->validation[] = FormValidation::RULE_REQUIRED;
+            $oField
+                ->addValidation(FormValidation::RULE_REQUIRED);
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
