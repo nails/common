@@ -253,13 +253,13 @@ class Field
     /**
      * Set the default property
      *
-     * @param mixed $sDefault The value to set
+     * @param mixed $mDefault The value to set
      *
      * @return $this
      */
-    public function setDefault($sDefault): self
+    public function setDefault($mDefault): self
     {
-        $this->default = $sDefault;
+        $this->default = $mDefault;
         return $this;
     }
 
@@ -422,6 +422,22 @@ class Field
     public function setData(array $aData): self
     {
         $this->data = $aData;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Adds a new data attribute to the stack
+     *
+     * @param string $sKey   The data key
+     * @param mixed  $mValue The value
+     *
+     * @return $this
+     */
+    public function addData(string $sKey, $mValue): self
+    {
+        $this->validation[$sKey] = $mValue;
         return $this;
     }
 }
