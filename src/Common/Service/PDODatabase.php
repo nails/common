@@ -10,15 +10,23 @@
 
 namespace Nails\Common\Service;
 
+use Exception;
 use Nails\Common\Exception\Database\ConnectionException;
 use Nails\Common\Exception\Database\TransactionException;
+use PDO;
+use PDOStatement;
 
+/**
+ * Class PDODatabase
+ *
+ * @package Nails\Common\Service
+ */
 class PDODatabase
 {
     /**
      * The PDO handler
      *
-     * @var \PDO
+     * @var PDO
      */
     protected $oDb;
 
@@ -27,7 +35,7 @@ class PDODatabase
      *
      * @var bool
      */
-    protected $transactionRunning = false;
+    protected $bIsTransactionRunning = false;
 
     // --------------------------------------------------------------------------
 
@@ -42,15 +50,16 @@ class PDODatabase
     /**
      * Connect to the database
      *
-     * @param  string $sDbHost The database host
-     * @param  string $sDbUser The database user
-     * @param  string $sDbPass The database password
-     * @param  string $sDbName The database
+     * @param string     $sDbHost The database host
+     * @param string     $sDbUser The database user
+     * @param string     $sDbPass The database password
+     * @param string     $sDbName The database
+     * @param string|int $sDbPort The database port
      *
      * @return void
      * @throws ConnectionException
      */
-    public function connect($sDbHost = '', $sDbUser = '', $sDbPass = '', $sDbName = '')
+    public function connect($sDbHost = '', $sDbUser = '', $sDbPass = '', $sDbName = '', $sDbPort = '')
     {
         //  Close the connection if one is open
         if (!is_null($this->oDb)) {
@@ -61,17 +70,25 @@ class PDODatabase
         $sDbUser = !empty($sDbUser) ? $sDbUser : \Nails\Config::get('DB_USERNAME');
         $sDbPass = !empty($sDbPass) ? $sDbPass : \Nails\Config::get('DB_PASSWORD');
         $sDbName = !empty($sDbName) ? $sDbName : \Nails\Config::get('DB_DATABASE');
+        $sDbPort = !empty($sDbPort) ? $sDbPort : \Nails\Config::get('DB_PORT');
 
         try {
 
-            $this->oDb = new \PDO(
-                'mysql:host=' . $sDbHost . ';dbname=' . $sDbName . ';charset=utf8', $sDbUser, $sDbPass
+            $this->oDb = new PDO(
+                sprintf(
+                    'mysql:host=%s;port=%s;dbname=%s;charset=utf8',
+                    $sDbHost,
+                    $sDbPort,
+                    $sDbName
+                ),
+                $sDbUser,
+                $sDbPass
             );
 
             $this->oDb->exec('set names utf8');
-            $this->oDb->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            $this->oDb->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new ConnectionException(
                 sprintf(self::ERR_MSG_CONNECTION_FAILED, $e->getCode(), $e->getMessage()),
                 self::ERR_NUM_CONNECTION_FAILED
@@ -84,11 +101,12 @@ class PDODatabase
     /**
      * Execute a query
      *
-     * @param  string $sQuery The query to execute
+     * @param string $sQuery The query to execute
      *
-     * @return \PDOStatement
+     * @return PDOStatement
+     * @throws ConnectionException
      */
-    public function query($sQuery)
+    public function query($sQuery): PDOStatement
     {
         if (empty($this->oDb)) {
             $this->connect();
@@ -102,11 +120,12 @@ class PDODatabase
     /**
      * Prepares an SQL query
      *
-     * @param  string $sQuery The query to prepare
+     * @param string $sQuery The query to prepare
      *
-     * @return \PDOStatement
+     * @return PDOStatement
+     * @throws ConnectionException
      */
-    public function prepare($sQuery)
+    public function prepare($sQuery): PDOStatement
     {
         if (empty($this->oDb)) {
             $this->connect();
@@ -121,8 +140,9 @@ class PDODatabase
      * Returns the ID created by the previous write query
      *
      * @return string
+     * @throws ConnectionException
      */
-    public function lastInsertId()
+    public function lastInsertId(): string
     {
         if (empty($this->oDb)) {
             $this->connect();
@@ -136,9 +156,9 @@ class PDODatabase
     /**
      * Exposes the database API
      *
-     * @return \PDO
+     * @return PDO
      */
-    public function db()
+    public function db(): PDO
     {
         return $this->oDb;
     }
@@ -148,11 +168,12 @@ class PDODatabase
     /**
      * Escapes a string to make it query safe
      *
-     * @param  string $sString The string to escape
+     * @param string $sString The string to escape
      *
      * @return string
+     * @throws ConnectionException
      */
-    public function escape($sString)
+    public function escape($sString): string
     {
         if (empty($this->oDb)) {
             $this->connect();
@@ -166,10 +187,11 @@ class PDODatabase
     /**
      * Starts a DB transaction
      *
-     * @return boolean
+     * @return $this
      * @throws TransactionException
+     * @throws ConnectionException
      */
-    public function transactionStart()
+    public function transactionStart(): self
     {
         if (empty($this->oDb)) {
             $this->connect();
@@ -178,13 +200,13 @@ class PDODatabase
         try {
 
             $this->oDb->beginTransaction();
-            $this->transactionRunning = true;
+            $this->bIsTransactionRunning = true;
 
-            return true;
-
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new TransactionException($e->getMessage(), $e->getCode());
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -192,10 +214,11 @@ class PDODatabase
     /**
      * Commits a DB transaction
      *
-     * @return boolean
+     * @return $this
      * @throws TransactionException
+     * @throws ConnectionException
      */
-    public function transactionCommit()
+    public function transactionCommit(): self
     {
         if (empty($this->oDb)) {
             $this->connect();
@@ -204,24 +227,25 @@ class PDODatabase
         try {
 
             $this->oDb->commit();
-            $this->transactionRunning = false;
+            $this->bIsTransactionRunning = false;
 
-            return true;
-
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new TransactionException($e->getMessage(), $e->getCode());
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Rollsback a DB transaction
+     * Rolls back a DB transaction
      *
-     * @return boolean
+     * @return $this
      * @throws TransactionException
+     * @throws ConnectionException
      */
-    public function transactionRollback()
+    public function transactionRollback(): self
     {
         if (empty($this->oDb)) {
             $this->connect();
@@ -230,13 +254,13 @@ class PDODatabase
         try {
 
             $this->oDb->rollback();
-            $this->transactionRunning = false;
+            $this->bIsTransactionRunning = false;
 
-            return true;
-
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new TransactionException($e->getMessage(), $e->getCode());
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -244,10 +268,10 @@ class PDODatabase
     /**
      * Returns whether a transaction is currently running
      *
-     * @return boolean
+     * @return bool
      */
-    public function isTransactionRunning()
+    public function isTransactionRunning(): bool
     {
-        return $this->transactionRunning;
+        return $this->bIsTransactionRunning;
     }
 }

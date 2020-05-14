@@ -16,6 +16,7 @@
 
 namespace Nails\Common\Service;
 
+use CI_DB_mysqli_driver;
 use Nails\Common\Exception\Database\ConnectionException;
 use Nails\Config;
 use Nails\Environment;
@@ -132,7 +133,7 @@ class Database
     /**
      * The database object
      *
-     * @var \CI_DB_mysqli_driver
+     * @var CI_DB_mysqli_driver
      */
     private $oDb;
 
@@ -171,6 +172,7 @@ class Database
             'hostname' => Config::get('DB_HOST'),
             'username' => Config::get('DB_USERNAME'),
             'password' => Config::get('DB_PASSWORD'),
+            'port'     => Config::get('DB_PORT'),
             'database' => Environment::is([Environment::ENV_TEST, Environment::ENV_HTTP_TEST])
                 ? Testing::DB_NAME
                 : Config::get('DB_DATABASE'),

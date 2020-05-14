@@ -54,6 +54,9 @@ final class Bootstrap
 
     /**
      * @param $sEntryPoint
+     *
+     * @throws Common\Exception\EnvironmentException
+     * @throws Common\Exception\FactoryException
      */
     public static function run($sEntryPoint)
     {
@@ -160,6 +163,8 @@ final class Bootstrap
 
     /**
      * Set Nails constants
+     *
+     * @throws Common\Exception\EnvironmentException
      */
     public static function setNailsConstants()
     {
@@ -224,16 +229,18 @@ final class Bootstrap
         Config::default('APP_DB_PREFIX', 'app_');
 
         //  Potentially vary between deployments
-        //  @todo (Pablo - 2020-03-02) - Remove, kept for backwards compatability
+        //  @todo (Pablo - 2020-03-02) - Remove, kept for backwards compatibility
         Config::default('DEPLOY_DB_HOST', '127.0.0.1');
         Config::default('DEPLOY_DB_USERNAME');
         Config::default('DEPLOY_DB_PASSWORD');
         Config::default('DEPLOY_DB_DATABASE');
+        Config::default('DEPLOY_DB_PORT', 3306);
 
         Config::default('DB_HOST', Config::get('DEPLOY_DB_HOST'));
         Config::default('DB_USERNAME', Config::get('DEPLOY_DB_USERNAME'));
         Config::default('DB_PASSWORD', Config::get('DEPLOY_DB_PASSWORD'));
         Config::default('DB_DATABASE', Config::get('DEPLOY_DB_DATABASE'));
+        Config::default('DB_PORT', Config::get('DEPLOY_DB_PORT'));
 
         //  App
         Config::default('APP_PRIVATE_KEY', '');
@@ -649,6 +656,9 @@ final class Bootstrap
 
     /**
      * Handles system shutdown
+     *
+     * @throws Common\Exception\FactoryException
+     * @throws Common\Exception\NailsException
      */
     public static function shutdown()
     {
