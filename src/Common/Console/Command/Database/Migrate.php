@@ -71,6 +71,12 @@ class Migrate extends Base
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Database Name'
+            )
+            ->addOption(
+                'dbPort',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Database Port'
             );
     }
 
@@ -107,6 +113,7 @@ class Migrate extends Base
         $sDbUser = $oInput->getOption('dbUser') ?: Config::get('DB_USERNAME');
         $sDbPass = $oInput->getOption('dbPass') ?: Config::get('DB_PASSWORD');
         $sDbName = $oInput->getOption('dbName') ?: Config::get('DB_DATABASE');
+        $iDbPort = $oInput->getOption('dbPort') ?: Config::get('DB_PORT');
 
         //  Check we have a database to connect to
         if (empty($sDbName)) {
@@ -116,7 +123,7 @@ class Migrate extends Base
 
         //  Get the DB object
         $this->oDb = Factory::service('PDODatabase');
-        $this->oDb->connect($sDbHost, $sDbUser, $sDbPass, $sDbName);
+        $this->oDb->connect($sDbHost, $sDbUser, $sDbPass, $sDbName, $iDbPort);
 
         //  Test the db
         $iResult = $this->oDb->query('SHOW Tables LIKE \'' . Config::get('NAILS_DB_PREFIX') . 'migration\'')->rowCount();

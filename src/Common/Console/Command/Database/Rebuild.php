@@ -51,6 +51,12 @@ class Rebuild extends Base
             InputOption::VALUE_OPTIONAL,
             'Database Name'
         );
+        $this->addOption(
+            'dbPort',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'Database Port'
+        );
     }
 
     // --------------------------------------------------------------------------
@@ -86,6 +92,7 @@ class Rebuild extends Base
         $sDbUser = $oInput->getOption('dbUser') ?: Config::get('DB_USERNAME');
         $sDbPass = $oInput->getOption('dbPass') ?: Config::get('DB_PASSWORD');
         $sDbName = $oInput->getOption('dbName') ?: Config::get('DB_DATABASE');
+        $iDbPort = $oInput->getOption('dbPort') ?: Config::get('DB_Port');
 
         //  Check we have a database to connect to
         if (empty($sDbName)) {
@@ -94,7 +101,7 @@ class Rebuild extends Base
 
         //  Get the DB object
         $oDb = Factory::service('PDODatabase');
-        $oDb->connect($sDbHost, $sDbUser, $sDbPass, $sDbName);
+        $oDb->connect($sDbHost, $sDbUser, $sDbPass, $sDbName, $iDbPort);
 
         // --------------------------------------------------------------------------
 
