@@ -73,7 +73,7 @@ final class Component
         $aNailsData = !empty($aPackage['extra']->nails) ? (array) $aPackage['extra']->nails : [];
 
         $this->slug         = ArrayHelper::getFromArray('name', $aPackage);
-        $this->namespace    = ArrayHelper::getFromArray('namespace', $aNailsData);
+        $this->namespace    = '\\' . ltrim(ArrayHelper::getFromArray('namespace', $aNailsData), '\\');
         $this->name         = ArrayHelper::getFromArray('name', $aNailsData, $this->slug);
         $this->description  = ArrayHelper::getFromArray('description', $aNailsData, ArrayHelper::getFromArray('description', $aPackage));
         $this->homepage     = ArrayHelper::getFromArray('homepage', $aNailsData, ArrayHelper::getFromArray('homepage', $aPackage));
