@@ -69,7 +69,7 @@ class Event
      */
     protected function autoLoadSubscriptions($sNamespace): void
     {
-        $sClassName = '\\' . $sNamespace . 'Events';
+        $sClassName = $sNamespace . 'Events';
 
         if (class_exists($sClassName)) {
 
