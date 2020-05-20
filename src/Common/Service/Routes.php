@@ -234,6 +234,11 @@ class Routes
         }
 
         fclose($fHandle);
+
+        if (function_exists('opcache_invalidate')) {
+            opcache_invalidate($this->getRoutesFile(), true);
+        }
+
         return true;
     }
 
