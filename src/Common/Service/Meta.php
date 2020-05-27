@@ -183,6 +183,7 @@ class Meta
     {
         $sAppName     = $oMetaData->getTitles()->implode();
         $sDescription = $oMetaData->getDescription();
+        $aKeywords    = array_filter(array_unique($oMetaData->getKeywords()));
 
         // --------------------------------------------------------------------------
 
@@ -292,7 +293,8 @@ class Meta
         $this
             ->add('apple-mobile-web-app-title', $sAppName)
             ->add('application-name', $sAppName)
-            ->add('description', $sDescription);
+            ->add('description', $sDescription)
+            ->add('keywords', implode(', ', $aKeywords));
 
         if ($oMetaData->getThemeColour()) {
             $this
