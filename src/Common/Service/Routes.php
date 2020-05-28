@@ -39,7 +39,7 @@ class Routes
     /**
      * Whether the routes can be written
      *
-     * @var boolean
+     * @var bool
      */
     protected $bCanWriteRoutes;
 
@@ -183,7 +183,7 @@ class Routes
     /**
      * Write the routes file
      *
-     * @return boolean
+     * @return bool
      */
     protected function writeFile()
     {
@@ -247,7 +247,7 @@ class Routes
     /**
      * Determine whether or not the routes can be written
      *
-     * @return boolean
+     * @return bool
      */
     public function canWriteRoutes()
     {
