@@ -78,17 +78,13 @@ class DefaultSeed extends Base
         }
 
         for ($i = 0; $i < static::CONFIG_NUM_PER_SEED; $i++) {
-            try {
-                $aData = $this->generate($aFields);
-                if (classUses($oModel, Localised::class)) {
-                    if (!$oModel->create($aData, false, $oDefaultLocale)) {
-                        throw new NailsException('Failed to create item. ' . $oModel->lastError());
-                    }
-                } elseif (!$oModel->create($aData)) {
+            $aData = $this->generate($aFields);
+            if (classUses($oModel, Localised::class)) {
+                if (!$oModel->create($aData, false, $oDefaultLocale)) {
                     throw new NailsException('Failed to create item. ' . $oModel->lastError());
                 }
-            } catch (\Exception $e) {
-                echo "\nSEED ERROR: " . $e->getMessage();
+            } elseif (!$oModel->create($aData)) {
+                throw new NailsException('Failed to create item. ' . $oModel->lastError());
             }
         }
     }
