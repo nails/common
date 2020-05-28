@@ -13,7 +13,7 @@
 namespace Nails\Common\Service;
 
 use Nails\Auth;
-use Nails\Common\Controller\Nails404Controller;
+use Nails\Common\Controller\NailsMockController;
 use Nails\Common\Events;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\ViewNotFoundException;
@@ -299,29 +299,6 @@ class ErrorHandler
 
         // --------------------------------------------------------------------------
 
-        /**
-         * If the SYSTEM_READY event hasn't been fired then we know that the app's controller hasn't been executed.
-         * Instantiate this controller to allow the full application stack to execute, this allows the 404 views to
-         * make use of variables defined by /App/Controller/Base. Also, load CI's core services as they might not
-         * have been loaded.
-         */
-
-        /** @var Event $oEvent */
-        $oEvent = Factory::service('Event');
-        if (!$oEvent->hasBeenTriggered(Events::SYSTEM_READY)) {
-
-            require_once BASEPATH . 'core/Controller.php';
-
-            load_class('Output', 'core');
-            load_class('Security', 'core');
-            load_class('Input', 'core');
-            load_class('Lang', 'core');
-
-            new Nails404Controller();
-        }
-
-        // --------------------------------------------------------------------------
-
         set_status_header(HttpCodes::STATUS_NOT_FOUND);
         $this->renderErrorView(
             '404',
@@ -378,7 +355,16 @@ class ErrorHandler
                 $sMessage .= '</small>';
             }
 
-            set_status_header(401);
+            // --------------------------------------------------------------------------
+
+            /**
+             * Define a constant for easier identification of 404 pages
+             */
+            Config::set('NAILS_IS_401', true);
+
+            // --------------------------------------------------------------------------
+
+            set_status_header(HttpCodes::STATUS_UNAUTHORIZED);
             $this->renderErrorView(
                 '401',
                 [
@@ -435,6 +421,8 @@ class ErrorHandler
         $aData = [],
         $bFlushBuffer = true
     ) {
+
+        static::instantiateMockController();
 
         //  Flush the output buffer
         if ($bFlushBuffer) {
@@ -501,6 +489,34 @@ class ErrorHandler
 
         } else {
             static::halt('404 Page Not Found', '', HttpCodes::STATUS_NOT_FOUND);
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * If the SYSTEM_READY event hasn't been fired then we know that the app's controller hasn't been executed.
+     * Instantiate this controller to allow the full application stack to execute, this allows the 404 views to
+     * make use of variables defined by /App/Controller/Base. Also, load CI's core services as they might not
+     * have been loaded.
+     *
+     * @throws FactoryException
+     */
+    protected static function instantiateMockController()
+    {
+        /** @var Event $oEvent */
+        $oEvent = Factory::service('Event');
+
+        if (!$oEvent->hasBeenTriggered(Events::SYSTEM_READY)) {
+
+            require_once BASEPATH . 'core/Controller.php';
+
+            load_class('Output', 'core');
+            load_class('Security', 'core');
+            load_class('Input', 'core');
+            load_class('Lang', 'core');
+
+            new NailsMockController();
         }
     }
 
