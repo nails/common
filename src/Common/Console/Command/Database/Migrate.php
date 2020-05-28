@@ -4,6 +4,7 @@ namespace Nails\Common\Console\Command\Database;
 
 use Nails\Common\Factory\Component;
 use Nails\Common\Service\Database;
+use Nails\Common\Service\Routes;
 use Nails\Config;
 use Nails\Components;
 use Nails\Console\Command\Base;
@@ -204,6 +205,16 @@ class Migrate extends Base
         $oOutput->writeln('');
         $oOutput->writeln('<comment>Starting migration...</comment>');
 
+        /**
+         * Ignore route rewriting until the whole migration is complete. Some actions
+         * might internally trigger a rewrite which could cause thigns ot fall over as
+         * the code will have expected the migration to finish. We rewrite the routes
+         * afterwards anyway so any internal request will [eventually] be honoured.
+         */
+        /** @var Routes $oRoutes */
+        $oRoutes = Factory::service('Routes');
+        $oRoutes->ignoreRewriteRequests(true);
+
         // --------------------------------------------------------------------------
 
         //  Start migrating
@@ -235,6 +246,7 @@ class Migrate extends Base
         // --------------------------------------------------------------------------
 
         //  Rewrite Routes
+        $oRoutes->ignoreRewriteRequests(false);
         $oOutput->writeln('<comment>Rewriting routes...</comment>');
         $this->callCommand('routes:rewrite', [], false, true);
 
