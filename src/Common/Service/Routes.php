@@ -51,6 +51,13 @@ class Routes
     public $sCantWriteReason;
 
     /**
+     * Ignore requests to rewrite routes
+     *
+     * @var bool
+     */
+    protected $bIgnoreRewriteRequests = false;
+
+    /**
      * The routes to write
      *
      * @var array
@@ -95,17 +102,35 @@ class Routes
     // --------------------------------------------------------------------------
 
     /**
+     * Sets whether rewrite requests are ignored or not
+     *
+     * @param bool $bIgnore Whether to ignore rewrite requests
+     *
+     * @return $this
+     */
+    public function ignoreRewriteRequests(bool $bIgnore): self
+    {
+        $this->bIgnoreRewriteRequests = $bIgnore;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Update routes
      *
      * @param string          $sModule For which module to restrict the route update
      * @param OutputInterface $oOutput A Symfony OutputInterface to write logs to
      *
-     * @return boolean
+     * @return bool
      * @throws \Exception
      */
     public function update(string $sModule = null, OutputInterface $oOutput = null)
     {
-        if (!$this->bCanWriteRoutes) {
+        if ($this->bIgnoreRewriteRequests) {
+            return true;
+
+        } elseif (!$this->bCanWriteRoutes) {
             $this->setError($this->sCantWriteReason);
             return false;
         }
