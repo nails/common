@@ -88,6 +88,7 @@ class MX_Router extends CI_Router
 
 	protected function _set_404override_controller()
 	{
+
 		$this->_set_module_path($this->routes['404_override']);
 	}
 
@@ -120,7 +121,7 @@ class MX_Router extends CI_Router
 		}
 
 		/* get the segments array elements */
-		list($module, $directory, $controller) = array_pad($segments, 3, NULL);
+		[$module, $directory, $controller] = array_pad($segments, 3, NULL);
 
 		/* check modules */
 		foreach (Modules::$locations as $location => $offset)
@@ -236,11 +237,12 @@ class MX_Router extends CI_Router
 
 	public function set_class($class)
 	{
-		$suffix = $this->config->item('controller_suffix');
-		if (strpos($class, $suffix) === FALSE)
-		{
-			$class .= $suffix;
-		}
+		$suffix = (string) $this->config->item('controller_suffix');
+
+        if ($suffix && strpos($class, $suffix) === FALSE) {
+            $class .= $suffix;
+        }
+
 		parent::set_class($class);
 	}
 }
