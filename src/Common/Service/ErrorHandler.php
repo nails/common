@@ -120,7 +120,7 @@ class ErrorHandler
 
         $sDriverNamespace = ArrayHelper::getFromArray('namespace', (array) $oErrorHandler->data);
         $sDriverClass     = ArrayHelper::getFromArray('class', (array) $oErrorHandler->data);
-        $sClassName       = '\\' . $sDriverNamespace . $sDriverClass;
+        $sClassName       = $sDriverNamespace . $sDriverClass;
 
         if (!class_exists($sClassName)) {
             static::halt('Expected: ' . $sClassName, 'Driver class not available');
@@ -186,7 +186,7 @@ class ErrorHandler
         $oDriver          = $this->getDefaultDriver();
         $sDriverNamespace = ArrayHelper::getFromArray('namespace', (array) $oDriver->data);
         $sDriverClass     = ArrayHelper::getFromArray('class', (array) $oDriver->data);
-        return '\\' . $sDriverNamespace . $sDriverClass;
+        return $sDriverNamespace . $sDriverClass;
     }
 
     // --------------------------------------------------------------------------

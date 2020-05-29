@@ -57,7 +57,7 @@ class ListEvents extends Base
                 continue;
             }
 
-            $sClass = '\\' . $oComponent->namespace . 'Events';
+            $sClass = $oComponent->namespace . 'Events';
             if (class_exists($sClass)) {
 
                 if (!classExtends($sClass, \Nails\Common\Events\Base::class)) {
