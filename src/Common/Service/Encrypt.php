@@ -24,11 +24,11 @@ class Encrypt
     /**
      * Encodes a given value using the supplied key
      *
-     * @param  mixed  $mValue The value to encode
-     * @param  string $sSalt  The salt to add to the key
+     * @param mixed  $mValue The value to encode
+     * @param string $sSalt  The salt to add to the key
      *
-     * @throws EnvironmentException
      * @return string
+     * @throws EnvironmentException
      */
     public static function encode($mValue, $sSalt = '')
     {
@@ -50,12 +50,12 @@ class Encrypt
     /**
      * Decodes a given value using the supplied key
      *
-     * @param  mixed  $sCipher The value to decode
-     * @param  string $sSalt   The salt to add to the key
+     * @param mixed  $sCipher The value to decode
+     * @param string $sSalt   The salt to add to the key
      *
-     * @throws EnvironmentException
-     * @throws DecodeException
      * @return string
+     * @throws DecodeException
+     * @throws EnvironmentException
      */
     public static function decode($sCipher, $sSalt = '')
     {
@@ -82,7 +82,7 @@ class Encrypt
     /**
      * Returns the key to use, salted
      *
-     * @param  string $sSalt The salt to add to the key
+     * @param string $sSalt The salt to add to the key
      *
      * @return string
      */
