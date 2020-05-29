@@ -11,6 +11,7 @@ namespace Nails\Common\Console\Command\Logs;
 
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Service\Logger;
+use Nails\Config;
 use Nails\Console\Command\Base;
 use Nails\Factory;
 use RecursiveDirectoryIterator;
@@ -30,7 +31,20 @@ class Clean extends Base
      *
      * @var int
      */
-    const LOG_RETENTION = 180;
+    protected $iLogRetention;
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Clean constructor.
+     *
+     * @param string|null $name
+     */
+    public function __construct(string $name = null)
+    {
+        $this->iLogRetention = (int) Config::get('LOG_RETENTION', 180);
+        parent::__construct($name);
+    }
 
     // --------------------------------------------------------------------------
 
@@ -39,9 +53,10 @@ class Clean extends Base
      */
     protected function configure()
     {
+        d('configure');
         $this
             ->setName('logs:clean')
-            ->setDescription('Deletes log files older than ' . static::LOG_RETENTION . ' days');
+            ->setDescription('Deletes log files older than ' . $this->iLogRetention . ' days');
     }
 
     // --------------------------------------------------------------------------
@@ -59,7 +74,7 @@ class Clean extends Base
         parent::execute($oInput, $oOutput);
 
         $this->banner('Logs: Clean');
-        $oOutput->writeln('Cleaning log files older than <comment>' . static::LOG_RETENTION . '</comment> days');
+        $oOutput->writeln('Cleaning log files older than <comment>' . $this->iLogRetention . '</comment> days');
         $oOutput->writeln('');
 
         /** @var Logger $oLogger */
@@ -107,7 +122,7 @@ class Clean extends Base
 
                 $oModified = \DateTime::createFromFormat('U', $oFile->getMTime());
 
-                if ($oNow->diff($oModified, true)->days > static::LOG_RETENTION) {
+                if ($oNow->diff($oModified, true)->days > $this->iLogRetention) {
                     $i++;
                     $this->oOutput->writeln(' ↳ Removing <comment>' . $sFileName . '</comment>');
                 }
