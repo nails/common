@@ -11,16 +11,6 @@ use Nails\Factory;
 use Symfony\Component\Mime\MimeTypes;
 
 return [
-
-    'properties' => [
-        /**
-         * The number of days to keep log files
-         *
-         * @var int
-         */
-        'LOG_RETENTION' => 180,
-    ],
-
     'services' => [
         'AppSetting'                     => function (): Service\AppSetting {
             if (class_exists('\App\Common\Service\AppSetting')) {

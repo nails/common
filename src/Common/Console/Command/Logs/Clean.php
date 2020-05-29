@@ -26,13 +26,22 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Clean extends Base
 {
     /**
+     * The number of days to keep log files
+     *
+     * @var int
+     */
+    const LOG_RETENTION = 180;
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Configure the logs:clean command
      */
     protected function configure()
     {
         $this
             ->setName('logs:clean')
-            ->setDescription('Deletes log files older than ' . Factory::property('LOG_RETENTION') . ' days');
+            ->setDescription('Deletes log files older than ' . static::LOG_RETENTION . ' days');
     }
 
     // --------------------------------------------------------------------------
@@ -50,7 +59,7 @@ class Clean extends Base
         parent::execute($oInput, $oOutput);
 
         $this->banner('Logs: Clean');
-        $oOutput->writeln('Cleaning log files older than <comment>' . Factory::property('LOG_RETENTION') . '</comment> days');
+        $oOutput->writeln('Cleaning log files older than <comment>' . static::LOG_RETENTION . '</comment> days');
         $oOutput->writeln('');
 
         /** @var Logger $oLogger */
@@ -98,7 +107,7 @@ class Clean extends Base
 
                 $oModified = \DateTime::createFromFormat('U', $oFile->getMTime());
 
-                if ($oNow->diff($oModified, true)->days > Factory::property('LOG_RETENTION')) {
+                if ($oNow->diff($oModified, true)->days > static::LOG_RETENTION) {
                     $i++;
                     $this->oOutput->writeln(' ↳ Removing <comment>' . $sFileName . '</comment>');
                 }
