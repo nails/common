@@ -38,33 +38,23 @@ class ListEvents extends Base
     {
         parent::execute($oInput, $oOutput);
 
-        $sFilter     = $this->oInput->getArgument('component');
-        $aEvents     = [];
-        $aComponents = array_merge(
-            [
-                (object) [
-                    'namespace' => 'App\\',
-                    'slug'      => 'app',
-                ],
-            ],
-            Components::available()
-        );
+        $sFilter = $this->oInput->getArgument('component');
+        $aEvents = [];
 
-        foreach ($aComponents as $oComponent) {
+        foreach (Components::available() as $oComponent) {
 
-            $sPattern = '/' . str_replace('/', '\/', $sFilter) . '/';
-            if (!empty($sFilter) && !preg_match($sPattern, $oComponent->slug)) {
+            if (!empty($sFilter) && !preg_match('/' . preg_quote($sFilter, '/') . '/', $oComponent->slug)) {
                 continue;
             }
 
             $sClass = $oComponent->namespace . 'Events';
+
             if (class_exists($sClass)) {
 
                 if (!classExtends($sClass, \Nails\Common\Events\Base::class)) {
                     throw new EventException($sClass . ' must extend ' . \Nails\Common\Events\Base::class);
-                }
 
-                if (method_exists($sClass, 'info')) {
+                } elseif (method_exists($sClass, 'info')) {
                     $aComponentEvents = call_user_func([$sClass, 'info']);
                     if (!empty($aComponentEvents)) {
                         $aEvents[$oComponent->slug] = $aComponentEvents;
