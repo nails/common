@@ -488,7 +488,13 @@ class ErrorHandler
             echo $oView->load($sValidPath, [], true);
 
         } else {
-            static::halt('404 Page Not Found', '', HttpCodes::STATUS_NOT_FOUND);
+            static::halt(
+                getFromArray('sMessage', $aData),
+                getFromArray('sSubject', $aData),
+                is_numeric($sView)
+                    ? (int) $sView
+                    : HttpCodes::STATUS_INTERNAL_SERVER_ERROR
+            );
         }
     }
 
