@@ -53,7 +53,6 @@ class Clean extends Base
      */
     protected function configure()
     {
-        d('configure');
         $this
             ->setName('logs:clean')
             ->setDescription('Deletes log files older than ' . $this->iLogRetention . ' days');
