@@ -422,6 +422,17 @@ class ErrorHandler
         $bFlushBuffer = true
     ) {
 
+        //  Stops cascading errors if CI isn't available
+        if (!class_exists('MX_LANG')) {
+            static::halt(
+                getFromArray('sMessage', $aData),
+                getFromArray('sSubject', $aData),
+                is_numeric($sView)
+                    ? (int) $sView
+                    : HttpCodes::STATUS_INTERNAL_SERVER_ERROR
+            );
+        }
+
         static::instantiateMockController();
 
         //  Flush the output buffer
