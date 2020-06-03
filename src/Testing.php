@@ -53,7 +53,9 @@ class Testing
      */
     public function __construct($sEntryPoint)
     {
-        $this->migrateDatabase($sEntryPoint);
+        $this
+            ->setDatabaseName()
+            ->migrateDatabase($sEntryPoint);
     }
 
     // --------------------------------------------------------------------------
@@ -69,38 +71,63 @@ class Testing
     // --------------------------------------------------------------------------
 
     /**
-     * Migrate the test database
+     * Sets the database name in the config
+     *
+     * @return $this
      */
-    private function migrateDatabase($sEntryPoint)
+    private function setDatabaseName(): self
     {
+        Config::set('DB_DATABASE', static::DB_NAME);
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Migrate the test database
+     *
+     * @return $this
+     */
+    private function migrateDatabase($sEntryPoint): self
+    {
+        Config::set('DB_DATABASE', static::DB_NAME);
         $oInputInterface = new ArrayInput([
             'command'          => !empty($_ENV['TEST_DB_MODE']) && $_ENV['TEST_DB_MODE'] === 'fresh' ? 'db:rebuild' : 'db:migrate',
             '--dbName'         => static::DB_NAME,
             '--no-interaction' => true,
+            '-vvv'             => true,
         ]);
 
         $oApp = new App();
         $oApp->go($sEntryPoint, $oInputInterface, null, false);
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Set up the testing environment; called before any tests are run
+     *
+     * @return $this
      */
-    public function setUp()
+    public function setUp(): self
     {
         \App\Tests\Bootstrap::setUp();
+        return $this;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Tear down the testing environment; called after all tests have been run
+     *
+     * @return $this
      */
-    public function tearDown()
+    public function tearDown(): self
     {
         \App\Tests\Bootstrap::tearDown();
+        return $this;
     }
 
     // --------------------------------------------------------------------------
