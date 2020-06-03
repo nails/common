@@ -86,4 +86,18 @@ class ClassCollection extends Collection
             return Tools::classExtends($sItem, $sParent);
         });
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Filters the collection by classes which can be instantiated
+     *
+     * @return $this
+     */
+    public function whichCanBeInstantiated(): self
+    {
+        return $this->filter(function ($sItem) {
+            return Tools::classCanBeInstantiated($sItem);
+        });
+    }
 }

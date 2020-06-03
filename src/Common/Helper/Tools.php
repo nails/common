@@ -122,7 +122,7 @@ class Tools
             if (strpos($sCIDRMask, '/') !== false) {
 
                 //  Hat tip: http://stackoverflow.com/a/594134/789224
-                list ($sSubnet, $sBits) = explode('/', $sCIDRMask);
+                [$sSubnet, $sBits] = explode('/', $sCIDRMask);
 
                 $iBits   = (int) $sBits;
                 $iIp     = ip2long($sIp);
@@ -211,5 +211,21 @@ class Tools
             ltrim($sParent, '\\'),
             class_parents($mClass)
         );
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Checks if a class can be instantiated
+     *
+     * @param object|string $mClass The class to test, either as an object or a string
+     *
+     * @return bool
+     * @throws \ReflectionException
+     */
+    public static function classCanBeInstantiated($mClass): bool
+    {
+        $oReflectionClass = new \ReflectionClass($mClass);
+        return $oReflectionClass->isInstantiable();
     }
 }
