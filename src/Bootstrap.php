@@ -25,6 +25,13 @@ use Nails\Common\Service\Routes;
 final class Bootstrap
 {
     /**
+     * Whether the app has been bootstrapped already
+     *
+     * @var bool
+     */
+    private static $sBootstrapped = false;
+
+    /**
      * The entry point
      *
      * @var string
@@ -60,6 +67,12 @@ final class Bootstrap
      */
     public static function run($sEntryPoint)
     {
+        if (static::$sBootstrapped) {
+            return;
+        } else {
+            static::$sBootstrapped = true;
+        }
+
         Profiler::mark('BOOTSTRAPPING:START');
 
         self::setEntryPoint($sEntryPoint);
