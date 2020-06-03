@@ -424,9 +424,22 @@ class ErrorHandler
 
         //  Stops cascading errors if CI isn't available
         if (!class_exists('MX_LANG')) {
+            $sSubject = getFromArray('sSubject', $aData);
+            $sMessage = getFromArray('sMessage', $aData);
+            $sFile    = getFromArray('sFile', $aData);
+            $sLine    = getFromArray('sLine', $aData);
+
+            if (!empty($sFile)) {
+                $sMessage .= '; File: ' . $sFile;
+            }
+
+            if (!empty($sLine)) {
+                $sMessage .= '; Line: ' . $sLine;
+            }
+
             static::halt(
-                getFromArray('sMessage', $aData),
-                getFromArray('sSubject', $aData),
+                $sMessage,
+                $sSubject,
                 is_numeric($sView)
                     ? (int) $sView
                     : HttpCodes::STATUS_INTERNAL_SERVER_ERROR
