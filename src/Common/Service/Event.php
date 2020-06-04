@@ -53,9 +53,6 @@ class Event
                 $this->autoLoadSubscriptions($oComponent->namespace);
             }
         }
-
-        //  Any subscriptions for the app?
-        $this->autoLoadSubscriptions('App\\');
     }
 
     // --------------------------------------------------------------------------
