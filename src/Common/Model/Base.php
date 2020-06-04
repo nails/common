@@ -894,8 +894,10 @@ abstract class Base
         $aIds = array_filter($aIds);
         $aIds = array_values($aIds);
 
+        /** @var Database $oDb */
         $oDb = Factory::service('Database');
         try {
+
             $oDb->trans_begin();
             foreach ($aIds as $iId) {
                 if (!$this->delete($iId)) {
@@ -904,6 +906,7 @@ abstract class Base
             }
             $oDb->trans_commit();
             return true;
+
         } catch (\Exception $e) {
             $oDb->trans_rollback();
             $this->setError($e->getMessage());
@@ -924,8 +927,24 @@ abstract class Base
     public function deleteWhere(array $aData)
     {
         $oResults = $this->getAllRawQuery(['where' => $aData]);
-        while ($oResult = $oResults->unbuffered_row()) {
-            $this->delete($oResult->id);
+
+        /** @var Database $oDb */
+        $oDb = Factory::service('Database');
+        try {
+
+            $oDb->trans_begin();
+            while ($oResult = $oResults->unbuffered_row()) {
+                if (!$this->delete($oResult->id)) {
+                    throw new ModelException('Failed to delete item with ID ' . $oResult->id . '. ' . $this->lastError());
+                }
+            }
+            $oDb->trans_commit();
+            return true;
+
+        } catch (\Exception $e) {
+            $oDb->trans_rollback();
+            $this->setError($e->getMessage());
+            return false;
         }
     }
 
