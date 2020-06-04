@@ -914,6 +914,24 @@ abstract class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Deletes items generated as a result of a lookup
+     *
+     * @param array $aData The `where` coponent of a config array
+     *
+     * @throws FactoryException
+     * @throws ModelException
+     */
+    public function deleteWhere(array $aData)
+    {
+        $oResults = $this->getAllRawQuery(['where' => $aData]);
+        while ($oResult = $oResults->unbuffered_row()) {
+            $this->delete($oResult->id);
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Unmarks an object as deleted
      *
      * If destructive deletion is enabled then this method will return null.
