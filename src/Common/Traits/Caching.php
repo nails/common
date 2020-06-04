@@ -28,6 +28,13 @@ trait Caching
     protected static $CACHING_ENABLED = true;
 
     /**
+     * Whether to skip the cache for the next query
+     *
+     * @var bool
+     */
+    protected static $SKIP_CACHE = false;
+
+    /**
      * Holds the cache values
      *
      * @var array
@@ -38,20 +45,39 @@ trait Caching
 
     /**
      * Enable the cache
+     *
+     * @return $this
      */
-    public function enableCache()
+    public function enableCache(): self
     {
         static::$CACHING_ENABLED = true;
+        return $this;
     }
 
     // --------------------------------------------------------------------------
 
     /**
      * Disable the cache
+     *
+     * @return $this
      */
-    public function disableCache()
+    public function disableCache(): self
     {
         static::$CACHING_ENABLED = false;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Skips the next call to getCache
+     *
+     * @return $this
+     */
+    public function skipCache(): self
+    {
+        static::$SKIP_CACHE = true;
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -164,6 +190,9 @@ trait Caching
         if (!static::$CACHING_ENABLED) {
             return null;
         } elseif (empty($sKey)) {
+            return null;
+        } elseif (static::$SKIP_CACHE) {
+            static::$SKIP_CACHE = false;
             return null;
         }
 
