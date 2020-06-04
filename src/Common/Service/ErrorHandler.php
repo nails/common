@@ -537,7 +537,7 @@ class ErrorHandler
         /** @var Event $oEvent */
         $oEvent = Factory::service('Event');
 
-        if (!$oEvent->hasBeenTriggered(Events::SYSTEM_READY)) {
+        if (!$oEvent->hasBeenTriggered(Events::SYSTEM_STARTING)) {
 
             require_once BASEPATH . 'core/Controller.php';
 

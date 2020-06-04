@@ -25,12 +25,17 @@ class Events extends Base
     const SYSTEM_STARTUP = 'SYSTEM:STARTUP';
 
     /**
+     * Fired when the Base Nails controller is about to run
+     */
+    const SYSTEM_STARTING = 'SYSTEM:STARTING';
+
+    /**
      * Fired when the system is ready and the controller is about to be constructed
      */
     const SYSTEM_READY = 'SYSTEM:READY';
 
     /**
-     * Fired when the system shutsdown, this is the last event to be fired
+     * Fired when the system shuts down, this is the last event to be fired
      */
     const SYSTEM_SHUTDOWN = 'SYSTEM:SHUTDOWN';
 

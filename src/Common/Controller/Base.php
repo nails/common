@@ -82,6 +82,9 @@ abstract class Base extends \MX_Controller
     public function __construct()
     {
         Profiler::mark('CONTROLLER:PRE');
+        Factory::service('Event')
+            ->trigger(Events::SYSTEM_STARTING);
+
         parent::__construct();
 
         // --------------------------------------------------------------------------
@@ -298,6 +301,7 @@ abstract class Base extends \MX_Controller
      */
     protected function passwordProtected(): self
     {
+
         /** @var Input $oInput */
         $oInput = Factory::service('Input');
 
