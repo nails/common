@@ -198,6 +198,13 @@ abstract class Base
      */
     const RESOURCE_PROVIDER = null;
 
+    /**
+     * The property of the config array which contains the search keywords
+     *
+     * @var string
+     */
+    const KEYWORD_PROPERTY = 'keywords';
+
     // --------------------------------------------------------------------------
 
     /**
@@ -1110,8 +1117,8 @@ abstract class Base
 
         // --------------------------------------------------------------------------
 
-        if (!empty($aData['keywords'])) {
-            $this->applySearchConditionals($aData, $aData['keywords']);
+        if (!empty($aData[static::KEYWORD_PROPERTY])) {
+            $this->applySearchConditionals($aData, $aData[static::KEYWORD_PROPERTY]);
         }
 
         // --------------------------------------------------------------------------
@@ -2141,8 +2148,8 @@ abstract class Base
 
         // --------------------------------------------------------------------------
 
-        if (!empty($aData['keywords'])) {
-            $this->applySearchConditionals($aData, $aData['keywords']);
+        if (!empty($aData[static::KEYWORD_PROPERTY])) {
+            $this->applySearchConditionals($aData, $aData[static::KEYWORD_PROPERTY]);
         }
 
         // --------------------------------------------------------------------------
@@ -2184,7 +2191,7 @@ abstract class Base
             $iPage = null;
         }
 
-        $this->applySearchConditionals($aData, $sKeywords);
+        $aData[static::KEYWORD_PROPERTY] = $sKeywords;
 
         return (object) [
             'page'    => $iPage,
