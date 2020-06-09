@@ -2223,7 +2223,7 @@ abstract class Base
             if (is_array($mField)) {
 
                 $sMappedFields = array_map(function ($sInput) use ($sAlias) {
-                    if (strpos($sInput, '.') !== false) {
+                    if (strpos($sInput, '.') !== false || preg_match('/^\(.*\)$/', $sInput)) {
                         return $sInput;
                     } else {
                         return $sAlias . $sInput;
@@ -2231,12 +2231,15 @@ abstract class Base
                 }, $mField);
 
                 $aData['or_like'][] = ['CONCAT_WS(" ", ' . implode(',', $sMappedFields) . ')', $sKeywords];
+
+            } elseif (preg_match('/^\(.*\)$/', $mField)) {
+                $aData['or_like'][] = [$mField, $sKeywords];
+
+            } elseif (strpos($mField, '.') !== false) {
+                $aData['or_like'][] = [$mField, $sKeywords];
+
             } else {
-                if (strpos($mField, '.') !== false) {
-                    $aData['or_like'][] = [$mField, $sKeywords];
-                } else {
-                    $aData['or_like'][] = [$sAlias . $mField, $sKeywords];
-                }
+                $aData['or_like'][] = [$sAlias . $mField, $sKeywords];
             }
         }
     }
