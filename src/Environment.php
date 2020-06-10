@@ -57,7 +57,6 @@ final class Environment
                 $oInput = Factory::service('Input');
                 if (self::not(self::ENV_PROD) && $oInput->header(Testing::TEST_HEADER_NAME) === Testing::TEST_HEADER_VALUE) {
                     self::set(self::ENV_HTTP_TEST);
-                    //  @todo (Pablo - 2018-11-21) - Consider halting execution if on prod and a test header is received
                 }
 
             } catch (\Exception $e) {
