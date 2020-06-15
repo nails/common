@@ -89,6 +89,18 @@ abstract class Base extends \MX_Controller
 
         // --------------------------------------------------------------------------
 
+        //  Populate some standard fields
+        $this->oLocale   = Factory::service('Locale');
+        $this->oMetaData = Factory::service('MetaData');
+        $this->oMetaData->setLocale($this->oLocale->get());
+
+        //  @todo (Pablo - 2020-02-24) - Remove this/backwards compatibility
+        $this->data              =& getControllerData();
+        $this->data['oMetaData'] = $this->oMetaData;
+        $this->data['page']      = $this->oMetaData;
+
+        // --------------------------------------------------------------------------
+
         $this
             ->maintenanceMode()
             ->setErrorReporting()
@@ -105,16 +117,6 @@ abstract class Base extends \MX_Controller
             ->setGlobalCss();
 
         // --------------------------------------------------------------------------
-
-        //  Populate some standard fields
-        $this->oLocale   = Factory::service('Locale');
-        $this->oMetaData = Factory::service('MetaData');
-        $this->oMetaData->setLocale($this->oLocale->get());
-
-        //  @todo (Pablo - 2020-02-24) - Remove this/backwards compatibility
-        $this->data              =& getControllerData();
-        $this->data['oMetaData'] = $this->oMetaData;
-        $this->data['page']      = $this->oMetaData;
 
         static::populateUserFeedback($this->data);
 
