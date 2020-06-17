@@ -205,6 +205,13 @@ abstract class Base
      */
     const KEYWORD_PROPERTY = 'keywords';
 
+    /**
+     * Any fields which should be considered sensitive
+     *
+     * @var string[]
+     */
+    const SENSITIVE_FIELDS = [];
+
     // --------------------------------------------------------------------------
 
     /**
@@ -3132,6 +3139,18 @@ abstract class Base
         }
 
         return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns any sensitive fields
+     *
+     * @return string[]
+     */
+    public function sensitiveFields(): array
+    {
+        return static::SENSITIVE_FIELDS;
     }
 
     // --------------------------------------------------------------------------
