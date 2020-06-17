@@ -138,14 +138,9 @@ class Routes
         // --------------------------------------------------------------------------
 
         //  Look for modules who wish to write to the routes file
-        $aModules = Components::modules();
+        $aModules        = Components::modules();
+        $aModules['app'] = Components::getApp();
 
-        //  Append the app
-        $aModules['app'] = (object) [
-            'slug'      => 'app',
-            'name'      => 'APP',
-            'namespace' => 'App\\',
-        ];
 
         foreach ($aModules as $oModule) {
 
