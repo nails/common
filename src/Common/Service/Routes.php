@@ -141,6 +141,8 @@ class Routes
         $aModules        = Components::modules();
         $aModules['app'] = Components::getApp();
 
+        //  Reset routes cache
+        $this->aRoutes = [];
 
         foreach ($aModules as $oModule) {
 
