@@ -1305,10 +1305,10 @@ class Asset
                 'URL'  => Config::get('NAILS_ASSETS_URL'),
                 'LANG' => (object) [],
                 'USER' => (object) [
-                    'ID'    => activeUser('id') ? activeUser('id') : null,
-                    'FNAME' => activeUser('first_name'),
-                    'LNAME' => activeUser('last_name'),
-                    'EMAIL' => activeUser('email'),
+                    'ID'    => function_exists('activeUser') ? ((int) activeUser('id') ?: null) : null,
+                    'FNAME' => function_exists('activeUser') ? activeUser('first_name') : null,
+                    'LNAME' => function_exists('activeUser') ? activeUser('last_name') : null,
+                    'EMAIL' => function_exists('activeUser') ? activeUser('email') : null,
                 ],
             ],
         ];

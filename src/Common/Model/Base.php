@@ -2768,7 +2768,9 @@ abstract class Base
      */
     public function isAutoSetUsers()
     {
-        return static::AUTO_SET_USER;
+        return static::AUTO_SET_USER
+            && function_exists('activeUser')
+            && function_exists('isLoggedIn');
     }
 
     // --------------------------------------------------------------------------

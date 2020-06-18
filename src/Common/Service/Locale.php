@@ -269,7 +269,9 @@ class Locale
     {
         $this->setFromString(
             $oLocale,
-            activeUser('locale') ?? ''
+            function_exists('activeUser') && activeUser('locale')
+                ? activeUser('locale')
+                : ''
         );
 
         return $this;
