@@ -9,13 +9,6 @@ if (!function_exists('form_text')) {
     }
 }
 
-if (!function_exists('form_wysiwyg')) {
-    function form_wysiwyg($data = '', $value = '', $extra = '')
-    {
-        return Form::wysiwyg($data, $value, $extra);
-    }
-}
-
 if (!function_exists('form_hidden')) {
     function form_hidden($data = '', $value = '', $extra = '')
     {

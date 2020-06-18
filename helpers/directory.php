@@ -13,9 +13,9 @@
 use Nails\Common\Helper\Directory;
 
 if (!function_exists('deleteDir')) {
-    function deleteDir($sDir)
+    function deleteDir($sDir): void
     {
-        return Directory::delete($sDir);
+        Directory::delete($sDir);
     }
 }
 

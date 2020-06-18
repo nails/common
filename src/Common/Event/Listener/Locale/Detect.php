@@ -22,6 +22,8 @@ class Detect extends Subscription
      */
     protected $oLocaleService;
 
+    // --------------------------------------------------------------------------
+
     /**
      * Detect constructor.
      */

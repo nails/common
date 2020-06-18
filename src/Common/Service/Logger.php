@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Provides enhanced logging facilities
  *
@@ -118,7 +117,7 @@ class Logger
      */
     public function dummy($sEnabled = true): self
     {
-        $this->oLogger->bDummy = $sMute;
+        $this->oLogger->bDummy = $sEnabled;
         return $this;
     }
 }
