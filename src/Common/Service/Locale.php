@@ -154,7 +154,7 @@ class Locale
             ->setScript(Factory::factory('LocaleScript', null, static::DEFAULT_SCRIPT));
 
         foreach (static::SUPPORTED_LOCALES as $sLocale) {
-            list($sLanguage, $sRegion, $sScript) = static::parseLocaleString($sLocale);
+            [$sLanguage, $sRegion, $sScript] = static::parseLocaleString($sLocale);
             $this->aSupportedLocales[] = Factory::factory('Locale')
                 ->setLanguage(Factory::factory('LocaleLanguage', null, $sLanguage))
                 ->setRegion(Factory::factory('LocaleRegion', null, $sRegion))
@@ -361,7 +361,7 @@ class Locale
     {
         if (!empty($sLocale)) {
 
-            list($sLanguage, $sRegion, $sScript) = static::parseLocaleString($sLocale);
+            [$sLanguage, $sRegion, $sScript] = static::parseLocaleString($sLocale);
 
             if ($sLanguage) {
                 $oLocale
