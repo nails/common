@@ -13,7 +13,6 @@
 
 namespace Nails\Common\Controller;
 
-use Nails\Auth;
 use Nails\Common\Events;
 use Nails\Common\Exception\AssetException;
 use Nails\Common\Exception\FactoryException;
