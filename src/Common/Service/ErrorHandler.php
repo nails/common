@@ -12,7 +12,6 @@
 
 namespace Nails\Common\Service;
 
-use Nails\Auth;
 use Nails\Common\Controller\NailsMockController;
 use Nails\Common\Events;
 use Nails\Common\Exception\FactoryException;
@@ -340,20 +339,6 @@ class ErrorHandler
 
             $sMessage = 'The page you are trying to view is restricted. Sadly you do not have enough ';
             $sMessage .= 'permissions to see its content.';
-
-            if (function_exists('wasAdmin') && wasAdmin()) {
-
-                /** @var Auth\Model\User $oUserModel */
-                $oUserModel = Factory::model('User', Auth\Constants::MODULE_SLUG);
-                $oRecovery  = $oUserModel->getAdminRecoveryData();
-
-                $sMessage .= '<br /><br />';
-                $sMessage .= '<small>';
-                $sMessage .= 'However, it looks like you are logged in as someone else.';
-                $sMessage .= '<br />' . anchor($oRecovery->loginUrl, 'Log back in as ' . $oRecovery->name);
-                $sMessage .= ' and try again.';
-                $sMessage .= '</small>';
-            }
 
             // --------------------------------------------------------------------------
 
