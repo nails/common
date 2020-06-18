@@ -12,7 +12,6 @@
 namespace Nails\Common\Factory;
 
 use GuzzleHttp\Client;
-use Nails\Auth\Resource\User;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Helper\ArrayHelper;
@@ -158,7 +157,7 @@ abstract class HttpRequest
     /**
      * Set the required headers for imitating a user
      *
-     * @param User|int $oUser The user to imitate
+     * @param object|int $oUser The user to imitate
      *
      * @return $this
      */
@@ -166,11 +165,13 @@ abstract class HttpRequest
     {
         if ($oUser === null) {
             return $this;
+
         } elseif (is_int($oUser)) {
             $oUser = (object) ['id' => $oUser];
-        } elseif (!$oUser instanceof User) {
+
+        } elseif (!is_object($oUser) || !property_exists($oUser, 'id')) {
             throw new \InvalidArgumentException(
-                sprintf('Passed user must be an instance of %s or an integer', User::class)
+                sprintf('Passed user must be an object with an `id` property or an integer')
             );
         }
 
