@@ -108,9 +108,7 @@ abstract class Base extends \MX_Controller
             ->definePackages()
             ->passwordProtected()
             ->initiateDatabase()
-            ->instantiateUser()
             ->instantiateLanguages()
-            ->isUserSuspended()
             ->instantiateDateTime()
             ->generateRoutes()
             ->setGlobalJs()
@@ -439,33 +437,6 @@ abstract class Base extends \MX_Controller
 
         // --------------------------------------------------------------------------
 
-        /**
-         * Set the timezones.
-         * Choose the user's timezone - starting with their preference, followed by
-         * the app's default.
-         */
-
-        if (activeUser('timezone')) {
-            $sTimezoneUser = activeUser('timezone');
-        } else {
-            $sTimezoneUser = $oDateTimeService->getTimezoneDefault();
-        }
-
-        $oDateTimeService->setTimezones('UTC', $sTimezoneUser);
-
-        // --------------------------------------------------------------------------
-
-        //  Set the user date/time formats
-        $sFormatDate = activeUser('datetime_format_date');
-        $sFormatDate = $sFormatDate ? $sFormatDate : Config::get('APP_DEFAULT_DATETIME_FORMAT_DATE_SLUG');
-
-        $sFormatTime = activeUser('datetime_format_time');
-        $sFormatTime = $sFormatTime ? $sFormatTime : Config::get('APP_DEFAULT_DATETIME_FORMAT_TIME_SLUG');
-
-        $oDateTimeService->setUserFormats($sFormatDate, $sFormatTime);
-
-        // --------------------------------------------------------------------------
-
         return $this;
     }
 
@@ -525,23 +496,16 @@ abstract class Base extends \MX_Controller
 
         // --------------------------------------------------------------------------
 
-        /**
-         * Set any global preferences for this user, e.g languages, fall back to the
-         * app's default language (defined in config.php).
-         */
-
-        $sUserLangCode = activeUser('language');
-
-        if (!empty($sUserLangCode)) {
-            Config::default('RENDER_LANG_CODE', $sUserLangCode);
-        } else {
-            Config::default('RENDER_LANG_CODE', Config::get('APP_DEFAULT_LANG_CODE'));
-        }
-
         //  Set the language config item which CodeIgniter will use.
+        //  @todo (Pablo - 2020-06-18) - Move away from this ASAP
         /** @var \Nails\Common\Service\Config $oConfig */
         $oConfig = Factory::service('Config');
-        $oConfig->set_item('language', Config::get('RENDER_LANG_CODE'));
+        $oConfig->set_item(
+            'language',
+            function_exists('activeUser') && activeUser('language')
+                ? activeUser('language')
+                : Config::get('APP_DEFAULT_LANG_CODE')
+        );
 
         //  Load the Nails. generic lang file
         get_instance()->lang->load('nails');
@@ -609,60 +573,9 @@ abstract class Base extends \MX_Controller
     protected function initiateDatabase(): self
     {
         Factory::service('Database');
-
         return $this;
     }
 
-    // --------------------------------------------------------------------------
-
-    /**
-     * Set up the active user
-     *
-     * @return $this
-     * @throws FactoryException
-     * @throws ModelException
-     */
-    protected function instantiateUser(): self
-    {
-        /**
-         * Find a remembered user and initialise the user model; this routine checks
-         * the user's cookies and set's up the session for an existing or new user.
-         */
-
-        /** @var Auth\Model\User $oUserModel */
-        $oUserModel = Factory::model('User', Auth\Constants::MODULE_SLUG);
-        $oUserModel->init();
-
-        return $this;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Determines whether the active user is suspended and, if so, logs them out.
-     *
-     * @return $this
-     * @throws FactoryException
-     */
-    protected function isUserSuspended(): self
-    {
-        //  Check if this user is suspended
-        if (isLoggedIn() && activeUser('is_suspended')) {
-
-            /** @var Auth\Service\Authentication $oAuthService */
-            $oAuthService = Factory::service('Authentication', Auth\Constants::MODULE_SLUG);
-            get_instance()->lang->load('auth/auth');
-
-            $oAuthService->logout();
-
-            /** @var Session $oSession */
-            $oSession = Factory::service('Session');
-            $oSession->setFlashData('error', lang('auth_login_fail_suspended'));
-            redirect('/');
-        }
-
-        return $this;
-    }
 
     // --------------------------------------------------------------------------
 
