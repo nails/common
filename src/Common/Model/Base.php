@@ -2281,7 +2281,7 @@ abstract class Base
 
             $iCounter++;
 
-        } while (!$this->isValidSlug($sSlug, $aData, $iIgnoreId));
+        } while (!$this->isValidSlug($sSlug, $iIgnoreId, $aData));
 
         return $sSlugTest;
     }
