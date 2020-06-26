@@ -2271,29 +2271,62 @@ abstract class Base
      */
     protected function generateSlug(string $sLabel, int $iIgnoreId = null, array $aData = [])
     {
+        $sSlug    = $this->generateSlugBase($sLabel);
         $iCounter = 0;
-        $oDb      = Factory::service('Database');
-        $sSlug    = Transliterator::transliterate($sLabel);
 
         do {
 
-            if ($iCounter) {
-                $sSlugTest = $sSlug . '-' . $iCounter;
-            } else {
-                $sSlugTest = $sSlug;
-            }
+            $sSlugTest = $iCounter
+                ? $sSlug . '-' . $iCounter
+                : $sSlug;
 
-            if ($iIgnoreId) {
-                $oDb->where($this->tableIdColumn . ' !=', $iIgnoreId);
-            }
-
-            $oDb->where($this->tableSlugColumn, $sSlugTest);
-            $this->generateSlugHook($aData);
             $iCounter++;
 
-        } while ($oDb->count_all_results($this->getTableName()));
+        } while (!$this->isValidSlug($sSlug, $aData, $iIgnoreId));
 
         return $sSlugTest;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the slug's base, compiled from the label
+     *
+     * @param string $sLabel The item's label
+     *
+     * @return string
+     */
+    protected function generateSlugBase(string $sLabel): string
+    {
+        return Transliterator::transliterate($sLabel);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * checks whether a slug is valid
+     *
+     * @param string   $sSlug     The slug to check
+     * @param int|null $iIgnoreId An ID to ignore when checking
+     * @param array    $aData     Any data to pass to generateSlugHook()
+     *
+     * @return bool
+     * @throws FactoryException
+     * @throws ModelException
+     */
+    public function isValidSlug(string $sSlug, int $iIgnoreId = null, array $aData = []): bool
+    {
+        /** @var Database $oDb */
+        $oDb = Factory::service('Database');
+
+        if ($iIgnoreId) {
+            $oDb->where($this->getColumn('id') . ' !=', $iIgnoreId);
+        }
+
+        $oDb->where($this->getColumn('slug'), $sSlug);
+        $this->generateSlugHook($aData);
+
+        return $oDb->count_all_results($this->getTableName()) === 0;
     }
 
     // --------------------------------------------------------------------------
