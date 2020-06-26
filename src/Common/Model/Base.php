@@ -774,9 +774,8 @@ abstract class Base
                 }
 
                 $aData[$this->tableSlugColumn] = $this->generateSlug(
-                    $aData[$this->tableLabelColumn],
-                    $iIgnoreId,
-                    $aData
+                    $aData,
+                    $iIgnoreId
                 );
             }
         }
@@ -2263,15 +2262,15 @@ abstract class Base
     /**
      * Generates a unique slug
      *
-     * @param string $sLabel    The label from which to generate a slug
-     * @param int    $iIgnoreId The ID of an item to ignore
+     * @param array $aData     The data to use when generating a slug
+     * @param int   $iIgnoreId The ID of an item to ignore
      *
      * @return string
      * @throws ModelException
      */
-    protected function generateSlug(string $sLabel, int $iIgnoreId = null, array $aData = [])
+    protected function generateSlug(array $aData = [], int $iIgnoreId = null)
     {
-        $sSlug    = $this->generateSlugBase($sLabel);
+        $sSlug    = $this->generateSlugBase($aData);
         $iCounter = 0;
 
         do {
@@ -2296,9 +2295,11 @@ abstract class Base
      *
      * @return string
      */
-    protected function generateSlugBase(string $sLabel): string
+    protected function generateSlugBase(array $aData): string
     {
-        return Transliterator::transliterate($sLabel);
+        return Transliterator::transliterate(
+            getFromArray($this->getColumn('label'), $aData)
+        );
     }
 
     // --------------------------------------------------------------------------
