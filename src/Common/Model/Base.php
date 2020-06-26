@@ -976,7 +976,7 @@ abstract class Base
      * @throws FactoryException
      * @throws ModelException
      */
-    public function restore($iId): bool
+    public function restore($iId): ?bool
     {
         $this->triggerEvent(static::EVENT_RESTORING, [$iId, $this]);
 
