@@ -2297,6 +2297,15 @@ abstract class Base
      */
     protected function generateSlugBase(array $aData): string
     {
+        if (!array_key_exists($this->getColumn('label'), $aData)) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Key `%s` is required when generating slugs',
+                    $this->getColumn('label')
+                )
+            );
+        }
+
         return Transliterator::transliterate(
             getFromArray($this->getColumn('label'), $aData)
         );
