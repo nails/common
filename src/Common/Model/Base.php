@@ -2292,24 +2292,25 @@ abstract class Base
      * Returns the slug's base, compiled from the label
      *
      * @param string $sLabel The item's label
+     * @param string $sKey   The key to use from the supplied data array
      *
      * @return string
      */
-    protected function generateSlugBase(array $aData, string $sProperty = null): string
+    protected function generateSlugBase(array $aData, string $sKey = null): string
     {
-        $sProperty = $sProperty ?? $this->getColumn('label');
+        $sKey = $sKey ?? $this->getColumn('label');
 
-        if (!array_key_exists($sProperty, $aData)) {
+        if (!array_key_exists($sKey, $aData)) {
             throw new \InvalidArgumentException(
                 sprintf(
                     'Key `%s` is required when generating slugs',
-                    $sProperty
+                    $sKey
                 )
             );
         }
 
         return Transliterator::transliterate(
-            getFromArray($sProperty, $aData)
+            getFromArray($sKey, $aData)
         );
     }
 
