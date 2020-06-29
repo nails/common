@@ -2295,19 +2295,21 @@ abstract class Base
      *
      * @return string
      */
-    protected function generateSlugBase(array $aData): string
+    protected function generateSlugBase(array $aData, string $sProperty = null): string
     {
-        if (!array_key_exists($this->getColumn('label'), $aData)) {
+        $sProperty = $sProperty ?? $this->getColumn('label');
+
+        if (!array_key_exists($sProperty, $aData)) {
             throw new \InvalidArgumentException(
                 sprintf(
                     'Key `%s` is required when generating slugs',
-                    $this->getColumn('label')
+                    $sProperty
                 )
             );
         }
 
         return Transliterator::transliterate(
-            getFromArray($this->getColumn('label'), $aData)
+            getFromArray($sProperty, $aData)
         );
     }
 
