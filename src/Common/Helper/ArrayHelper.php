@@ -313,4 +313,42 @@ class ArrayHelper
 
         return $aResult;
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Read an array or object using dot notation
+     *
+     * @param array|object $mIterable An item to traverse
+     * @param string       $sPath     The item's path
+     *
+     * @return mixed
+     */
+    public static function dot($mIterable, string $sPath)
+    {
+        if (empty($sPath)) {
+            return $mIterable;
+        }
+
+        if (!is_array($mIterable)) {
+            $mIterable = (array) $mIterable;
+        }
+
+        if (is_array($mIterable) && array_key_exists($sPath, $mIterable)) {
+            return $mIterable[$sPath];
+        }
+
+        $aSegments = explode('.', $sPath);
+        $sSegment  = array_shift($aSegments);
+
+        if (array_key_exists($sSegment, $mIterable)) {
+            if (count($aSegments) === 0) {
+                return $mIterable[$sSegment];
+            } else {
+                return static::dot($mIterable[$sSegment], implode('.', $aSegments));
+            }
+        }
+
+        return null;
+    }
 }
