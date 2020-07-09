@@ -788,7 +788,7 @@ trait GetCountCommon
         // --------------------------------------------------------------------------
 
         //  Filter out bad sort values
-        if (!empty($aOut['order']) && !in_array($aOut['order'], ['ASC', 'DESC'])) {
+        if (!empty($aOut['order']) && !in_array($aOut['order'], ['ASC', 'DESC', 'RANDOM'])) {
             $aOut['order'] = '';
         }
 
