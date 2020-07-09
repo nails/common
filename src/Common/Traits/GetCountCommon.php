@@ -716,15 +716,19 @@ trait GetCountCommon
 
             } elseif (is_array($aData['sort'])) {
 
-                $mFirst = reset($aData['sort']);
+                $mColumn = $aData['sort']['column'] ?? reset($aData['sort']);
 
-                if (is_string($mFirst)) {
+                if (is_string($mColumn)) {
 
                     //  Single dimension array
                     $aSort = $this->getCountCommonParseSort($aData['sort']);
 
                     if (!empty($aSort['column'])) {
-                        $oDb->order_by($aSort['column'], $aSort['order']);
+                        $oDb->order_by(
+                            $aSort['column'],
+                            $aSort['order'],
+                            $aSort['escape']
+                        );
                     }
 
                 } else {
@@ -735,7 +739,11 @@ trait GetCountCommon
                         $aSort = $this->getCountCommonParseSort($sort);
 
                         if (!empty($aSort['column'])) {
-                            $oDb->order_by($aSort['column'], $aSort['order']);
+                            $oDb->order_by(
+                                $aSort['column'],
+                                $aSort['order'],
+                                $aSort['escape']
+                            );
                         }
                     }
                 }
@@ -755,39 +763,33 @@ trait GetCountCommon
      */
     protected function getCountCommonParseSort($mSort): array
     {
-        $aOut = ['column' => null, 'order' => null];
+        $aOut = [
+            'column' => '',
+            'order'  => '',
+            'escape' => true,
+        ];
 
         // --------------------------------------------------------------------------
 
         if (is_string($mSort)) {
-
             $aOut['column'] = $mSort;
             return $aOut;
-
-        } elseif (isset($mSort['column'])) {
-
-            $aOut['column'] = $mSort['column'];
-
-        } else {
-
-            //  Take the first element
-            $aOut['column'] = reset($mSort);
-            $aOut['column'] = is_string($aOut['column']) ? $aOut['column'] : null;
         }
 
+        // --------------------------------------------------------------------------
+
+        $aOut['column'] = $mSort['column'] ?? reset($mSort);
+
         if ($aOut['column']) {
+            $aOut['order']  = strtoupper($mSort['order'] ?? $mSort[1] ?? $aOut['order']);
+            $aOut['escape'] = (bool) ($mSort['escape'] ?? $mSort[2] ?? $aOut['escape']);
+        }
 
-            //  Determine order
-            if (isset($mSort['order'])) {
+        // --------------------------------------------------------------------------
 
-                $aOut['order'] = $mSort['order'];
-
-            } elseif (count($mSort) > 1) {
-
-                //  Take the last element
-                $aOut['order'] = end($mSort);
-                $aOut['order'] = is_string($aOut['order']) ? $aOut['order'] : null;
-            }
+        //  Filter out bad sort values
+        if (!empty($aOut['order']) && !in_array($aOut['order'], ['ASC', 'DESC'])) {
+            $aOut['order'] = '';
         }
 
         return $aOut;
