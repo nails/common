@@ -224,7 +224,7 @@ class Meta
             ->addRaw([
                 'tag'      => 'meta',
                 'property' => 'og:url',
-                'content'  => siteUrl(),
+                'content'  => current_url(),
             ])
             ->addRaw([
                 'tag'      => 'meta',
