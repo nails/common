@@ -34,4 +34,11 @@ class Country extends Resource
 
     /** @var Resource\Country\Language[] */
     public $languages;
+
+    // --------------------------------------------------------------------------
+
+    public function __toString()
+    {
+        return $this->iso;
+    }
 }

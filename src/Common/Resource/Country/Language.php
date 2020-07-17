@@ -19,4 +19,11 @@ class Language extends Resource
 
     /** @var string */
     public $native;
+
+    // --------------------------------------------------------------------------
+
+    public function __toString()
+    {
+        return $this->iso;
+    }
 }

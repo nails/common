@@ -16,4 +16,11 @@ class Continent extends Resource
 
     /** @var string */
     public $iso;
+
+    // --------------------------------------------------------------------------
+
+    public function __toString()
+    {
+        return $this->iso;
+    }
 }
