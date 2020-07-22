@@ -88,7 +88,7 @@ class FileCacheTest extends TestCase
         );
 
         $sDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . md5(microtime(true));
-        $this->assertDirectoryNotExists($sDir);
+        $this->assertDirectoryDoesNotExist($sDir);
 
         new Driver($sDir);
     }
@@ -196,7 +196,7 @@ class FileCacheTest extends TestCase
         $this->assertFileExists(static::$sDirPrivate . 'existing-file.txt');
         $bResult = static::$oCache->delete('existing-file.txt');
         $this->assertTrue($bResult);
-        $this->assertFileNotExists(static::$sDirPrivate . 'existing-file.txt');
+        $this->assertFileDoesNotExist(static::$sDirPrivate . 'existing-file.txt');
     }
 
     // --------------------------------------------------------------------------
@@ -206,7 +206,7 @@ class FileCacheTest extends TestCase
      */
     public function testCanDeleteInvalidItemFromPrivateCache()
     {
-        $this->assertFileNotExists(static::$sDirPrivate . 'non-existing-file.txt');
+        $this->assertFileDoesNotExist(static::$sDirPrivate . 'non-existing-file.txt');
         $bResult = static::$oCache->delete('non-existing-file.txt');
         $this->assertFalse($bResult);
     }
@@ -233,7 +233,7 @@ class FileCacheTest extends TestCase
         );
 
         $sDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . md5(microtime(true));
-        $this->assertDirectoryNotExists($sDir);
+        $this->assertDirectoryDoesNotExist($sDir);
 
         new Driver\AccessibleByUrl($sDir);
     }
@@ -340,7 +340,7 @@ class FileCacheTest extends TestCase
     {
         $this->assertFileExists(static::$sDirPublic . 'existing-file.txt');
         static::$oCache->public()->delete('existing-file.txt');
-        $this->assertFileNotExists(static::$sDirPublic . 'existing-file.txt');
+        $this->assertFileDoesNotExist(static::$sDirPublic . 'existing-file.txt');
     }
 
     // --------------------------------------------------------------------------
@@ -350,7 +350,7 @@ class FileCacheTest extends TestCase
      */
     public function testCanDeleteInvalidItemFromPublicCache()
     {
-        $this->assertFileNotExists(static::$sDirPublic . 'non-existing-file.txt');
+        $this->assertFileDoesNotExist(static::$sDirPublic . 'non-existing-file.txt');
         $bResult = static::$oCache->public()->delete('non-existing-file.txt');
         $this->assertFalse($bResult);
     }

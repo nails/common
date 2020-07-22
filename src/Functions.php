@@ -76,64 +76,6 @@ class Functions
     // --------------------------------------------------------------------------
 
     /**
-     * Attempts to get the top level part of a URL (i.e example.tld from sub.domains.example.tld).
-     * Hat tip: http://uk1.php.net/parse_url#104874
-     * BUG: 2 character TLD's break this
-     *
-     * @param string $sUrl The URL to analyse
-     *
-     * @return mixed        string on success, false on failure
-     * @todo: Try and fix this bug
-     *
-     */
-    public static function getDomainFromUrl($sUrl)
-    {
-        $sDomain = parse_url($sUrl, PHP_URL_HOST);
-        $bits    = explode('.', $sDomain);
-        $idz     = count($bits);
-        $idz     -= 3;
-
-        if (!isset($bits[($idz + 2)])) {
-
-            $aOut = false;
-
-        } elseif (strlen($bits[($idz + 2)]) == 2 && isset($bits[($idz + 2)])) {
-
-            $aOut = [
-                !empty($bits[$idz]) ? $bits[$idz] : false,
-                !empty($bits[$idz + 1]) ? $bits[$idz + 1] : false,
-                !empty($bits[$idz + 2]) ? $bits[$idz + 2] : false,
-            ];
-
-            $aOut = implode('.', array_filter($aOut));
-
-        } elseif (strlen($bits[($idz + 2)]) == 0) {
-
-            $aOut = [
-                !empty($bits[$idz]) ? $bits[$idz] : false,
-                !empty($bits[$idz + 1]) ? $bits[$idz + 1] : false,
-            ];
-
-            $aOut = implode('.', array_filter($aOut));
-
-        } elseif (isset($bits[($idz + 1)])) {
-
-            $aOut = [
-                !empty($bits[$idz + 1]) ? $bits[$idz + 1] : false,
-                !empty($bits[$idz + 2]) ? $bits[$idz + 2] : false,
-            ];
-            $aOut = implode('.', array_filter($aOut));
-
-        } else {
-            $aOut = false;
-        }
-
-        return $aOut;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Fetches the relative path between two directories
      * Hat tip: Thanks to Gordon for this one; http://stackoverflow.com/a/2638272/789224
      *

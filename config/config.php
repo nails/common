@@ -1,9 +1,9 @@
 <?php
 
+use Nails\Common\Helper\Url;
 use Nails\Common\Service\FileCache;
 use Nails\Config;
 use Nails\Factory;
-use Nails\Functions;
 
 /* Load the base config file from the CodeIgniter package */
 require Config::get('NAILS_CI_APP_PATH') . 'config/config.php';
@@ -49,11 +49,13 @@ $config['sess_regenerate_destroy'] = false;
 
 //  Cookie related variables
 $config['cookie_httponly'] = true;
+$config['cookie_domain']   = '';
 
 if (Config::get('CONF_COOKIE_DOMAIN')) {
 
     //  The developer has specified the specific domain to use for cookies
     $config['cookie_domain'] = Config::get('CONF_COOKIE_DOMAIN');
+
 } else {
 
     /**
@@ -61,25 +63,17 @@ if (Config::get('CONF_COOKIE_DOMAIN')) {
      * use of all specified BASE_URLs, i.e BASE_URL and SECURE_BASE_URL
      */
 
-    $config['cookie_domain'] = '';
+    $sBaseDomain       = Url::extractRegistrableDomain(Config::get('BASE_URL'));
+    $sSecureBaseDomain = Url::extractRegistrableDomain(Config::get('SECURE_BASE_URL'));
 
-    /**
-     * Are the BASE_URL and SECURE_BASE_URL on the same domain? if so, cool,
-     * if not then...
-     */
+    if ($sBaseDomain === $sSecureBaseDomain) {
 
-    $baseDomain       = Functions::getDomainFromUrl($config['base_url']);
-    $secureBaseDomain = Functions::getDomainFromUrl(Config::get('SECURE_BASE_URL'));
-
-    if ($baseDomain == $secureBaseDomain) {
-
-        //  If the two match, then define it
-        $config['cookie_domain'] = $baseDomain;
+        $config['cookie_domain'] = $sBaseDomain;
 
     } else {
 
         $_ERROR = 'The <code>BASE_URL</code> and <code>SECURE_BASE_URL</code> ';
-        $_ERROR .= 'constants do not share the same domain, this can cause issues ';
+        $_ERROR .= 'values do not share the same domain, this can cause issues ';
         $_ERROR .= 'with sessions.';
 
         include Config::get('NAILS_COMMON_PATH') . 'errors/startup_error.php';
