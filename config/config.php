@@ -1,9 +1,9 @@
 <?php
 
+use Nails\Common\Helper\Url;
 use Nails\Common\Service\FileCache;
 use Nails\Config;
 use Nails\Factory;
-use Nails\Functions;
 
 /* Load the base config file from the CodeIgniter package */
 require Config::get('NAILS_CI_APP_PATH') . 'config/config.php';
@@ -68,8 +68,8 @@ if (Config::get('CONF_COOKIE_DOMAIN')) {
      * if not then...
      */
 
-    $baseDomain       = Functions::getDomainFromUrl($config['base_url']);
-    $secureBaseDomain = Functions::getDomainFromUrl(Config::get('SECURE_BASE_URL'));
+    $sBaseDomain       = Url::extractRegistrableDomain(Config::get('BASE_URL'));
+    $sSecureBaseDomain = Url::extractRegistrableDomain(Config::get('SECURE_BASE_URL'));
 
     if ($baseDomain == $secureBaseDomain) {
 
