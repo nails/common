@@ -13,6 +13,8 @@
 namespace Nails\Common\Helper;
 
 use Nails\Bootstrap;
+use Nails\Common\Exception\FactoryException;
+use Nails\Common\Exception\NailsException;
 use Nails\Factory;
 use Pdp;
 use Psr\SimpleCache\InvalidArgumentException;
@@ -29,17 +31,18 @@ class Url
     // --------------------------------------------------------------------------
 
     /**
-     * Create a local URL based on your basepath. Segments can be passed via the
+     * Create a local URL based on your base path. Segments can be passed via the
      * first parameter either as a string or an array.
      *
      * @param mixed $sUrl         URI segments, either as a string or an array
      * @param bool  $bForceSecure Whether to force the url to be secure or not
      *
      * @return string
+     * @throws FactoryException
      */
     public static function siteUrl(string $sUrl = null, bool $bForceSecure = false): string
     {
-        $oConfig = \Nails\Factory::service('Config');
+        $oConfig = Factory::service('Config');
         return $oConfig::siteUrl($sUrl, $bForceSecure);
     }
 
@@ -54,11 +57,13 @@ class Url
      *
      * Overriding so as to call the post_system hook before exit()'ing
      *
-     * @param string  $sUrl              The uri to redirect to
-     * @param string  $sMethod           The redirect method
-     * @param integer $sHttpResponseCode The response code to send
+     * @param string $sUrl    The uri to redirect to
+     * @param string $sMethod The redirect method
+     * @param int    $iHttpResponseCode
      *
      * @return void
+     * @throws FactoryException
+     * @throws NailsException
      */
     public static function redirect(string $sUrl = null, string $sMethod = 'location', int $iHttpResponseCode = 302): void
     {
@@ -101,7 +106,7 @@ class Url
     public static function tel(string $sUrl = null, string $sTitle = '', string $sAttributes = ''): string
     {
         $sTitle = empty($sTitle) ? $sUrl : $sTitle;
-        $sUrl   = preg_replace('/[^\+0-9]/', '', $sUrl);
+        $sUrl   = preg_replace('/[^+0-9]/', '', $sUrl);
         $sUrl   = 'tel://' . $sUrl;
 
         return anchor($sUrl, $sTitle, $sAttributes);
