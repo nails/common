@@ -620,6 +620,8 @@ abstract class Base extends \MX_Controller
     {
         /** @var Asset $oAsset */
         $oAsset    = Factory::service('Asset');
+        $oAsset->compileGlobalData();
+
         $sCustomJs = appSetting('site_custom_js', 'site');
         if (!empty($sCustomJs)) {
             $oAsset->inline($sCustomJs, 'JS');
