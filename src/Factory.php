@@ -510,15 +510,13 @@ class Factory
         //  CI base helpers
         require_once BASEPATH . 'core/Common.php';
 
-        $aComponents = [];
-        foreach (Components::available() as $oModule) {
-            $aComponents[] = (object) [
-                'slug'     => $oModule->slug,
-                'autoload' => $oModule->autoload,
-            ];
-        }
+        //  Cherry pick the app, autoload it's items last, we do this so common's
+        //  helpers are available early as they're most liekly to be used by the
+        //  app or modules
+        $aComponents = Components::available();
+        $oApp        = array_shift($aComponents);
+        array_push($aComponents, $oApp);
 
-        //  Module items
         foreach ($aComponents as $oModule) {
             //  Helpers
             if (!empty($oModule->autoload->helpers)) {
