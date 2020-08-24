@@ -36,12 +36,16 @@ abstract class BaseDriver extends BaseComponent
     /**
      * Return an instance of the driver.
      *
-     * @param  string $sSlug The driver's slug
+     * @param Component|string $sSlug The driver's slug
      *
      * @return mixed
      */
     public function getInstance($sSlug)
     {
+        if ($sSlug instanceof Component) {
+            $sSlug = $sSlug->slug;
+        }
+
         if (isset($this->aInstances[$sSlug])) {
 
             return $this->aInstances[$sSlug];
