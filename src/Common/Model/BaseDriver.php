@@ -3,22 +3,24 @@
 /**
  * This class brings about uniformity to Nails driver models.
  *
- * @package     Nails
- * @subpackage  common
- * @category    model
- * @author      Nails Dev Team
+ * @package                   Nails
+ * @subpackage                common
+ * @category                  model
+ * @author                    Nails Dev Team
  * @link
  * @todo (Pablo - 2019-03-22) - Drivers shouldn't be in the "model" namespace
  */
 
 namespace Nails\Common\Model;
 
+use Nails\Common\Factory\Component;
 use Nails\Components;
 
 abstract class BaseDriver extends BaseComponent
 {
     /**
      * The type of component to load up
+     *
      * @var string
      */
     protected $sComponentType = 'driver';
@@ -27,6 +29,7 @@ abstract class BaseDriver extends BaseComponent
 
     /**
      * The array of driver instances, created on demand.
+     *
      * @var array
      */
     protected $aInstances = [];
