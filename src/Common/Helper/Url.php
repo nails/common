@@ -15,6 +15,7 @@ namespace Nails\Common\Helper;
 use Nails\Bootstrap;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
+use Nails\Common\Service\FileCache;
 use Nails\Factory;
 use Pdp;
 use Psr\SimpleCache\InvalidArgumentException;
@@ -124,8 +125,12 @@ class Url
      */
     public static function extractRegistrableDomain(?string $sUrl): ?string
     {
+        /** @var FileCache $oFileCache */
+        $oFileCache = Factory::service('FileCache');
+        $sCacheDir  = $oFileCache->getDir() . 'php-domain-parser' . DIRECTORY_SEPARATOR;
+
         $oManager = new Pdp\Manager(
-            new Pdp\Cache(),
+            new Pdp\Cache($sCacheDir),
             new Pdp\CurlHttpClient()
         );
 
