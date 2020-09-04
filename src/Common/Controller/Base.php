@@ -16,7 +16,6 @@ namespace Nails\Common\Controller;
 use Nails\Common\Events;
 use Nails\Common\Exception\AssetException;
 use Nails\Common\Exception\FactoryException;
-use Nails\Common\Exception\ModelException;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Factory\Locale;
 use Nails\Common\Service\Asset;
@@ -25,7 +24,6 @@ use Nails\Common\Service\ErrorHandler;
 use Nails\Common\Service\Event;
 use Nails\Common\Service\Input;
 use Nails\Common\Service\Language;
-use Nails\Common\Service\Meta;
 use Nails\Common\Service\MetaData;
 use Nails\Common\Service\Output;
 use Nails\Common\Service\Profiler;
@@ -36,7 +34,6 @@ use Nails\Components;
 use Nails\Config;
 use Nails\Environment;
 use Nails\Factory;
-use Nails\Functions;
 
 /**
  * Class Base
@@ -619,7 +616,7 @@ abstract class Base extends \MX_Controller
     protected function setGlobalJs(): self
     {
         /** @var Asset $oAsset */
-        $oAsset    = Factory::service('Asset');
+        $oAsset = Factory::service('Asset');
         $oAsset->compileGlobalData();
 
         $sCustomJs = appSetting('site_custom_js', 'site');
