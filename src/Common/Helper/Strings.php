@@ -51,7 +51,7 @@ class Strings
         $sString = explode('_', $sString);
         $sString = array_map('strtolower', $sString);
         $sString = array_map('ucfirst', $sString);
-        $sString = implode($sString);
+        $sString = implode('', $sString);
         $sString = $bLowerFirst ? lcfirst($sString) : $sString;
         return $sString;
     }
@@ -148,7 +148,7 @@ class Strings
             }
         }
 
-        return implode($aOut);
+        return implode('', $aOut);
     }
 
     // --------------------------------------------------------------------------
