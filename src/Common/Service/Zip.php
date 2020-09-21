@@ -106,16 +106,16 @@ class Zip
     // --------------------------------------------------------------------------
 
     /**
-     * @param string $filename
+     * @param string $sFilename
      *
      * @throws NailsException
      */
-    public function download($filename = 'backup.zip')
+    public function download($sFilename = 'backup.zip')
     {
         if (!function_exists('get_instance')) {
             throw new NailsException('Cannot download; CodeIgniter not available');
         }
 
-        parent::download($filename);
+        $this->oZip->download($sFilename);
     }
 }
