@@ -1526,8 +1526,8 @@ abstract class Base
 
         $aKey = array_filter([
             strtoupper($sColumn),
-            json_encode($mValue),
-            $aData !== null ? md5(json_encode($aData)) : null,
+            serialize($mValue),
+            $aData !== null ? md5(serialize($aData)) : null,
         ]);
 
         return implode(':', $aKey);
