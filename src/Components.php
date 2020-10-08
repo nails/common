@@ -16,7 +16,6 @@ use Nails\Common\Exception\NailsException;
 use Nails\Common\Factory\Component;
 use Nails\Common\Helper\ArrayHelper;
 use Nails\Common\Service\ErrorHandler;
-use Nails\Config;
 
 /**
  * Class Components
@@ -127,6 +126,7 @@ final class Components
                                 'authors'     => ArrayHelper::getFromArray('authors', $aConfig, []),
                                 'extra'       => (object) [
                                     'nails' => (object) [
+                                        'name'       => ArrayHelper::getFromArray('name', $aConfig, $sDirName),
                                         'namespace'  => ArrayHelper::getFromArray('namespace', $aConfig, null),
                                         'moduleName' => ArrayHelper::getFromArray('moduleName', $aConfig, null),
                                         'data'       => ArrayHelper::getFromArray('data', $aConfig, ''),
