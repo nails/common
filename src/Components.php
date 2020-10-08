@@ -128,11 +128,11 @@ final class Components
                                 'extra'       => (object) [
                                     'nails' => (object) [
                                         'namespace'  => ArrayHelper::getFromArray('namespace', $aConfig, null),
-                                        'moduleName' => ArrayHelper::getFromArray('data', $aConfig, null),
-                                        'data'       => ArrayHelper::getFromArray('type', $aConfig, ''),
-                                        'type'       => ArrayHelper::getFromArray('subType', $aConfig, ''),
-                                        'subType'    => ArrayHelper::getFromArray('forModule', $aConfig, ''),
-                                        'forModule'  => ArrayHelper::getFromArray('autoload', $aConfig, null),
+                                        'moduleName' => ArrayHelper::getFromArray('moduleName', $aConfig, null),
+                                        'data'       => ArrayHelper::getFromArray('data', $aConfig, ''),
+                                        'type'       => ArrayHelper::getFromArray('type', $aConfig, ''),
+                                        'subType'    => ArrayHelper::getFromArray('subType', $aConfig, ''),
+                                        'forModule'  => ArrayHelper::getFromArray('forModule', $aConfig, null),
                                         'autoload'   => ArrayHelper::getFromArray('autoload', $aConfig, null),
                                     ],
                                 ],
@@ -194,7 +194,12 @@ final class Components
             } elseif ($oComponent->type === 'skin') {
                 $aSkins[] = $oComponent;
             } else {
-                die('unknown type: ' . $oComponent->type);
+                throw new NailsException(
+                    sprintf(
+                        'Unsupported component type: %s',
+                        $oComponent->type
+                    )
+                );
             }
         }
 
