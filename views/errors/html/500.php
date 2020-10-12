@@ -39,7 +39,7 @@ if (Environment::not(Environment::ENV_PROD)) {
                                             <?php
 
                                             if (is_string($v) || is_numeric($v)) {
-                                                echo $v;
+                                                echo nl2br($v);
                                             } else {
                                                 echo json_encode($v, JSON_PRETTY_PRINT);
                                             }
@@ -122,6 +122,7 @@ if (Environment::not(Environment::ENV_PROD)) {
 
                 header {
                     background: #D5D5D5;
+                    line-height: 2.25rem;
                 }
 
                 section.data-section h3 {
@@ -179,8 +180,8 @@ if (Environment::not(Environment::ENV_PROD)) {
                 </a>
             </div>
             <header>
-                <h1><?=$sSubject?></h1>
-                <h2><?=$sMessage?></h2>
+                <h1><?=nl2br($sSubject)?></h1>
+                <h2><?=nl2br($sMessage)?></h2>
                 <?=!empty($oDetails->url) ? anchor($oDetails->url, null, 'target="_blank"') : ''?>
             </header>
             <?php

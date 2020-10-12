@@ -7,17 +7,18 @@ class CI_DB extends \CI_DB_query_builder
     /**
      * Display an error message using an exception rather than a view
      *
-     * @param    string $error  The error message
-     * @param    string $swap   Any "swap" values
-     * @param    bool   $native Whether to localize the message
+     * @param string $error  The error message
+     * @param string $swap   Any "swap" values
+     * @param bool   $native Whether to localize the message
      *
      * @return    void
      */
     public function display_error($error = '', $swap = '', $native = false)
     {
         if (is_array($error)) {
-            $error = implode('; ', $error);
+            $error = implode(PHP_EOL . PHP_EOL, $error);
         }
+
         throw new QueryException($error);
     }
 
@@ -28,8 +29,8 @@ class CI_DB extends \CI_DB_query_builder
      *
      * Generates a platform-specific update string from the supplied data
      *
-     * @param    string $table  The table name
-     * @param    array  $values The update data
+     * @param string $table  The table name
+     * @param array  $values The update data
      *
      * @return    string
      */
@@ -50,6 +51,7 @@ class CI_DB extends \CI_DB_query_builder
 
     /**
      * Compiles the JOIN string
+     *
      * @return string
      */
     protected function _compile_join()
