@@ -2997,8 +2997,11 @@ abstract class Base
              * Numeric
              */
             case 'int':
+            case 'int unsigned':
             case 'mediumint':
+            case 'mediumint unsigned':
             case 'bigint':
+            case 'bigint unsigned':
                 //  @todo (Pablo - 2019-11-28) - This is only number to match the form type, and could be misleading
                 $oField
                     ->setType(Helper\Form::FIELD_NUMBER);
@@ -3009,6 +3012,7 @@ abstract class Base
              * Nails convention uses tinyint(1) as a boolean; if not (1) then treat as integer
              */
             case 'tinyint':
+            case 'tinyint unsigned':
             case 'bool':
             case 'boolean':
                 $oField
@@ -3105,12 +3109,12 @@ abstract class Base
             case 'int':
                 $oField
                     ->addValidation(FormValidation::RULE_INTEGER);
+                break;
 
-                if ($sExtra === 'unsigned') {
-                    //  @todo (Pablo - 2019-12-18) - Use FormValidation::rule when CI is no longer a dependency
-                    $oField
-                        ->addValidation(sprintf('%s[%s]', FormValidation::RULE_GREATER_THAN, -1));
-                }
+            case 'int unsigned':
+                $oField
+                    ->addValidation(FormValidation::RULE_INTEGER)
+                    ->addValidation(sprintf('%s[%s]', FormValidation::RULE_GREATER_THAN, -1));
                 break;
 
             case 'tinyint':
