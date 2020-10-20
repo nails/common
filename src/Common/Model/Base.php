@@ -3016,7 +3016,7 @@ abstract class Base
             case 'bool':
             case 'boolean':
                 $oField
-                    ->setType($iLength == 1 ? Helper\Form::FIELD_BOOLEAN : Helper\Form::FIELD_NUMBER);
+                    ->setType(Helper\Form::FIELD_BOOLEAN);
                 break;
 
             /**
