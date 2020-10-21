@@ -100,12 +100,19 @@ final class Config
     {
         if (array_key_exists($sKey, self::$aConfig)) {
             return true;
+
         } elseif (defined($sKey)) {
             return true;
+
         } elseif (array_key_exists($sKey, $_ENV)) {
             return true;
+
         } elseif (array_key_exists($sKey, $_SERVER)) {
             return true;
+
+        } elseif (getenv($sKey) !== false) {
+            return true;
+
         } else {
             return false;
         }
