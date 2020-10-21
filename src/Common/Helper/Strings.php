@@ -189,4 +189,27 @@ class Strings
             return implode('', $aOut);
         }
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Masks a string
+     *
+     * @param string         $sInput      The string to mask
+     * @param float|int|null $iMaskLength The length of the mask, calculated as a percentage if the value is < 1
+     * @param string|null    $sMask       The masking character
+     *
+     * @return string
+     */
+    public static function mask(string $sInput, $iMaskLength = null, string $sMask = null): string
+    {
+        $iMaskLength = $iMaskLength ?? 0.75;
+        $sMask       = $sMask ?? '*';
+
+        $iMaskLength = $iMaskLength < 1
+            ? ceil(strlen($sInput) * $iMaskLength)
+            : floor($iMaskLength);
+
+        return str_repeat($sMask, $iMaskLength) . substr($sInput, $iMaskLength);
+    }
 }

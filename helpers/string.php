@@ -58,6 +58,13 @@ if (!function_exists('prosaicList')) {
     }
 }
 
+if (!function_exists('mask')) {
+    function mask(string $sInput, $iMaskLength = null, string $sMask = null): string
+    {
+        return Strings::mask($sInput, $iMaskLength, $sMask);
+    }
+}
+
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original
