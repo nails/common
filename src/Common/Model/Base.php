@@ -25,6 +25,7 @@ use Nails\Common\Traits\Caching;
 use Nails\Common\Traits\ErrorHandling;
 use Nails\Common\Traits\GetCountCommon;
 use Nails\Common\Traits\Model\Localised;
+use Nails\Common\Traits\Model\Timestamps;
 use Nails\Components;
 use Nails\Factory;
 
@@ -38,6 +39,7 @@ abstract class Base
     use ErrorHandling;
     use Caching;
     use GetCountCommon;
+    use Timestamps;
 
     // --------------------------------------------------------------------------
 
@@ -350,14 +352,6 @@ abstract class Base
     protected $tableAlias;
 
     /**
-     * Whether to automatically set created/modified timestamps
-     *
-     * @var bool|null
-     * @deprecated Use constant AUTO_SET_TIMESTAMP instead
-     */
-    protected $tableAutoSetTimestamps;
-
-    /**
      * Whether to automatically set slugs
      *
      * @var bool|null
@@ -610,9 +604,22 @@ abstract class Base
     public function updateMany(array $aIds, array $aData = []): bool
     {
         $oDb = Factory::service('Database');
+
+        /**
+         * Note the current timestamp behaiour, if we want to skip it then we'll
+         * need to re-set it on each iteration of the loop as `update()` will
+         * reset it.
+         */
+        $bSkipUpdateTimestamps = $this->bSkipUpdateTimestamp;
+
         try {
             $oDb->trans_begin();
             foreach ($aIds as $iId) {
+
+                if ($bSkipUpdateTimestamps) {
+                    $this->skipUpdateTimestamp();
+                }
+
                 if (!$this->update($iId, $aData)) {
                     throw new ModelException('Failed to update item with ID ' . $iId);
                 }
@@ -668,34 +675,6 @@ abstract class Base
      */
     protected function prepareWriteData(array &$aData): Base
     {
-        return $this;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Sets the timestamps on the $aData array
-     *
-     * @param array $aData       The data being passed to the model
-     * @param bool  $bSetCreated Whether to set the created timestamp or not
-     *
-     * @return $this
-     * @throws FactoryException
-     */
-    protected function setDataTimestamps(array &$aData, bool $bSetCreated = true): Base
-    {
-        if ($this->isAutoSetTimestamps()) {
-
-            $oDate = Factory::factory('DateTime');
-
-            if ($bSetCreated && empty($aData[$this->tableCreatedColumn])) {
-                $aData[$this->tableCreatedColumn] = $oDate->format('Y-m-d H:i:s');
-            }
-            if (empty($aData[$this->tableModifiedColumn])) {
-                $aData[$this->tableModifiedColumn] = $oDate->format('Y-m-d H:i:s');
-            }
-        }
-
         return $this;
     }
 
@@ -2790,19 +2769,6 @@ abstract class Base
     {
         //  @todo (Pablo - 2019-04-15) - Phase out support for $this->destructiveDelete
         return $this->destructiveDelete ?? static::DESTRUCTIVE_DELETE;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Returns whether this model automatically generates timestamps or not
-     *
-     * @return bool
-     */
-    public function isAutoSetTimestamps()
-    {
-        //  @todo (Pablo - 2019-04-15) - Phase out support for $this->tableAutoSetTimestamps
-        return $this->tableAutoSetTimestamps ?? static::AUTO_SET_TIMESTAMP;
     }
 
     // --------------------------------------------------------------------------
