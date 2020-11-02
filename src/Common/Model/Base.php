@@ -2897,8 +2897,8 @@ abstract class Base
                 ->setAllowNull($oField->Null === 'YES');
 
             $this
-                ->describeFieldsGuessType($oTemp, $oField->Type)
-                ->describeFieldsGuessValidation($oTemp, $oField->Type);
+                ->describeFieldsGuessType($oTemp, $oField)
+                ->describeFieldsGuessValidation($oTemp, $oField);
 
             $aFields[$oTemp->key] = $oTemp;
         }
@@ -2944,14 +2944,14 @@ abstract class Base
     /**
      * Guesses the field's type and sets it accordingly
      *
-     * @param Field  $oField The field object
-     * @param string $sType  The database type
+     * @param Field     $oField   The field object
+     * @param \stdClass $oDbField The database field
      *
      * @return $this
      */
-    protected function describeFieldsGuessType(Field &$oField, string $sType): self
+    protected function describeFieldsGuessType(Field &$oField, \stdClass $oDbField): self
     {
-        preg_match('/^(.*?)(\((.+?)\)(.*))?$/', $sType, $aMatches);
+        preg_match('/^(.*?)(\((.+?)\)(.*))?$/', $oDbField->Type, $aMatches);
 
         $sType       = Helper\ArrayHelper::getFromArray(1, $aMatches, 'text');
         $sTypeConfig = trim(Helper\ArrayHelper::getFromArray(3, $aMatches));
@@ -2975,23 +2975,15 @@ abstract class Base
 
             /**
              * Boolean
-             * Nails convention uses tinyint(1) unsigned as a boolean; if not (1) unsigned then treat as number
              */
+            //  @todo (Pablo 02/11/2020) - Consider whether the asumption of tinyin == boolean is too much of a gotcha
             case 'tinyint':
             case 'tinyint unsigned':
-                if ($aMatches[2] === '(1) unsigned') {
-                    $oField
-                        ->setType(Helper\Form::FIELD_BOOLEAN);
-                } else {
-                    $oField
-                        ->setType(Helper\Form::FIELD_NUMBER);
-                }
-                break;
-
             case 'bool':
             case 'boolean':
-            $oField
-                ->setType(Helper\Form::FIELD_BOOLEAN);
+            case 'bit':
+                $oField
+                    ->setType(Helper\Form::FIELD_BOOLEAN);
                 break;
 
             /**
@@ -3063,14 +3055,14 @@ abstract class Base
     /**
      * Guesses the field's validation rules based on it's type
      *
-     * @param Field  $oField The field object
-     * @param string $sType  The database type
+     * @param Field     $oField   The field object
+     * @param \stdClass $oDbField The database field
      *
      * @return $this
      */
-    protected function describeFieldsGuessValidation(Field &$oField, string $sType): self
+    protected function describeFieldsGuessValidation(Field &$oField, \stdClass $oDbField): self
     {
-        preg_match('/^(.*?)(\((.+?)\)(.*))?$/', $sType, $aMatches);
+        preg_match('/^(.*?)(\((.+?)\)(.*))?$/', $oDbField->Type, $aMatches);
 
         $sType   = Helper\ArrayHelper::getFromArray(1, $aMatches, 'text');
         $iLength = Helper\ArrayHelper::getFromArray(3, $aMatches);
