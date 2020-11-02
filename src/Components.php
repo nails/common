@@ -73,14 +73,24 @@ final class Components
             ErrorHandler::halt('Failed to discover potential modules; could not load composer/installed.json');
         }
 
-        $aComposer = @json_decode($sComposer);
+        $mComposer = @json_decode($sComposer);
 
-        if (empty($aComposer)) {
+        if (empty($mComposer)) {
             ErrorHandler::halt('Failed to discover potential modules; could not decode composer/installed.json');
         }
 
+        if (is_array($mComposer)) {
+            $aPackages = $mComposer;
+
+        } elseif (is_object($mComposer) && property_exists($mComposer, 'packages')) {
+            $aPackages = $mComposer->packages;
+
+        } else {
+            ErrorHandler::halt('composer/installed.json is not in a valid format');
+        }
+
         $aOut = [];
-        foreach ($aComposer as $oPackage) {
+        foreach ($aPackages as $oPackage) {
             if (isset($oPackage->extra->nails)) {
                 $aOut[] = new Component(
                     $oPackage,
