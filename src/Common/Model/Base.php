@@ -2975,14 +2975,23 @@ abstract class Base
 
             /**
              * Boolean
-             * Nails convention uses tinyint(1) as a boolean; if not (1) then treat as integer
+             * Nails convention uses tinyint(1) unsigned as a boolean; if not (1) unsigned then treat as number
              */
             case 'tinyint':
             case 'tinyint unsigned':
+                if ($aMatches[2] === '(1) unsigned') {
+                    $oField
+                        ->setType(Helper\Form::FIELD_BOOLEAN);
+                } else {
+                    $oField
+                        ->setType(Helper\Form::FIELD_NUMBER);
+                }
+                break;
+
             case 'bool':
             case 'boolean':
-                $oField
-                    ->setType(Helper\Form::FIELD_BOOLEAN);
+            $oField
+                ->setType(Helper\Form::FIELD_BOOLEAN);
                 break;
 
             /**
