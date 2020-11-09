@@ -28,8 +28,7 @@ module.exports = {
     },
     plugins: [
         new MiniCssExtractPlugin({
-            filename: '../css/nails.min.css',
-            allChunks: true
+            filename: '../css/nails.min.css'
         })
     ],
     mode: 'production'
