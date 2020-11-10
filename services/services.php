@@ -2,11 +2,9 @@
 
 use MimeTyper\Repository\MimeDbRepository;
 use Nails\Common\Interfaces;
-use Nails\Common\Service;
-use Nails\Common\Model;
 use Nails\Common\Resource;
+use Nails\Common\Service;
 use Nails\Config;
-use Nails\Environment;
 use Nails\Factory;
 use Symfony\Component\Mime\MimeTypes;
 
@@ -369,8 +367,11 @@ return [
     ],
 
     'factories' => [
-        'DateTime'                => function ($sTime = 'now', DateTimeZone $oTimeZone = null): \DateTime {
-            return new \DateTime($sTime, $oTimeZone);
+        'DateTime'                => function ($sTime = null, DateTimeZone $oTimeZone = null): \DateTime {
+            return new \DateTime(
+                $sTime ?? Config::get('NAILS_TIME_NOW', 'now'),
+                $oTimeZone
+            );
         },
         'EventSubscription'       => function (): \Nails\Common\Events\Subscription {
             if (class_exists('\App\Common\Events\Subscription')) {
