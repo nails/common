@@ -103,61 +103,6 @@ final class Components
 
         // --------------------------------------------------------------------------
 
-        //  Get App components, too
-        $sAppPath = NAILS_APP_PATH . 'application' . DIRECTORY_SEPARATOR . 'components' . DIRECTORY_SEPARATOR;
-
-        if (is_dir($sAppPath)) {
-            $aDirs = scandir($sAppPath);
-            foreach ($aDirs as $sDirName) {
-                if ($sDirName == '.' || $sDirName == '..') {
-                    continue;
-                }
-
-                /**
-                 * Load up config.json, This is basically exactly like composer.json, but
-                 * the bit contained within extra->nails.
-                 */
-
-                $sConfigPath = $sAppPath . $sDirName . DIRECTORY_SEPARATOR . 'config.json';
-
-                if (is_file($sConfigPath)) {
-
-                    $sConfig = file_get_contents($sConfigPath);
-                    $oConfig = json_decode($sConfig);
-
-                    if (!empty($oConfig)) {
-                        $aConfig = (array) $oConfig;
-                        $aOut[]  = new Component(
-                            (object) [
-                                'slug'        => 'app/' . $sDirName,
-                                'name'        => ArrayHelper::getFromArray('name', $aConfig, $sDirName),
-                                'description' => ArrayHelper::getFromArray('description', $aConfig, ''),
-                                'homepage'    => ArrayHelper::getFromArray('homepage', $aConfig, ''),
-                                'authors'     => ArrayHelper::getFromArray('authors', $aConfig, []),
-                                'extra'       => (object) [
-                                    'nails' => (object) [
-                                        'name'       => ArrayHelper::getFromArray('name', $aConfig, $sDirName),
-                                        'namespace'  => ArrayHelper::getFromArray('namespace', $aConfig, null),
-                                        'moduleName' => ArrayHelper::getFromArray('moduleName', $aConfig, null),
-                                        'data'       => ArrayHelper::getFromArray('data', $aConfig, ''),
-                                        'type'       => ArrayHelper::getFromArray('type', $aConfig, ''),
-                                        'subType'    => ArrayHelper::getFromArray('subType', $aConfig, ''),
-                                        'forModule'  => ArrayHelper::getFromArray('forModule', $aConfig, null),
-                                        'autoload'   => ArrayHelper::getFromArray('autoload', $aConfig, null),
-                                    ],
-                                ],
-                            ],
-                            $sAppPath . $sDirName,
-                            'application' . DIRECTORY_SEPARATOR . 'components' . DIRECTORY_SEPARATOR . $sDirName,
-                            true
-                        );
-                    }
-                }
-            }
-        }
-
-        // --------------------------------------------------------------------------
-
         uasort($aOut, function ($a, $b) {
 
             $a = (object) $a;
