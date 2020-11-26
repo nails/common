@@ -57,7 +57,7 @@ class Post extends Get
      * Populates the body of the request
      *
      * @param string $sBody   The request body
-     * @param bool   $bIsJson Whetehr the body is JSON or not
+     * @param bool   $bIsJson Whether the body is JSON or not
      */
     public function body(string $sBody, bool $bIsJson = true): self
     {
