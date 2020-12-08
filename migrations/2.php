@@ -32,7 +32,7 @@ class Migration2 extends Base
         $oEncrypt = Factory::service('Encrypt');
         while ($oRow = $oResult->fetch(\PDO::FETCH_OBJ)) {
 
-            $sNewCipher = $oEncrypt->migrate($oRow->value, APP_PRIVATE_KEY);
+            $sNewCipher = $oEncrypt->migrate($oRow->value, \Nails\Config('PRIVATE_KEY'));
 
             //  Update the record
             $sQuery = '

@@ -88,7 +88,7 @@ class Encrypt
      */
     public static function getKey($sSalt = '')
     {
-        return \Nails\Config::get('APP_PRIVATE_KEY') . $sSalt;
+        return \Nails\Config::get('PRIVATE_KEY') . $sSalt;
     }
 
     // --------------------------------------------------------------------------

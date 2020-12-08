@@ -36,7 +36,7 @@ $oFileCache           = Factory::service('FileCache');
 $config['cache_path'] = $oFileCache->getDir();
 
 //  The encryption key
-$config['encryption_key'] = md5(Config::get('APP_PRIVATE_KEY'));
+$config['encryption_key'] = md5(Config::get('PRIVATE_KEY'));
 
 //  Session variables
 $config['sess_driver']             = 'database';
