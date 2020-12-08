@@ -258,7 +258,6 @@ final class Bootstrap
         //  App
         Config::default('PRIVATE_KEY', '');
         Config::default('APP_NAME', 'Nails');
-        Config::default('APP_NATIVE_LOGIN_USING', 'BOTH');   //  [EMAIL|USERNAME|BOTH]
 
         //  Logging
         Config::default('LOG_DIR', Config::get('NAILS_APP_PATH') . implode(DIRECTORY_SEPARATOR, ['application', 'logs', '']));
