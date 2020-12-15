@@ -14,11 +14,10 @@
         "postcss-loader": "^4.1",
         "sass-loader": "^10.1",
         "webpack": "^4.44",
-        "webpack-command": "^0.5"
+        "webpack-cli": "^4.2"
     },
     "scripts": {
-        "build": "webpack -p",
-        "build-dev": "webpack",
+        "build": "webpack",
         "watch": "webpack --watch"
     }
 }
