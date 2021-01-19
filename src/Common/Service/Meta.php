@@ -309,16 +309,10 @@ class Meta
                     'theme-color',
                     $oMetaData->getThemeColour()
                 )
-                ->addRaw([
-                    'tag'     => 'meta',
-                    'name'    => 'theme-color',
-                    'content' => $oMetaData->getThemeColour(),
-                ])
-                ->addRaw([
-                    'tag'     => 'meta',
-                    'name'    => 'msapplication-TileColor',
-                    'content' => $oMetaData->getThemeColour(),
-                ]);
+                ->add(
+                    'msapplication-TileColor',
+                    $oMetaData->getThemeColour()
+                );
         }
 
         // --------------------------------------------------------------------------
