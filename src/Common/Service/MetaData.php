@@ -40,6 +40,9 @@ class MetaData
     /** @var string */
     protected $sThemeColour = '';
 
+    /** @var string */
+    protected $sTwitterHandle = '';
+
     /** @var string[] */
     protected $aHtmlClasses = [];
 
@@ -317,6 +320,33 @@ class MetaData
     public function getThemeColour(): string
     {
         return $this->sThemeColour;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets the Twitter handle
+     *
+     * @param string $sTwitterHandle The Twitter handle to set
+     *
+     * @return $this
+     */
+    public function setTwitterHandle(string $sTwitterHandle): self
+    {
+        $this->sTwitterHandle = $sTwitterHandle;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Gets the Twitter handle
+     *
+     * @return string
+     */
+    public function getTwitterHandle(): string
+    {
+        return $this->sTwitterHandle;
     }
 
     // --------------------------------------------------------------------------

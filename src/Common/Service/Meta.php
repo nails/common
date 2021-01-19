@@ -13,8 +13,14 @@
 
 namespace Nails\Common\Service;
 
+/**
+ * Class Meta
+ *
+ * @package Nails\Common\Service
+ */
 class Meta
 {
+    /** @var array */
     private $aEntries = [];
 
     // --------------------------------------------------------------------------
@@ -22,9 +28,9 @@ class Meta
     /**
      * Returns the raw entries array
      *
-     * @return Array
+     * @return array
      */
-    public function getEntries()
+    public function getEntries(): array
     {
         return array_values($this->aEntries);
     }
@@ -35,11 +41,12 @@ class Meta
      * Adds a meta tag, setting all the element keys as tag attributes.
      *
      * @param array $aAttr An array of attributes which make up the entry
+     *
+     * @return $this
      */
-    public function addRaw($aAttr)
+    public function addRaw($aAttr): self
     {
         if (!empty($aAttr)) {
-
             $sHash                  = md5(json_encode($aAttr));
             $this->aEntries[$sHash] = $aAttr;
         }
@@ -53,11 +60,12 @@ class Meta
      * Adds a meta tag
      *
      * @param array $aAttr An array of attributes which make up the entry
+     *
+     * @return $this
      */
-    public function removeRaw($aAttr)
+    public function removeRaw($aAttr): self
     {
         if (!empty($aAttr)) {
-
             $sHash = md5(json_encode($aAttr));
             unset($this->aEntries[$sHash]);
         }
@@ -73,16 +81,16 @@ class Meta
      * @param string $sName    The element's name attribute
      * @param string $sContent The element's content attribute
      * @param string $sTag     The elements's type
+     *
+     * @return $this
      */
-    public function add($sName, $sContent, $sTag = '')
+    public function add($sName, $sContent, $sTag = ''): self
     {
-        $aMeta = [
+        return $this->addRaw([
             'name'    => $sName,
             'content' => $sContent,
             'tag'     => $sTag,
-        ];
-
-        return $this->addRaw($aMeta);
+        ]);
     }
 
     // --------------------------------------------------------------------------
@@ -93,16 +101,16 @@ class Meta
      * @param string $sName    The elements's name attribute
      * @param string $sContent The elements's content attribute
      * @param string $sTag     The elements's type
+     *
+     * @return $this
      */
-    public function remove($sName, $sContent, $sTag = '')
+    public function remove($sName, $sContent, $sTag = ''): self
     {
-        $aMeta = [
+        return $this->removeRaw([
             'name'    => $sName,
             'content' => $sContent,
             'tag'     => $sTag,
-        ];
-
-        return $this->removeRaw($aMeta);
+        ]);
     }
 
     // --------------------------------------------------------------------------
@@ -114,7 +122,7 @@ class Meta
      *
      * @return $this
      */
-    public function removeByPropertyPattern($aProperties)
+    public function removeByPropertyPattern($aProperties): self
     {
         foreach ($this->aEntries as $sHash => $aEntry) {
             foreach ($aProperties as $aPatterns) {
@@ -139,7 +147,7 @@ class Meta
      *
      * @return array
      */
-    public function outputAr()
+    public function outputAr(): array
     {
         $aOut = [];
 
@@ -148,7 +156,6 @@ class Meta
             $sTemp = !empty($aEntry['tag']) ? '<' . $aEntry['tag'] . ' ' : '<meta ';
             unset($aEntry['tag']);
             foreach ($aEntry as $sKey => $sValue) {
-
                 $sTemp .= $sKey . '="' . $sValue . '" ';
             }
             $sTemp  = trim($sTemp) . '>';
@@ -165,9 +172,9 @@ class Meta
      *
      * @return string
      */
-    public function outputStr()
+    public function outputStr(): string
     {
-        return implode("\n", $this->outputAr());
+        return implode(PHP_EOL, $this->outputAr());
     }
 
     // --------------------------------------------------------------------------
@@ -246,7 +253,7 @@ class Meta
             ])
             ->addRaw([
                 'name'    => 'twitter:site',
-                'content' => siteUrl(),
+                'content' => $oMetaData->getTwitterHandle(),
             ])
             ->addRaw([
                 'name'    => 'twitter:card',
@@ -305,6 +312,11 @@ class Meta
                 ->addRaw([
                     'tag'     => 'meta',
                     'name'    => 'theme-color',
+                    'content' => $oMetaData->getThemeColour(),
+                ])
+                ->addRaw([
+                    'tag'     => 'meta',
+                    'name'    => 'msapplication-TileColor',
                     'content' => $oMetaData->getThemeColour(),
                 ]);
         }
