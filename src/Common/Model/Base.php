@@ -19,6 +19,7 @@ use Nails\Common\Factory\Model\Field;
 use Nails\Common\Helper;
 use Nails\Common\Resource;
 use Nails\Common\Service\Database;
+use Nails\Common\Service\Event;
 use Nails\Common\Service\FormValidation;
 use Nails\Common\Service\Locale;
 use Nails\Common\Traits\Caching;
@@ -277,7 +278,7 @@ abstract class Base
      *
      * @var string
      */
-    protected $tableDeletedColumn = 'is_deleted';
+    protected $tableIsDeletedColumn = 'is_deleted';
 
     /**
      * The columns which should be included when searching by keyword
@@ -393,9 +394,9 @@ abstract class Base
         }
 
         $this->aCacheColumns = [
-            $this->tableIdColumn,
-            $this->tableSlugColumn,
-            $this->tableTokenColumn,
+            $this->getColumn('id'),
+            $this->getColumn('slug'),
+            $this->getColumn('token'),
         ];
 
         /**
@@ -405,8 +406,8 @@ abstract class Base
          * @todo  allow some sort of cleansing callback so that models can prep the
          * search string if needed.
          */
-        $this->searchableFields[] = $this->tableIdColumn;
-        $this->searchableFields[] = $this->tableLabelColumn;
+        $this->searchableFields[] = $this->getColumn('id');
+        $this->searchableFields[] = $this->getColumn('label');
     }
 
     // --------------------------------------------------------------------------
@@ -692,18 +693,18 @@ abstract class Base
     {
         if ($this->isAutoSetUsers()) {
             if (isLoggedIn()) {
-                if ($bSetCreated && empty($aData[$this->tableCreatedByColumn])) {
-                    $aData[$this->tableCreatedByColumn] = activeUser('id');
+                if ($bSetCreated && empty($aData[$this->getColumn('created_by')])) {
+                    $aData[$this->getColumn('created_by')] = activeUser('id');
                 }
-                if (empty($aData[$this->tableModifiedByColumn])) {
-                    $aData[$this->tableModifiedByColumn] = activeUser('id');
+                if (empty($aData[$this->getColumn('modified_by')])) {
+                    $aData[$this->getColumn('modified_by')] = activeUser('id');
                 }
             } else {
-                if ($bSetCreated && empty($aData[$this->tableCreatedByColumn])) {
-                    $aData[$this->tableCreatedByColumn] = null;
+                if ($bSetCreated && empty($aData[$this->getColumn('created_by')])) {
+                    $aData[$this->getColumn('created_by')] = null;
                 }
-                if (empty($aData[$this->tableModifiedByColumn])) {
-                    $aData[$this->tableModifiedByColumn] = null;
+                if (empty($aData[$this->getColumn('modified_by')])) {
+                    $aData[$this->getColumn('modified_by')] = null;
                 }
             }
         }
@@ -725,15 +726,15 @@ abstract class Base
     protected function setDataSlug(array &$aData, bool $bIsCreate = true, int $iIgnoreId = null): Base
     {
         if ($this->isAutoSetSlugs() &&
-            empty($aData[$this->tableSlugColumn]) &&
+            empty($aData[$this->getColumn('slug')]) &&
             ($bIsCreate || !static::AUTO_SET_SLUG_IMMUTABLE)
         ) {
 
-            if (empty($this->tableSlugColumn)) {
+            if (empty($this->getColumn('slug'))) {
                 throw new ModelException(static::class . '::create() Slug column variable not set', 1);
             }
 
-            if (empty($this->tableLabelColumn)) {
+            if (empty($this->getColumn('label'))) {
                 throw new ModelException(static::class . '::create() Label column variable not set', 1);
             }
 
@@ -742,17 +743,17 @@ abstract class Base
              * - It is a create operation
              * - it is an update operation and the label column is defined (else, lease it as it is)
              */
-            if ($bIsCreate || array_key_exists($this->tableLabelColumn, $aData)) {
+            if ($bIsCreate || array_key_exists($this->getColumn('label'), $aData)) {
 
-                if (empty($aData[$this->tableLabelColumn])) {
+                if (empty($aData[$this->getColumn('label')])) {
                     throw new ModelException(
-                        static::class . '::create() "' . $this->tableLabelColumn .
+                        static::class . '::create() "' . $this->getColumn('label') .
                         '" is required when automatically generating slugs.',
                         1
                     );
                 }
 
-                $aData[$this->tableSlugColumn] = $this->generateSlug(
+                $aData[$this->getColumn('slug')] = $this->generateSlug(
                     $aData,
                     $iIgnoreId
                 );
@@ -772,15 +773,15 @@ abstract class Base
      */
     protected function setDataToken(array &$aData, $bIsCreate = true): Base
     {
-        if ($bIsCreate && $this->isAutoSetTokens() && empty($aData[$this->tableTokenColumn])) {
-            if (empty($this->tableTokenColumn)) {
+        if ($bIsCreate && $this->isAutoSetTokens() && empty($aData[$this->getColumn('token')])) {
+            if (empty($this->getColumn('token'))) {
                 throw new ModelException(static::class . '::create() Token column variable not set', 1);
             }
-            $aData[$this->tableTokenColumn] = $this->generateToken();
+            $aData[$this->getColumn('token')] = $this->generateToken();
         } elseif (!$bIsCreate) {
             //  Automatically set tokens are permanent and immutable
-            if ($this->isAutoSetTokens() && !empty($aData[$this->tableTokenColumn])) {
-                unset($aData[$this->tableTokenColumn]);
+            if ($this->isAutoSetTokens() && !empty($aData[$this->getColumn('token')])) {
+                unset($aData[$this->getColumn('token')]);
             }
         }
 
@@ -833,7 +834,7 @@ abstract class Base
      *
      * If destructive deletion is enabled then this method will permanently
      * destroy the object. If Non-destructive deletion is enabled then the
-     * $this->tableDeletedColumn field will be set to true.
+     * $this->getColumn('is_deleted') field will be set to true.
      *
      * @param int $iId The ID of the object to mark as deleted
      *
@@ -854,7 +855,7 @@ abstract class Base
         if ($this->isDestructiveDelete()) {
             $bResult = $this->destroy($iId);
         } else {
-            $bResult = $this->update($iId, [$this->tableDeletedColumn => true]);
+            $bResult = $this->update($iId, [$this->getColumn('is_deleted') => true]);
         }
 
         if ($bResult) {
@@ -946,7 +947,7 @@ abstract class Base
      * Unmarks an object as deleted
      *
      * If destructive deletion is enabled then this method will return null.
-     * If Non-destructive deletion is enabled then the $this->tableDeletedColumn
+     * If Non-destructive deletion is enabled then the $this->getColumn('is_deleted')
      * field will be set to false.
      *
      * @param int $iId The ID of the object to restore
@@ -961,7 +962,7 @@ abstract class Base
 
         if ($this->isDestructiveDelete()) {
             return null;
-        } elseif ($this->update($iId, [$this->tableDeletedColumn => false])) {
+        } elseif ($this->update($iId, [$this->getColumn('is_deleted') => false])) {
             $this->triggerEvent(static::EVENT_RESTORED, [$iId, $this]);
             return true;
         }
@@ -1147,7 +1148,7 @@ abstract class Base
 
         //  If non-destructive delete is enabled then apply the delete query
         if (!$this->isDestructiveDelete() && !$bIncludeDeleted) {
-            $oDb->where($this->getTableAlias(true) . $this->tableDeletedColumn, false);
+            $oDb->where($this->getTableAlias(true) . $this->getColumn('is_deleted'), false);
         }
 
         // --------------------------------------------------------------------------
@@ -1349,6 +1350,14 @@ abstract class Base
      */
     public function getAllFlat($iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false)
     {
+
+        if (!array_key_exists('select', $aData)) {
+            $aData['select'] = [];
+        }
+
+        $aData['select'][] = $this->getColumn('id');
+        $aData['select'][] = $this->getColumn('label');
+
         $aItems = $this->getAll($iPage, $iPerPage, $aData, $bIncludeDeleted);
         $aOut   = [];
 
@@ -1362,16 +1371,16 @@ abstract class Base
         //  Test columns
         $oTest = reset($aItems);
 
-        if (!property_exists($oTest, $this->tableLabelColumn)) {
+        if (!property_exists($oTest, $this->getColumn('label'))) {
             throw new ModelException(
-                static::class . '::getAllFlat() "' . $this->tableLabelColumn . '" is not a valid column.',
+                static::class . '::getAllFlat() "' . $this->getColumn('label') . '" is not a valid column.',
                 1
             );
         }
 
-        if (!property_exists($oTest, $this->tableLabelColumn)) {
+        if (!property_exists($oTest, $this->getColumn('label'))) {
             throw new ModelException(
-                static::class . '::getAllFlat() "' . $this->tableIdColumn . '" is not a valid column.',
+                static::class . '::getAllFlat() "' . $this->getColumn('id') . '" is not a valid column.',
                 1
             );
         }
@@ -1381,7 +1390,7 @@ abstract class Base
         // --------------------------------------------------------------------------
 
         foreach ($aItems as $oItem) {
-            $aOut[$oItem->{$this->tableIdColumn}] = $oItem->{$this->tableLabelColumn};
+            $aOut[$oItem->{$this->getColumn('id')}] = $oItem->{$this->getColumn('label')};
         }
 
         return $aOut;
@@ -1449,7 +1458,7 @@ abstract class Base
                     continue;
                 }
 
-                if ($sColumn === $this->tableIdColumn) {
+                if ($sColumn === $this->getColumn('id')) {
                     $this->setCache(
                         $this->prepareCacheKey($sColumn, $oResult->{$sColumn}, $aData),
                         [$oResult]
@@ -1457,7 +1466,7 @@ abstract class Base
                 } else {
                     $this->setCacheAlias(
                         $this->prepareCacheKey($sColumn, $oResult->{$sColumn}, $aData),
-                        $this->prepareCacheKey($this->tableIdColumn, $oResult->{$this->tableIdColumn}, $aData)
+                        $this->prepareCacheKey($this->getColumn('id'), $oResult->{$this->getColumn('id')}, $aData)
                     );
                 }
             }
@@ -1525,11 +1534,11 @@ abstract class Base
      */
     public function getById($iId, array $aData = [])
     {
-        if (!$this->tableIdColumn) {
+        if (!$this->getColumn('id')) {
             throw new ModelException(static::class . '::getById() Column variable not set.', 1);
         }
 
-        return $this->getByColumn($this->tableIdColumn, $iId, $aData);
+        return $this->getByColumn($this->getColumn('id'), $iId, $aData);
     }
 
     // --------------------------------------------------------------------------
@@ -1546,13 +1555,13 @@ abstract class Base
      */
     public function getByIds($aIds, array $aData = [], $bMaintainInputOrder = false)
     {
-        if (!$this->tableIdColumn) {
+        if (!$this->getColumn('id')) {
             throw new ModelException(static::class . '::getByIds() Column variable not set.', 1);
         }
 
-        $aItems = $this->getByColumn($this->tableIdColumn, $aIds, $aData, true);
+        $aItems = $this->getByColumn($this->getColumn('id'), $aIds, $aData, true);
         if ($bMaintainInputOrder) {
-            return $this->sortItemsByColumn($aItems, $aIds, $this->tableIdColumn);
+            return $this->sortItemsByColumn($aItems, $aIds, $this->getColumn('id'));
         } else {
             return $aItems;
         }
@@ -1571,11 +1580,11 @@ abstract class Base
      */
     public function getBySlug($sSlug, array $aData = [])
     {
-        if (!$this->tableSlugColumn) {
+        if (!$this->getColumn('slug')) {
             throw new ModelException(static::class . '::getBySlug() Column variable not set.', 1);
         }
 
-        return $this->getByColumn($this->tableSlugColumn, $sSlug, $aData);
+        return $this->getByColumn($this->getColumn('slug'), $sSlug, $aData);
     }
 
     // --------------------------------------------------------------------------
@@ -1592,13 +1601,13 @@ abstract class Base
      */
     public function getBySlugs($aSlugs, array $aData = [], $bMaintainInputOrder = false)
     {
-        if (!$this->tableSlugColumn) {
+        if (!$this->getColumn('slug')) {
             throw new ModelException(static::class . '::getBySlugs() Column variable not set.', 1);
         }
 
-        $aItems = $this->getByColumn($this->tableSlugColumn, $aSlugs, $aData, true);
+        $aItems = $this->getByColumn($this->getColumn('slug'), $aSlugs, $aData, true);
         if ($bMaintainInputOrder) {
-            return $this->sortItemsByColumn($aItems, $aSlugs, $this->tableSlugColumn);
+            return $this->sortItemsByColumn($aItems, $aSlugs, $this->getColumn('slug'));
         } else {
             return $aItems;
         }
@@ -1641,11 +1650,11 @@ abstract class Base
      */
     public function getByToken($sToken, array $aData = [])
     {
-        if (!$this->tableTokenColumn) {
+        if (!$this->getColumn('token')) {
             throw new ModelException(static::class . '::getByToken() Column variable not set.', 1);
         }
 
-        return $this->getByColumn($this->tableTokenColumn, $sToken, $aData);
+        return $this->getByColumn($this->getColumn('token'), $sToken, $aData);
     }
 
     // --------------------------------------------------------------------------
@@ -1662,13 +1671,13 @@ abstract class Base
      */
     public function getByTokens($aTokens, array $aData = [], $bMaintainInputOrder = false)
     {
-        if (!$this->tableTokenColumn) {
+        if (!$this->getColumn('token')) {
             throw new ModelException(static::class . '::getByTokens() Column variable not set.', 1);
         }
 
-        $aItems = $this->getByColumn($this->tableTokenColumn, $aTokens, $aData, true);
+        $aItems = $this->getByColumn($this->getColumn('token'), $aTokens, $aData, true);
         if ($bMaintainInputOrder) {
-            return $this->sortItemsByColumn($aItems, $aTokens, $this->tableTokenColumn);
+            return $this->sortItemsByColumn($aItems, $aTokens, $this->getColumn('token'));
         } else {
             return $aItems;
         }
@@ -2128,6 +2137,7 @@ abstract class Base
      */
     public function countAll(array $aData = [], $bIncludeDeleted = false)
     {
+        /** @var Database $oDb */
         $oDb   = Factory::service('Database');
         $table = $this->getTableName(true);
 
@@ -2146,7 +2156,7 @@ abstract class Base
 
         //  If non-destructive delete is enabled then apply the delete query
         if (!$this->isDestructiveDelete() && !$bIncludeDeleted) {
-            $oDb->where($this->getTableAlias(true) . $this->tableDeletedColumn, false);
+            $oDb->where($this->getTableAlias(true) . $this->getColumn('is_deleted'), false);
         }
 
         // --------------------------------------------------------------------------
@@ -2339,7 +2349,7 @@ abstract class Base
      *
      * @param string|null $sMask   The token mask, defaults to $this->sTokenMask
      * @param string|null $sTable  The table to use defaults to $this->table
-     * @param string|null $sColumn The column to use, defaults to $this->tableTokenColumn
+     * @param string|null $sColumn The column to use, defaults to $this->getColumn('token')
      *
      * @return string
      * @throws ModelException
@@ -2355,12 +2365,13 @@ abstract class Base
         }
 
         if (is_null($sColumn)) {
-            if (!$this->tableTokenColumn) {
+            if (!$this->getColumn('token')) {
                 throw new ModelException(static::class . '::generateToken() Token variable not set', 1);
             }
-            $sColumn = $this->tableTokenColumn;
+            $sColumn = $this->getColumn('token');
         }
 
+        /** @var Database $oDb */
         $oDb = Factory::service('Database');
 
         do {
@@ -2821,13 +2832,26 @@ abstract class Base
      *
      * @return string
      */
-    public function getColumn($sColumn, $sDefault = null)
+    public function getColumn(string $sColumn, string $sDefault = null): string
     {
-        $sColumn = ucfirst(trim($sColumn));
-        if (property_exists($this, 'table' . $sColumn . 'Column')) {
-            return $this->{'table' . $sColumn . 'Column'};
+        $sCacheKey = 'MODEL-COLUMN:' . $sColumn;
+        $sCache    = $this->getCache($sCacheKey);
+        if (!empty($sCache)) {
+            return $sCache;
         }
-        return $sDefault;
+
+        $sProperty = sprintf(
+            'table%sColumn',
+            ucfirst(underscoreToCamelcase(trim($sColumn)))
+        );
+
+        $sValue = property_exists($this, $sProperty)
+            ? $this->{$sProperty}
+            : $sDefault;
+
+        $this->setCache($sCacheKey, $sValue);
+
+        return $sValue;
     }
 
     // --------------------------------------------------------------------------
@@ -2852,6 +2876,7 @@ abstract class Base
 
         // --------------------------------------------------------------------------
 
+        /** @var Database $oDb */
         $oDb     = Factory::service('Database');
         $aResult = $oDb->query('DESCRIBE `' . $sTable . '`;')->result();
         $aFields = [];
@@ -3198,7 +3223,9 @@ abstract class Base
     protected function triggerEvent($sEvent, array $aData)
     {
         if ($sEvent) {
-            Factory::service('Event')
+            /** @var Event $oEvent */
+            $oEvent = Factory::service('Event');
+            $oEvent
                 ->trigger(
                     $sEvent,
                     static::getEventNamespace(),

@@ -24,7 +24,7 @@ trait Copyable
      *
      * @return string
      */
-    abstract public function getColumn($sColumn, $sDefault = null);
+    abstract public function getColumn(string $sColumn, string $sDefault = null): string;
 
     // --------------------------------------------------------------------------
 
