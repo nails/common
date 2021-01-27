@@ -1350,7 +1350,6 @@ abstract class Base
      */
     public function getAllFlat($iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false)
     {
-
         if (!array_key_exists('select', $aData)) {
             $aData['select'] = [];
         }
@@ -1358,7 +1357,7 @@ abstract class Base
         $aData['select'][] = $this->getColumn('id');
         $aData['select'][] = $this->getColumn('label');
 
-        $aItems = $this->getAll($iPage, $iPerPage, $aData, $bIncludeDeleted);
+        $aItems = $this->getAllRawQuery($iPage, $iPerPage, $aData, $bIncludeDeleted)->result();
         $aOut   = [];
 
         //  Nothing returned? Skip the rest of this method, it's pointless.
