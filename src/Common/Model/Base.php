@@ -406,8 +406,10 @@ abstract class Base
          * @todo  allow some sort of cleansing callback so that models can prep the
          * search string if needed.
          */
-        $this->searchableFields[] = $this->getColumn('id');
-        $this->searchableFields[] = $this->getColumn('label');
+        if (empty($this->searchableFields)) {
+            $this->searchableFields[] = $this->getColumn('id');
+            $this->searchableFields[] = $this->getColumn('label');
+        }
     }
 
     // --------------------------------------------------------------------------
