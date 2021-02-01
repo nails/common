@@ -15,6 +15,7 @@ namespace Nails\Common\Model;
 use Behat\Transliterator\Transliterator;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\ModelException;
+use Nails\Common\Exception\NailsException;
 use Nails\Common\Factory\Model\Field;
 use Nails\Common\Helper;
 use Nails\Common\Resource;
@@ -2831,9 +2832,9 @@ abstract class Base
      * @param string      $sColumn  The column to query
      * @param string|null $sDefault The default value if not defined
      *
-     * @return string
+     * @return string|null
      */
-    public function getColumn(string $sColumn, string $sDefault = null): string
+    public function getColumn(string $sColumn, string $sDefault = null): ?string
     {
         $sCacheKey = 'MODEL-COLUMN:' . $sColumn;
         $sCache    = $this->getCache($sCacheKey);
