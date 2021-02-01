@@ -55,11 +55,11 @@ trait Timestamps
 
             $oDate = Factory::factory('DateTime');
 
-            if ($bSetCreated && empty($aData[$this->tableCreatedColumn])) {
-                $aData[$this->tableCreatedColumn] = $oDate->format('Y-m-d H:i:s');
+            if ($bSetCreated && empty($aData[$this->getColumn('created')])) {
+                $aData[$this->getColumn('created')] = $oDate->format('Y-m-d H:i:s');
             }
-            if (empty($aData[$this->tableModifiedColumn])) {
-                $aData[$this->tableModifiedColumn] = $oDate->format('Y-m-d H:i:s');
+            if (empty($aData[$this->getColumn('modified')])) {
+                $aData[$this->getColumn('modified')] = $oDate->format('Y-m-d H:i:s');
             }
         }
 

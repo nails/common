@@ -314,11 +314,11 @@ trait Localised
         $aData['region']   = $oLocale->getRegion();
         unset($aData['locale']);
 
-        if (empty($aData[$this->tableIdColumn])) {
-            $oDb->set($this->tableIdColumn, null);
+        if (empty($aData[$this->getColumn('id')])) {
+            $oDb->set($this->getColumn('id'), null);
             $oDb->insert(parent::getTableName());
-            $aData[$this->tableIdColumn] = $oDb->insert_id();
-            if (empty($aData[$this->tableIdColumn])) {
+            $aData[$this->getColumn('id')] = $oDb->insert_id();
+            if (empty($aData[$this->getColumn('id')])) {
                 throw new ModelException(
                     'Failed to generate parent item for localised object'
                 );
@@ -331,15 +331,15 @@ trait Localised
          * exists in the table
          */
         if (!$this->isDestructiveDelete()) {
-            $this->destroy($aData[$this->tableIdColumn], $oLocale);
+            $this->destroy($aData[$this->getColumn('id')], $oLocale);
         }
 
         /**
          * Ensure automatic slug generation takes into account locale
          */
-        if ($this->isAutoSetSlugs() && empty($aData[$this->tableSlugColumn])) {
-            $aData[$this->tableSlugColumn] = $this->generateSlug(
-                getFromArray($this->tableLabelColumn, $aData),
+        if ($this->isAutoSetSlugs() && empty($aData[$this->getColumn('slug')])) {
+            $aData[$this->getColumn('slug')] = $this->generateSlug(
+                getFromArray($this->getColumn('label'), $aData),
                 null,
                 $aData,
                 $oLocale
@@ -350,7 +350,7 @@ trait Localised
 
         if (empty($iItemId)) {
             if (!empty($bCreatedItem)) {
-                $oDb->where($this->tableIdColumn, $aData[$this->tableIdColumn]);
+                $oDb->where($this->getColumn('id'), $aData[$this->getColumn('id')]);
                 $oDb->delete(parent::getTableName());
             }
             return null;
@@ -387,9 +387,9 @@ trait Localised
         /**
          * Ensure automatic slug generation takes into account locale
          */
-        if ($this->isAutoSetSlugs() && empty($aData[$this->tableSlugColumn]) && !static::AUTO_SET_SLUG_IMMUTABLE) {
-            $aData[$this->tableSlugColumn] = $this->generateSlug(
-                getFromArray($this->tableLabelColumn, $aData),
+        if ($this->isAutoSetSlugs() && empty($aData[$this->getColumn('slug')]) && !static::AUTO_SET_SLUG_IMMUTABLE) {
+            $aData[$this->getColumn('slug')] = $this->generateSlug(
+                getFromArray($this->getColumn('label'), $aData),
                 $iId,
                 $aData,
                 $oLocale
@@ -440,7 +440,7 @@ trait Localised
             } else {
                 $bResult = $this->update(
                     $iId,
-                    [$this->tableDeletedColumn => true],
+                    [$this->getColumn('is_deleted') => true],
                     $oLocale
                 );
             }
@@ -512,7 +512,7 @@ trait Localised
 
         if ($this->isDestructiveDelete()) {
             return null;
-        } elseif ($this->update($iId, [$this->tableDeletedColumn => false], $oLocale)) {
+        } elseif ($this->update($iId, [$this->getColumn('is_deleted') => false], $oLocale)) {
             $this->triggerEvent(static::EVENT_RESTORED, [$iId]);
             return true;
         }
