@@ -26,4 +26,17 @@ class Options extends HttpRequest
      * @var string
      */
     const HTTP_METHOD = 'OPTIONS';
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Compile the request
+     *
+     * @param array $aClientConfig   The config array for the HTTP Client
+     * @param array $aRequestOptions The options for the request
+     */
+    protected function compile(array &$aClientConfig, array &$aRequestOptions): void
+    {
+        //  Nothing to compile, but method is required by the parent
+    }
 }
