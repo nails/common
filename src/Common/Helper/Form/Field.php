@@ -905,16 +905,28 @@ EOT;
 
         // --------------------------------------------------------------------------
 
-        $_out = '<div class="field boolean ' . $_error . ' ' . $_field['oddeven'] . ' ' . $_readonly_cls . '" data-text-on="' . $_field['text_on'] . '" data-text-off="' . $_field['text_off'] . '" ' . $_field_id_top . '>';
+        $_out = '<div class="field boolean ' . $_error . ' ' . $_field['oddeven'] . ' ' . $_readonly_cls . '" ' . $_field_id_top . '>';
 
         //  Does the field have an id?
         $_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
 
         //  Any data attributes?
-        $_data = 'data-is-boolean-field="true"';
-        foreach ($_field['data'] as $attr => $value) {
-            $_data .= ' data-' . $attr . '="' . $value . '"';
-        }
+        $aDataAttr = array_merge(
+            [
+                'is-boolean-field' => 'true',
+                'text-on'          => $_field['text_on'],
+                'text-off'         => $_field['text_off'],
+            ],
+            $_field['data']
+        );
+
+        array_walk($aDataAttr, function(&$sValue, $sKey) {
+            $sValue = sprintf(
+                'data-%s="%s"',
+                $sKey,
+                $sValue
+            );
+        });
 
         //  Label
         $_out .= '<span class="label">';
@@ -928,7 +940,22 @@ EOT;
         $_out      .= '<span class="input ' . $_tipclass . '">';
         $_selected = set_value($_field['key'], (bool) $_field['default']);
 
-        $_out .= Form::boolean($_field['key'], true, $_selected, $_field['id'] . $_data . ' ' . $_readonly . ' ' . $_class);
+        $_out .= Form::boolean(
+            $_field['key'],
+            true,
+            $_selected,
+            implode(
+                ' ',
+                array_merge(
+                    [
+                        $_field['id'],
+                        $_readonly,
+                        $_class
+                    ],
+                    $aDataAttr
+                )
+            )
+        );
 
         //  Tip
         $_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
