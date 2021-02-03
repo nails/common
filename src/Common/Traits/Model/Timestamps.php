@@ -28,6 +28,18 @@ trait Timestamps
     // --------------------------------------------------------------------------
 
     /**
+     * Returns the column name for specific columns of interest
+     *
+     * @param string      $sColumn  The column to query
+     * @param string|null $sDefault The default value if not defined
+     *
+     * @return string|null
+     */
+    abstract public function getColumn(string $sColumn, string $sDefault = null): ?string;
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Returns whether this model automatically generates timestamps or not
      *
      * @return bool
