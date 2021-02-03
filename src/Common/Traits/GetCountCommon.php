@@ -16,6 +16,11 @@ use Nails\Common\Helper\ArrayHelper;
 use Nails\Common\Service\Database;
 use Nails\Factory;
 
+/**
+ * Trait GetCountCommon
+ *
+ * @package Nails\Common\Traits
+ */
 trait GetCountCommon
 {
     /**

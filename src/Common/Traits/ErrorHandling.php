@@ -12,14 +12,20 @@
 
 namespace Nails\Common\Traits;
 
+/**
+ * Trait ErrorHandling
+ *
+ * @package Nails\Common\Traits
+ */
 trait ErrorHandling
 {
-    protected $aErrors = array();
+    protected $aErrors = [];
 
     // --------------------------------------------------------------------------
 
     /**
      * Set a generic error
+     *
      * @param string $error The error message
      */
     protected function setError($sError)
@@ -31,6 +37,7 @@ trait ErrorHandling
 
     /**
      * Return the error array
+     *
      * @return array
      */
     public function getErrors()
@@ -42,6 +49,7 @@ trait ErrorHandling
 
     /**
      * Returns the last error
+     *
      * @return string
      */
     public function lastError()
@@ -53,6 +61,7 @@ trait ErrorHandling
 
     /**
      * Clears the last error
+     *
      * @return mixed
      */
     public function clearLastError()
@@ -64,10 +73,11 @@ trait ErrorHandling
 
     /**
      * Clears all errors
+     *
      * @return void
      */
     public function clearErrors()
     {
-        $this->aErrors = array();
+        $this->aErrors = [];
     }
 }

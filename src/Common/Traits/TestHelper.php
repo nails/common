@@ -2,6 +2,11 @@
 
 namespace Nails\Common\Traits;
 
+/**
+ * Trait TestHelper
+ *
+ * @package Nails\Common\Traits
+ */
 trait TestHelper
 {
     /**
