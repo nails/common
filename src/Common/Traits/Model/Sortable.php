@@ -13,12 +13,12 @@ trait Sortable
     /**
      * Returns the column name for specific columns of interest
      *
-     * @param string $sColumn  The column to query
-     * @param string $sDefault The default value if not defined
+     * @param string      $sColumn  The column to query
+     * @param string|null $sDefault The default value if not defined
      *
-     * @return string
+     * @return string|null
      */
-    abstract public function getColumn(string $sColumn, string $sDefault = null): string;
+    abstract public function getColumn(string $sColumn, string $sDefault = null): ?string;
 
     // --------------------------------------------------------------------------
 

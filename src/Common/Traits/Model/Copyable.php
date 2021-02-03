@@ -22,9 +22,9 @@ trait Copyable
      * @param string      $sColumn  The column to query
      * @param string|null $sDefault The default value if not defined
      *
-     * @return string
+     * @return string|null
      */
-    abstract public function getColumn(string $sColumn, string $sDefault = null): string;
+    abstract public function getColumn(string $sColumn, string $sDefault = null): ?string;
 
     // --------------------------------------------------------------------------
 
