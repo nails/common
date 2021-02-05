@@ -134,6 +134,8 @@ class Country
             $aTarget[$sIso] = Factory::resource($sResource, null, $oDatum);
         }
 
+        arraySortMulti($aTarget, 'name');
+
         return $this;
     }
 
