@@ -2836,24 +2836,14 @@ abstract class Base
      */
     public function getColumn(string $sColumn, string $sDefault = null): ?string
     {
-        $sCacheKey = 'MODEL-COLUMN:' . $sColumn;
-        $sCache    = $this->getCache($sCacheKey);
-        if (!empty($sCache)) {
-            return $sCache;
-        }
-
         $sProperty = sprintf(
             'table%sColumn',
             ucfirst(underscoreToCamelcase(trim($sColumn)))
         );
 
-        $sValue = property_exists($this, $sProperty)
+        return property_exists($this, $sProperty)
             ? $this->{$sProperty}
             : $sDefault;
-
-        $this->setCache($sCacheKey, $sValue);
-
-        return $sValue;
     }
 
     // --------------------------------------------------------------------------
