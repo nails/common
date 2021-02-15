@@ -2113,10 +2113,8 @@ abstract class Base
             ],
         ];
 
-        $aExistingItems = $oAssociatedItemModel->getAll($aData);
-        foreach ($aExistingItems as $oExistingItem) {
-            $aExistingItemIds[] = $oExistingItem->id;
-        }
+        $aExistingItems   = $oAssociatedItemModel->getAllFlat($aData);
+        $aExistingItemIds = array_keys($aExistingItems);
 
         // --------------------------------------------------------------------------
 
