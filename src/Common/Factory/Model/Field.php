@@ -203,7 +203,7 @@ class Field
      */
     public function getValidation(): array
     {
-        return $this->validation;
+        return array_unique($this->validation);
     }
 
     // --------------------------------------------------------------------------
