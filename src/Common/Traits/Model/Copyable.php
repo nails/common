@@ -132,7 +132,7 @@ trait Copyable
                 $this->getColumn('created_by'),
                 $this->getColumn('modified'),
                 $this->getColumn('modified_by'),
-                $this->getColumn('deleted'),
+                $this->getColumn('is_deleted'),
             ]);
         });
 
