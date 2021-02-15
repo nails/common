@@ -2067,10 +2067,17 @@ abstract class Base
         $oDb                  = Factory::service('Database');
         $oAssociatedItemModel = Factory::model($sAssociatedModel, $sAssociatedModelProvider);
 
-        $iId = $oAssociatedItemModel->create($aAssociatedData);
+        if (array_key_exists($this->getColumn('id'), $aAssociatedData)) {
+            $iId = $aAssociatedData[$this->getColumn('id')];
+            unset($aAssociatedData[$this->getColumn('id')]);
+            $oAssociatedItemModel->update($iId, $aAssociatedData);
+
+        } else {
+            $iId = $oAssociatedItemModel->create($aAssociatedData);
+        }
 
         $oDb->set($sAssociatedItemIdColumn, $iId);
-        $oDb->where('id', $iItemId);
+        $oDb->where($this->getColumn('id'), $iItemId);
         if (!$oDb->update($this->getTableName())) {
             throw new ModelException(
                 'Failed to update associated item (' . $sAssociatedModelProvider . ':' . $sAssociatedModel . ') ' . $oAssociatedItemModel->lastError()
