@@ -71,7 +71,7 @@ trait Copyable
      *
      * @return Entity|int
      */
-    public function copy(int $iId, bool $bReturnObject = false)
+    public function copy(int $iId, bool $bReturnObject = false, array $aReturnData = [])
     {
         /** @var Database $oDb */
         $oDb    = Factory::service('Database');
@@ -102,7 +102,15 @@ trait Copyable
 
         //  @todo (Pablo - 2019-12-10) - Add support for classes which implement Localised trait
 
-        return $this->create($aResult, $bReturnObject);
+        $iItemId = $this->create($aResult);
+        if (empty($iItemId)) {
+            throw new NailsException('Failed to copy item.' . $this->lastError());
+        }
+
+        //  Return the new item's ID or object
+        return $bReturnObject
+            ? $this->getById($iItemId, $aReturnData)
+            : $iItemId;
     }
 
     // --------------------------------------------------------------------------
