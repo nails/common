@@ -464,9 +464,10 @@ abstract class Base
         // --------------------------------------------------------------------------
 
         //  Execute the data pre-write hooks
+        //  Generic write hook, before specific create hook
         $this
-            ->prepareCreateData($aData)
-            ->prepareWriteData($aData);
+            ->prepareWriteData($aData)
+            ->prepareCreateData($aData);
 
         // --------------------------------------------------------------------------
 
@@ -492,8 +493,11 @@ abstract class Base
                 $iId = $oDb->insert_id();
             }
 
-            $this->autoSaveExpandableFieldsSave($iId, $aAutoSaveExpandableFields);
-            $this->triggerEvent(static::EVENT_CREATED, [$iId, $this]);
+            $this
+                ->autoSaveExpandableFieldsSave($iId, $aAutoSaveExpandableFields)
+                ->afterCreate($iId)
+                ->afterWrite($iId)
+                ->triggerEvent(static::EVENT_CREATED, [$iId, $this]);
 
             return $bReturnObject ? $this->getById($iId) : $iId;
 
@@ -553,9 +557,10 @@ abstract class Base
         // --------------------------------------------------------------------------
 
         //  Execute the data pre-write hooks
+        //  Generic write hook, before specific update hook
         $this
-            ->prepareUpdateData($aData)
-            ->prepareWriteData($aData);
+            ->prepareWriteData($aData)
+            ->prepareUpdateData($aData);
 
         // --------------------------------------------------------------------------
 
@@ -576,7 +581,10 @@ abstract class Base
         if ($this->saveToDb($aData, $iId)) {
 
             //  Save any expandable objects
-            $this->autoSaveExpandableFieldsSave($iId, $aAutoSaveExpandableFields);
+            $this
+                ->autoSaveExpandableFieldsSave($iId, $aAutoSaveExpandableFields)
+                ->afterUpdate($iId)
+                ->afterWrite($iId);
 
             //  Clear the cache
             foreach ($this->aCacheColumns as $sColumn) {
@@ -678,6 +686,49 @@ abstract class Base
      * @return $this
      */
     protected function prepareWriteData(array &$aData): Base
+    {
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Provides an opportunity for models to perform an action after a create operation
+     *
+     * @param int $iId The ID of the item which was created
+     *
+     * @return $this
+     */
+    protected function afterCreate(int $iId): Base
+    {
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Provides an opportunity for models to perform an action after an update operation
+     *
+     * @param int $iId The ID of the item which was updated
+     *
+     * @return $this
+     */
+    protected function afterUpdate(int $iId): Base
+    {
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Provides an opportunity for models to perform an action after a create or
+     * an update operation
+     *
+     * @param int $iId The ID of the item which was created or updated
+     *
+     * @return $this
+     */
+    protected function afterWrite(int $iId): Base
     {
         return $this;
     }
@@ -2746,11 +2797,15 @@ abstract class Base
      *
      * @param int   $iId
      * @param array $aExpandableFields
+     *
+     * @return $this
      */
-    protected function autoSaveExpandableFieldsSave($iId, array $aExpandableFields)
+    protected function autoSaveExpandableFieldsSave($iId, array $aExpandableFields): Base
     {
         foreach ($aExpandableFields as $oField) {
+
             $aData = array_filter((array) $oField->data);
+
             if ($oField->type === static::EXPANDABLE_TYPE_MANY) {
                 $this->saveAssociatedItems(
                     $iId,
@@ -2759,6 +2814,7 @@ abstract class Base
                     $oField->model,
                     $oField->provider
                 );
+
             } elseif ($oField->type === static::EXPANDABLE_TYPE_SINGLE) {
                 $this->saveAssociatedItem(
                     $iId,
@@ -2769,6 +2825,8 @@ abstract class Base
                 );
             }
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -3212,7 +3270,7 @@ abstract class Base
      *
      * @throws ModelException
      */
-    protected function triggerEvent($sEvent, array $aData)
+    protected function triggerEvent($sEvent, array $aData): Base
     {
         if ($sEvent) {
             /** @var Event $oEvent */
@@ -3224,5 +3282,7 @@ abstract class Base
                     $aData
                 );
         }
+
+        return $this;
     }
 }
