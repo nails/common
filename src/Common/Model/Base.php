@@ -2672,6 +2672,7 @@ abstract class Base
      * @param string      $sModel       The related model
      * @param string      $sProvider    The provider of the related model
      * @param string|null $sLocalColumn The local column contianing the foreign ID
+     * @param array       $aData        Any data to bind to the expandable field
      *
      * @return $this
      * @throws ModelException
@@ -2680,7 +2681,8 @@ abstract class Base
         string $sTrigger,
         string $sModel,
         string $sProvider = 'app',
-        string $sLocalColumn = null
+        string $sLocalColumn = null,
+        array $aData = []
     ): self {
         return $this
             ->addExpandableField([
@@ -2689,6 +2691,7 @@ abstract class Base
                 'model'     => $sModel,
                 'provider'  => $sProvider,
                 'id_column' => $sLocalColumn ?? sprintf('%s_id', $sTrigger),
+                'data'      => $aData,
             ]);
     }
 
@@ -2701,6 +2704,7 @@ abstract class Base
      * @param string $sModel         The related model
      * @param string $sForeignColumn The foreign column contianing the local ID
      * @param string $sProvider      The provider of the related model
+     * @param array  $aData          Any data to bind to the expandable field
      *
      * @return $this
      * @throws ModelException
@@ -2709,7 +2713,8 @@ abstract class Base
         string $sTrigger,
         string $sModel,
         string $sForeignColumn,
-        string $sProvider = 'app'
+        string $sProvider = 'app',
+        array $aData = []
     ): self {
         return $this
             ->addExpandableField([
@@ -2718,6 +2723,7 @@ abstract class Base
                 'model'     => $sModel,
                 'provider'  => $sProvider,
                 'id_column' => $sForeignColumn,
+                'data'      => $aData,
             ]);
     }
 
