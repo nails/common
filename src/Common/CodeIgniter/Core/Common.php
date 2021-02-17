@@ -90,9 +90,9 @@ if (!function_exists('show404')) {
 }
 
 if (!function_exists('getFromArray')) {
-    function getFromArray($sKey, $aArray, $mDefault = null)
+    function getFromArray($mKey, $aArray, $mDefault = null)
     {
-        return ArrayHelper::getFromArray($sKey, $aArray, $mDefault);
+        return ArrayHelper::getFromArray($mKey, $aArray, $mDefault);
     }
 }
 
