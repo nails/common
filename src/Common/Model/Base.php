@@ -216,6 +216,13 @@ abstract class Base
      */
     const SENSITIVE_FIELDS = [];
 
+    /**
+     * The mask to mask when generating tokens
+     *
+     * @var string
+     */
+    const TOKEN_MASK = null;
+
     // --------------------------------------------------------------------------
 
     /**
@@ -297,13 +304,6 @@ abstract class Base
     protected $aCacheColumns = [];
 
     /**
-     * Override the default token mask when automatically generating tokens for items
-     *
-     * @var string
-     */
-    protected $sTokenMask;
-
-    /**
      * The model's expandable field definitions
      *
      * @var array
@@ -374,6 +374,14 @@ abstract class Base
      * @deprecated Use constant DESTRUCTIVE_DELETE instead
      */
     protected $destructiveDelete;
+
+    /**
+     * Override the default token mask when automatically generating tokens for items
+     *
+     * @var string
+     * @deprecated Use constant TOKEN_MASK instead
+     */
+    protected $sTokenMask;
 
     /**
      * --------------------------------------------------------------------------
@@ -2405,39 +2413,51 @@ abstract class Base
     /**
      * Generates a unique token for a record
      *
-     * @param string|null $sMask   The token mask, defaults to $this->sTokenMask
-     * @param string|null $sTable  The table to use defaults to $this->table
+     * @param string|null $sMask   The token mask, defaults to $this->getTokenMask()
+     * @param string|null $sTable  The table to use defaults to $this->getTableName()
      * @param string|null $sColumn The column to use, defaults to $this->getColumn('token')
      *
      * @return string
      * @throws ModelException
      */
-    protected function generateToken($sMask = null, $sTable = null, $sColumn = null)
+    protected function generateToken(string $sMask = null, string $sTable = null, string $sColumn = null): string
     {
-        if (is_null($sMask)) {
-            $sMask = $this->sTokenMask;
-        }
+        $sMask   = $sMask ?? $this->getTokenMask();
+        $sTable  = $sTable ?? $this->getTableName();
+        $sColumn = $sColumn ?? $this->getColumn('token');
 
-        if (is_null($sTable)) {
-            $sTable = $this->getTableName();
-        }
-
-        if (is_null($sColumn)) {
-            if (!$this->getColumn('token')) {
-                throw new ModelException(static::class . '::generateToken() Token variable not set', 1);
-            }
-            $sColumn = $this->getColumn('token');
+        if (!$sColumn) {
+            throw new ModelException(
+                sprintf(
+                    '%s::generateToken() Token variable not set',
+                    static::class
+                )
+            );
         }
 
         /** @var Database $oDb */
         $oDb = Factory::service('Database');
 
         do {
+
             $sToken = generateToken($sMask);
             $oDb->where($sColumn, $sToken);
+
         } while ($oDb->count_all_results($sTable));
 
         return $sToken;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the token mask to use
+     *
+     * @return string
+     */
+    protected function getTokenMask(): string
+    {
+        return static::TOKEN_MASK ?? $this->sTokenMask;
     }
 
     // --------------------------------------------------------------------------
