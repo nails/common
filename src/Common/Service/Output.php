@@ -134,12 +134,12 @@ class Output
     /**
      * Set the Content-Type header
      *
-     * @param stirng      $sMimeType The mime type of the output
+     * @param string      $sMimeType The mime type of the output
      * @param string|null $sCharset  The charset of the output
      *
      * @return $this
      */
-    public function setContentType(stirng $sMimeType, string $sCharset = null): self
+    public function setContentType(string $sMimeType, string $sCharset = null): self
     {
         $this->oOutput->set_content_type($sMimeType, $sCharset);
         return $this;
@@ -166,7 +166,7 @@ class Output
      *
      * @return string|null
      */
-    public function getHeader(string $sHeader): ?null
+    public function getHeader(string $sHeader): ?string
     {
         return $this->oOutput->get_header($sHeader);
     }
