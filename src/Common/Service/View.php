@@ -209,7 +209,7 @@ class View
             } else {
                 /** @var Output $oOutput */
                 $oOutput = Factory::service('Output');
-                $oOutput->append_output(ob_get_contents());
+                $oOutput->appendOutput(ob_get_contents());
                 @ob_end_clean();
             }
 

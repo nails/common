@@ -54,7 +54,7 @@ class Url
      *
      * Header redirect in two flavors
      * For very fine grained control over headers, you could use the Output
-     * Library's set_header() function.
+     * Library's setHeader() function.
      *
      * Overriding so as to call the post_system hook before exit()'ing
      *

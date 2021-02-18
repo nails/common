@@ -21,30 +21,6 @@ use Nails\Factory;
  * Class Output
  *
  * @package Nails\Common\Service
- *
- * @property $final_output     = null;
- * @property $cache_expiration = 0;
- * @property $headers          = array();
- * @property $mimes            =    array();
- * @property $enable_profiler  = FALSE;
- * @property $parse_exec_vars  = TRUE;
- *
- * @method get_output()
- * @method set_output($output)
- * @method append_output($output)
- * @method set_header($header, $replace = true)
- * @method set_content_type($mime_type, $charset = null)
- * @method get_content_type()
- * @method get_header($header)
- * @method set_status_header($code = 200, $text = '')
- * @method enable_profiler($val = true)
- * @method set_profiler_sections($sections)
- * @method cache($time)
- * @method _display($output = '')
- * @method _write_cache($output)
- * @method _display_cache(&$CFG, &$URI)
- * @method delete_cache($uri = '')
- * @method set_cache_header($last_modified, $expiration)
  */
 class Output
 {
@@ -53,7 +29,7 @@ class Output
      *
      * @var \CI_Output
      */
-    private $oOutput;
+    protected $oOutput;
 
     // --------------------------------------------------------------------------
 
@@ -95,6 +71,185 @@ class Output
         $oEventService->trigger(Events::OUTPUT_POST);
     }
 
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the current output string
+     *
+     * @return string|null
+     */
+    public function getOutput(): ?string
+    {
+        return $this->oOutput->get_output();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets the output string
+     *
+     * @param string $sOutput The output to set
+     *
+     * @return $this
+     */
+    public function setOutput(string $sOutput): self
+    {
+        $this->oOutput->set_output($sOutput);
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Append to the existing output string
+     *
+     * @param string $sOutput The output to append
+     *
+     * @return $this
+     */
+    public function appendOutput(string $sOutput): self
+    {
+        $this->oOutput->append_output($sOutput);
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Set a header to be sent with final output
+     *
+     * @param string $sHeader  the header to set
+     * @param bool   $bReplace Whether to replace the old header value, if set
+     *
+     * @return $this
+     */
+    public function setHeader(string $sHeader, bool $bReplace = true): self
+    {
+        $this->oOutput->set_header($sHeader, $bReplace);
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Set the Content-Type header
+     *
+     * @param stirng      $sMimeType The mime type of the output
+     * @param string|null $sCharset  The charset of the output
+     *
+     * @return $this
+     */
+    public function setContentType(stirng $sMimeType, string $sCharset = null): self
+    {
+        $this->oOutput->set_content_type($sMimeType, $sCharset);
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Get the current Content-Type header
+     *
+     * @return string
+     */
+    public function getContentType(): string
+    {
+        return $this->oOutput->get_content_type();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Get a header
+     *
+     * @param string $sHeader The header to get
+     *
+     * @return string|null
+     */
+    public function getHeader(string $sHeader): ?null
+    {
+        return $this->oOutput->get_header($sHeader);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets the HTTP status header
+     *
+     * @param int    $iCode The status code
+     * @param string $sText The status text
+     *
+     * @return $this
+     */
+    public function setStatusHeader($iCode = 200, $sText = ''): self
+    {
+        $this->oOutput->set_status_header($iCode, $sText);
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Enable the CI profiler
+     *
+     * @return $this
+     */
+    public function enableProfiler(): self
+    {
+        $this->oOutput->enable_profiler(true);
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Disable the CI profiler
+     *
+     * @return $this
+     */
+    public function disableProfiler(): self
+    {
+        $this->oOutput->enable_profiler(false);
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Set profiler sections
+     *
+     * @param array $aSections Profiler sections
+     *
+     * @return $this
+     */
+    public function setProfilerSections(array $aSections): self
+    {
+        $this->oOutput->set_profiler_sections($aSections);
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Set Cache Header
+     *
+     * Set the HTTP headers to match the server-side file cache settings
+     * in order to reduce bandwidth.
+     *
+     * @param int $iLastModified Timestamp of when the page was last modified
+     * @param int $iExpiration   Timestamp of when should the requested page expire from cache
+     *
+     * @return $this
+     */
+    public function setCacheHeader(int $iLastModified, int $iExpiration): self
+    {
+        $this->oOutput->set_cache_header($iLastModified, $iExpiration);
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+    //  The following methods exist only to to ensure backwards compatability
+    //  with CodeIgniter and should be considered deprecated
     // --------------------------------------------------------------------------
 
     /**

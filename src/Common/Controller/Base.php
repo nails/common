@@ -176,7 +176,7 @@ abstract class Base extends \MX_Controller
     {
         /** @var Output $oOutput */
         $oOutput = Factory::service('Output');
-        $oOutput->set_content_type('text/html; charset=utf-8');
+        $oOutput->setContentType('text/html; charset=utf-8');
 
         return $this;
     }
@@ -240,24 +240,26 @@ abstract class Base extends \MX_Controller
 
                 if (!$oInput::isCli()) {
 
-                    $oOutput->set_header($oInput->server('SERVER_PROTOCOL') . ' 503 Service Temporarily Unavailable');
-                    $oOutput->set_header('Status: 503 Service Temporarily Unavailable');
-                    $oOutput->set_header('Retry-After: 7200');
+                    $oOutput
+                        ->setHeader($oInput->server('SERVER_PROTOCOL') . ' 503 Service Temporarily Unavailable')
+                        ->setHeader('Status: 503 Service Temporarily Unavailable')
+                        ->setHeader('Retry-After: 7200');
 
                     // --------------------------------------------------------------------------
 
                     //  If the request is an AJAX request, or the URL is on the API then spit back JSON
                     if ($oInput::isAjax() || $oUri->segment(1) == 'api') {
 
-                        $oOutput->set_header('Cache-Control: no-store, no-cache, must-revalidate');
-                        $oOutput->set_header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-                        $oOutput->set_header('Content-Type: application/json');
-                        $oOutput->set_header('Pragma: no-cache');
-
-                        echo $oOutput->_display(json_encode([
-                            'status' => 503,
-                            'error'  => $sMaintenanceTitle,
-                        ]));
+                        $oOutput
+                            ->setHeader('Cache-Control: no-store, no-cache, must-revalidate')
+                            ->setHeader('Expires: Mon, 26 Jul 1997 05:00:00 GMT')
+                            ->setHeader('Content-Type: application/json')
+                            ->setHeader('Pragma: no-cache')
+                            ->setOutput(json_encode([
+                                'status' => 503,
+                                'error'  => $sMaintenanceTitle,
+                            ]))
+                            ->display();
 
                     } else {
                         //  Otherwise, render some HTML
