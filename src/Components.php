@@ -29,7 +29,7 @@ final class Components
      *
      * @var string
      */
-    public static $oAppSlug = 'app';
+    public static $sAppSlug = 'app';
 
     /**
      * The namespace to use for App components
@@ -263,10 +263,10 @@ final class Components
                  */
                 'slug' => array_key_exists('moduleName', $aNails)
                     ? $aComposer['name']
-                    : static::$oAppSlug,
+                    : static::$sAppSlug,
                 'name' => array_key_exists('moduleName', $aNails)
                     ? $aComposer['name']
-                    : static::$oAppSlug,
+                    : static::$sAppSlug,
 
                 'description' => ArrayHelper::getFromArray('description', $aNails, ArrayHelper::getFromArray('description', $aComposer)),
                 'homepage'    => ArrayHelper::getFromArray('homepage', $aNails, ArrayHelper::getFromArray('homepage', $aComposer)),
@@ -471,7 +471,7 @@ final class Components
         }
 
         foreach (static::available() as $oComponent) {
-            if ($oComponent->slug === static::$oAppSlug) {
+            if ($oComponent->slug === static::$sAppSlug) {
                 continue;
             } elseif (preg_match('/^' . preg_quote($oComponent->path, '/') . '/', $sPath)) {
                 return $oComponent;

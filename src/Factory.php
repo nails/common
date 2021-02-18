@@ -22,13 +22,6 @@ use Pimple\Container;
 class Factory
 {
     /**
-     * The slug to use for app services
-     *
-     * @var string
-     */
-    public static $oAppSlug = 'app';
-
-    /**
      * Contains an array of containers; each component gets its own element so as
      * to avoid naming collisions.
      *

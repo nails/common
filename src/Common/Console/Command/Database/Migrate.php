@@ -287,7 +287,7 @@ class Migrate extends Base
 
         // --------------------------------------------------------------------------
 
-        if ($oComponent->slug === Components::$oAppSlug) {
+        if ($oComponent->slug === Components::$sAppSlug) {
             $sMigrationsPath = $oComponent->path . 'application/migrations';
         } else {
             $sMigrationsPath = $oComponent->path . 'migrations';
@@ -360,7 +360,7 @@ class Migrate extends Base
         //  Shift the app migrations onto the end so they are executed last
         if (!empty($aOut)) {
             $oFirst = reset($aOut);
-            if ($oFirst->name === Components::$oAppSlug) {
+            if ($oFirst->name === Components::$sAppSlug) {
                 $oApp = array_shift($aOut);
                 $aOut = array_merge($aOut, [$oApp]);
                 $aOut = array_filter($aOut);
@@ -387,7 +387,7 @@ class Migrate extends Base
         // --------------------------------------------------------------------------
 
         //  Map the directory and fetch only the files we need
-        $sPath   = $oModule->name == Components::$oAppSlug ? 'application/migrations/' : 'vendor/' . $oModule->name . '/migrations/';
+        $sPath   = $oModule->name == Components::$sAppSlug ? 'application/migrations/' : 'vendor/' . $oModule->name . '/migrations/';
         $aDirMap = $this->mapDir($sPath);
 
         //  Set the current version to -1 if null so migrations with a zero index are picked up
