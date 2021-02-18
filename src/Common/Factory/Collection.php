@@ -20,7 +20,7 @@ use Nails\Common\Helper\Tools;
  *
  * @package Nails\Common\Factory
  */
-abstract class Collection implements \Iterator
+abstract class Collection implements \Iterator, \Countable
 {
     /**
      * The collection
@@ -149,5 +149,15 @@ abstract class Collection implements \Iterator
                 ) ?? []
             )
         );
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * @inheritDoc
+     */
+    public function count()
+    {
+        return count($this->aCollection);
     }
 }
