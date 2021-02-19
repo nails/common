@@ -2453,9 +2453,9 @@ abstract class Base
     /**
      * Returns the token mask to use
      *
-     * @return string
+     * @return string|null
      */
-    protected function getTokenMask(): string
+    protected function getTokenMask(): ?string
     {
         return static::TOKEN_MASK ?? $this->sTokenMask;
     }
