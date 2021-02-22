@@ -132,7 +132,7 @@ class Logger
                 write_file(
                     $sLogPath,
                     sprintf(
-                        $this->sFormat,
+                        $this->sFormat . PHP_EOL,
                         $sType ?? self::TYPE_INFO,
                         $oNow->format('Y-m-d H:i:s'),
                         trim($sLogPath)
