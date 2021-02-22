@@ -135,7 +135,7 @@ class Logger
                         $this->sFormat . PHP_EOL,
                         $sType ?? self::TYPE_INFO,
                         $oNow->format('Y-m-d H:i:s'),
-                        trim($sLogPath)
+                        trim($sLine)
                     ),
                     'a'
                 );
