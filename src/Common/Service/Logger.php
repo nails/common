@@ -45,13 +45,74 @@ class Logger
      * Writes a line to the app log
      *
      * @param string $sLine The line to write to the log
+     * @param string $sType The type of log entry
      *
      * @return $this
      * @throws FactoryException
      */
-    public function line($sLine = ''): self
+    public function line($sLine = '', string $sType = null): self
     {
         $this->oLogger->line($sLine);
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Logs a message of type \Nails\Common\Factory\Logger::TYPE_DEBUG
+     *
+     * @param string $sLine The line to write
+     *
+     * @return $this
+     */
+    public function debug($sLine = ''): self
+    {
+        $this->oLogger->debug($sLine);
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Logs a message of type \Nails\Common\Factory\Logger::TYPE_INFO
+     *
+     * @param string $sLine The line to write
+     *
+     * @return $this
+     */
+    public function info($sLine = ''): self
+    {
+        $this->oLogger->info($sLine);
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Logs a message of type \Nails\Common\Factory\Logger::TYPE_WARNING
+     *
+     * @param string $sLine The line to write
+     *
+     * @return $this
+     */
+    public function warning($sLine = ''): self
+    {
+        $this->oLogger->warning($sLine);
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Logs a message of type \Nails\Common\Factory\Logger::TYPE_ERROR
+     *
+     * @param string $sLine The line to write
+     *
+     * @return $this
+     */
+    public function error($sLine = ''): self
+    {
+        $this->oLogger->error($sLine);
         return $this;
     }
 

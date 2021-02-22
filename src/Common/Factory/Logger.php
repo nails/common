@@ -25,6 +25,18 @@ use Nails\Factory;
  */
 class Logger
 {
+    /**
+     * The various log types
+     *
+     * @var string
+     */
+    const TYPE_DEBUG   = 'DEBUG';
+    const TYPE_INFO    = 'INFO';
+    const TYPE_WARNING = 'WARNING';
+    const TYPE_ERROR   = 'ERROR';
+
+    // --------------------------------------------------------------------------
+
     /** @var bool */
     public $bMute = false;
 
@@ -39,6 +51,17 @@ class Logger
 
     /** @var string */
     protected $sFile;
+
+    /**
+     * The format for each line in the log
+     * Arguments:
+     * 1. Type, e.g. INFO
+     * 2. Timestamp, in Y-m-d H:i:s format
+     * 3. Value
+     *
+     * @var string
+     */
+    protected $sFormat = '%s - %s --> %s ';
 
     // --------------------------------------------------------------------------
 
@@ -58,11 +81,12 @@ class Logger
      * Writes a line to the log
      *
      * @param string $sLine The line to write
+     * @param string $sType The type of log entry
      *
      * @return $this
      * @throws FactoryException
      */
-    public function line($sLine = ''): self
+    public function line($sLine = '', string $sType = null): self
     {
         //  Is dummy mode enabled? If it is then don't do anything.
         if ($this->bDummy) {
@@ -77,7 +101,6 @@ class Logger
         // --------------------------------------------------------------------------
 
         if (is_null($this->bExists)) {
-
             if (!file_exists($sLogPath)) {
 
                 $sDir = dirname($sLogPath);
@@ -87,7 +110,7 @@ class Logger
 
                 // --------------------------------------------------------------------------
 
-                $sFirstLine = '<?php die(\'Unauthorised\'); ?>' . "\n\n";
+                $sFirstLine = '<?php die(\'Unauthorised\'); ?>' . PHP_EOL . PHP_EOL;
                 if (write_file($sLogPath, $sFirstLine)) {
                     $this->bExists = true;
                 } else {
@@ -103,13 +126,104 @@ class Logger
 
         if ($this->bExists) {
             if (empty($sLine)) {
-                write_file($sLogPath, "\n", 'a');
+                write_file($sLogPath, PHP_EOL, 'a');
+
             } else {
-                write_file($sLogPath, 'INFO - ' . $oNow->format('Y-m-d H:i:s') . ' --> ' . trim($sLine) . "\n", 'a');
+                write_file(
+                    $sLogPath,
+                    sprintf(
+                        $this->sFormat,
+                        $sType ?? self::TYPE_INFO,
+                        $oNow->format('Y-m-d H:i:s'),
+                        trim($sLogPath)
+                    ),
+                    'a'
+                );
             }
         }
 
         return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Logs a message of type static::TYPE_DEBUG
+     *
+     * @param string $sLine The line to write
+     *
+     * @return $this
+     */
+    public function debug($sLine = ''): self
+    {
+        return $this->line($sLine, static::TYPE_DEBUG);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Logs a message of type static::TYPE_INFO
+     *
+     * @param string $sLine The line to write
+     *
+     * @return $this
+     */
+    public function info($sLine = ''): self
+    {
+        return $this->line($sLine, static::TYPE_INFO);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Logs a message of type static::TYPE_WARNING
+     *
+     * @param string $sLine The line to write
+     *
+     * @return $this
+     */
+    public function warning($sLine = ''): self
+    {
+        return $this->line($sLine, static::TYPE_WARNING);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Logs a message of type static::TYPE_ERROR
+     *
+     * @param string $sLine The line to write
+     *
+     * @return $this
+     */
+    public function error($sLine = ''): self
+    {
+        return $this->line($sLine, static::TYPE_ERROR);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets the line format
+     *
+     * @param string $sFormat The format to set
+     */
+    public function setFormat(string $sFormat): self
+    {
+        $this->sFormat = $sFormat;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the line format
+     *
+     * @return string
+     */
+    public function getFormat(): string
+    {
+        return $this->sFormat;
     }
 
     // --------------------------------------------------------------------------
