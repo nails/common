@@ -369,9 +369,11 @@ class Factory
             );
 
         } elseif (!empty($aParamaters)) {
-            trigger_error(
-                'A call to Factory::' . $sType . '(' . $sName . ') passed construction paramaters, but the object has already been constructed'
-            );
+            trigger_error(sprintf(
+                'A call to Factory::%s(%s) passed construction paramaters, but the object has already been constructed',
+                $sType,
+                $sName
+            ));
         }
 
         return $aTrackerArray[$sKey];
