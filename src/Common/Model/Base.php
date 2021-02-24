@@ -2634,7 +2634,7 @@ abstract class Base
         if (classUses(static::class, 'Nails\Common\Traits\Model\Sortable')) {
             $sColumn = $this->getSortableColumn();
         } else {
-            $sColumn = static::DEFAULT_SORT_COLUMN ?? $this->defaultSortColumn;
+            $sColumn = $this->getColumn(static::DEFAULT_SORT_COLUMN ?? $this->defaultSortColumn);
         }
 
         if ($sColumn && strpos($sColumn, '.') === false) {
