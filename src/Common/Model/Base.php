@@ -2602,26 +2602,24 @@ abstract class Base
      */
     public function getTableAlias($bIncludeSeparator = false)
     {
-        //  @todo (Pablo - 2019-04-15) - Deprecate $this->>tableAlias
+        //  @todo (Pablo - 2019-04-15) - Deprecate $this->tableAlias
         $sOut = static::TABLE_ALIAS ?? $this->tableAlias ?? '';
 
         if (empty($sOut)) {
 
-            //  work it out
             $sTable = strtolower($this->getTableName());
             $sTable = preg_replace('/[^a-z_]/', '', $sTable);
             $sTable = preg_replace('/_/', ' ', $sTable);
             $aTable = explode(' ', $sTable);
+
             foreach ($aTable as $sWord) {
                 $sOut .= $sWord[0];
             }
         }
 
-        if (!empty($sOut) && $bIncludeSeparator) {
-            $sOut .= '.';
-        }
-
-        return $sOut;
+        return !empty($sOut) && $bIncludeSeparator
+            ? $sOut . '.'
+            : $sOut;
     }
 
     // --------------------------------------------------------------------------
