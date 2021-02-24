@@ -237,6 +237,20 @@ abstract class Base
      */
     const SORT_DESC = 'desc';
 
+    /**
+     * The default column to sort on
+     *
+     * @var string|null
+     */
+    const DEFAULT_SORT_COLUMN = null;
+
+    /**
+     * The default sort order
+     *
+     * @var string
+     */
+    const DEFAULT_SORT_ORDER = null;
+
     // --------------------------------------------------------------------------
 
     /**
@@ -332,20 +346,6 @@ abstract class Base
     protected $perPage = 50;
 
     /**
-     * The default column to use for sorting items
-     *
-     * @var string|null
-     */
-    protected $defaultSortColumn;
-
-    /**
-     * The default sort order
-     *
-     * @var string
-     */
-    protected $defaultSortOrder = self::SORT_ASC;
-
-    /**
      * --------------------------------------------------------------------------
      * DEPRECATED PROPERTIES
      * --------------------------------------------------------------------------
@@ -398,12 +398,22 @@ abstract class Base
     protected $sTokenMask;
 
     /**
-     * --------------------------------------------------------------------------
-     * CONSTRUCTOR && DESTRUCTOR
-     * The constructor preps common variables and sets the model up for user.
-     * The destructor clears
-     * --------------------------------------------------------------------------
+     * The default column to use for sorting items
+     *
+     * @var string|null
+     * @deprecated Use constant DEFAULT_SORT_COLUMN instead
      */
+    protected $defaultSortColumn;
+
+    /**
+     * The default sort order
+     *
+     * @var string
+     * @deprecated Use constant DEFAULT_SORT_ORDER instead
+     */
+    protected $defaultSortOrder = self::SORT_ASC;
+
+    // --------------------------------------------------------------------------
 
     /**
      * Base constructor.
@@ -411,10 +421,6 @@ abstract class Base
     public function __construct()
     {
         $this->clearErrors();
-
-        if (classUses(static::class, 'Nails\Common\Traits\Model\Sortable')) {
-            $this->defaultSortColumn = $this->getSortableColumn();
-        }
 
         $this->aCacheColumns = [
             $this->getColumn('id'),
@@ -1168,13 +1174,11 @@ abstract class Base
         // --------------------------------------------------------------------------
 
         //  Define the default sorting
-        if (empty($aData['sort']) && !empty($this->defaultSortColumn)) {
-            if (strpos($this->defaultSortColumn, '.') !== false) {
-                $sColumn = $this->defaultSortColumn;
-            } else {
-                $sColumn = $this->getTableAlias(true) . $this->defaultSortColumn;
-            }
-            $aData['sort'] = [$sColumn, $this->defaultSortOrder];
+        if (empty($aData['sort']) && $this->getDefaultSortColumn()) {
+            $aData['sort'] = [
+                $this->getDefaultSortColumn(),
+                $this->getDefaultSortOrder(),
+            ];
         }
 
         // --------------------------------------------------------------------------
@@ -2618,6 +2622,40 @@ abstract class Base
         }
 
         return $sOut;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the default sort column
+     *
+     * @return string|null
+     */
+    public function getDefaultSortColumn(): ?string
+    {
+        if (classUses(static::class, 'Nails\Common\Traits\Model\Sortable')) {
+            $sColumn = $this->getSortableColumn();
+        } else {
+            $sColumn = static::DEFAULT_SORT_COLUMN ?? $this->defaultSortColumn;
+        }
+
+        if ($sColumn && strpos($sColumn, '.') === false) {
+            $sColumn = $this->getTableAlias(true) . $sColumn;
+        }
+
+        return $sColumn;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the default sort order
+     *
+     * @return string
+     */
+    public function getDefaultSortOrder(): string
+    {
+        return static::DEFAULT_SORT_ORDER ?? $this->defaultSortOrder;
     }
 
     // --------------------------------------------------------------------------
