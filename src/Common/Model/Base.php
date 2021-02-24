@@ -223,6 +223,20 @@ abstract class Base
      */
     const TOKEN_MASK = null;
 
+    /**
+     * The string for sorting in ascending order
+     *
+     * @var string
+     */
+    const SORT_ASC = 'asc';
+
+    /**
+     * The string for sorting in descending order
+     *
+     * @var string
+     */
+    const SORT_DESC = 'desc';
+
     // --------------------------------------------------------------------------
 
     /**
@@ -329,7 +343,7 @@ abstract class Base
      *
      * @var string
      */
-    protected $defaultSortOrder = 'ASC';
+    protected $defaultSortOrder = self::SORT_ASC;
 
     /**
      * --------------------------------------------------------------------------
