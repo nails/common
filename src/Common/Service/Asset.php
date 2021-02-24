@@ -1047,16 +1047,6 @@ class Asset
                 );
                 break;
 
-            case 'UPLOADIFY':
-                $this->load(
-                    [
-                        'uploadify/uploadify.css',
-                        'uploadify/jquery.uploadify.min.js',
-                    ],
-                    'NAILS-PACKAGE'
-                );
-                break;
-
             case 'CHOSEN':
                 $this->load(
                     [
