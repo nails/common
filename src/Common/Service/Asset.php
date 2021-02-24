@@ -1067,15 +1067,6 @@ class Asset
                 );
                 break;
 
-            case 'ZEROCLIPBOARD':
-                $this->load(
-                    [
-                        'zeroclipboard/dist/ZeroClipboard.min.js',
-                    ],
-                    'NAILS-BOWER'
-                );
-                break;
-
             case 'KNOCKOUT':
                 $this->load(
                     [
