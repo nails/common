@@ -486,6 +486,7 @@ abstract class Base
     {
         $this->triggerEvent(static::EVENT_CREATING, [$aData, $this]);
 
+        /** @var Database $oDb */
         $oDb    = Factory::service('Database');
         $sTable = $this->getTableName();
 
@@ -584,7 +585,8 @@ abstract class Base
 
         $sAlias = $this->getTableAlias(true);
         $sTable = $this->getTableName(true);
-        $oDb    = Factory::service('Database');
+        /** @var Database $oDb */
+        $oDb = Factory::service('Database');
 
         // --------------------------------------------------------------------------
 
@@ -1076,6 +1078,7 @@ abstract class Base
     {
         $this->triggerEvent(static::EVENT_DESTROYING, [$iId, $this]);
 
+        /** @var Database $oDb */
         $oDb    = Factory::service('Database');
         $sTable = $this->getTableName();
 
@@ -1176,6 +1179,7 @@ abstract class Base
 
         // --------------------------------------------------------------------------
 
+        /** @var Database $oDb */
         $oDb    = Factory::service('Database');
         $sTable = $this->getTableName(true);
 
