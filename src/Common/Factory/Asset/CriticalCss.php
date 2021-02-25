@@ -2,6 +2,8 @@
 
 namespace Nails\Common\Factory\Asset;
 
+use Nails\Common\Service\Asset;
+
 /**
  * Class CriticalCss
  *
@@ -9,11 +11,26 @@ namespace Nails\Common\Factory\Asset;
  */
 class CriticalCss
 {
+    /** @var Asset */
+    protected $oAsset;
+
     /** @var string */
     protected $sDeferredStylesheet;
 
     /** @var string[] */
     protected $aInlineCss = [];
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * CriticalCss constructor.
+     *
+     * @param Asset $oAsset The asset service
+     */
+    public function __construct(Asset $oAsset)
+    {
+        $this->oAsset = $oAsset;
+    }
 
     // --------------------------------------------------------------------------
 
@@ -115,6 +132,22 @@ class CriticalCss
 
     // --------------------------------------------------------------------------
 
+    protected function getDeferredStylesheetUrl(): ?string
+    {
+        $sStylesheet = $this->getDeferredStylesheet();
+        if (empty($sStylesheet)) {
+            return null;
+        }
+
+        if (preg_match('/^https?:\/\//', $sStylesheet)) {
+            return $sStylesheet;
+        }
+
+        return $this->oAsset->buildUrl($this->oAsset->getCssDir() . $sStylesheet);
+    }
+
+    // --------------------------------------------------------------------------
+
     /**
      * Renders the deferred stylesheet
      *
@@ -122,10 +155,11 @@ class CriticalCss
      */
     protected function renderDeferredStylesheet(): string
     {
-        return $this->getDeferredStylesheet()
+        $sUrl = $this->getDeferredStylesheetUrl();
+        return $sUrl
             ? sprintf(
                 '<link rel="stylesheet" as="style" href="%s" media="print" onload="this.media=\'all\'">',
-                siteUrl($this->getDeferredStylesheet())
+                $sUrl
             ) : '';
     }
 
@@ -138,10 +172,11 @@ class CriticalCss
      */
     protected function renderImmediateStylesheet(): string
     {
-        return $this->getDeferredStylesheet()
+        $sUrl = $this->getDeferredStylesheetUrl();
+        return $sUrl
             ? sprintf(
                 '<link href="%s" rel="stylesheet" type="text/css"/>',
-                siteUrl($this->getDeferredStylesheet())
+                $sUrl
             ) : '';
     }
 }

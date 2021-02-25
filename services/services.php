@@ -367,11 +367,11 @@ return [
     ],
 
     'factories' => [
-        'AssetCriticalCss'        => function (): \Nails\Common\Factory\Asset\CriticalCss {
+        'AssetCriticalCss'        => function (Service\Asset $oAsset): \Nails\Common\Factory\Asset\CriticalCss {
             if (class_exists('\App\Common\Factory\Asset\CriticalCss')) {
-                return new \App\Common\Factory\Asset\CriticalCss();
+                return new \App\Common\Factory\Asset\CriticalCss($oAsset);
             } else {
-                return new \Nails\Common\Factory\Asset\CriticalCss();
+                return new \Nails\Common\Factory\Asset\CriticalCss($oAsset);
             }
         },
         'DateTime'                => function ($sTime = null, DateTimeZone $oTimeZone = null): \DateTime {

@@ -1326,6 +1326,30 @@ class Asset
     // --------------------------------------------------------------------------
 
     /**
+     * Returns the CSS directory
+     *
+     * @return string
+     */
+    public function getCssDir(): string
+    {
+        return $this->sCssDir;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the JS directory
+     *
+     * @return string
+     */
+    public function getJsDir(): string
+    {
+        return $this->sJsDir;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Returns the CriticalCss object
      *
      * @return CriticalCss
@@ -1334,7 +1358,7 @@ class Asset
     public function criticalCss(): CriticalCss
     {
         if (empty($this->oCriticalCss)) {
-            $this->oCriticalCss = Factory::factory('AssetCriticalCss');
+            $this->oCriticalCss = Factory::factory('AssetCriticalCss', null, $this);
         }
 
         return $this->oCriticalCss;
