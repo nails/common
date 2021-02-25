@@ -226,7 +226,7 @@ class Database
          * database in a known state.
          */
         if (Environment::is(Environment::ENV_HTTP_TEST)) {
-            $this->oDb->transaction()->start();
+            $this->transaction()->start();
         }
     }
 
@@ -238,7 +238,7 @@ class Database
     public function __destruct()
     {
         if (Environment::is(Environment::ENV_HTTP_TEST)) {
-            $this->oDb->transaction()->rollback();
+            $this->transaction()->rollback();
         }
     }
 
