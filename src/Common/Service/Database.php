@@ -18,6 +18,8 @@ namespace Nails\Common\Service;
 
 use CI_DB_mysqli_driver;
 use Nails\Common\Exception\Database\ConnectionException;
+use Nails\Common\Exception\FactoryException;
+use Nails\Common\Factory\Database\Transaction;
 use Nails\Config;
 use Nails\Environment;
 use Nails\Factory;
@@ -93,14 +95,6 @@ use Nails\Testing;
  * @method query($sql, $binds = false, $return_object = null)
  * @method load_rdriver()
  * @method simple_query($sql)
- * @method trans_off()
- * @method trans_strict($mode = true)
- * @method trans_start($test_mode = false)
- * @method trans_complete()
- * @method trans_status()
- * @method trans_begin($test_mode = false)
- * @method trans_commit()
- * @method trans_rollback()
  * @method compile_binds($sql, $binds)
  * @method is_write_type($sql)
  * @method elapsed_time($decimals = 6)
@@ -137,10 +131,16 @@ class Database
      */
     private $oDb;
 
+    /** @var Transaction */
+    protected $oTransaction;
+
     // --------------------------------------------------------------------------
 
     /**
-     * Construct the class, connect to the database
+     * Database constructor.
+     *
+     * @throws ConnectionException
+     * @throws FactoryException
      */
     public function __construct()
     {
@@ -311,6 +311,23 @@ class Database
         }
 
         return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the Transaction object
+     *
+     * @return Transaction
+     * @throws \Nails\Common\Exception\FactoryException
+     */
+    public function transaction(): Transaction
+    {
+        if (empty($this->oTransaction)) {
+            $this->oTransaction = Factory::factory('DatabaseTransaction', null, $this);
+        }
+
+        return $this->oTransaction;
     }
 
     // --------------------------------------------------------------------------

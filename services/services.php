@@ -374,6 +374,13 @@ return [
                 return new \Nails\Common\Factory\Asset\CriticalCss($oAsset);
             }
         },
+        'DatabaseTransaction'     => function (Service\Database $oDatabase): \Nails\Common\Factory\Database\Transaction {
+            if (class_exists('\App\Common\Factory\Database\Transaction')) {
+                return new \App\Common\Factory\Database\Transaction($oDatabase);
+            } else {
+                return new \Nails\Common\Factory\Database\Transaction($oDatabase);
+            }
+        },
         'DateTime'                => function ($sTime = null, DateTimeZone $oTimeZone = null): \DateTime {
             return new \DateTime(
                 $sTime ?? Config::get('NAILS_TIME_NOW', 'now'),
