@@ -1467,7 +1467,7 @@ abstract class Base
             );
         }
 
-        if (!property_exists($oTest, $this->getColumn('label'))) {
+        if (!property_exists($oTest, $this->getColumn('id'))) {
             throw new ModelException(
                 static::class . '::getAllFlat() "' . $this->getColumn('id') . '" is not a valid column.'
             );
