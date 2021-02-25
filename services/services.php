@@ -367,6 +367,13 @@ return [
     ],
 
     'factories' => [
+        'AssetCriticalCss'        => function (): \Nails\Common\Factory\Asset\CriticalCss {
+            if (class_exists('\App\Common\Factory\Asset\CriticalCss')) {
+                return new \App\Common\Factory\Asset\CriticalCss();
+            } else {
+                return new \Nails\Common\Factory\Asset\CriticalCss();
+            }
+        },
         'DateTime'                => function ($sTime = null, DateTimeZone $oTimeZone = null): \DateTime {
             return new \DateTime(
                 $sTime ?? Config::get('NAILS_TIME_NOW', 'now'),

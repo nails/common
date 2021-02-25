@@ -2,10 +2,16 @@
 
 use Nails\Factory;
 use Nails\Common\Service;
+use Nails\Common\Resource;
 
 /**
- * @var \Nails\Common\Resource\MetaData $oMetaData
+ * @var Service\Asset     $oAssetService
+ * @var Service\Meta      $oMetaService
+ * @var Resource\MetaData $oMetaData
  */
+
+$oMetaService  = Factory::service('Meta');
+$oAssetService = Factory::service('Asset');
 
 $sHtmlLang    = $oMetaData->getLocale()->getLanguage()->getLabel();
 $sHtmlClasses = $oMetaData->getHtmlClasses()->implode();
@@ -23,17 +29,18 @@ $sBodyClasses = $oMetaData->getBodyClasses()->implode();
 
         // --------------------------------------------------------------------------
 
+        //  Critical CSS
+        echo $oAssetService->critical()->render();
+
+        // --------------------------------------------------------------------------
+
         //  Meta tags
-        /** @var Service\Meta $oMetaService */
-        $oMetaService = Factory::service('Meta');
         $oMetaService->compileFromMetaData($oMetaData);
         echo $oMetaService->outputStr();
 
         // --------------------------------------------------------------------------
 
         //  Assets
-        /** @var Service\Asset $oAssetService */
-        $oAssetService = Factory::service('Asset');
         $oAssetService->output('CSS');
         $oAssetService->output('CSS-INLINE');
         $oAssetService->output('JS-INLINE-HEADER');
