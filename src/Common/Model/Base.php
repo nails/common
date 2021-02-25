@@ -837,8 +837,7 @@ abstract class Base
                 if (empty($aData[$this->getColumn('label')])) {
                     throw new ModelException(
                         static::class . '::create() "' . $this->getColumn('label') .
-                        '" is required when automatically generating slugs.',
-                        1
+                        '" is required when automatically generating slugs.'
                     );
                 }
 
@@ -1464,15 +1463,13 @@ abstract class Base
 
         if (!property_exists($oTest, $this->getColumn('label'))) {
             throw new ModelException(
-                static::class . '::getAllFlat() "' . $this->getColumn('label') . '" is not a valid column.',
-                1
+                static::class . '::getAllFlat() "' . $this->getColumn('label') . '" is not a valid column.'
             );
         }
 
         if (!property_exists($oTest, $this->getColumn('label'))) {
             throw new ModelException(
-                static::class . '::getAllFlat() "' . $this->getColumn('id') . '" is not a valid column.',
-                1
+                static::class . '::getAllFlat() "' . $this->getColumn('id') . '" is not a valid column.'
             );
         }
 
