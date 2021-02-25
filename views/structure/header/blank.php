@@ -30,7 +30,7 @@ $sBodyClasses = $oMetaData->getBodyClasses()->implode();
         // --------------------------------------------------------------------------
 
         //  Critical CSS
-        echo $oAssetService->critical()->render();
+        echo $oAssetService->criticalCss()->render();
 
         // --------------------------------------------------------------------------
 
