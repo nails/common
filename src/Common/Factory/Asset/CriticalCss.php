@@ -132,6 +132,11 @@ class CriticalCss
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Returns the stylesheet's URL
+     *
+     * @return string|null
+     */
     protected function getDeferredStylesheetUrl(): ?string
     {
         $sStylesheet = $this->getDeferredStylesheet();
