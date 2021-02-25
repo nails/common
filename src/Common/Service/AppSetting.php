@@ -148,7 +148,7 @@ class AppSetting
     {
         /** @var Database $oDb */
         $oDb = Factory::service('Database');
-        $oDb->trans_begin();
+        $oDb->transaction()->start();
 
         try {
 
@@ -159,11 +159,11 @@ class AppSetting
             } else {
                 $this->doSet($mKey, $sGrouping, $mValue, $bEncrypt);
             }
-            $oDb->trans_commit();
+            $oDb->transaction()->commit();
             return true;
 
         } catch (\Exception $e) {
-            $oDb->trans_rollback();
+            $oDb->transaction()->rollback();
             return false;
         }
     }
@@ -234,7 +234,7 @@ class AppSetting
     {
         /** @var Database $oDb */
         $oDb = Factory::service('Database');
-        $oDb->trans_begin();
+        $oDb->transaction()->start();
 
         try {
 
@@ -246,11 +246,11 @@ class AppSetting
                 $this->doDelete($mKey, $sGrouping);
             }
 
-            $oDb->trans_commit();
+            $oDb->transaction()->commit();
             return true;
 
         } catch (\Exception $e) {
-            $oDb->trans_rollback();
+            $oDb->transaction()->rollback();
             return false;
         }
     }

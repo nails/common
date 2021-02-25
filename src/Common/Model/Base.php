@@ -545,18 +545,22 @@ abstract class Base
      */
     public function createMany(array $aData)
     {
+        /** @var Database $oDb */
         $oDb = Factory::service('Database');
+
         try {
-            $oDb->trans_begin();
+
+            $oDb->transaction()->start();
             foreach ($aData as $aDatum) {
                 if (!$this->create($aDatum)) {
                     throw new ModelException('Failed to create item with data: ' . json_encode($aDatum));
                 }
             }
-            $oDb->trans_commit();
+            $oDb->transaction()->commit();
             return true;
+
         } catch (\Exception $e) {
-            $oDb->trans_rollback();
+            $oDb->transaction()->rollback();
             $this->setError($e->getMessage());
             return false;
         }
@@ -643,6 +647,7 @@ abstract class Base
      */
     public function updateMany(array $aIds, array $aData = []): bool
     {
+        /** @var Database $oDb */
         $oDb = Factory::service('Database');
 
         /**
@@ -653,7 +658,7 @@ abstract class Base
         $bSkipUpdateTimestamps = $this->bSkipUpdateTimestamp;
 
         try {
-            $oDb->trans_begin();
+            $oDb->transaction()->start();
             foreach ($aIds as $iId) {
 
                 if ($bSkipUpdateTimestamps) {
@@ -664,10 +669,10 @@ abstract class Base
                     throw new ModelException('Failed to update item with ID ' . $iId);
                 }
             }
-            $oDb->trans_commit();
+            $oDb->transaction()->commit();
             return true;
         } catch (\Exception $e) {
-            $oDb->trans_rollback();
+            $oDb->transaction()->rollback();
             $this->setError($e->getMessage());
             return false;
         }
@@ -883,6 +888,7 @@ abstract class Base
      */
     protected function saveToDb(array $aData, int $iId = null): bool
     {
+        /** @var Database $oDb */
         $oDb = Factory::service('Database');
 
         if (!empty($aData)) {
@@ -973,17 +979,17 @@ abstract class Base
         $oDb = Factory::service('Database');
         try {
 
-            $oDb->trans_begin();
+            $oDb->transaction()->start();
             foreach ($aIds as $iId) {
                 if (!$this->delete($iId)) {
                     throw new ModelException('Failed to delete item with ID ' . $iId . '. ' . $this->lastError());
                 }
             }
-            $oDb->trans_commit();
+            $oDb->transaction()->commit();
             return true;
 
         } catch (\Exception $e) {
-            $oDb->trans_rollback();
+            $oDb->transaction()->rollback();
             $this->setError($e->getMessage());
             return false;
         }
@@ -1007,17 +1013,17 @@ abstract class Base
         $oDb = Factory::service('Database');
         try {
 
-            $oDb->trans_begin();
+            $oDb->transaction()->start();
             while ($oResult = $oResults->unbuffered_row()) {
                 if (!$this->delete($oResult->id)) {
                     throw new ModelException('Failed to delete item with ID ' . $oResult->id . '. ' . $this->lastError());
                 }
             }
-            $oDb->trans_commit();
+            $oDb->transaction()->commit();
             return true;
 
         } catch (\Exception $e) {
-            $oDb->trans_rollback();
+            $oDb->transaction()->rollback();
             $this->setError($e->getMessage());
             return false;
         }
@@ -1106,18 +1112,19 @@ abstract class Base
         $aIds = array_filter($aIds);
         $aIds = array_values($aIds);
 
+        /** @var Database $oDb */
         $oDb = Factory::service('Database');
         try {
-            $oDb->trans_begin();
+            $oDb->transaction()->start();
             foreach ($aIds as $iId) {
                 if (!$this->destroy($iId)) {
                     throw new ModelException('Failed to destroy item with ID ' . $iId);
                 }
             }
-            $oDb->trans_commit();
+            $oDb->transaction()->commit();
             return true;
         } catch (\Exception $e) {
-            $oDb->trans_rollback();
+            $oDb->transaction()->rollback();
             $this->setError($e->getMessage());
             return false;
         }
@@ -1132,6 +1139,7 @@ abstract class Base
      */
     public function truncate()
     {
+        /** @var Database $oDb */
         $oDb = Factory::service('Database');
         return $oDb->truncate($this->getTableName());
     }

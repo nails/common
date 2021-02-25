@@ -23,7 +23,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
         $oDb = Factory::service('Database');
-        $oDb->trans_begin();
+        $oDb->transaction()->start();
     }
 
     // --------------------------------------------------------------------------
@@ -35,6 +35,6 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     {
         parent::tearDown();
         $oDb = Factory::service('Database');
-        $oDb->trans_rollback();
+        $oDb->transaction()->rollback();
     }
 }
