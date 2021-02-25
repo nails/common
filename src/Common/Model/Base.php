@@ -1458,14 +1458,11 @@ abstract class Base
 
         // --------------------------------------------------------------------------
 
-        //  Test columns
+        /**
+         * Test columns
+         * We need an ID, label is encouraged but if not available we can use the ID
+         */
         $oTest = reset($aItems);
-
-        if (!property_exists($oTest, $this->getColumn('label'))) {
-            throw new ModelException(
-                static::class . '::getAllFlat() "' . $this->getColumn('label') . '" is not a valid column.'
-            );
-        }
 
         if (!property_exists($oTest, $this->getColumn('id'))) {
             throw new ModelException(
@@ -1478,7 +1475,11 @@ abstract class Base
         // --------------------------------------------------------------------------
 
         foreach ($aItems as $oItem) {
-            $aOut[$oItem->{$this->getColumn('id')}] = $oItem->{$this->getColumn('label')};
+
+            $iId    = $oItem->{$this->getColumn('id')};
+            $sLabel = $oItem->{$this->getColumn('label')} ?? 'Item #' . $iId;
+
+            $aOut[$iId] = $sLabel;
         }
 
         return $aOut;
