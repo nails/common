@@ -2,6 +2,7 @@
 
 namespace Nails\Common\Traits\Model;
 
+use Nails\Common\Exception\FactoryException;
 use Nails\Common\Service\Database;
 use Nails\Common\Resource;
 use Nails\Factory;
@@ -111,8 +112,8 @@ trait Nestable
     /**
      * Generates breadcrumbs after updating an object
      *
-     * @param array|integer $mIds  The ID(s) to update
-     * @param array         $aData Data to update the items with¬
+     * @param array|int $mIds  The ID(s) to update
+     * @param array     $aData Data to update the items with¬
      *
      * @return mixed
      */
@@ -134,10 +135,14 @@ trait Nestable
     /**
      * Generates breadcrumbs for the item
      *
-     * @param integer $iItemId The item's ID
+     * @param int $iItemId The item's ID
      */
     protected function saveBreadcrumbs($iItemId)
     {
+        if (!$this->shouldSaveBreadcrumbs($iItemId)) {
+            return;
+        }
+
         //  @todo (Pablo - 2018-07-01) - protect against infinite loops
 
         $oItem = $this->getById($iItemId);
@@ -184,35 +189,63 @@ trait Nestable
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Whether the Trait should attempt to save the breadcrumbs
+     *
+     * @return bool
+     */
+    public function shouldSaveBreadcrumbs($iItemId): bool
+    {
+        return !defined('static::SORTABLE_SAVE_BREADCRUMBS') || static::SORTABLE_SAVE_BREADCRUMBS;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Save the item's orders
+     *
+     * @throws FactoryException
+     */
     protected function saveOrder()
     {
-        /**
-         * If the model also uses the Sortable trait then  let that handle sorting
-         */
-        if (!classUses($this, Sortable::class)) {
-            /** @var Database $oDb */
-            $oDb = Factory::service('Database');
-            $oDb->select([
-                $this->getColumn('id'),
-                $this->getColumn('parent_id', 'parent_id'),
-            ]);
-            if (!$this->isDestructiveDelete()) {
-                $oDb->where($this->getColumn('deleted'), false);
-            }
-            $oDb->order_by($this->getColumn('label'));
-            $aItems = $oDb->get($this->getTableName())->result();
-
-            $iIndex = 0;
-            $aItems = $this->flattenTree(
-                $this->buildTree($aItems)
-            );
-
-            foreach ($aItems as $oItem) {
-                $oDb->set($this->getOrderColumn(), ++$iIndex);
-                $oDb->where($this->getColumn('id'), $oItem->id);
-                $oDb->update($this->getTableName());
-            }
+        if (!$this->shouldSaveOrder()) {
+            return;
         }
+
+        /** @var Database $oDb */
+        $oDb = Factory::service('Database');
+        $oDb->select([
+            $this->getColumn('id'),
+            $this->getColumn('parent_id', 'parent_id'),
+        ]);
+        if (!$this->isDestructiveDelete()) {
+            $oDb->where($this->getColumn('deleted'), false);
+        }
+        $oDb->order_by($this->getColumn('label'));
+        $aItems = $oDb->get($this->getTableName())->result();
+
+        $iIndex = 0;
+        $aItems = $this->flattenTree(
+            $this->buildTree($aItems)
+        );
+
+        foreach ($aItems as $oItem) {
+            $oDb->set($this->getOrderColumn(), ++$iIndex);
+            $oDb->where($this->getColumn('id'), $oItem->id);
+            $oDb->update($this->getTableName());
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Whether the Trait should attempt to save the order
+     *
+     * @return bool
+     */
+    public function shouldSaveOrder(): bool
+    {
+        return !classUses($this, Sortable::class) && (!defined('static::SORTABLE_SAVE_ORDER') || static::SORTABLE_SAVE_ORDER);
     }
 
     // --------------------------------------------------------------------------
@@ -298,9 +331,9 @@ trait Nestable
     /**
      * Retrieves the immediate children of an item
      *
-     * @param integer $iId        The ID of the item
-     * @param bool    $bRecursive Whetehr to recursively fetch children
-     * @param array   $aData      Any additional data to pass to the `getAll()` method
+     * @param int   $iId        The ID of the item
+     * @param bool  $bRecursive Whetehr to recursively fetch children
+     * @param array $aData      Any additional data to pass to the `getAll()` method
      *
      * @return mixed
      */
