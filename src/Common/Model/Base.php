@@ -2669,7 +2669,7 @@ abstract class Base
      */
     public function getDefaultSortOrder(): string
     {
-        return static::DEFAULT_SORT_ORDER ?? $this->defaultSortOrder;
+        return static::DEFAULT_SORT_ORDER ?? $this->defaultSortOrder ?? static::SORT_ASC;
     }
 
     // --------------------------------------------------------------------------
