@@ -40,7 +40,7 @@
         "behat/transliterator": "1.*",
         "codeigniter/framework": "3.1.11",
         "defuse/php-encryption": "2.*",
-        "guzzle/guzzle": "7.*",
+        "guzzlehttp/guzzle": "7.*",
         "mustache/mustache": "2.*",
         "pimple/pimple": "3.*",
         "ralouphie/getallheaders": "3.*",
