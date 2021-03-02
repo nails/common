@@ -1,0 +1,31 @@
+name: test
+on: [ push ]
+jobs:
+    test:
+        name: test
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Checkout code
+                uses: actions/checkout@v2
+
+            -   name: Setup PHP, with composer and extensions
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: 7.3
+
+            -   name: Get Composer cache directory
+                id: composer-cache
+                run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+            -   name: Cache Domposer dependencies
+                uses: actions/cache@v1
+                with:
+                    path: ${{ steps.composer-cache.outputs.dir }}
+                    key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+                    restore-keys: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+
+            -   name: Install dependencies
+                run: composer install
+
+            -   name: Run tests
+                run: composer test
