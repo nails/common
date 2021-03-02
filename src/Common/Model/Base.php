@@ -27,6 +27,7 @@ use Nails\Common\Traits\Caching;
 use Nails\Common\Traits\ErrorHandling;
 use Nails\Common\Traits\GetCountCommon;
 use Nails\Common\Traits\Model\Localised;
+use Nails\Common\Traits\Model\Sortable;
 use Nails\Common\Traits\Model\Timestamps;
 use Nails\Components;
 use Nails\Factory;
@@ -2641,7 +2642,7 @@ abstract class Base
      */
     public function getDefaultSortColumn(): ?string
     {
-        if (classUses(static::class, 'Nails\Common\Traits\Model\Sortable')) {
+        if (classUses(static::class, Sortable::class)) {
             $sColumn = $this->getSortableColumn();
         } else {
             $sColumn = static::DEFAULT_SORT_COLUMN ?? $this->defaultSortColumn;
