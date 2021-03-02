@@ -52,7 +52,7 @@
         "phpunit/phpunit": "9.*"
     },
     "scripts": {
-        "test": "./vendor/bin/phpunit"
+        "test": "mkdir -p cache/private cache/public && ./vendor/bin/phpunit"
     },
     "autoload": {
         "psr-4": {
