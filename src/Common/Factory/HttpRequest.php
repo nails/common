@@ -48,14 +48,14 @@ abstract class HttpRequest
      *
      * @var string
      */
-    protected $sBaseUri;
+    protected $sBaseUri = '';
 
     /**
      * The path for the request
      *
      * @var string
      */
-    protected $sPath;
+    protected $sPath = '';
 
     /**
      * The UserAgent to use for the request
@@ -87,7 +87,7 @@ abstract class HttpRequest
      * @param string $sPath    The path for the request
      * @param array  $aHeaders An array of headers to set
      */
-    public function __construct($sBaseUri = null, $sPath = null, array $aHeaders = [])
+    public function __construct(string $sBaseUri = '', string $sPath = '', array $aHeaders = [])
     {
         if (Environment::is(Environment::ENV_TEST)
             && !$sBaseUri
@@ -189,7 +189,7 @@ abstract class HttpRequest
      *
      * @return $this
      */
-    public function baseUri($sBaseUri): self
+    public function baseUri(string $sBaseUri): self
     {
         $this->sBaseUri = $sBaseUri ?: Config::get('BASE_URL');
         return $this;
@@ -204,7 +204,7 @@ abstract class HttpRequest
      *
      * @return $this
      */
-    public function path($sPath): self
+    public function path(string $sPath): self
     {
         $this->sPath = $sPath;
         return $this;

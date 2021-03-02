@@ -442,8 +442,8 @@ return [
             }
         },
         'HttpRequestPost'         => function (
-            $sBaseUri = null,
-            $sPath = null,
+            $sBaseUri = '',
+            string $sPath = '',
             array $aHeaders = []
         ): \Nails\Common\Factory\HttpRequest\Post {
             if (class_exists('\App\Common\Factory\HttpRequest\Post')) {
