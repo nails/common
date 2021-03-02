@@ -2999,7 +2999,7 @@ abstract class Base
 
         return property_exists($this, $sProperty)
             ? $this->{$sProperty}
-            : $sDefault;
+            : ($sDefault ?? $sColumn);
     }
 
     // --------------------------------------------------------------------------
