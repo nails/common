@@ -75,6 +75,13 @@ class Field
     public $info = '';
 
     /**
+     * The field's info classes
+     *
+     * @var string
+     */
+    public $info_class = '';
+
+    /**
      * The field's fieldset
      *
      * @var string
