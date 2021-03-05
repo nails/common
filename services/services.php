@@ -412,16 +412,20 @@ return [
                 return new \GuzzleHttp\Client($aConfig);
             }
         },
-        'HttpRequestDelete'       => function (array $aConfig = []): \Nails\Common\Factory\HttpRequest\Delete {
+        'HttpRequestDelete'       => function (
+            string $sBaseUri = '',
+            string $sPath = '',
+            array $aHeaders = []
+        ): \Nails\Common\Factory\HttpRequest\Delete {
             if (class_exists('\App\Common\Factory\HttpRequest\Delete')) {
-                return new \App\Common\Factory\HttpRequest\Delete($aConfig);
+                return new \App\Common\Factory\HttpRequest\Delete($sBaseUri, $sPath, $aHeaders);
             } else {
-                return new \Nails\Common\Factory\HttpRequest\Delete($aConfig);
+                return new \Nails\Common\Factory\HttpRequest\Delete($sBaseUri, $sPath, $aHeaders);
             }
         },
         'HttpRequestGet'          => function (
-            $sBaseUri = null,
-            $sPath = null,
+            string $sBaseUri = '',
+            string $sPath = '',
             array $aHeaders = []
         ): \Nails\Common\Factory\HttpRequest\Get {
             if (class_exists('\App\Common\Factory\HttpRequest\Get')) {
@@ -431,8 +435,8 @@ return [
             }
         },
         'HttpRequestPatch'        => function (
-            $sBaseUri = null,
-            $sPath = null,
+            string $sBaseUri = '',
+            string $sPath = '',
             array $aHeaders = []
         ): \Nails\Common\Factory\HttpRequest\Patch {
             if (class_exists('\App\Common\Factory\HttpRequest\Patch')) {
@@ -442,7 +446,7 @@ return [
             }
         },
         'HttpRequestPost'         => function (
-            $sBaseUri = '',
+            string $sBaseUri = '',
             string $sPath = '',
             array $aHeaders = []
         ): \Nails\Common\Factory\HttpRequest\Post {
@@ -453,8 +457,8 @@ return [
             }
         },
         'HttpRequestPut'          => function (
-            $sBaseUri = null,
-            $sPath = null,
+            string $sBaseUri = '',
+            string $sPath = '',
             array $aHeaders = []
         ): \Nails\Common\Factory\HttpRequest\Put {
             if (class_exists('\App\Common\Factory\HttpRequest\Put')) {
