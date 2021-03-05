@@ -82,10 +82,12 @@ class Mime
             include static::NAILS_MIME_FILE;
         }
 
-        if (!empty($mimes)) {
-            foreach ($mimes as $sExtension => $mMimes) {
-                $this->addExtension($sExtension, (array) $mMimes);
-            }
+        if (empty($mimes)) {
+            $mimes = [];
+        }
+
+        foreach ($mimes as $sExtension => $mMimes) {
+            $this->addExtension($sExtension, (array) $mMimes);
         }
     }
 

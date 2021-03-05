@@ -480,7 +480,7 @@ EOT;
             $aField['class'] = '';
         }
         $aField['class'] = trim($aField['class'] . ' wysiwyg wysiwyg-basic');
-        return static::wys($aField, $sTip);
+        return static::wysiwyg($aField, $sTip);
     }
 
     // --------------------------------------------------------------------------

@@ -239,31 +239,26 @@ class FormValidation
      * Sets a rule
      *
      * @param string|array $mKey   The key to set, or an array of key/value pairs
-     * @param string|array $mRule  The rule to set
+     * @param string       $sRule  The rule to set
      * @param string|null  $sLabel The field being validated, human friendly
      *
      * @return $this;
      */
-    public function setRule($mKey, string $mRule, string $sLabel = null): self
+    public function setRule($mKey, string $sRule, string $sLabel = null): self
     {
         if (is_array($mKey)) {
-            foreach ($mKey as $sKey => $mRule) {
-                if (is_array($mRule)) {
-                    foreach ($mRule as $sRule) {
+            foreach ($mKey as $sKey => $sRule) {
+                if (is_array($sRule)) {
+                    foreach ($sRule as $sRule) {
                         $this->oFormValidation->set_rules($sKey, null, $sRule);
                     }
                 } else {
-                    $this->oFormValidation->set_rules($sKey, null, $mRule);
+                    $this->oFormValidation->set_rules($sKey, null, $sRule);
                 }
             }
+
         } else {
-            if (is_array($mRule)) {
-                foreach ($mRule as $sRule) {
-                    $this->oFormValidation->set_rules($mKey, null, $sRule);
-                }
-            } else {
-                $this->oFormValidation->set_rules($mKey, $sLabel, $sRule);
-            }
+            $this->oFormValidation->set_rules($mKey, $sLabel, $sRule);
         }
 
         return $this;

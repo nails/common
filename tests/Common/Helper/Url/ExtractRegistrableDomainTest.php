@@ -35,6 +35,7 @@ class ExtractRegistrableDomainTest extends TestCase
     public function test_test_arg_is_required(): void
     {
         $this->expectException(\TypeError::class);
+        /** @phpstan-ignore-next-line */
         Url::extractRegistrableDomain();
     }
 
