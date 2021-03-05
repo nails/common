@@ -1,0 +1,13 @@
+parameters:
+    level: 0
+    paths:
+        - ../helpers
+        - ../src
+        - ../tests
+    bootstrapFiles:
+        - constants.php
+    scanDirectories:
+        - ../vendor/codeigniter/framework/system/core
+        - ../vendor/codeigniter/framework/system/libraries
+        - ../vendor/codeigniter/framework/system/database
+        - ../vendor/codeigniter/framework/system/helpers
