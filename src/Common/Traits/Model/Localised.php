@@ -288,14 +288,16 @@ trait Localised
      * @return string
      * @throws ModelException
      */
-    protected function generateSlug(string $sLabel, int $iIgnoreId = null, array $aData = [], \Nails\Common\Factory\Locale $oLocale = null)
+    protected function generateSlug(array $aData = [], int $iIgnoreId = null, \Nails\Common\Factory\Locale $oLocale = null)
     {
         if (empty($oLocale)) {
-            throw new ModelException(
-                self::class . ': A locale must be defined when generating slugs for a localised item'
-            );
+            throw new ModelException(sprintf(
+                '%s: A locale must be defined when generating slugs for a localised item',
+                self::class
+            ));
         }
 
+        /** @var Database $oDb */
         $oDb = Factory::service('Database');
 
         $oDb->start_cache();
@@ -303,7 +305,7 @@ trait Localised
         $oDb->where('region', $oLocale->getRegion());
         $oDb->stop_cache();
 
-        $sSlug = parent::generateSlug($sLabel, $iIgnoreId, $aData);
+        $sSlug = parent::generateSlug($aData, $iIgnoreId);
 
         $oDb->flush_cache();
 
@@ -362,12 +364,7 @@ trait Localised
          * Ensure automatic slug generation takes into account locale
          */
         if ($this->isAutoSetSlugs() && empty($aData[$this->getColumn('slug')])) {
-            $aData[$this->getColumn('slug')] = $this->generateSlug(
-                getFromArray($this->getColumn('label'), $aData),
-                null,
-                $aData,
-                $oLocale
-            );
+            $aData[$this->getColumn('slug')] = $this->generateSlug($aData, null, $oLocale);
         }
 
         $iItemId = parent::create($aData, false);
@@ -412,14 +409,10 @@ trait Localised
          * Ensure automatic slug generation takes into account locale
          */
         if ($this->isAutoSetSlugs() && empty($aData[$this->getColumn('slug')]) && !static::AUTO_SET_SLUG_IMMUTABLE) {
-            $aData[$this->getColumn('slug')] = $this->generateSlug(
-                getFromArray($this->getColumn('label'), $aData),
-                $iId,
-                $aData,
-                $oLocale
-            );
+            $aData[$this->getColumn('slug')] = $this->generateSlug($aData, $iId, $oLocale);
         }
 
+        /** @var Database $oDb */
         $oDb = Factory::service('Database');
         $oDb->where('language', $oLocale->getLanguage());
         $oDb->where('region', $oLocale->getRegion());
@@ -507,6 +500,7 @@ trait Localised
             );
         }
 
+        /** @var Database $oDb */
         $oDb = Factory::service('Database');
         $oDb->where('language', $oLocale->getLanguage());
         $oDb->where('region', $oLocale->getRegion());
