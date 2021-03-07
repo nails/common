@@ -4,6 +4,9 @@ namespace Nails\Common\Traits\Model;
 
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\ModelException;
+use Nails\Common\Factory\Locale\Language;
+use Nails\Common\Factory\Locale\Region;
+use Nails\Common\Factory\Locale\Script;
 use Nails\Common\Resource;
 use Nails\Common\Service\Database;
 use Nails\Common\Service\Locale;
@@ -241,10 +244,20 @@ trait Localised
      */
     private function getLocale(string $sLanguage, string $sRegion): \Nails\Common\Factory\Locale
     {
-        return Factory::factory('Locale')
-            ->setLanguage(Factory::factory('LocaleLanguage', null, $sLanguage))
-            ->setRegion(Factory::factory('LocaleRegion', null, $sRegion))
-            ->setScript(Factory::factory('LocaleScript'));
+        /** @var Language $oLocaleLanguage */
+        $oLocaleLanguage = Factory::factory('LocaleLanguage', null, $sLanguage);
+        /** @var Region $oLocaleRegion */
+        $oLocaleRegion = Factory::factory('LocaleRegion', null, $sRegion);
+        /** @var Script $oLocaleScript */
+        $oLocaleScript = Factory::factory('LocaleScript');
+
+        /** @var \Nails\Common\Factory\Locale $oLocale */
+        $oLocale = Factory::factory('Locale')
+            ->setLanguage($oLocaleLanguage)
+            ->setRegion($oLocaleRegion)
+            ->setScript($oLocaleScript);
+
+        return $oLocale;
     }
 
     // --------------------------------------------------------------------------
