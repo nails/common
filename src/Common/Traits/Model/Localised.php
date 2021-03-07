@@ -124,7 +124,7 @@ trait Localised
             if ($aData['USE_LOCALE'] instanceof \Nails\Common\Factory\Locale) {
                 $oUserLocale = $aData['USE_LOCALE'];
             } else {
-                list($sLanguage, $sRegion) = $oLocale::parseLocaleString($aData['USE_LOCALE']);
+                [$sLanguage, $sRegion] = $oLocale::parseLocaleString($aData['USE_LOCALE']);
                 $oUserLocale = $this->getLocale($sLanguage, $sRegion);
             }
 
@@ -146,7 +146,6 @@ trait Localised
 
             $sQueryExact    = 'SELECT COUNT(*) FROM ' . $sTable . ' sub_1 WHERE sub_1.id = ' . $sAlias . '.id AND sub_1.' . static::$sColumnLanguage . ' = "' . $sUserLanguage . '" AND sub_1.' . static::$sColumnRegion . ' = "' . $sUserRegion . '"';
             $sQueryLanguage = 'SELECT COUNT(*) FROM ' . $sTable . ' sub_2 WHERE sub_2.id = ' . $sAlias . '.id AND sub_2.' . static::$sColumnLanguage . ' = "' . $sUserLanguage . '" AND sub_2.' . static::$sColumnRegion . ' != "' . $sUserRegion . '"';
-
 
             if ($oLocale::MODEL_FALLBACK_TO_DEFAULT_LOCALE) {
                 $aConditionals = [
@@ -214,7 +213,7 @@ trait Localised
 
         //  Set the locales for all _available_ items
         $oResource->available_locales = array_map(function ($sLocale) use ($oLocale) {
-            list($sLanguage, $sRegion) = $oLocale::parseLocaleString($sLocale);
+            [$sLanguage, $sRegion] = $oLocale::parseLocaleString($sLocale);
             return $this->getLocale($sLanguage, $sRegion);
         }, explode(',', $oResource->available_locales));
 
