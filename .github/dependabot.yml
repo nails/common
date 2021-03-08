@@ -6,6 +6,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    reviewers:
+      - "hellopablo"
     labels:
       - "php"
       - "dependencies"
@@ -16,6 +18,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    reviewers:
+      - "hellopablo"
     labels:
       - "npm"
       - "dependencies"
