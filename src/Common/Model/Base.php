@@ -529,7 +529,7 @@ abstract class Base
                 ->afterWrite($iId)
                 ->triggerEvent(static::EVENT_CREATED, [$iId, $this]);
 
-            return $bReturnObject ? $this->getById($iId) : $iId;
+            return $bReturnObject ? $this->skipCache()->getById($iId) : $iId;
 
         } else {
             return null;
