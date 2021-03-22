@@ -72,6 +72,13 @@ if (!function_exists('form_field_wysiwyg')) {
     }
 }
 
+if (!function_exists('form_field_wysiwyg_basic')) {
+    function form_field_wysiwyg_basic($aField, $sTip = '')
+    {
+        return Form\Field::wysiwygBasic($aField, $sTip);
+    }
+}
+
 if (!function_exists('form_field_text')) {
     function form_field_text($aField, $sTip = '')
     {

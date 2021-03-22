@@ -475,11 +475,10 @@ EOT;
      */
     public static function wysiwygBasic($aField, $sTip = '')
     {
-        $aField['type'] = 'textarea';
         if (empty($aField['class'])) {
             $aField['class'] = '';
         }
-        $aField['class'] = trim($aField['class'] . ' wysiwyg wysiwyg-basic');
+        $aField['class'] = trim($aField['class'] . ' wysiwyg-basic');
         return static::wysiwyg($aField, $sTip);
     }
 
@@ -920,7 +919,7 @@ EOT;
             $_field['data']
         );
 
-        array_walk($aDataAttr, function(&$sValue, $sKey) {
+        array_walk($aDataAttr, function (&$sValue, $sKey) {
             $sValue = sprintf(
                 'data-%s="%s"',
                 $sKey,
@@ -950,7 +949,7 @@ EOT;
                     [
                         $_field['id'],
                         $_readonly,
-                        $_class
+                        $_class,
                     ],
                     $aDataAttr
                 )
