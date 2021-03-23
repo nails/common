@@ -467,6 +467,28 @@ return [
                 return new \Nails\Common\Factory\HttpRequest\Put($sBaseUri, $sPath, $aHeaders);
             }
         },
+        'HttpRequestOptions'      => function (
+            string $sBaseUri = '',
+            string $sPath = '',
+            array $aHeaders = []
+        ): \Nails\Common\Factory\HttpRequest\Options {
+            if (class_exists('\App\Common\Factory\HttpRequest\Options')) {
+                return new \App\Common\Factory\HttpRequest\Options($sBaseUri, $sPath, $aHeaders);
+            } else {
+                return new \Nails\Common\Factory\HttpRequest\Options($sBaseUri, $sPath, $aHeaders);
+            }
+        },
+        'HttpRequestHead'         => function (
+            string $sBaseUri = '',
+            string $sPath = '',
+            array $aHeaders = []
+        ): \Nails\Common\Factory\HttpRequest\Head {
+            if (class_exists('\App\Common\Factory\HttpRequest\Head')) {
+                return new \App\Common\Factory\HttpRequest\Head($sBaseUri, $sPath, $aHeaders);
+            } else {
+                return new \Nails\Common\Factory\HttpRequest\Head($sBaseUri, $sPath, $aHeaders);
+            }
+        },
         'HttpResponse'            => function (
             GuzzleHttp\Psr7\Response $oClient
         ): \Nails\Common\Factory\HttpResponse {
