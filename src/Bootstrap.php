@@ -242,18 +242,11 @@ final class Bootstrap
         Config::default('APP_DB_PREFIX', 'app_');
 
         //  Potentially vary between deployments
-        //  @todo (Pablo - 2020-03-02) - Remove, kept for backwards compatibility
-        Config::default('DEPLOY_DB_HOST', '127.0.0.1');
-        Config::default('DEPLOY_DB_USERNAME');
-        Config::default('DEPLOY_DB_PASSWORD');
-        Config::default('DEPLOY_DB_DATABASE');
-        Config::default('DEPLOY_DB_PORT', 3306);
-
-        Config::default('DB_HOST', Config::get('DEPLOY_DB_HOST'));
-        Config::default('DB_USERNAME', Config::get('DEPLOY_DB_USERNAME'));
-        Config::default('DB_PASSWORD', Config::get('DEPLOY_DB_PASSWORD'));
-        Config::default('DB_DATABASE', Config::get('DEPLOY_DB_DATABASE'));
-        Config::default('DB_PORT', Config::get('DEPLOY_DB_PORT'));
+        Config::default('DB_HOST', '127.0.0.1');
+        Config::default('DB_USERNAME');
+        Config::default('DB_PASSWORD');
+        Config::default('DB_DATABASE');
+        Config::default('DB_PORT', 3306);
 
         //  App
         Config::default('PRIVATE_KEY', '');
