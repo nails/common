@@ -393,6 +393,33 @@ class Field
     // --------------------------------------------------------------------------
 
     /**
+     * Get the info_class property
+     *
+     * @return string
+     */
+    public function getInfoClass(): string
+    {
+        return $this->info_class;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Set the info_class property
+     *
+     * @param string $sInfoClass The value to set
+     *
+     * @return $this
+     */
+    public function setInfoClass(string $sInfoClass): self
+    {
+        $this->info_class = $sInfoClass;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Get the fieldset property
      *
      * @return string
