@@ -2,6 +2,8 @@
 
 namespace Nails\Common\Factory\Model;
 
+use Nails\Common\Service\FormValidation;
+
 /**
  * Class Field
  *
@@ -106,6 +108,34 @@ class Field
      * @var bool
      */
     public $encrypted = false;
+
+    /**
+     * Whether the field is requird
+     *
+     * @var bool
+     */
+    public $required = false;
+
+    /**
+     * Whether the field is read-only
+     *
+     * @var bool
+     */
+    public $readonly = false;
+
+    /**
+     * The fields's placeholder
+     *
+     * @var string
+     */
+    public $placeholder = '';
+
+    /**
+     * The field's tip
+     *
+     * @var string
+     */
+    public $tip = '';
 
     // --------------------------------------------------------------------------
 
@@ -237,6 +267,7 @@ class Field
     public function setValidation(array $aValidation): self
     {
         $this->validation = $aValidation;
+        $this->checkIfFieldIsRequired();
         return $this;
     }
 
@@ -252,7 +283,18 @@ class Field
     public function addValidation(string $sRule): self
     {
         $this->validation[] = $sRule;
+        $this->checkIfFieldIsRequired();
         return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets field as required if the validation determines it as so
+     */
+    private function checkIfFieldIsRequired()
+    {
+        $this->setIsRequired(in_array(FormValidation::RULE_REQUIRED, $this->validation));
     }
 
     // --------------------------------------------------------------------------
@@ -513,5 +555,113 @@ class Field
     public function isEncrypted(): bool
     {
         return $this->encrypted;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets whether the field is required
+     *
+     * @param bool $bValue
+     *
+     * @return $this
+     */
+    public function setIsRequired(bool $bValue)
+    {
+        $this->required = $bValue;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns whether the field is requirdd
+     *
+     * @return bool
+     */
+    public function isRequired(): bool
+    {
+        return $this->required;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets whether the field is read-only
+     *
+     * @param bool $bValue
+     *
+     * @return $this
+     */
+    public function setIsReadOnly(bool $bValue)
+    {
+        $this->readonly = $bValue;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns whether the field is read-only
+     *
+     * @return bool
+     */
+    public function isReadOnly(): bool
+    {
+        return $this->readonly;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets the field's placeholder
+     *
+     * @param string $sValue
+     *
+     * @return $this
+     */
+    public function setPlaceholder(string $sValue)
+    {
+        $this->placeholder = $sValue;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the field's placeholder
+     *
+     * @return string
+     */
+    public function getPlaceholder(): string
+    {
+        return $this->placeholder;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets the field's tip
+     *
+     * @param string $sValue
+     *
+     * @return $this
+     */
+    public function setTip(string $sValue)
+    {
+        $this->tip = $sValue;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the field's tip
+     *
+     * @return string
+     */
+    public function getTip(): string
+    {
+        return $this->tip;
     }
 }
