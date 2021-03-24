@@ -173,7 +173,7 @@ abstract class BaseComponent
                 return $oComponent->slug;
             }, $aComponents),
             array_map(function (Component $oComponent) {
-                return $oComponent->label;
+                return $oComponent->name;
             }, $aComponents)
         );
     }
