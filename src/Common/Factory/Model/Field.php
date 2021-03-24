@@ -2,6 +2,11 @@
 
 namespace Nails\Common\Factory\Model;
 
+/**
+ * Class Field
+ *
+ * @package Nails\Common\Factory\Model
+ */
 class Field
 {
     /**
@@ -94,6 +99,13 @@ class Field
      * @var array
      */
     public $data = [];
+
+    /**
+     * Whether the field is encrypted or not (only applies in the context of app settings)
+     *
+     * @var bool
+     */
+    public $encrypted = false;
 
     // --------------------------------------------------------------------------
 
@@ -446,5 +458,33 @@ class Field
     {
         $this->data[$sKey] = $mValue;
         return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Set whether the field is encrypted (only applies in the context of app settings)
+     *
+     * @param bool $bEncrypted
+     *
+     * @return $this
+     * @todo (Pablo 2021-03-24) - Consider the option of automatic encryption in models
+     */
+    public function setEncrypted(bool $bEncrypted): self
+    {
+        $this->encrypted = $bEncrypted;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns whether the field is encrypted
+     *
+     * @return bool
+     */
+    public function isEncrypted(): bool
+    {
+        return $this->encrypted;
     }
 }
