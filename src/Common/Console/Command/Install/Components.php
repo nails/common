@@ -2,6 +2,9 @@
 
 namespace Nails\Common\Console\Command\Install;
 
+use Nails\Common\Factory\Component;
+use Nails\Common\Interfaces;
+use Nails\Common\Service\AppSetting;
 use Nails\Console\Command\Base;
 use Nails\Factory;
 use Symfony\Component\Console\Input\InputInterface;
@@ -39,16 +42,44 @@ class Components extends Base
     {
         parent::execute($oInput, $oOutput);
 
+        $this->banner('Install: Components');
+
         foreach (\Nails\Components::available() as $oComponent) {
-            if (!empty($oComponent->scripts->install)) {
-                $this->oOutput->writeln('Executing post-install scripts for: <comment>' . $oComponent->slug . '</comment>');
-                $this->oOutput->writeln('> <info>cd ' . $oComponent->path . '</info>');
-                chdir($oComponent->path);
-                $this->executeCommand($oComponent->scripts->install);
-            }
+            $this
+                ->executePostInstallScripts($oComponent);
         }
 
         return static::EXIT_CODE_SUCCESS;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Executes any post install scripts for a component
+     *
+     * @param Component $oComponent
+     *
+     * @return $this
+     */
+    protected function executePostInstallScripts(Component $oComponent): self
+    {
+        if (!empty($oComponent->scripts->install)) {
+            $this->oOutput->writeln(sprintf(
+                'Executing post-install scripts for: <comment>%s</comment>',
+                $oComponent->slug
+            ));
+
+            $this->oOutput->writeln(sprintf(
+                '> <info>cd %s</info>',
+                $oComponent->path
+            ));
+
+            chdir($oComponent->path);
+
+            $this->executeCommand($oComponent->scripts->install);
+        }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -64,9 +95,13 @@ class Components extends Base
             foreach ($sCommand as $sCommand) {
                 $this->executeCommand($sCommand);
             }
+
         } elseif (is_string($sCommand)) {
 
-            $this->oOutput->writeln('> <info>' . $sCommand . '</info>');
+            $this->oOutput->writeln(sprintf(
+                '> <info>cd %s</info>',
+                $sCommand
+            ));
             exec($sCommand, $aOutput, $iReturnVal);
 
             if ($iReturnVal) {
