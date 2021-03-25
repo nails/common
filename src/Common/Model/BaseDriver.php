@@ -67,18 +67,10 @@ abstract class BaseDriver extends BaseComponent
                 $this->aInstances[$oDriver->slug] = Components::getDriverInstance($oDriver);
 
                 //  Apply driver configurations
-                $aSettings = [
-                    'sSlug' => $oDriver->slug,
-                ];
-                if (!empty($oDriver->data->settings)) {
-                    $aSettings = array_merge(
-                        $aSettings,
-                        $this->extractComponentSettings(
-                            $oDriver->data->settings,
-                            $oDriver->slug
-                        )
-                    );
-                }
+                $aSettings = array_merge(
+                    ['sSlug' => $oDriver->slug],
+                    appSetting(null, $oDriver->slug)
+                );
 
                 $this->aInstances[$sSlug]->setConfig($aSettings);
 
