@@ -65,6 +65,13 @@ if (!function_exists('mask')) {
     }
 }
 
+if (!function_exists('toArray')) {
+    function toArray(string $sInput, array $aDeliminators = null, array $aFormatters = null): array
+    {
+        return Strings::toArray($sInput, $aDeliminators, $aFormatters);
+    }
+}
+
 // --------------------------------------------------------------------------
 
 //  Include the CodeIgniter original

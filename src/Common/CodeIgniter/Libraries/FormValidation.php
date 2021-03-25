@@ -16,6 +16,7 @@ use CI_Form_validation;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\ValidationException;
 use Nails\Common\Helper\ArrayHelper;
+use Nails\Common\Helper\Strings;
 use Nails\Common\Service\Database;
 use Nails\Common\Service\Input;
 use Nails\Common\Service\Locale;
@@ -1274,5 +1275,21 @@ class FormValidation extends CI_Form_validation
             return false;
         }
         return true;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Validates a string contains only valid emails
+     *
+     * @param $str
+     *
+     * @return bool
+     */
+    public function valid_emails($str)
+    {
+        return parent::valid_emails(
+            implode(',', Strings::toArray($str))
+        );
     }
 }

@@ -212,4 +212,33 @@ class Strings
 
         return str_repeat($sMask, $iMaskLength) . substr($sInput, $iMaskLength);
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Takes a string and transforms it into an array
+     *
+     * @param string     $sInput        The string to transform
+     * @param array|null $aDeliminators What characters should be considered deliminator (default: "\r", "\n", ';')
+     * @param array|null $aFormatters   Any post-processing functions to perform on the array elements (default: trim)
+     *
+     * @return string[]
+     */
+    public static function toArray(string $sInput, array $aDeliminators = null, array $aFormatters = null): array
+    {
+        foreach ($aDeliminators ?? ["\r", "\n", ';'] as $sDeliminator) {
+            $sInput = str_replace($sDeliminator, ',', $sInput);
+        }
+
+        $aInput = explode(',', $sInput);
+
+        foreach ($aFormatters ?? ['trim'] as $cFormatter) {
+            $aInput = array_map($cFormatter, $aInput);
+        }
+
+        $aInput = array_filter($aInput);
+        $aInput = array_unique($aInput);
+
+        return array_values($aInput);
+    }
 }
