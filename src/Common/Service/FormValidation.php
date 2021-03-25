@@ -360,27 +360,9 @@ class FormValidation
      * @param mixed  ...$aArgs Any arguments to pass to the validation rule
      *
      * @return string
-     * @throws FactoryException
-     * @throws ValidationException
      */
     public static function rule(string $sRule, ...$aArgs): string
     {
-        /**
-         * Ensure that the instance has been loaded at least once, this will ensure
-         * all the right classes have ben loaded.
-         */
-        Factory::service('FormValidation');
-
-        if (
-            !method_exists(\Nails\Common\CodeIgniter\Libraries\FormValidation::class, $sRule)
-            && !method_exists(\CI_Form_validation::class, $sRule)
-        ) {
-            throw new ValidationException(
-                sprintf('%s is not a valid validation rule', $sRule),
-                HttpCodes::STATUS_INTERNAL_SERVER_ERROR
-            );
-        }
-
         if (empty($aArgs)) {
             return $sRule;
         }
