@@ -137,6 +137,13 @@ class Field
      */
     public $tip = '';
 
+    /**
+     * The field's formatter
+     *
+     * @var callable
+     */
+    public $formatter = '';
+
     // --------------------------------------------------------------------------
 
     /**
@@ -663,5 +670,32 @@ class Field
     public function getTip(): string
     {
         return $this->tip;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets the field's formatter
+     *
+     * @param callable $cFormatter
+     *
+     * @return $this
+     */
+    public function setFormatter(callable $cFormatter)
+    {
+        $this->formatter = $cFormatter;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the field's formatter
+     *
+     * @return callable|null
+     */
+    public function getFormatter(): ?callable
+    {
+        return $this->formatter;
     }
 }
