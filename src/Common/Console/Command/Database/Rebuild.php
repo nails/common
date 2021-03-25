@@ -74,7 +74,7 @@ class Rebuild extends Base
     {
         parent::execute($oInput, $oOutput);
 
-        $this->banner('Nails Database Rebuild');
+        $this->banner('Database: Rebuild');
 
         // --------------------------------------------------------------------------
 

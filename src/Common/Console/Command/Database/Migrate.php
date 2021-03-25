@@ -95,7 +95,7 @@ class Migrate extends Base
     {
         parent::execute($oInput, $oOutput);
 
-        $this->banner('Nails Database Migration Tool');
+        $this->banner('Database: Migrate');
 
         // --------------------------------------------------------------------------
 
@@ -149,6 +149,7 @@ class Migrate extends Base
         // --------------------------------------------------------------------------
 
         //  Backwards compatability - ensure that the vendor prefix is correct
+        //  @todo (Pablo 2021-03-25) - Remove this
         $this->oDb->query(
             'UPDATE `' . Config::get('NAILS_DB_PREFIX') . 'migration` SET `module` = REPLACE(`module`, "nailsapp/", "nails/");'
         );

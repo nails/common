@@ -37,7 +37,7 @@ class Rewrite extends Base
     {
         parent::execute($oInput, $oOutput);
 
-        $this->banner('Nails Routes Rewrite');
+        $this->banner('Routes: Rewrite');
 
         try {
 
