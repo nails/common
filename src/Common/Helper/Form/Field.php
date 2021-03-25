@@ -40,7 +40,6 @@ class Field
         $_field_tip          = isset($field['tip']) ? $field['tip'] : $tip;
         $_field_autocomplete = isset($field['autocomplete']) ? (bool) $field['autocomplete'] : true;
         $_field_helper       = isset($field['helper']) ? $field['helper'] : '';
-        $_field_formatter    = isset($field['formatter']) ? $field['formatter'] : '';
 
         $_tip          = [];
         $_tip['class'] = is_array($_field_tip) && isset($_field_tip['class']) ? $_field_tip['class'] : 'fa fa-question-circle fa-lg tip';
@@ -119,16 +118,10 @@ class Field
         $sFieldAttr .= 'placeholder="' . htmlentities($_field_placeholder, ENT_QUOTES) . '" ';
         $sFieldAttr .= $_readonly;
 
-        $mFieldValue = set_value($_field_key, $_field_default, false);
-
-        if ($_field_formatter && is_object($mFieldValue) || is_array($mFieldValue)) {
-            $mFieldValue = call_user_func($_field_formatter, $mFieldValue);
-        }
-
         $_field_html = call_user_func(
             '\Nails\Common\Helper\Form::' . $_field_type,
             $_field_key,
-            $mFieldValue,
+            set_value($_field_key, $_field_default, false),
             $sFieldAttr
         );
 

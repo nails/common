@@ -217,6 +217,10 @@ class Validator
             )
         );
 
+        if (empty($aAllRules)) {
+            return $this;
+        }
+
         $aMessages = $this->getMessages();
         foreach ($aAllRules as $sRule) {
             if (preg_match('/^' . static::CI_CALLBACK_PREFIX . static::CLOSURE_METHOD . '/', $sRule)) {

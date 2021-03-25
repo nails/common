@@ -2,7 +2,7 @@
 
 namespace Nails\Common\Interfaces\Component;
 
-use Nails\Common\Factory\Model\Field;
+use Nails\Components\Setting;
 
 interface Settings
 {
@@ -16,7 +16,7 @@ interface Settings
     /**
      * Returns the component's settings configuration
      *
-     * @return Field[]
+     * @return Setting[]
      */
     public function get(): array;
 }

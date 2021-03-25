@@ -374,6 +374,9 @@ return [
                 return new \Nails\Common\Factory\Asset\CriticalCss($oAsset);
             }
         },
+        'ComponentSetting'        => function (): \Nails\Components\Setting {
+            return new \Nails\Components\Setting();
+        },
         'DatabaseTransaction'     => function (Service\Database $oDatabase): \Nails\Common\Factory\Database\Transaction {
             if (class_exists('\App\Common\Factory\Database\Transaction')) {
                 return new \App\Common\Factory\Database\Transaction($oDatabase);

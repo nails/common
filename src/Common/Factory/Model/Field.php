@@ -103,13 +103,6 @@ class Field
     public $data = [];
 
     /**
-     * Whether the field is encrypted or not (only applies in the context of app settings)
-     *
-     * @var bool
-     */
-    public $encrypted = false;
-
-    /**
      * Whether the field is requird
      *
      * @var bool
@@ -136,13 +129,6 @@ class Field
      * @var string
      */
     public $tip = '';
-
-    /**
-     * The field's formatter
-     *
-     * @var callable
-     */
-    public $formatter = '';
 
     // --------------------------------------------------------------------------
 
@@ -539,34 +525,6 @@ class Field
     // --------------------------------------------------------------------------
 
     /**
-     * Set whether the field is encrypted (only applies in the context of app settings)
-     *
-     * @param bool $bEncrypted
-     *
-     * @return $this
-     * @todo (Pablo 2021-03-24) - Consider the option of automatic encryption in models
-     */
-    public function setEncrypted(bool $bEncrypted): self
-    {
-        $this->encrypted = $bEncrypted;
-        return $this;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Returns whether the field is encrypted
-     *
-     * @return bool
-     */
-    public function isEncrypted(): bool
-    {
-        return $this->encrypted;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Sets whether the field is required
      *
      * @param bool $bValue
@@ -670,32 +628,5 @@ class Field
     public function getTip(): string
     {
         return $this->tip;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Sets the field's formatter
-     *
-     * @param callable $cFormatter
-     *
-     * @return $this
-     */
-    public function setFormatter(callable $cFormatter)
-    {
-        $this->formatter = $cFormatter;
-        return $this;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Returns the field's formatter
-     *
-     * @return callable|null
-     */
-    public function getFormatter(): ?callable
-    {
-        return $this->formatter;
     }
 }
