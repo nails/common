@@ -11,6 +11,7 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Asset\Constants;
 use Nails\Common\Exception\AssetException;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Factory\Asset\CriticalCss;
@@ -217,24 +218,11 @@ class Asset
 
         //  Backwards compatibility
         $sAssetLocation = $sAssetLocation === true ? 'NAILS' : $sAssetLocation;
+        $sAssetLocation = $sAssetLocation === 'NAILS' ? Constants::MODULE_SLUG : $sAssetLocation;
 
         // --------------------------------------------------------------------------
 
         switch (strtoupper($sAssetLocation)) {
-
-            case 'NAILS-PACKAGE':
-                $sAssetLocationMethod = 'unloadNailsPackage';
-                break;
-
-            case 'NAILS':
-                $sAssetLocationMethod = 'unloadNails';
-                break;
-
-            case 'APP-PACKAGE':
-            case 'PACKAGE':
-                $sAssetLocationMethod = 'unloadAppPackage';
-                break;
-
             case 'APP':
                 $sAssetLocationMethod = 'unloadApp';
                 break;
@@ -432,24 +420,11 @@ class Asset
 
         //  Backwards compatibility
         $sAssetLocation = $sAssetLocation === true ? 'NAILS' : $sAssetLocation;
+        $sAssetLocation = $sAssetLocation === 'NAILS' ? Constants::MODULE_SLUG : $sAssetLocation;
 
         // --------------------------------------------------------------------------
 
         switch (strtoupper($sAssetLocation)) {
-
-            case 'NAILS-PACKAGE':
-                $sAssetLocationMethod = 'loadNailsPackage';
-                break;
-
-            case 'NAILS':
-                $sAssetLocationMethod = 'loadNails';
-                break;
-
-            case 'APP-PACKAGE':
-            case 'PACKAGE':
-                $sAssetLocationMethod = 'loadAppPackage';
-                break;
-
             case 'APP':
                 $sAssetLocationMethod = 'loadApp';
                 break;
@@ -743,22 +718,6 @@ class Asset
     // --------------------------------------------------------------------------
 
     /**
-     * Loads an asset from the Nails asset module
-     *
-     * @param string $sAsset     The asset to load
-     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
-     * @param bool   $bAsync     Whether to load the asset asynchronously
-     *
-     * @return void
-     */
-    protected function loadNails($sAsset, $sForceType, bool $bAsync)
-    {
-        $this->loadModule($sAsset, $sForceType, $bAsync, 'nails/module-asset');
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Loads an asset from a module's asset directory
      *
      * @param string $sAsset     The asset to load
@@ -854,33 +813,6 @@ class Asset
     // --------------------------------------------------------------------------
 
     /**
-     * Loads a Nails package asset (as a relative url from $this->getNailsAssetUrl() . 'packages/')
-     *
-     * @param string $sAsset     The asset to load
-     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
-     * @param bool   $bAsync     Whether to load the asset asynchronously
-     *
-     * @return void
-     */
-    protected function loadNailsPackage($sAsset, $sForceType, bool $bAsync)
-    {
-        $sType = $this->determineType($sAsset, $sForceType);
-
-        switch ($sType) {
-
-            case 'CSS':
-                $this->aCss['NAILS-PACKAGE-' . $sAsset] = $this->getNailsAssetUrl() . 'packages/' . $sAsset;
-                break;
-
-            case 'JS':
-                $this->aJs['NAILS-PACKAGE-' . $sAsset] = [$this->getNailsAssetUrl() . 'packages/' . $sAsset, $bAsync];
-                break;
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Builds the URL, with base URL and cachebuster
      *
      * @param string $sItem The item being loaded
@@ -934,33 +866,6 @@ class Asset
     // --------------------------------------------------------------------------
 
     /**
-     * Loads an App package asset (as a relative url from 'packages/')
-     *
-     * @param string $sAsset     The asset to load
-     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
-     * @param bool   $bAsync     Whether to load the asset asynchronously
-     *
-     * @return void
-     */
-    protected function loadAppPackage($sAsset, $sForceType, bool $bAsync)
-    {
-        $sType = $this->determineType($sAsset, $sForceType);
-
-        switch ($sType) {
-
-            case 'CSS':
-                $this->aCss['APP-PACKAGE-' . $sAsset] = $this->buildUrl('packages/' . $sAsset);
-                break;
-
-            case 'JS':
-                $this->aJs['APP-PACKAGE-' . $sAsset] = [$this->buildUrl('packages/' . $sAsset), $bAsync];
-                break;
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Loads an asset from the app's asset directory
      *
      * @param string $sAsset     The asset to load
@@ -988,21 +893,6 @@ class Asset
     // --------------------------------------------------------------------------
 
     /**
-     * Unloads an asset from the Nails asset module
-     *
-     * @param string $sAsset     The asset to unload
-     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
-     *
-     * @return void
-     */
-    protected function unloadNails($sAsset, $sForceType)
-    {
-        $this->unloadModule($sAsset, $sForceType, 'nails/module-asset');
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Unloads an asset from the app's asset directory
      *
      * @param string $sAsset     The asset to unload
@@ -1022,58 +912,6 @@ class Asset
 
             case 'JS':
                 unset($this->aJs['MODULE-' . $sModule . '-' . $sAsset]);
-                break;
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Unloads a Nails package asset (as a relative url from $this->getNailsAssetUrl() . 'packages/')
-     *
-     * @param string $sAsset     The asset to unload
-     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
-     *
-     * @return void
-     */
-    protected function unloadNailsPackage($sAsset, $sForceType)
-    {
-        $sType = $this->determineType($sAsset, $sForceType);
-
-        switch ($sType) {
-
-            case 'CSS':
-                unset($this->aCss['NAILS-PACKAGE-' . $sAsset]);
-                break;
-
-            case 'JS':
-                unset($this->aJs['NAILS-PACKAGE-' . $sAsset]);
-                break;
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Unloads an App package asset (as a relative url from 'packages/')
-     *
-     * @param string $sAsset     The asset to load
-     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
-     *
-     * @return void
-     */
-    protected function unloadAppPackage($sAsset, $sForceType)
-    {
-        $sType = $this->determineType($sAsset, $sForceType);
-
-        switch ($sType) {
-
-            case 'CSS':
-                unset($this->aCss['APP-PACKAGE-' . $sAsset]);
-                break;
-
-            case 'JS':
-                unset($this->aJs['APP-PACKAGE-' . $sAsset]);
                 break;
         }
     }
