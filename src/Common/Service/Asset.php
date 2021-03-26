@@ -362,7 +362,8 @@ class Asset
 
             case 'CKEDITOR':
                 $this
-                    ->load('https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.16.0/ckeditor.min.js')
+                    //  Using minified version breaks... unsure why
+                    ->load('https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.16.0/ckeditor.js')
                     ->load('https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.16.0/adapters/jquery.min.js');
                 break;
 
