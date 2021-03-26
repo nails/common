@@ -13,6 +13,17 @@ interface Settings
      */
     public function getLabel(): string;
 
+    // --------------------------------------------------------------------------
+
+    /**
+     * Any additional permissions to collect
+     *
+     * @return stirng[]
+     */
+    public function getPermissions(): array;
+
+    // --------------------------------------------------------------------------
+
     /**
      * Returns the component's settings configuration
      *
