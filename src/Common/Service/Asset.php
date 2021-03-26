@@ -395,61 +395,38 @@ class Asset
         switch (strtoupper($sLibrary)) {
 
             case 'CKEDITOR':
-                $this->load(
-                    [
-                        'ckeditor/ckeditor.js',
-                        'ckeditor/adapters/jquery.js',
-                    ],
-                    'NAILS-BOWER'
-                );
+                $this
+                    ->load('https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.16.0/ckeditor.min.js')
+                    ->load('https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.16.0/adapters/jquery.min.js')
                 break;
 
             case 'JQUERYUI':
-                $this->load(
-                    [
-                        'jquery-ui/jquery-ui.min.js',
-                        'jquery-ui/themes/smoothness/jquery-ui.min.css',
-                        'jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js',
-                        'jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css',
-                    ],
-                    'NAILS-BOWER'
-                );
+                $this
+                    ->load('https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js')
+                    ->load('https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.min.css')
+                    ->load('https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.js')
+                    ->load('https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.css');
                 break;
 
             case 'SELECT2':
-                $this->load(
-                    [
-                        'select2/select2.css',
-                        'select2/select2.min.js',
-                    ],
-                    'NAILS-BOWER'
-                );
+                $this
+                    ->load('https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.min.js')
+                    ->load('https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.min.css');
                 break;
+
             case 'KNOCKOUT':
-                $this->load(
-                    [
-                        'knockout/dist/knockout.js',
-                    ],
-                    'NAILS-BOWER'
-                );
+                $this
+                    ->load('https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-latest.min.js');
                 break;
 
             case 'MUSTACHE':
-                $this->load(
-                    [
-                        'mustache.js/mustache.js',
-                    ],
-                    'NAILS-BOWER'
-                );
+                $this
+                    ->load('https://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.8.2/mustache.min.js');
                 break;
 
             case 'MOMENT':
-                $this->load(
-                    [
-                        'moment/moment.js',
-                    ],
-                    'NAILS-BOWER'
-                );
+                $this
+                    ->load('https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js');
                 break;
         }
 
