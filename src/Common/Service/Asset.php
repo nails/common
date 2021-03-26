@@ -420,37 +420,6 @@ class Asset
                 );
                 break;
 
-            case 'CMSWIDGETEDITOR':
-                $this->library('JQUERYUI');
-                $this->load(
-                    [
-                        'mustache.js/mustache.js',
-                        'jquery-serialize-object/dist/jquery.serialize-object.min.js',
-                    ],
-                    'NAILS-BOWER'
-                );
-                break;
-
-            case 'UPLOADIFY':
-                $this->load(
-                    [
-                        'uploadify/uploadify.css',
-                        'uploadify/jquery.uploadify.min.js',
-                    ],
-                    'NAILS-PACKAGE'
-                );
-                break;
-
-            case 'CHOSEN':
-                $this->load(
-                    [
-                        'chosen/chosen.min.css',
-                        'chosen/chosen.jquery.min.js',
-                    ],
-                    'NAILS-BOWER'
-                );
-                break;
-
             case 'SELECT2':
                 $this->load(
                     [
@@ -460,16 +429,6 @@ class Asset
                     'NAILS-BOWER'
                 );
                 break;
-
-            case 'ZEROCLIPBOARD':
-                $this->load(
-                    [
-                        'zeroclipboard/dist/ZeroClipboard.min.js',
-                    ],
-                    'NAILS-BOWER'
-                );
-                break;
-
             case 'KNOCKOUT':
                 $this->load(
                     [
