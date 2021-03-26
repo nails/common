@@ -70,7 +70,7 @@ class Logo
         }
 
         if (Config::get('NAILS_BRANDING')) {
-            return Config::get('NAILS_ASSETS_URL'). 'img/nails/icon/icon@2x.png';
+            return Config::get('NAILS_ASSETS_URL'). 'img/nails-logo.png';
         }
 
         return null;

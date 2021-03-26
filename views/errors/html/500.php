@@ -176,7 +176,7 @@ if (Environment::not(Environment::ENV_PROD)) {
             <div class="dev-only">
                 This page is viewable in development environments only.
                 <a href="http://docs.nailsapp.co.uk">
-                    <img src="<?=\Nails\Config::get('NAILS_ASSETS_URL')?>img/nails/icon/icon@2x.png" id="nailsLogo" />
+                    <img src="<?=\Nails\Config::get('NAILS_ASSETS_URL')?>img/nails-logo.png" id="nailsLogo" />
                 </a>
             </div>
             <header>
