@@ -414,10 +414,6 @@ class Asset
                     ],
                     'NAILS-BOWER'
                 );
-                $this->load(
-                    'jquery.ui.extra.css',
-                    'NAILS'
-                );
                 break;
 
             case 'SELECT2':
