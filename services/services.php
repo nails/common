@@ -20,7 +20,6 @@ return [
         'Asset'                          => function (): Service\Asset {
 
             //  @todo (Pablo - 2020-03-08) - Remove DEPLOY_REVISION
-            //  @todo (Pablo - 2020-03-08) - Remove bower support
             $sCacheBuster         = Config::get('ASSET_REVISION', Config::get('DEPLOY_REVISION'));
             $sBaseUrl             = Config::get('ASSET_URL', '/assets');
             $sBaseUrlSecure       = Config::get('ASSET_URL_SECURE', $sBaseUrl);
@@ -28,7 +27,6 @@ return [
             $sBaseModuleUrlSecure = Config::get('ASSET_MODULE_URL_SECURE', $sBaseModuleUrl);
             $sCssDir              = Config::get('ASSET_CSS_DIR', 'build/css');
             $sJsDir               = Config::get('ASSET_JS_DIR', 'build/js');
-            $sBowerDir            = Config::get('ASSET_BOWER_DIR', 'bower_components');
 
             if (class_exists('\App\Common\Service\Asset')) {
                 return new \App\Common\Service\Asset(
@@ -38,8 +36,7 @@ return [
                     $sBaseModuleUrl,
                     $sBaseModuleUrlSecure,
                     $sCssDir,
-                    $sJsDir,
-                    $sBowerDir
+                    $sJsDir
                 );
             } else {
                 return new Service\Asset(
@@ -49,8 +46,7 @@ return [
                     $sBaseModuleUrl,
                     $sBaseModuleUrlSecure,
                     $sCssDir,
-                    $sJsDir,
-                    $sBowerDir
+                    $sJsDir
                 );
             }
         },

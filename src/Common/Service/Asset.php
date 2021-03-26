@@ -9,8 +9,6 @@
  * @author     Nails Dev Team
  */
 
-//  @todo (Pablo - 2020-03-08) - Remove support for Bower
-
 namespace Nails\Common\Service;
 
 use Nails\Common\Exception\AssetException;
@@ -79,13 +77,6 @@ class Asset
     protected $sJsDir;
 
     /**
-     * Where bower assets are stored
-     *
-     * @var string
-     */
-    protected $sBowerDir;
-
-    /**
      * Loaded CSS files
      *
      * @var array
@@ -135,7 +126,6 @@ class Asset
      * @param string $sBaseModuleUrlSecure The secure base URL where modules are
      * @param string $sCssDir              Where compiled CSS is stored
      * @param string $sJsDir               Where compiled JS is stored
-     * @param string $sBowerDir            Where bower assets are stored
      */
     public function __construct(
         ?string $sCacheBuster,
@@ -144,11 +134,12 @@ class Asset
         string $sBaseModuleUrl,
         string $sBaseModuleUrlSecure,
         string $sCssDir,
-        string $sJsDir,
-        string $sBowerDir
+        string $sJsDir
     ) {
 
         $this->sCacheBuster = $sCacheBuster;
+        $this->sCssDir      = Strings::addTrailingSlash($sCssDir);
+        $this->sJsDir       = Strings::addTrailingSlash($sJsDir);
 
         $this->setBaseUrls(
             $sBaseUrl,
@@ -156,10 +147,6 @@ class Asset
             $sBaseUrlSecure,
             $sBaseModuleUrlSecure
         );
-
-        $this->sCssDir   = Strings::addTrailingSlash($sCssDir);
-        $this->sJsDir    = Strings::addTrailingSlash($sJsDir);
-        $this->sBowerDir = Strings::addTrailingSlash($sBowerDir);
     }
 
     // --------------------------------------------------------------------------
@@ -235,21 +222,12 @@ class Asset
 
         switch (strtoupper($sAssetLocation)) {
 
-            case 'NAILS-BOWER':
-                $sAssetLocationMethod = 'unloadNailsBower';
-                break;
-
             case 'NAILS-PACKAGE':
                 $sAssetLocationMethod = 'unloadNailsPackage';
                 break;
 
             case 'NAILS':
                 $sAssetLocationMethod = 'unloadNails';
-                break;
-
-            case 'APP-BOWER':
-            case 'BOWER':
-                $sAssetLocationMethod = 'unloadAppBower';
                 break;
 
             case 'APP-PACKAGE':
@@ -397,7 +375,7 @@ class Asset
             case 'CKEDITOR':
                 $this
                     ->load('https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.16.0/ckeditor.min.js')
-                    ->load('https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.16.0/adapters/jquery.min.js')
+                    ->load('https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.16.0/adapters/jquery.min.js');
                 break;
 
             case 'JQUERYUI':
@@ -459,21 +437,12 @@ class Asset
 
         switch (strtoupper($sAssetLocation)) {
 
-            case 'NAILS-BOWER':
-                $sAssetLocationMethod = 'loadNailsBower';
-                break;
-
             case 'NAILS-PACKAGE':
                 $sAssetLocationMethod = 'loadNailsPackage';
                 break;
 
             case 'NAILS':
                 $sAssetLocationMethod = 'loadNails';
-                break;
-
-            case 'APP-BOWER':
-            case 'BOWER':
-                $sAssetLocationMethod = 'loadAppBower';
                 break;
 
             case 'APP-PACKAGE':
@@ -815,22 +784,11 @@ class Asset
         switch ($sType) {
 
             case 'CSS':
-                if ($sLocation == 'BOWER') {
-                    $this->aCss[$sKey] = $this->sBaseModuleUrl . $sModule . '/assets/bower_components/' . $sAsset;
-                } else {
-                    $this->aCss[$sKey] = $this->sBaseModuleUrl . $sModule . '/assets/css/' . $sAsset;
-                }
+                $this->aCss[$sKey] = $this->sBaseModuleUrl . $sModule . '/assets/css/' . $sAsset;
                 break;
 
             case 'JS':
-                if ($sLocation == 'BOWER') {
-                    $this->aJs[$sKey] = [
-                        $this->sBaseModuleUrl . $sModule . '/assets/bower_components/' . $sAsset,
-                        $bAsync,
-                    ];
-                } else {
-                    $this->aJs[$sKey] = [$this->sBaseModuleUrl . $sModule . '/assets/js/' . $sAsset, $bAsync];
-                }
+                $this->aJs[$sKey] = [$this->sBaseModuleUrl . $sModule . '/assets/js/' . $sAsset, $bAsync];
                 break;
         }
     }
@@ -884,36 +842,6 @@ class Asset
     // --------------------------------------------------------------------------
 
     /**
-     * Loads a Bower asset from the Nails asset module's bower_components directory
-     *
-     * @param string $sAsset     The asset to load
-     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
-     * @param bool   $bAsync     Whether to load the asset asynchronously
-     *
-     * @return void
-     */
-    protected function loadNailsBower($sAsset, $sForceType, bool $bAsync)
-    {
-        $sType = $this->determineType($sAsset, $sForceType);
-
-        switch ($sType) {
-
-            case 'CSS':
-                $this->aCss['NAILS-BOWER-' . $sAsset] = $this->getNailsAssetUrl() . $this->sBowerDir . $sAsset;
-                break;
-
-            case 'JS':
-                $this->aJs['NAILS-BOWER-' . $sAsset] = [
-                    $this->getNailsAssetUrl() . $this->sBowerDir . $sAsset,
-                    $bAsync,
-                ];
-                break;
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Returns the URL for the Nails assets module
      *
      * @return string
@@ -946,33 +874,6 @@ class Asset
 
             case 'JS':
                 $this->aJs['NAILS-PACKAGE-' . $sAsset] = [$this->getNailsAssetUrl() . 'packages/' . $sAsset, $bAsync];
-                break;
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Loads a Bower asset from the app's bower_components directory
-     *
-     * @param string $sAsset     The asset to load
-     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
-     * @param bool   $bAsync     Whether to load the asset asynchronously
-     *
-     * @return void
-     */
-    protected function loadAppBower($sAsset, $sForceType, bool $bAsync)
-    {
-        $sType = $this->determineType($sAsset, $sForceType);
-
-        switch ($sType) {
-
-            case 'CSS':
-                $this->aCss['APP-BOWER-' . $sAsset] = $this->buildUrl($this->sBowerDir . $sAsset);
-                break;
-
-            case 'JS':
-                $this->aJs['APP-BOWER-' . $sAsset] = [$this->buildUrl($this->sBowerDir . $sAsset), $bAsync];
                 break;
         }
     }
@@ -1128,32 +1029,6 @@ class Asset
     // --------------------------------------------------------------------------
 
     /**
-     * Loads a Bower asset from the Nails asset module's bower_components directory
-     *
-     * @param string $sAsset     The asset to unload
-     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
-     *
-     * @return void
-     */
-    protected function unloadNailsBower($sAsset, $sForceType)
-    {
-        $sType = $this->determineType($sAsset, $sForceType);
-
-        switch ($sType) {
-
-            case 'CSS':
-                unset($this->aCss['NAILS-BOWER-' . $sAsset]);
-                break;
-
-            case 'JS':
-                unset($this->aJs['NAILS-BOWER-' . $sAsset]);
-                break;
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Unloads a Nails package asset (as a relative url from $this->getNailsAssetUrl() . 'packages/')
      *
      * @param string $sAsset     The asset to unload
@@ -1173,32 +1048,6 @@ class Asset
 
             case 'JS':
                 unset($this->aJs['NAILS-PACKAGE-' . $sAsset]);
-                break;
-        }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Unloads a Bower asset from the app's bower_components directory
-     *
-     * @param string $sAsset     The asset to unload
-     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
-     *
-     * @return void
-     */
-    protected function unloadAppBower($sAsset, $sForceType)
-    {
-        $sType = $this->determineType($sAsset, $sForceType);
-
-        switch ($sType) {
-
-            case 'CSS':
-                unset($this->aCss['APP-BOWER-' . $sAsset]);
-                break;
-
-            case 'JS':
-                unset($this->aJs['APP-BOWER-' . $sAsset]);
                 break;
         }
     }
