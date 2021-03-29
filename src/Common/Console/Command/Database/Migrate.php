@@ -181,7 +181,7 @@ class Migrate extends Base
             foreach ($aEnabledModules as $oModule) {
 
                 $sStart = is_null($oModule->start) ? 'The beginning of time' : '#' . $oModule->start;
-                $sLine  = ' - <comment>' . $oModule->name . '</comment> from ';
+                $sLine  = ' - <comment>' . $oModule->slug . '</comment> from ';
                 $sLine  .= '<info>' . $sStart . '</info> to <info>#' . $oModule->end . '</info>';
 
                 $oOutput->writeln($sLine);
@@ -200,7 +200,7 @@ class Migrate extends Base
         // --------------------------------------------------------------------------
 
         $oOutput->writeln('');
-        $oOutput->writeln('<comment>Starting migration</comment>...');
+        $oOutput->writeln('<comment>Starting migration...</comment>');
 
         /**
          * Ignore route rewriting until the whole migration is complete. Some actions
@@ -229,7 +229,7 @@ class Migrate extends Base
         if (!empty($aEnabledModules)) {
             foreach ($aEnabledModules as $oModule) {
 
-                $oOutput->write('[' . $iCurStep . '/' . $iNumMigrations . '] Migrating <info>' . $oModule->name . '</info>... ');
+                $oOutput->write('[' . $iCurStep . '/' . $iNumMigrations . '] Migrating <info>' . $oModule->slug . '</info>... ');
                 if ($this->doMigration($oModule)) {
                     $oOutput->writeln('<info>done</info>');
                 } else {
@@ -262,7 +262,7 @@ class Migrate extends Base
     protected function determineModuleState(Component $oComponent): ?\stdClass
     {
         $oState = (object) [
-            'name'  => $oComponent->slug,
+            'slug'  => $oComponent->slug,
             'type'  => null,
             'start' => null,
             'end'   => null,
@@ -343,7 +343,7 @@ class Migrate extends Base
         //  Shift the app migrations onto the end so they are executed last
         if (!empty($aOut)) {
             $oFirst = reset($aOut);
-            if ($oFirst->name === Components::$sAppSlug) {
+            if ($oFirst->slug === Components::$sAppSlug) {
                 $oApp = array_shift($aOut);
                 $aOut = array_merge($aOut, [$oApp]);
                 $aOut = array_filter($aOut);
@@ -369,8 +369,19 @@ class Migrate extends Base
 
         // --------------------------------------------------------------------------
 
+        if ($oModule->slug == Components::$sAppSlug) {
+            /**
+             * Set all component settings ahead of migrating the app.
+             * This ensures that the app has a sane foundation and all components
+             * should work as expected, at least with default values.
+             */
+            $this->callCommand('install:settings', [], false, true);
+        }
+
+        // --------------------------------------------------------------------------
+
         //  Map the directory and fetch only the files we need
-        $sPath   = $oModule->name == Components::$sAppSlug ? 'application/migrations/' : 'vendor/' . $oModule->name . '/migrations/';
+        $sPath   = $oModule->slug == Components::$sAppSlug ? 'application/migrations/' : 'vendor/' . $oModule->slug . '/migrations/';
         $aDirMap = $this->mapDir($sPath);
 
         //  Set the current version to -1 if null so migrations with a zero index are picked up
@@ -385,7 +396,7 @@ class Migrate extends Base
             }
 
             //  Mark this migration as complete
-            $sSql    = "UPDATE `" . Config::get('NAILS_DB_PREFIX') . "migration` SET `version` = " . $aMigration['index'] . " WHERE `module` = '" . $oModule->name . "'";
+            $sSql    = "UPDATE `" . Config::get('NAILS_DB_PREFIX') . "migration` SET `version` = " . $aMigration['index'] . " WHERE `module` = '" . $oModule->slug . "'";
             $oResult = $this->oDb->query($sSql);
         }
 
@@ -394,7 +405,7 @@ class Migrate extends Base
             // Error updating migration record
             $oOutput->writeln('');
             $oOutput->writeln('');
-            $oOutput->writeln('<error>ERROR</error>: Failed to update migration record for <info>' . $oModule->name . '</info>.');
+            $oOutput->writeln('<error>ERROR</error>: Failed to update migration record for <info>' . $oModule->slug . '</info>.');
 
             return false;
         }
@@ -420,7 +431,7 @@ class Migrate extends Base
 
         //  Generate the expected class name, i.e., "vendor-name/package-name" -> VendorName\PackageName"
         $sPattern    = '[^a-zA-Z0-9' . preg_quote(DIRECTORY_SEPARATOR, '/\-') . ']';
-        $sModuleName = strtolower($oModule->name);
+        $sModuleName = strtolower($oModule->slug);
         $sModuleName = preg_replace('/' . $sPattern . '/', ' ', $sModuleName);
         $sModuleName = str_replace(DIRECTORY_SEPARATOR, ' ' . DIRECTORY_SEPARATOR . ' ', $sModuleName);
         $sModuleName = ucwords($sModuleName);
@@ -542,7 +553,7 @@ class Migrate extends Base
      */
     protected function complete(): int
     {
-        //  Set default settings
+        //  Set default settings... again
         $this->oOutput->write('<comment>Setting defaults</comment>... ');
         $this->callCommand('install:settings', [], false, true);
         $this->oOutput->writeln('<info>done</info>');
