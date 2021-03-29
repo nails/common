@@ -8,6 +8,7 @@ use Nails\Common\Service\AppSetting;
 use Nails\Console\Command\Base;
 use Nails\Factory;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -24,8 +25,15 @@ class Settings extends Base
      */
     protected function configure()
     {
-        $this->setName('install:settings');
-        $this->setDescription('Installs default settings for components');
+        $this
+            ->setName('install:settings')
+            ->setDescription('Installs default settings for components')
+            ->addOption(
+                'component',
+                'c',
+                InputOption::VALUE_REQUIRED,
+                'Restrict to a specific component'
+            );
     }
 
     // --------------------------------------------------------------------------
@@ -48,9 +56,13 @@ class Settings extends Base
         $oAppSetting = Factory::service('AppSetting');
         $oAppSetting->load();
 
+        $sFilter = $oInput->getOption('component');
+
         foreach (\Nails\Components::available() as $oComponent) {
-            $this
-                ->setDefaultSettings($oComponent);
+            if (empty($sFilter) || $sFilter === $oComponent->slug) {
+                $this
+                    ->setDefaultSettings($oComponent);
+            }
         }
 
         $oAppSetting->load();
