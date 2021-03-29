@@ -156,21 +156,16 @@ class Migrate extends Base
 
         // --------------------------------------------------------------------------
 
-        $oOutput->writeln('');
-
-        // --------------------------------------------------------------------------
-
         $aEnabledModules = $this->findEnabledModules();
 
         // --------------------------------------------------------------------------
 
         //  Anything to migrate?
         if (!$aEnabledModules) {
-            $oOutput->writeln('');
             $oOutput->writeln('Nothing to migrate');
             $oOutput->writeln('');
 
-            return self::EXIT_CODE_SUCCESS;
+            return $this->complete();
         }
 
         // --------------------------------------------------------------------------
@@ -195,6 +190,7 @@ class Migrate extends Base
 
         $oOutput->writeln('');
         $oOutput->writeln('Routes will be rewritten');
+        $oOutput->writeln('Setting defaults will be set');
         $oOutput->writeln('');
 
         if (!$this->confirm('Continue?', true)) {
@@ -208,7 +204,7 @@ class Migrate extends Base
 
         /**
          * Ignore route rewriting until the whole migration is complete. Some actions
-         * might internally trigger a rewrite which could cause thigns ot fall over as
+         * might internally trigger a rewrite which could cause things to fall over as
          * the code will have expected the migration to finish. We rewrite the routes
          * afterwards anyway so any internal request will [eventually] be honoured.
          */
@@ -235,7 +231,7 @@ class Migrate extends Base
 
                 $oOutput->write('[' . $iCurStep . '/' . $iNumMigrations . '] Migrating <info>' . $oModule->name . '</info>... ');
                 if ($this->doMigration($oModule)) {
-                    $oOutput->writeln('done!');
+                    $oOutput->writeln('<info>done</info>');
                 } else {
                     return $this->abort(static::EXIT_CODE_MODULE_MIGRATION_FAILED);
                 }
@@ -246,26 +242,12 @@ class Migrate extends Base
 
         // --------------------------------------------------------------------------
 
-        //  Rewrite Routes
-        $oRoutes->ignoreRewriteRequests(false);
-        $oOutput->writeln('<comment>Rewriting routes...</comment>');
-        $this->callCommand('routes:rewrite', [], false, true);
-
-        // --------------------------------------------------------------------------
-
-        //  Cleaning up
-        $oOutput->writeln('<comment>Cleaning up...</comment>');
-
         //  Restore previous foreign key checks
         $this->oDb->query('SET FOREIGN_KEY_CHECKS = \'' . $sOldForeignKeyChecks . '\';');
 
         // --------------------------------------------------------------------------
 
-        //  And we're done
-        $oOutput->writeln('');
-        $oOutput->writeln('Complete!');
-
-        return self::EXIT_CODE_SUCCESS;
+        return $this->complete();
     }
 
     // --------------------------------------------------------------------------
@@ -548,6 +530,36 @@ class Migrate extends Base
             },
             $sString
         );
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Completes the migration, running post-processing tasks
+     *
+     * @return int
+     * @throws \Exception
+     */
+    protected function complete(): int
+    {
+        //  Set default settings
+        $this->oOutput->write('<comment>Setting defaults</comment>... ');
+        $this->callCommand('install:settings', [], false, true);
+        $this->oOutput->writeln('<info>done</info>');
+
+        // --------------------------------------------------------------------------
+
+        //  Rewrite Routes
+        /** @var Routes $oRoutes */
+        $oRoutes = Factory::service('Routes');
+        $oRoutes->ignoreRewriteRequests(false);
+        $this->oOutput->write('<comment>Rewriting routes</comment>... ');
+        $this->callCommand('routes:rewrite', [], false, true);
+        $this->oOutput->writeln('<info>done</info>');
+
+        // --------------------------------------------------------------------------
+
+        return static::EXIT_CODE_SUCCESS;
     }
 
     // --------------------------------------------------------------------------
