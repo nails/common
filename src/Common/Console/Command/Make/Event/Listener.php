@@ -61,7 +61,7 @@ class Listener extends BaseMaker
 
         //  Cleaning up
         $oOutput->writeln('');
-        $oOutput->writeln('<comment>Cleaning up...</comment>');
+        $oOutput->writeln('<comment>Cleaning up</comment>...');
 
         // --------------------------------------------------------------------------
 
@@ -140,14 +140,14 @@ class Listener extends BaseMaker
                         $this->getResource('template/event_listener.php', $aConfig)
                     );
                     $aCreated[] = $aConfig['FILE_PATH'];
-                    $this->oOutput->writeln('<info>done!</info>');
+                    $this->oOutput->writeln('<info>done</info>');
 
                     //  @todo (Pablo - 2019-04-30) - Add to src/Events.php if properly configured
                 }
             }
 
         } catch (ConsoleException $e) {
-            $this->oOutput->writeln('<error>failed!</error>');
+            $this->oOutput->writeln('<error>fail</error>');
             //  Clean up created services
             if (!empty($aCreated)) {
                 $this->oOutput->writeln('<error>Cleaning up - removing newly created files</error>');

@@ -172,7 +172,7 @@ class Routes
                 );
 
                 if (!is_null($oOutput)) {
-                    $oOutput->writeln('<info>done!</info>');
+                    $oOutput->writeln('<info>done</info>');
                 }
             }
         }
@@ -187,14 +187,14 @@ class Routes
         if ($this->writeFile()) {
 
             if (!is_null($oOutput)) {
-                $oOutput->writeln('<info>done!</info>');
+                $oOutput->writeln('<info>done</info>');
             }
             return true;
 
         } else {
 
             if (!is_null($oOutput)) {
-                $oOutput->writeln('<error>failed!</error>');
+                $oOutput->writeln('<error>fail</error>');
             }
             return false;
         }

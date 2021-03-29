@@ -61,7 +61,7 @@ class Factory extends BaseMaker
 
         //  Cleaning up
         $oOutput->writeln('');
-        $oOutput->writeln('<comment>Cleaning up...</comment>');
+        $oOutput->writeln('<comment>Cleaning up</comment>...');
 
         // --------------------------------------------------------------------------
 
@@ -154,7 +154,7 @@ class Factory extends BaseMaker
                         $this->getResource('template/factory.php', $aConfig)
                     );
                     $aCreated[] = $aConfig['FILE_PATH'];
-                    $this->oOutput->writeln('<info>done!</info>');
+                    $this->oOutput->writeln('<info>done</info>');
 
                     //  Generate the service definition
                     $aDefinition           = [
@@ -169,11 +169,11 @@ class Factory extends BaseMaker
                 $this->oOutput->writeln('');
                 $this->oOutput->write('Adding factory(ies) to app services... ');
                 $this->writeServiceFile($aServiceDefinitions);
-                $this->oOutput->writeln('<info>done!</info>');
+                $this->oOutput->writeln('<info>done</info>');
             }
 
         } catch (ConsoleException $e) {
-            $this->oOutput->writeln('<error>failed!</error>');
+            $this->oOutput->writeln('<error>fail</error>');
             //  Clean up created factories
             if (!empty($aCreated)) {
                 $this->oOutput->writeln('<error>Cleaning up - removing newly created files</error>');

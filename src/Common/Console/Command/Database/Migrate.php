@@ -200,7 +200,7 @@ class Migrate extends Base
         // --------------------------------------------------------------------------
 
         $oOutput->writeln('');
-        $oOutput->writeln('<comment>Starting migration...</comment>');
+        $oOutput->writeln('<comment>Starting migration</comment>...');
 
         /**
          * Ignore route rewriting until the whole migration is complete. Some actions

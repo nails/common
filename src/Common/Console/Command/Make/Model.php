@@ -156,7 +156,7 @@ class Model extends BaseMaker
 
         //  Cleaning up
         $oOutput->writeln('');
-        $oOutput->writeln('<comment>Cleaning up...</comment>');
+        $oOutput->writeln('<comment>Cleaning up</comment>...');
 
         // --------------------------------------------------------------------------
 
@@ -345,7 +345,7 @@ class Model extends BaseMaker
                     $this->oOutput->writeln('');
                     $this->oOutput->write('Adding model(s) to app services...');
                     $this->writeServiceFile($aServiceModelDefinitions);
-                    $this->oOutput->writeln('<info>done!</info>');
+                    $this->oOutput->writeln('<info>done</info>');
                 }
 
                 //  Add resources to app's service array
@@ -354,7 +354,7 @@ class Model extends BaseMaker
                     //  Reset the token detials so we write to the correct part of the file
                     $this->validateServiceFile(static::SERVICE_RESOURCE_TOKEN);
                     $this->writeServiceFile($aServiceResourceDefinitions);
-                    $this->oOutput->writeln('<info>done!</info>');
+                    $this->oOutput->writeln('<info>done</info>');
                 }
             }
 
@@ -594,7 +594,7 @@ class Model extends BaseMaker
             $oModel->path . $oModel->filename,
             $this->getResource('template/' . $sTemplate . '.php', (array) $oModel)
         );
-        $this->oOutput->writeln('<info>done!</info>');
+        $this->oOutput->writeln('<info>done</info>');
 
         return $this;
     }
@@ -620,7 +620,7 @@ class Model extends BaseMaker
             $oModel->resource_path . $oModel->resource_filename,
             $this->getResource('template/' . $sTemplate . '.php', (array) $oModel)
         );
-        $this->oOutput->writeln('<info>done!</info>');
+        $this->oOutput->writeln('<info>done</info>');
 
         return $this;
     }
@@ -645,7 +645,7 @@ class Model extends BaseMaker
         $this->oOutput->write('Adding database table... ');
         $oModel->nails_db_prefix = Config::get('NAILS_DB_PREFIX');
         $oDb->query($this->getResource('template/' . $sTemplate . '.php', (array) $oModel));
-        $this->oOutput->writeln('<info>done!</info>');
+        $this->oOutput->writeln('<info>done</info>');
 
         return $this;
     }
@@ -674,9 +674,9 @@ class Model extends BaseMaker
             true
         );
         if ($iExitCode === static::EXIT_CODE_FAILURE) {
-            $this->oOutput->writeln('<error>failed!</error>');
+            $this->oOutput->writeln('<error>fail</error>');
         } else {
-            $this->oOutput->writeln('<info>done!</info>');
+            $this->oOutput->writeln('<info>done</info>');
         }
 
         return $this;
@@ -706,9 +706,9 @@ class Model extends BaseMaker
             true
         );
         if ($iExitCode === static::EXIT_CODE_FAILURE) {
-            $this->oOutput->writeln('<error>failed!</error>');
+            $this->oOutput->writeln('<error>fail</error>');
         } else {
-            $this->oOutput->writeln('<info>done!</info>');
+            $this->oOutput->writeln('<info>done</info>');
         }
 
         return $this;

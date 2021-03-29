@@ -141,7 +141,7 @@ class Seed extends Base
                         ['Failed to reset database.']
                     );
                 }
-                $oOutput->writeln('<info>done!</info>');
+                $oOutput->writeln('<info>done</info>');
             } else {
                 $oOutput->writeln('');
             }
@@ -164,7 +164,7 @@ class Seed extends Base
                 $oClass->execute();
                 $oClass->post();
 
-                $oOutput->writeln('<info>done!</info>');
+                $oOutput->writeln('<info>done</info>');
             }
             $oOutput->writeln('');
 
@@ -177,7 +177,7 @@ class Seed extends Base
         // --------------------------------------------------------------------------
 
         //  Cleaning up
-        $oOutput->writeln('<comment>Cleaning up...</comment>');
+        $oOutput->writeln('<comment>Cleaning up</comment>...');
 
         // --------------------------------------------------------------------------
 

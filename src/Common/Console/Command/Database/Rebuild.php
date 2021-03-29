@@ -134,7 +134,7 @@ class Rebuild extends Base
                 $oDb->query('DROP TABLE IF EXISTS `' . $sTable . '`;');
             }
             $oDb->query('SET FOREIGN_KEY_CHECKS = 1;');
-            $oOutput->writeln('<info>done!</info>');
+            $oOutput->writeln('<info>done</info>');
             $oOutput->write('Migrating database... ');
             $iExitCode = $this->callCommand(
                 'db:migrate',
@@ -152,9 +152,9 @@ class Rebuild extends Base
             );
 
             if ($iExitCode == static::EXIT_CODE_SUCCESS) {
-                $oOutput->writeln('<info>done!</info>');
+                $oOutput->writeln('<info>done</info>');
             } else {
-                $oOutput->writeln('<error>fail!</error>');
+                $oOutput->writeln('<error>fail</error>');
                 return $this->abort(
                     self::EXIT_CODE_FAILURE,
                     [
@@ -170,7 +170,7 @@ class Rebuild extends Base
 
         //  Cleaning up
         $oOutput->writeln('');
-        $oOutput->writeln('<comment>Cleaning up...</comment>');
+        $oOutput->writeln('<comment>Cleaning up</comment>...');
 
         /**
          * Reload app settings; rebuilding the database might have changed these and

@@ -73,7 +73,7 @@ class Migration extends BaseMaker
 
         //  Cleaning up
         $oOutput->writeln('');
-        $oOutput->writeln('<comment>Cleaning up...</comment>');
+        $oOutput->writeln('<comment>Cleaning up</comment>...');
 
         // --------------------------------------------------------------------------
 
@@ -192,10 +192,10 @@ class Migration extends BaseMaker
 
             $this->createFile($sPath, $this->getResource('template/migration.php', $aFields));
             $aCreated[] = $sPath;
-            $this->oOutput->writeln('<info>done!</info>');
+            $this->oOutput->writeln('<info>done</info>');
 
         } catch (\Exception $e) {
-            $this->oOutput->writeln('<error>failed!</error>');
+            $this->oOutput->writeln('<error>fail</error>');
             //  Clean up created models
             if (!empty($aCreated)) {
                 $this->oOutput->writeln('<error>Cleaning up - removing newly created migration</error>');

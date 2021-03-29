@@ -62,7 +62,7 @@ class Service extends BaseMaker
 
         //  Cleaning up
         $oOutput->writeln('');
-        $oOutput->writeln('<comment>Cleaning up...</comment>');
+        $oOutput->writeln('<comment>Cleaning up</comment>...');
 
         // --------------------------------------------------------------------------
 
@@ -156,7 +156,7 @@ class Service extends BaseMaker
                         $this->getResource('template/service.php', $aConfig)
                     );
                     $aCreated[] = $aConfig['FILE_PATH'];
-                    $this->oOutput->writeln('<info>done!</info>');
+                    $this->oOutput->writeln('<info>done</info>');
 
                     //  Generate the service definition
                     $aDefinition           = [
@@ -171,11 +171,11 @@ class Service extends BaseMaker
                 $this->oOutput->writeln('');
                 $this->oOutput->write('Adding service(s) to app services... ');
                 $this->writeServiceFile($aServiceDefinitions);
-                $this->oOutput->writeln('<info>done!</info>');
+                $this->oOutput->writeln('<info>done</info>');
             }
 
         } catch (ConsoleException $e) {
-            $this->oOutput->writeln('<error>failed!</error>');
+            $this->oOutput->writeln('<error>fail</error>');
             //  Clean up created services
             if (!empty($aCreated)) {
                 $this->oOutput->writeln('<error>Cleaning up - removing newly created files</error>');
