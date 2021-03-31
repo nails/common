@@ -489,12 +489,13 @@ return [
             }
         },
         'HttpResponse'            => function (
-            GuzzleHttp\Psr7\Response $oClient
+            GuzzleHttp\Psr7\Response $oClient,
+            \Nails\Common\Factory\HttpRequest $oRequest
         ): \Nails\Common\Factory\HttpResponse {
             if (class_exists('\App\Common\Factory\HttpResponse')) {
-                return new \App\Common\Factory\HttpResponse($oClient);
+                return new \App\Common\Factory\HttpResponse($oClient, $oRequest);
             } else {
-                return new \Nails\Common\Factory\HttpResponse($oClient);
+                return new \Nails\Common\Factory\HttpResponse($oClient, $oRequest);
             }
         },
         'Locale'                  => function (
