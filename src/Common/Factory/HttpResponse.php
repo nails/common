@@ -26,16 +26,23 @@ class HttpResponse
      */
     protected $oResponse;
 
+    /**
+     * @var HttpRequest
+     */
+    protected $oRequest;
+
     // --------------------------------------------------------------------------
 
     /**
      * HttpResponse constructor.
      *
-     * @param Response $oResponse
+     * @param Response    $oResponse
+     * @param HttpRequest $oRequest
      */
-    public function __construct(Response $oResponse)
+    public function __construct(Response $oResponse, HttpRequest $oRequest)
     {
         $this->oResponse = $oResponse;
+        $this->oRequest  = $oRequest;
     }
 
     // --------------------------------------------------------------------------
@@ -48,6 +55,18 @@ class HttpResponse
     public function getResponse(): Response
     {
         return $this->oResponse;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Get the HTTP request
+     *
+     * @return HttpRequest
+     */
+    public function getRequest(): HttpRequest
+    {
+        return $this->oRequest;
     }
 
     // --------------------------------------------------------------------------
