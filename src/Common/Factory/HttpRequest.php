@@ -198,6 +198,18 @@ abstract class HttpRequest
     // --------------------------------------------------------------------------
 
     /**
+     * Returns the base URI
+     *
+     * @return string
+     */
+    public function getBaseUri(): string
+    {
+        return $this->sBaseUri;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Populates the path property of the request
      *
      * @param string $sPath The path for the request
@@ -208,6 +220,18 @@ abstract class HttpRequest
     {
         $this->sPath = $sPath;
         return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the path
+     *
+     * @return string
+     */
+    public function getPath(): string
+    {
+        return $this->sPath;
     }
 
     // --------------------------------------------------------------------------
