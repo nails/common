@@ -139,7 +139,7 @@ trait GetCountCommon
                     $iSelectedIndex = !empty((int) $_GET['ddF'][$iFilterIndex]) ? (int) $_GET['ddF'][$iFilterIndex] : 0;
                     $oOption        = $oFilter->getOption($iSelectedIndex);
 
-                    if ($oOption && $oOption->getValue()) {
+                    if ($oOption && $oOption->getValue() !== null) {
                         $sWhereFilter = $this->getCountCommonCompileFiltersString(
                             $oFilter->getColumn(),
                             $oOption->getValue(),
