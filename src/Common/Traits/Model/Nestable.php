@@ -170,12 +170,9 @@ trait Nestable
             }
 
             //  Save breadcrumbs to the current item
-            parent::update(
-                $iItemId,
-                [
-                    $this->getBreadcrumbsColumn() => json_encode($aBreadcrumbs),
-                ]
-            );
+            $oDb->set($this->getBreadcrumbsColumn(), json_encode($aBreadcrumbs));
+            $oDb->where($this->getColumn('id'), $iItemId);
+            $oDb->update($this->getTableName());
 
             //  Save breadcrumbs of all children
             $oDb = Factory::service('Database');
@@ -332,7 +329,7 @@ trait Nestable
      * Retrieves the immediate children of an item
      *
      * @param int   $iId        The ID of the item
-     * @param bool  $bRecursive Whetehr to recursively fetch children
+     * @param bool  $bRecursive Whether to recursively fetch children
      * @param array $aData      Any additional data to pass to the `getAll()` method
      *
      * @return mixed
