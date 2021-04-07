@@ -62,6 +62,30 @@ trait Localised
     // --------------------------------------------------------------------------
 
     /**
+     * Returns the column to use for the locale language
+     *
+     * @return string
+     */
+    public function getLocaleLanguageColumn(): string
+    {
+        return static::$sColumnLanguage;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the column to use for the locale region
+     *
+     * @return string
+     */
+    public function getLocaleRegionColumn(): string
+    {
+        return static::$sColumnRegion;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Overloads the getAll to add a Locale object to each resource
      *
      * @param int|null|array $iPage           The page number of the results, if null then no pagination; also accepts an $aData array
@@ -108,9 +132,11 @@ trait Localised
     protected function injectLocalisationQuery(array &$aData): void
     {
         /** @var Locale $oLocale */
-        $oLocale = Factory::service('Locale');
-        $sTable  = $this->getTableName();
-        $sAlias  = $this->getTableAlias();
+        $oLocale         = Factory::service('Locale');
+        $sTable          = $this->getTableName();
+        $sAlias          = $this->getTableAlias();
+        $sColumnLanguage = $this->getLocaleLanguageColumn();
+        $sColumnRegion   = $this->getLocaleRegionColumn();
 
         /**
          * Restrict to a specific locale by passing in USE_LOCALE to the data array
@@ -135,8 +161,8 @@ trait Localised
                 $aData['where'] = [];
             }
 
-            $aData['where'][] = ['language', $oUserLocale->getLanguage()];
-            $aData['where'][] = ['region', $oUserLocale->getRegion()];
+            $aData['where'][] = [$sColumnLanguage, $oUserLocale->getLanguage()];
+            $aData['where'][] = [$sColumnRegion, $oUserLocale->getRegion()];
 
         } elseif (!array_key_exists('NO_LOCALISE_FILTER', $aData)) {
 
@@ -147,19 +173,19 @@ trait Localised
             $sDefaultLanguage = $oDefaultLocale->getLanguage();
             $sDefaultRegion   = $oDefaultLocale->getRegion();
 
-            $sQueryExact    = 'SELECT COUNT(*) FROM ' . $sTable . ' sub_1 WHERE sub_1.id = ' . $sAlias . '.id AND sub_1.' . static::$sColumnLanguage . ' = "' . $sUserLanguage . '" AND sub_1.' . static::$sColumnRegion . ' = "' . $sUserRegion . '"';
-            $sQueryLanguage = 'SELECT COUNT(*) FROM ' . $sTable . ' sub_2 WHERE sub_2.id = ' . $sAlias . '.id AND sub_2.' . static::$sColumnLanguage . ' = "' . $sUserLanguage . '" AND sub_2.' . static::$sColumnRegion . ' != "' . $sUserRegion . '"';
+            $sQueryExact    = 'SELECT COUNT(*) FROM ' . $sTable . ' sub_1 WHERE sub_1.id = ' . $sAlias . '.id AND sub_1.' . $sColumnLanguage . ' = "' . $sUserLanguage . '" AND sub_1.' . $sColumnRegion . ' = "' . $sUserRegion . '"';
+            $sQueryLanguage = 'SELECT COUNT(*) FROM ' . $sTable . ' sub_2 WHERE sub_2.id = ' . $sAlias . '.id AND sub_2.' . $sColumnLanguage . ' = "' . $sUserLanguage . '" AND sub_2.' . $sColumnRegion . ' != "' . $sUserRegion . '"';
 
             if ($oLocale::MODEL_FALLBACK_TO_DEFAULT_LOCALE) {
                 $aConditionals = [
-                    '((' . $sQueryExact . ') = 1 AND ' . static::$sColumnLanguage . ' = "' . $sUserLanguage . '" AND ' . static::$sColumnRegion . ' = "' . $sUserRegion . '")',
-                    '((' . $sQueryExact . ') = 0 AND ' . static::$sColumnLanguage . ' = "' . $sDefaultLanguage . '" AND ' . static::$sColumnRegion . ' = "' . $sDefaultRegion . '")',
+                    '((' . $sQueryExact . ') = 1 AND ' . $sColumnLanguage . ' = "' . $sUserLanguage . '" AND ' . $sColumnRegion . ' = "' . $sUserRegion . '")',
+                    '((' . $sQueryExact . ') = 0 AND ' . $sColumnLanguage . ' = "' . $sDefaultLanguage . '" AND ' . $sColumnRegion . ' = "' . $sDefaultRegion . '")',
                 ];
             } else {
                 $aConditionals = [
-                    '((' . $sQueryExact . ') = 1 AND ' . static::$sColumnLanguage . ' = "' . $sUserLanguage . '" AND ' . static::$sColumnRegion . ' = "' . $sUserRegion . '")',
-                    '((' . $sQueryExact . ') = 0 AND ' . static::$sColumnLanguage . ' = "' . $sUserLanguage . '")',
-                    '((' . $sQueryExact . ') = 0 AND (' . $sQueryLanguage . ') = 0 AND ' . static::$sColumnLanguage . ' = "' . $sDefaultLanguage . '" AND ' . static::$sColumnRegion . ' = "' . $sDefaultRegion . '")',
+                    '((' . $sQueryExact . ') = 1 AND ' . $sColumnLanguage . ' = "' . $sUserLanguage . '" AND ' . $sColumnRegion . ' = "' . $sUserRegion . '")',
+                    '((' . $sQueryExact . ') = 0 AND ' . $sColumnLanguage . ' = "' . $sUserLanguage . '")',
+                    '((' . $sQueryExact . ') = 0 AND (' . $sQueryLanguage . ') = 0 AND ' . $sColumnLanguage . ' = "' . $sDefaultLanguage . '" AND ' . $sColumnRegion . ' = "' . $sDefaultRegion . '")',
                 ];
             }
 
@@ -210,8 +236,8 @@ trait Localised
 
         //  Add the locale for _this_ item
         $oResource->locale = $this->getLocale(
-            $oResource->{static::$sColumnLanguage},
-            $oResource->{static::$sColumnRegion}
+            $oResource->{$this->getLocaleLanguageColumn()},
+            $oResource->{$this->getLocaleRegionColumn()}
         );
 
         //  Set the locales for all _available_ items
@@ -227,8 +253,8 @@ trait Localised
         );
 
         //  Remove internal fields
-        unset($oResource->{static::$sColumnLanguage});
-        unset($oResource->{static::$sColumnRegion});
+        unset($oResource->{$this->getLocaleLanguageColumn()});
+        unset($oResource->{$this->getLocaleRegionColumn()});
     }
 
     // --------------------------------------------------------------------------
@@ -301,8 +327,8 @@ trait Localised
         $oDb = Factory::service('Database');
 
         $oDb->start_cache();
-        $oDb->where('language', $oLocale->getLanguage());
-        $oDb->where('region', $oLocale->getRegion());
+        $oDb->where($this->getLocaleLanguageColumn(), $oLocale->getLanguage());
+        $oDb->where($this->getLocaleRegionColumn(), $oLocale->getRegion());
         $oDb->stop_cache();
 
         $sSlug = parent::generateSlug($aData, $iIgnoreId);
@@ -336,8 +362,8 @@ trait Localised
             );
         }
 
-        $aData['language'] = $oLocale->getLanguage();
-        $aData['region']   = $oLocale->getRegion();
+        $aData[$this->getLocaleLanguageColumn()] = $oLocale->getLanguage();
+        $aData[$this->getLocaleRegionColumn()]   = $oLocale->getRegion();
         unset($aData['locale']);
 
         if (empty($aData[$this->getColumn('id')])) {
@@ -414,8 +440,8 @@ trait Localised
 
         /** @var Database $oDb */
         $oDb = Factory::service('Database');
-        $oDb->where('language', $oLocale->getLanguage());
-        $oDb->where('region', $oLocale->getRegion());
+        $oDb->where($this->getLocaleLanguageColumn(), $oLocale->getLanguage());
+        $oDb->where($this->getLocaleRegionColumn(), $oLocale->getRegion());
 
         return parent::update($iId, $aData);
     }
@@ -502,8 +528,8 @@ trait Localised
 
         /** @var Database $oDb */
         $oDb = Factory::service('Database');
-        $oDb->where('language', $oLocale->getLanguage());
-        $oDb->where('region', $oLocale->getRegion());
+        $oDb->where($this->getLocaleLanguageColumn(), $oLocale->getLanguage());
+        $oDb->where($this->getLocaleRegionColumn(), $oLocale->getRegion());
 
         return parent::destroy($iId);
     }
@@ -526,10 +552,12 @@ trait Localised
             throw new ModelException(
                 'A locale must be defined when restoring a localised item'
             );
-        }
 
-        if ($this->isDestructiveDelete()) {
-            return null;
+        } elseif ($this->isDestructiveDelete()) {
+            throw new ModelException(
+                'Restore not available when destructive delete is enabled'
+            );
+
         } elseif ($this->update($iId, [$this->getColumn('is_deleted') => false], $oLocale)) {
             $this->triggerEvent(static::EVENT_RESTORED, [$iId]);
             return true;
