@@ -12,6 +12,7 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Common\Events;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Exception\ViewNotFoundCaseException;
@@ -182,14 +183,16 @@ class View
         } elseif (is_string($mView)) {
 
             $aData = array_merge($this->getData(), (array) $aData);
-            ob_start();
 
             try {
                 $sResolvedPath = $this->resolvePath($mView);
             } catch (ViewNotFoundException $e) {
-                @ob_end_clean();
                 throw $e;
             }
+
+            $this->triggerEvent(Events::VIEW_PRE, $mView, $sResolvedPath);
+
+            ob_start();
 
             extract($aData);
             include $sResolvedPath;
@@ -200,23 +203,24 @@ class View
 
             $this->aLoadedViews[$sResolvedPath]++;
 
+            $sBuffer = ob_get_contents();
+            @ob_end_clean();
+
             if ($bReturn) {
-                $sBuffer = ob_get_contents();
-                @ob_end_clean();
+                $this->triggerEvent(Events::VIEW_POST, $mView, $sResolvedPath);
                 return $sBuffer;
-            } elseif (ob_get_level() > $this->iBufferLevel + 1) {
-                ob_end_flush();
-            } else {
-                /** @var Output $oOutput */
-                $oOutput = Factory::service('Output');
-                $oOutput->appendOutput(ob_get_contents());
-                @ob_end_clean();
             }
 
-            return $this;
-        } else {
+            /** @var Output $oOutput */
+            $oOutput = Factory::service('Output');
+            $oOutput->appendOutput($sBuffer);
+
+            $this->triggerEvent(Events::VIEW_POST, $mView, $sResolvedPath);
+
             return $this;
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -316,6 +320,26 @@ class View
         $this->setCache($sCacheKey, $sResolvedPath);
 
         return $sResolvedPath;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Triggers the View Events
+     *
+     * @param string $sEvent
+     * @param string $sView
+     * @param string $sResolvedPath
+     *
+     * @throws FactoryException
+     * @throws NailsException
+     * @throws \ReflectionException
+     */
+    private function triggerEvent(string $sEvent, string $sView, string $sResolvedPath)
+    {
+        /** @var Event $oEventService */
+        $oEventService = Factory::service('Event');
+        $oEventService->trigger($sEvent, Events::getEventNamespace(), [$sView, $sResolvedPath]);
     }
 
     // --------------------------------------------------------------------------
