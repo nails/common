@@ -40,7 +40,8 @@ class Encrypt
         } catch (EnvironmentIsBrokenException $e) {
             throw new EnvironmentException(
                 $e->getMessage(),
-                $e->getCode()
+                $e->getCode(),
+                $e
             );
         }
     }
@@ -67,12 +68,14 @@ class Encrypt
         } catch (EnvironmentIsBrokenException $e) {
             throw new EnvironmentException(
                 $e->getMessage(),
-                $e->getCode()
+                $e->getCode(),
+                $e
             );
         } catch (WrongKeyOrModifiedCiphertextException $e) {
             throw new DecodeException(
                 $e->getMessage(),
-                $e->getCode()
+                $e->getCode(),
+                $e
             );
         }
     }
