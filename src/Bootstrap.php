@@ -12,6 +12,7 @@
 namespace Nails;
 
 use Nails\Common\Events;
+use Nails\Common\Exception\EnvironmentException;
 use Nails\Common\Service\ErrorHandler;
 use Nails\Common\Service\FileCache;
 use Nails\Common\Service\Profiler;
@@ -249,8 +250,14 @@ final class Bootstrap
         Config::default('DB_PORT', 3306);
 
         //  App
-        Config::default('PRIVATE_KEY', '');
         Config::default('APP_NAME', 'Nails');
+        Config::default('PRIVATE_KEY', '');
+
+        if (empty(Config::get('PRIVATE_KEY'))) {
+            throw new EnvironmentException(
+                'The private key has not been set. This is very insecure.'
+            );
+        }
 
         //  Logging
         Config::default('LOG_DIR', Config::get('NAILS_APP_PATH') . implode(DIRECTORY_SEPARATOR, ['application', 'logs', '']));
