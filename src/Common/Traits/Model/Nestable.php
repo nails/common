@@ -169,13 +169,15 @@ trait Nestable
                 }
             }
 
+            /** @var Database $oDb */
+            $oDb = Factory::service('Database');
+
             //  Save breadcrumbs to the current item
             $oDb->set($this->getBreadcrumbsColumn(), json_encode($aBreadcrumbs));
             $oDb->where($this->getColumn('id'), $iItemId);
             $oDb->update($this->getTableName());
 
             //  Save breadcrumbs of all children
-            $oDb = Factory::service('Database');
             $oDb->where('parent_id', $iItemId);
             $aChildren = $oDb->get($this->getTableName())->result();
             foreach ($aChildren as $oItem) {
