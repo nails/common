@@ -184,15 +184,16 @@ class View
 
             $aData = array_merge($this->getData(), (array) $aData);
 
+            ob_start();
+
             try {
                 $sResolvedPath = $this->resolvePath($mView);
             } catch (ViewNotFoundException $e) {
+                @ob_end_clean();
                 throw $e;
             }
 
             $this->triggerEvent(Events::VIEW_PRE, $mView, $sResolvedPath);
-
-            ob_start();
 
             extract($aData);
             include $sResolvedPath;
@@ -203,17 +204,21 @@ class View
 
             $this->aLoadedViews[$sResolvedPath]++;
 
-            $sBuffer = ob_get_contents();
-            @ob_end_clean();
-
             if ($bReturn) {
+                $sBuffer = ob_get_contents();
+                @ob_end_clean();
                 $this->triggerEvent(Events::VIEW_POST, $mView, $sResolvedPath);
                 return $sBuffer;
-            }
 
-            /** @var Output $oOutput */
-            $oOutput = Factory::service('Output');
-            $oOutput->appendOutput($sBuffer);
+            } elseif (ob_get_level() > $this->iBufferLevel + 1) {
+                ob_end_flush();
+
+            } else {
+                /** @var Output $oOutput */
+                $oOutput = Factory::service('Output');
+                $oOutput->appendOutput(ob_get_contents());
+                @ob_end_clean();
+            }
 
             $this->triggerEvent(Events::VIEW_POST, $mView, $sResolvedPath);
 
