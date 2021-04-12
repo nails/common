@@ -29,6 +29,25 @@ use Nails\Functions;
 class Asset
 {
     /**
+     * The various types of asset
+     */
+    const TYPE_ALL              = 'ALL';
+    const TYPE_JS               = 'JS';
+    const TYPE_JS_INLINE        = 'JS-INLINE';
+    const TYPE_JS_INLINE_HEADER = 'JS-INLINE-HEADER';
+    const TYPE_JS_INLINE_FOOTER = 'JS-INLINE-FOOTER';
+    const TYPE_CSS              = 'CSS';
+    const TYPE_CSS_INLINE       = 'CSS-INLINE';
+
+    /**
+     * The supported locations for JS
+     */
+    const JS_LOCATION_HEADER = 'HEADER';
+    const JS_LOCATION_FOOTER = 'FOOTER';
+
+    // --------------------------------------------------------------------------
+
+    /**
      * The cachebuster string
      *
      * @var string
@@ -237,7 +256,7 @@ class Asset
         foreach ($aAssets as $sAsset) {
             if (preg_match('#^https?://#', $sAsset)) {
                 $this->unloadUrl($sAsset, $sForceType);
-            } elseif (substr($sAsset, 0, 0) == '/') {
+            } elseif (substr($sAsset, 0, 0) === '/') {
                 $this->unloadAbsolute($sAsset, $sForceType);
             } else {
                 $this->{$sAssetLocationMethod}($sAsset, $sForceType, $sAssetLocation);
@@ -265,11 +284,11 @@ class Asset
 
         switch ($sType) {
 
-            case 'CSS':
+            case static::TYPE_CSS:
                 unset($this->aCss['URL-' . $sAsset]);
                 break;
 
-            case 'JS':
+            case static::TYPE_JS:
                 unset($this->aJs['URL-' . $sAsset]);
                 break;
         }
@@ -291,11 +310,11 @@ class Asset
 
         switch ($sType) {
 
-            case 'CSS':
+            case static::TYPE_CSS:
                 unset($this->aCss['ABSOLUTE-' . $sAsset]);
                 break;
 
-            case 'JS':
+            case static::TYPE_JS:
                 unset($this->aJs['ABSOLUTE-' . $sAsset]);
                 break;
         }
@@ -312,30 +331,30 @@ class Asset
      *
      * @return void
      */
-    public function unloadInline($sScript = null, $sForceType = null, $sJsLocation = 'FOOTER')
+    public function unloadInline($sScript = null, $sForceType = null, $sJsLocation = self::JS_LOCATION_FOOTER)
     {
         if (!empty($sScript)) {
 
             $sJsLocation = strtoupper($sJsLocation);
-            if ($sJsLocation != 'FOOTER' && $sJsLocation != 'HEADER') {
-                throw new AssetException(
-                    '"' . $sJsLocation . '" is not a valid inline asset location value.',
-                    1
-                );
+            if (!in_array($sJsLocation, [static::JS_LOCATION_FOOTER, static::JS_LOCATION_HEADER])) {
+                throw new AssetException(sprintf(
+                    '"%s" is not a valid inline asset location value.',
+                    $sJsLocation
+                ));
             }
 
             $sType = $this->determineType($sScript, $sForceType);
 
             switch ($sType) {
 
-                case 'CSS-INLINE':
-                case 'CSS':
+                case static::TYPE_CSS_INLINE:
+                case static::TYPE_CSS:
                     unset($this->aCssInline['INLINE-CSS-' . md5($sScript)]);
                     break;
 
-                case 'JS-INLINE':
-                case 'JS':
-                    if ($sJsLocation == 'FOOTER') {
+                case static::TYPE_JS_INLINE:
+                case static::TYPE_JS:
+                    if ($sJsLocation === static::JS_LOCATION_FOOTER) {
                         unset($this->aJsInlineFooter['INLINE-JS-' . md5($sScript)]);
                     } else {
                         unset($this->aJsInlineHeader['INLINE-JS-' . md5($sScript)]);
@@ -440,8 +459,10 @@ class Asset
         foreach ($aAssets as $sAsset) {
             if (preg_match('#^https?://#', $sAsset)) {
                 $this->loadUrl($sAsset, $sForceType, $bAsync);
-            } elseif (substr($sAsset, 0, 0) == '/') {
+
+            } elseif (substr($sAsset, 0, 0) === '/') {
                 $this->loadAbsolute(substr($sAsset, 1), $sForceType, $bAsync);
+
             } else {
                 $this->{$sAssetLocationMethod}($sAsset, $sForceType, $bAsync, $sAssetLocation);
             }
@@ -469,11 +490,11 @@ class Asset
 
         switch ($sType) {
 
-            case 'CSS':
+            case static::TYPE_CSS:
                 $this->aCss['URL-' . $sAsset] = $sAsset;
                 break;
 
-            case 'JS':
+            case static::TYPE_JS:
                 $this->aJs['URL-' . $sAsset] = [$sAsset, $bAsync];
                 break;
         }
@@ -496,11 +517,11 @@ class Asset
 
         switch ($sType) {
 
-            case 'CSS':
+            case static::TYPE_CSS:
                 $this->aCss['ABSOLUTE-' . $sAsset] = $this->buildUrl($sAsset);
                 break;
 
-            case 'JS':
+            case static::TYPE_JS:
                 $this->aJs['ABSOLUTE-' . $sAsset] = [$this->buildUrl($sAsset), $bAsync];
                 break;
         }
@@ -553,13 +574,13 @@ class Asset
      *
      * @return string
      */
-    public function output($sType = 'ALL', $bOutput = true)
+    public function output($sType = self::TYPE_ALL, $bOutput = true)
     {
         $aOut  = [];
         $sType = strtoupper($sType);
 
         //  Linked Stylesheets
-        if (!empty($this->aCss) && ($sType == 'CSS' || $sType == 'ALL')) {
+        if (!empty($this->aCss) && ($sType === static::TYPE_CSS || $sType === static::TYPE_ALL)) {
             foreach ($this->aCss as $sAsset) {
                 $aOut[] = link_tag($sAsset);
             }
@@ -568,7 +589,7 @@ class Asset
         // --------------------------------------------------------------------------
 
         //  Linked JS
-        if (!empty($this->aJs) && ($sType == 'JS' || $sType == 'ALL')) {
+        if (!empty($this->aJs) && ($sType === static::TYPE_JS || $sType === static::TYPE_ALL)) {
             foreach ($this->aJs as $aAsset) {
                 [$sAsset, $bAsync] = $aAsset;
                 $aOut[] = '<script ' . ($bAsync ? 'async ' : '') . 'src="' . $sAsset . '"></script>';
@@ -578,7 +599,7 @@ class Asset
         // --------------------------------------------------------------------------
 
         //  Inline CSS
-        if (!empty($this->aCssInline) && ($sType == 'CSS-INLINE' || $sType == 'ALL')) {
+        if (!empty($this->aCssInline) && ($sType === static::TYPE_CSS_INLINE || $sType === static::TYPE_ALL)) {
 
             $aOut[] = '<style type="text/css">';
             foreach ($this->aCssInline as $sAsset) {
@@ -594,7 +615,7 @@ class Asset
         // --------------------------------------------------------------------------
 
         //  Inline JS (Header)
-        if (!empty($this->aJsInlineHeader) && ($sType == 'JS-INLINE-HEADER' || $sType == 'ALL')) {
+        if (!empty($this->aJsInlineHeader) && ($sType === static::TYPE_JS_INLINE_HEADER || $sType === static::TYPE_ALL)) {
             $aOut[] = '<script>';
             foreach ($this->aJsInlineHeader as $sAsset) {
                 if ($sAsset instanceof \Closure) {
@@ -609,7 +630,7 @@ class Asset
         // --------------------------------------------------------------------------
 
         //  Inline JS (Footer)
-        if (!empty($this->aJsInlineFooter) && ($sType == 'JS-INLINE-FOOTER' || $sType == 'ALL')) {
+        if (!empty($this->aJsInlineFooter) && ($sType === static::TYPE_JS_INLINE_FOOTER || $sType === static::TYPE_ALL)) {
             $aOut[] = '<script>';
             foreach ($this->aJsInlineFooter as $sAsset) {
                 if ($sAsset instanceof \Closure) {
@@ -657,7 +678,7 @@ class Asset
         ];
 
         foreach ($aVariables as $sKey => $mValue) {
-            $this->inline('window.' . $sKey . ' = ' . json_encode($mValue) . ';', 'JS', 'HEADER');
+            $this->inline('window.' . $sKey . ' = ' . json_encode($mValue) . ';', static::TYPE_JS, static::JS_LOCATION_HEADER);
         }
 
         return $this;
@@ -674,16 +695,16 @@ class Asset
      *
      * @return object
      */
-    public function inline($sScript = null, $sForceType = null, $sJsLocation = 'FOOTER')
+    public function inline($sScript = null, $sForceType = null, $sJsLocation = self::JS_LOCATION_FOOTER)
     {
         if (!empty($sScript)) {
 
             $sJsLocation = strtoupper($sJsLocation);
-            if ($sJsLocation != 'FOOTER' && $sJsLocation != 'HEADER') {
-                throw new AssetException(
-                    '"' . $sJsLocation . '" is not a valid inline JS location value.',
-                    1
-                );
+            if (!in_array($sJsLocation, [static::JS_LOCATION_FOOTER, static::JS_LOCATION_HEADER])) {
+                throw new AssetException(sprintf(
+                    '"%s" is not a valid inline asset location value.',
+                    $sJsLocation
+                ));
             }
 
             if ($sScript instanceof \Closure && empty($sForceType)) {
@@ -697,19 +718,28 @@ class Asset
 
             switch ($sType) {
 
-                case 'CSS-INLINE':
-                case 'CSS':
+                case static::TYPE_CSS_INLINE:
+                case static::TYPE_CSS:
                     $this->aCssInline['INLINE-CSS-' . $sHash] = $sScript;
                     break;
 
-                case 'JS-INLINE':
-                case 'JS':
-                    if ($sJsLocation == 'FOOTER') {
+                case static::TYPE_JS_INLINE:
+                case static::TYPE_JS:
+                    if ($sJsLocation === static::JS_LOCATION_FOOTER) {
                         $this->aJsInlineFooter['INLINE-JS-' . $sHash] = $sScript;
                     } else {
                         $this->aJsInlineHeader['INLINE-JS-' . $sHash] = $sScript;
                     }
                     break;
+
+                case static::TYPE_JS_INLINE_HEADER:
+                case static::TYPE_JS_INLINE_FOOTER:
+                if ($sType === static::TYPE_JS_INLINE_FOOTER) {
+                    $this->aJsInlineFooter['INLINE-JS-' . $sHash] = $sScript;
+                } else {
+                    $this->aJsInlineHeader['INLINE-JS-' . $sHash] = $sScript;
+                }
+                break;
             }
         }
 
@@ -743,11 +773,11 @@ class Asset
 
         switch ($sType) {
 
-            case 'CSS':
+            case static::TYPE_CSS:
                 $this->aCss[$sKey] = $this->sBaseModuleUrl . $sModule . '/assets/css/' . $sAsset;
                 break;
 
-            case 'JS':
+            case static::TYPE_JS:
                 $this->aJs[$sKey] = [$this->sBaseModuleUrl . $sModule . '/assets/js/' . $sAsset, $bAsync];
                 break;
         }
@@ -774,28 +804,28 @@ class Asset
 
         //  Look for <style></style>
         if (preg_match('/^<style.*?>.*?<\/style>$/si', $sAsset)) {
-            return 'CSS-INLINE';
+            return static::TYPE_CSS_INLINE;
         }
 
         // --------------------------------------------------------------------------
 
         //  Look for <script></script>
         if (preg_match('/^<script.*?>.*?<\/script>$/si', $sAsset)) {
-            return 'JS-INLINE';
+            return static::TYPE_JS_INLINE;
         }
 
         // --------------------------------------------------------------------------
 
         //  Look for .css
-        if (substr($sAsset, strrpos($sAsset, '.')) == '.css') {
-            return 'CSS';
+        if (substr($sAsset, strrpos($sAsset, '.')) === '.css') {
+            return static::TYPE_CSS;
         }
 
         // --------------------------------------------------------------------------
 
         //  Look for .js
-        if (substr($sAsset, strrpos($sAsset, '.')) == '.js') {
-            return 'JS';
+        if (substr($sAsset, strrpos($sAsset, '.')) === '.js') {
+            return static::TYPE_JS;
         }
     }
 
@@ -881,11 +911,11 @@ class Asset
 
         switch ($sType) {
 
-            case 'CSS':
+            case static::TYPE_CSS:
                 $this->aCss['APP-' . $sAsset] = $this->buildUrl($this->sCssDir . $sAsset);
                 break;
 
-            case 'JS':
+            case static::TYPE_JS:
                 $this->aJs['APP-' . $sAsset] = [$this->buildUrl($this->sJsDir . $sAsset), $bAsync];
                 break;
         }
@@ -907,11 +937,11 @@ class Asset
 
         switch ($sType) {
 
-            case 'CSS':
+            case static::TYPE_CSS:
                 unset($this->aCss['MODULE-' . $sModule . '-' . $sAsset]);
                 break;
 
-            case 'JS':
+            case static::TYPE_JS:
                 unset($this->aJs['MODULE-' . $sModule . '-' . $sAsset]);
                 break;
         }
@@ -933,11 +963,11 @@ class Asset
 
         switch ($sType) {
 
-            case 'CSS':
+            case static::TYPE_CSS:
                 unset($this->aCss['APP-' . $sAsset]);
                 break;
 
-            case 'JS':
+            case static::TYPE_JS:
                 unset($this->aJs['APP-' . $sAsset]);
                 break;
         }
