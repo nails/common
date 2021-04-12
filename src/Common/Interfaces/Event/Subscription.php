@@ -9,49 +9,10 @@
  * @author      Nails Dev Team
  */
 
-namespace Nails\Common\Events;
+namespace Nails\Common\Interfaces\Event;
 
-use Nails\Common\Interfaces;
-
-abstract class Subscription implements Interfaces\Event\Subscription
+interface Subscription
 {
-    /**
-     * The name of the event being subscribed to
-     *
-     * @var string|array
-     */
-    protected $mEvent;
-
-    /**
-     * The namespace of the event being subscribed to
-     *
-     * @var string
-     */
-    protected $sNamespace = 'nails/common';
-
-    /**
-     * The callback to execute when triggered
-     *
-     * @var callable
-     */
-    protected $cCallback;
-
-    /**
-     * Whether the subscription should only be fired once
-     *
-     * @var bool
-     */
-    protected $bOnce;
-
-    /**
-     * Whether the subscription should be autoloaded
-     *
-     * @var bool
-     */
-    protected $bAutoload = true;
-
-    // --------------------------------------------------------------------------
-
     /**
      * Set the subscription event name
      *
@@ -59,11 +20,7 @@ abstract class Subscription implements Interfaces\Event\Subscription
      *
      * @return $this
      */
-    public function setEvent($mEvent): self
-    {
-        $this->mEvent = $mEvent;
-        return $this;
-    }
+    public function setEvent($mEvent): self;
 
     // --------------------------------------------------------------------------
 
@@ -72,10 +29,7 @@ abstract class Subscription implements Interfaces\Event\Subscription
      *
      * @return mixed
      */
-    public function getEvent()
-    {
-        return $this->mEvent;
-    }
+    public function getEvent();
 
     // --------------------------------------------------------------------------
 
@@ -86,11 +40,7 @@ abstract class Subscription implements Interfaces\Event\Subscription
      *
      * @return $this
      */
-    public function setNamespace(string $sNamespace): self
-    {
-        $this->sNamespace = $sNamespace;
-        return $this;
-    }
+    public function setNamespace(string $sNamespace): self;
 
     // --------------------------------------------------------------------------
 
@@ -99,10 +49,7 @@ abstract class Subscription implements Interfaces\Event\Subscription
      *
      * @return string
      */
-    public function getNamespace(): string
-    {
-        return $this->sNamespace;
-    }
+    public function getNamespace(): string;
 
     // --------------------------------------------------------------------------
 
@@ -113,11 +60,7 @@ abstract class Subscription implements Interfaces\Event\Subscription
      *
      * @return $this
      */
-    public function setCallback($cCallback): self
-    {
-        $this->cCallback = $cCallback;
-        return $this;
-    }
+    public function setCallback($cCallback): self;
 
     // --------------------------------------------------------------------------
 
@@ -126,10 +69,7 @@ abstract class Subscription implements Interfaces\Event\Subscription
      *
      * @return mixed
      */
-    public function getCallback()
-    {
-        return $this->cCallback;
-    }
+    public function getCallback();
 
     // --------------------------------------------------------------------------
 
@@ -140,11 +80,7 @@ abstract class Subscription implements Interfaces\Event\Subscription
      *
      * @return $this
      */
-    public function setOnce(bool $bOnce = true): self
-    {
-        $this->bOnce = $bOnce;
-        return $this;
-    }
+    public function setOnce(bool $bOnce = true): self;
 
     // --------------------------------------------------------------------------
 
@@ -153,20 +89,14 @@ abstract class Subscription implements Interfaces\Event\Subscription
      *
      * @return bool
      */
-    public function isOnce(): bool
-    {
-        return (bool) $this->bOnce;
-    }
+    public function isOnce(): bool;
 
     // --------------------------------------------------------------------------
 
     /**
-     * Returns whether the subscription should be autoloaded
+     * Returns whether the subscription should be fired more than once
      *
      * @return bool
      */
-    public function isAutoloaded(): bool
-    {
-        return (bool) $this->bAutoload;
-    }
+    public function isAutoloaded(): bool;
 }

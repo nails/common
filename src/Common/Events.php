@@ -53,35 +53,4 @@ class Events extends Base
      * Fired immediate after output is sent to the browser
      */
     const OUTPUT_POST = 'OUTPUT:POST';
-
-    /**
-     * Fired before a view is loaded
-     *
-     * @param $sView         string The view which was loaded
-     * @param $sResovledPath string The view's resolved path
-     */
-    const VIEW_PRE = 'VIEW:PRE';
-
-    /**
-     * Fired after a view is loaded
-     *
-     * @param $sView         string The view which was loaded
-     * @param $sResovledPath string The view's resolved path
-     */
-    const VIEW_POST = 'VIEW:POST';
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Subscribe to events
-     *
-     * @return Subscription[]
-     */
-    public function autoload(): array
-    {
-        return [
-            new Listener\Locale\Detect(),
-            new Listener\Routes\Update(),
-        ];
-    }
 }

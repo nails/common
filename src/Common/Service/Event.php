@@ -12,7 +12,9 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Common\Interfaces\Event\Subscription;
 use Nails\Components;
+use stdClass;
 
 /**
  * Class Event
@@ -26,7 +28,7 @@ class Event
      *
      * @var array
      */
-    protected $aSubscriptions;
+    protected $aSubscriptions = [];
 
     // --------------------------------------------------------------------------
 
@@ -44,14 +46,8 @@ class Event
      */
     public function __construct()
     {
-        //  Defaults
-        $this->aSubscriptions = [];
-
-        //  Set up initial subscriptions
         foreach (Components::available() as $oComponent) {
-            if (!empty($oComponent->namespace)) {
-                $this->autoLoadSubscriptions($oComponent->namespace);
-            }
+            $this->autoLoadSubscriptions($oComponent);
         }
     }
 
@@ -60,37 +56,37 @@ class Event
     /**
      * Looks for a component's event handler and executes the autoload() method if there is one
      *
-     * @param string $sNamespace The namespace to check
+     * @param \Nails\Common\Factory\Component $oComponent The component to check
      *
-     * @return void
+     * @return $this
      */
-    protected function autoLoadSubscriptions($sNamespace): void
+    protected function autoLoadSubscriptions($oComponent): self
     {
-        $sClassName = $sNamespace . 'Events';
+        $aClasses = $oComponent
+            ->findClasses('Event\\Listener')
+            ->whichImplement(Subscription::class)
+            ->whichCanBeInstantiated();
 
-        if (class_exists($sClassName)) {
+        foreach ($aClasses as $sClass) {
 
-            $oClass = new $sClassName();
-            if (is_callable([$oClass, 'autoload'])) {
-                $aSubscriptions = $oClass->autoload();
-                if (!empty($aSubscriptions)) {
-                    foreach ($aSubscriptions as $oSubscription) {
+            /** @var Subscription $oSubscription */
+            $oSubscription = new $sClass();
+            if ($oSubscription->isAutoloaded()) {
 
-                        $aEvent     = (array) $oSubscription->getEvent();
-                        $sNamespace = $oSubscription->getNamespace();
-                        $mCallback  = $oSubscription->getCallback();
-                        $bOnce      = $oSubscription->isOnce();
+                $aEvent     = (array) $oSubscription->getEvent();
+                $sNamespace = $oSubscription->getNamespace();
+                $mCallback  = $oSubscription->getCallback();
+                $bOnce      = $oSubscription->isOnce();
 
-                        if (!empty($aEvent) && !empty($sNamespace) && !empty($mCallback)) {
-                            foreach ($aEvent as $sEvent) {
-                                $this->subscribe($sEvent, $sNamespace, $mCallback, $bOnce);
-                            }
-                        }
+                if (!empty($aEvent) && !empty($sNamespace) && !empty($mCallback)) {
+                    foreach ($aEvent as $sEvent) {
+                        $this->subscribe($sEvent, $sNamespace, $mCallback, $bOnce);
                     }
                 }
             }
-            unset($oClass);
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -98,10 +94,10 @@ class Event
     /**
      * Subscribe to an event
      *
-     * @param string  $sEvent     The event to subscribe to
-     * @param string  $sNamespace The event's namespace
-     * @param mixed   $mCallback  The callback to execute
-     * @param boolean $bOnce      Whether the subscription should only fire once
+     * @param string $sEvent     The event to subscribe to
+     * @param string $sNamespace The event's namespace
+     * @param mixed  $mCallback  The callback to execute
+     * @param bool   $bOnce      Whether the subscription should only fire once
      *
      * @return $this
      */
@@ -199,18 +195,20 @@ class Event
      * @param string $sNamespace The event namespace
      * @param string $sEvent     The event name
      *
-     * @return array|\stdClass|null
+     * @return array|stdClass|null
      */
     public function getHistory($sNamespace = null, $sEvent = null)
     {
         if (empty($sNamespace) && empty($sEvent)) {
             return $this->aHistory;
+
         } elseif (
             empty($sEvent) &&
             !empty($sNamespace) &&
             array_key_exists($sNamespace, $this->aHistory)
         ) {
             return $this->aHistory[$sNamespace];
+
         } elseif (
             !empty($sNamespace) &&
             array_key_exists($sNamespace, $this->aHistory) &&
@@ -237,8 +235,10 @@ class Event
     {
         if (empty($sNamespace)) {
             $this->aHistory = [];
+
         } elseif (empty($sEvent) && array_key_exists($sNamespace, $this->aHistory)) {
             $this->aHistory[$sNamespace] = [];
+
         } elseif (
             array_key_exists($sNamespace, $this->aHistory) &&
             array_key_exists($sEvent, $this->aHistory[$sNamespace])
