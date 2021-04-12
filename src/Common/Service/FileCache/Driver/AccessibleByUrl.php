@@ -41,6 +41,6 @@ class AccessibleByUrl extends Driver implements Interfaces\Service\FileCache\Dri
     {
         $sUrl = rtrim($this->sUrl, '/');
         $sUrl .= $sKey ? '/' . $sKey : '';
-        return $sUrl;
+        return siteUrl($sUrl);
     }
 }
