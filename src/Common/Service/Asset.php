@@ -734,12 +734,12 @@ class Asset
 
                 case static::TYPE_JS_INLINE_HEADER:
                 case static::TYPE_JS_INLINE_FOOTER:
-                if ($sType === static::TYPE_JS_INLINE_FOOTER) {
-                    $this->aJsInlineFooter['INLINE-JS-' . $sHash] = $sScript;
-                } else {
-                    $this->aJsInlineHeader['INLINE-JS-' . $sHash] = $sScript;
-                }
-                break;
+                    if ($sType === static::TYPE_JS_INLINE_FOOTER) {
+                        $this->aJsInlineFooter['INLINE-JS-' . $sHash] = $sScript;
+                    } else {
+                        $this->aJsInlineHeader['INLINE-JS-' . $sHash] = $sScript;
+                    }
+                    break;
             }
         }
 
