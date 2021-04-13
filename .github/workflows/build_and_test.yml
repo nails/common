@@ -35,6 +35,8 @@ jobs:
 
             -   name: Run tests
                 run: composer test
+                env:
+                    PRIVATE_KEY: 123abc
 
             -   name: Build assets
                 run: yarn build
