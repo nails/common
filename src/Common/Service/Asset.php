@@ -864,17 +864,15 @@ class Asset
      */
     protected function addCacheBuster(string $sAsset): string
     {
-        if ($this->sCacheBuster) {
+        $sCacheBuster = $this->getCacheBuster();
+
+        if ($sCacheBuster) {
 
             $aParsedUrl = parse_url($sAsset);
 
-            if (empty($aParsedUrl['query'])) {
-                $sAsset .= '?';
-            } else {
-                $sAsset .= '&';
-            }
-
-            $sAsset .= 'revision=' . $this->sCacheBuster;
+            return empty($aParsedUrl['query'])
+                ? $sAsset . '?' . $this->getCacheBuster()
+                : $sAsset . '&' . $this->getCacheBuster();
         }
 
         return $sAsset;
@@ -892,6 +890,20 @@ class Asset
         return Functions::isPageSecure()
             ? $this->sBaseUrlSecure
             : $this->sBaseUrl;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the current cachebuster
+     *
+     * @return string|null
+     */
+    public function getCacheBuster(): ?string
+    {
+        return trim($this->sCacheBuster)
+            ? 'revision=' . trim($this->sCacheBuster)
+            : null;
     }
 
     // --------------------------------------------------------------------------
