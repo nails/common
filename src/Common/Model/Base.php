@@ -1800,6 +1800,80 @@ abstract class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Returns the IDs of the objects rturned by the query
+     *
+     * @param array $aData           The query data
+     * @param bool  $bIncludeDeleted Whether to include deleted items
+     *
+     * @return int[]
+     * @throws FactoryException
+     * @throws ModelException
+     */
+    public function getIds(array $aData = [], bool $bIncludeDeleted = false): array
+    {
+        return array_map('intval', $this->getAllColumn('id', $aData, $bIncludeDeleted));
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the slugs of the objects rturned by the query
+     *
+     * @param array $aData           The query data
+     * @param bool  $bIncludeDeleted Whether to include deleted items
+     *
+     * @return string[]
+     * @throws FactoryException
+     * @throws ModelException
+     */
+    public function getSlugs(array $aData = [], bool $bIncludeDeleted = false): array
+    {
+        return $this->getAllColumn('slug', $aData, $bIncludeDeleted);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the toens of the objects rturned by the query
+     *
+     * @param array $aData           The query data
+     * @param bool  $bIncludeDeleted Whether to include deleted items
+     *
+     * @return string[]
+     * @throws FactoryException
+     * @throws ModelException
+     */
+    public function getTokens(array $aData = [], bool $bIncludeDeleted = false): array
+    {
+        return $this->getAllColumn('token', $aData, $bIncludeDeleted);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns an array of extracted column for a query
+     *
+     * @param string $sColumn         The column to extract
+     * @param array  $aData           The query data
+     * @param bool   $bIncludeDeleted Whether to include deleted items
+     *
+     * @return mixed[]
+     * @throws FactoryException
+     * @throws ModelException
+     */
+    public function getAllColumn(string $sColumn, array $aData, bool $bIncludeDeleted = false): array
+    {
+        $oResults = $this->getAllRawQuery($aData, $bIncludeDeleted);
+
+        return arrayExtractProperty(
+            $oResults->result(),
+            $this->getColumn($sColumn)
+        );
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Sorts items into a specific order based on a specific column
      *
      * @param array  $aItems      The items to sort
