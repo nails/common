@@ -42,8 +42,7 @@ class Field
         $_field_helper       = isset($field['helper']) ? $field['helper'] : '';
 
         $_tip          = [];
-        $_tip['class'] = is_array($_field_tip) && isset($_field_tip['class']) ? $_field_tip['class'] : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']   = is_array($_field_tip) && isset($_field_tip['rel']) ? $_field_tip['rel'] : 'tipsy-left';
+        $_tip['class'] = is_array($_field_tip) && isset($_field_tip['class']) ? $_field_tip['class'] : 'fa fa-question-circle fa-lg tip hint--bottom-left';
         $_tip['title'] = is_array($_field_tip) && isset($_field_tip['title']) ? $_field_tip['title'] : null;
         $_tip['title'] = is_string($_field_tip) ? $_field_tip : $_tip['title'];
 
@@ -238,14 +237,12 @@ EOT;
 
         if (is_array($oField->tip) && !empty($oField->tip['title'])) {
             $oTip = (object) [
-                'class' => ArrayHelper::getFromArray('class', $oField->tip, 'fa fa-question-circle fa-lg tip'),
-                'rel'   => ArrayHelper::getFromArray('rel', $oField->tip, 'tipsy-left'),
+                'class' => ArrayHelper::getFromArray('class', $oField->tip, 'fa fa-question-circle fa-lg tip hint--bottom-left'),
                 'title' => ArrayHelper::getFromArray('title', $oField->tip, null),
             ];
         } elseif (is_string($oField->tip) && !empty($oField->tip)) {
             $oTip = (object) [
-                'class' => 'fa fa-question-circle fa-lg tip',
-                'rel'   => 'tipsy-left',
+                'class' => 'fa fa-question-circle fa-lg tip hint--bottom-left',
                 'title' => $oField->tip,
             ];
         }
@@ -595,8 +592,7 @@ EOT;
         $_field['options']          = isset($field['options']) ? $field['options'] : $options;
 
         $_tip          = [];
-        $_tip['class'] = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']   = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
+        $_tip['class'] = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip hint--bottom-left';
         $_tip['title'] = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
         $_tip['title'] = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
@@ -762,8 +758,7 @@ EOT;
         }
 
         $_tip          = [];
-        $_tip['class'] = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']   = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
+        $_tip['class'] = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip hint--bottom-left';
         $_tip['title'] = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
         $_tip['title'] = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
@@ -891,8 +886,7 @@ EOT;
         $_field['tip']         = isset($field['tip']) ? $field['tip'] : $tip;
 
         $_tip          = [];
-        $_tip['class'] = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']   = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
+        $_tip['class'] = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip hint--bottom-left';
         $_tip['title'] = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
         $_tip['title'] = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
@@ -1022,8 +1016,7 @@ EOT;
         $_field['data']        = isset($field['data']) ? $field['data'] : [];
 
         $_tip          = [];
-        $_tip['class'] = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip';
-        $_tip['rel']   = is_array($_field['tip']) && isset($_field['tip']['rel']) ? $_field['tip']['rel'] : 'tipsy-left';
+        $_tip['class'] = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip hint--bottom-left';
         $_tip['title'] = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
         $_tip['title'] = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
