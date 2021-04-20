@@ -42,7 +42,7 @@ class Field
         $_field_helper       = isset($field['helper']) ? $field['helper'] : '';
 
         $_tip          = [];
-        $_tip['class'] = is_array($_field_tip) && isset($_field_tip['class']) ? $_field_tip['class'] : 'fa fa-question-circle fa-lg tip hint--bottom-left';
+        $_tip['class'] = is_array($_field_tip) && isset($_field_tip['class']) ? $_field_tip['class'] : null;
         $_tip['title'] = is_array($_field_tip) && isset($_field_tip['title']) ? $_field_tip['title'] : null;
         $_tip['title'] = is_string($_field_tip) ? $_field_tip : $_tip['title'];
 
@@ -62,7 +62,7 @@ class Field
 
         //  Has the field got a tip?
         $_tipclass = $_tip['title'] ? 'with-tip' : '';
-        $_tip      = $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
+        $_tip      = static::getTipHtml((object) $_tip);
 
         // --------------------------------------------------------------------------
 
@@ -172,23 +172,23 @@ class Field
 
         $_out = <<<EOT
 
-    <div class="field $_error_class $_field_oddeven $_readonly_cls $_field_type" $_field_id_top $_field_attributes>
-        <label>
-            <span class="label">
-                $_field_label
-                $_field_sub_label
-            </span>
-            <span class="input $_tipclass">
-                $_field_html
-                $_max_length_html
-                $_tip
-                $_error
-                $info_block
-            <span>
-        </label>
-    </div>
+        <div class="field $_error_class $_field_oddeven $_readonly_cls $_field_type" $_field_id_top $_field_attributes>
+            <label>
+                <span class="label">
+                    $_field_label
+                    $_field_sub_label
+                </span>
+                <span class="input $_tipclass">
+                    $_field_html
+                    $_max_length_html
+                    $_tip
+                    $_error
+                    $info_block
+                </span>
+            </label>
+        </div>
 
-EOT;
+        EOT;
 
         // --------------------------------------------------------------------------
 
@@ -237,12 +237,12 @@ EOT;
 
         if (is_array($oField->tip) && !empty($oField->tip['title'])) {
             $oTip = (object) [
-                'class' => ArrayHelper::getFromArray('class', $oField->tip, 'fa fa-question-circle fa-lg tip hint--bottom-left'),
+                'class' => ArrayHelper::getFromArray('class', $oField->tip, 'tip'),
                 'title' => ArrayHelper::getFromArray('title', $oField->tip, null),
             ];
         } elseif (is_string($oField->tip) && !empty($oField->tip)) {
             $oTip = (object) [
-                'class' => 'fa fa-question-circle fa-lg tip hint--bottom-left',
+                'class' => 'tip',
                 'title' => $oField->tip,
             ];
         }
@@ -263,7 +263,7 @@ EOT;
 
         //  Has the field got a tip?
         $sTipClass = !empty($oTip) ? 'with-tip' : '';
-        $sTipHtml  = !empty($oTip) ? '<b class="' . $oTip->class . '" rel="' . $oTip->rel . '" title="' . htmlentities($oTip->title, ENT_QUOTES) . '"></b>' : '';
+        $sTipHtml  = !empty($oTip) ? static::getTipHtml($oTip) : '';
 
         // --------------------------------------------------------------------------
 
@@ -310,22 +310,22 @@ EOT;
 
         return <<<EOT
 
-    <div $sFieldAttr>
-        <label>
-            <span class="label">
-                $oField->label
-                $oField->sub_label
-            </span>
-            <span class="input $sTipClass">
-                $oField->html
-                $sTipHtml
-                $sError
-                $sInfoHtml
-            <span>
-        </label>
-    </div>
+        <div $sFieldAttr>
+            <label>
+                <span class="label">
+                    $oField->label
+                    $oField->sub_label
+                </span>
+                <span class="input $sTipClass">
+                    $oField->html
+                    $sTipHtml
+                    $sError
+                    $sInfoHtml
+                <span>
+            </label>
+        </div>
 
-EOT;
+        EOT;
     }
 
     // --------------------------------------------------------------------------
@@ -592,7 +592,7 @@ EOT;
         $_field['options']          = isset($field['options']) ? $field['options'] : $options;
 
         $_tip          = [];
-        $_tip['class'] = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip hint--bottom-left';
+        $_tip['class'] = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : null;
         $_tip['title'] = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
         $_tip['title'] = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
@@ -696,7 +696,7 @@ EOT;
         }
 
         //  Tip
-        $_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
+        $_out .= static::getTipHtml((object) $_tip);
 
         //  Error
         $_out .= Form::error($_field['key'], '<span class="alert alert-danger">', '</span>');
@@ -758,7 +758,7 @@ EOT;
         }
 
         $_tip          = [];
-        $_tip['class'] = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip hint--bottom-left';
+        $_tip['class'] = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : null;
         $_tip['title'] = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
         $_tip['title'] = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
@@ -834,7 +834,7 @@ EOT;
         // --------------------------------------------------------------------------
 
         //  Tip
-        $_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
+        $_out .= static::getTipHtml((object) $_tip);
 
         //  Error
         $_out .= Form::error($_field['key'], '<span class="alert alert-danger">', '</span>');
@@ -886,7 +886,7 @@ EOT;
         $_field['tip']         = isset($field['tip']) ? $field['tip'] : $tip;
 
         $_tip          = [];
-        $_tip['class'] = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip hint--bottom-left';
+        $_tip['class'] = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : null;
         $_tip['title'] = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
         $_tip['title'] = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
@@ -951,7 +951,7 @@ EOT;
         );
 
         //  Tip
-        $_out .= $_tip['title'] ? '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . htmlentities($_tip['title'], ENT_QUOTES) . '"></b>' : '';
+        $_out .= static::getTipHtml((object) $_tip);
 
         //  Error
         $_out .= Form::error($_field['key'], '<span class="alert alert-danger">', '</span>');
@@ -1016,7 +1016,7 @@ EOT;
         $_field['data']        = isset($field['data']) ? $field['data'] : [];
 
         $_tip          = [];
-        $_tip['class'] = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : 'fa fa-question-circle fa-lg tip hint--bottom-left';
+        $_tip['class'] = is_array($_field['tip']) && isset($_field['tip']['class']) ? $_field['tip']['class'] : null;
         $_tip['title'] = is_array($_field['tip']) && isset($_field['tip']['title']) ? $_field['tip']['title'] : null;
         $_tip['title'] = is_string($_field['tip']) ? $_field['tip'] : $_field['title'];
 
@@ -1118,11 +1118,7 @@ EOT;
         }
 
         //  Tip
-        if (!empty($_tip['title'])) {
-
-            $sTitle = htmlentities($_tip['title'], ENT_QUOTES);
-            $_out   .= '<b class="' . $_tip['class'] . '" rel="' . $_tip['rel'] . '" title="' . $sTitle . '"></b>';
-        }
+        $_out .= static::getTipHtml((object) $_tip);
 
         $_out .= '</span>';
         $_out .= '</label>';
@@ -1367,5 +1363,25 @@ EOT;
     public static function address(array $aField): string
     {
         return \Nails\Address\Helper\Form::address($aField);
+    }
+
+    // --------------------------------------------------------------------------
+
+    public static function getTipHtml(object $oTip): string
+    {
+        $sClass = $oTip->class ?? 'tip';
+        $sTitle = htmlentities($oTip->title ?? '', ENT_QUOTES);
+
+        if (empty($sTitle)) {
+            return '';
+        }
+
+        return <<<EOT
+            <span class="$sClass">
+                <span class="hint--left hint--large" aria-label="$sTitle">
+                    <b class="fa fa-question-circle fa-lg"></b>
+                </span>
+            </span>
+        EOT;
     }
 }
