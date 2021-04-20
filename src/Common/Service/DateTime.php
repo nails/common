@@ -713,6 +713,7 @@ class DateTime
      * @param string  $sMessageBadDate        The message to show if a bad timestamp is supplied
      * @param string  $sMessageGreaterOneWeek The message to show if the timestamp is greater than one week away
      * @param string  $sMessageLessTenMinutes The message to show if the timestamp is less than ten minutes away
+     * @param mixed   $oCompareWith           The date to compare with
      *
      * @return string
      */
@@ -721,7 +722,8 @@ class DateTime
         $bIncludeTense = true,
         $sMessageBadDate = null,
         $sMessageGreaterOneWeek = null,
-        $sMessageLessTenMinutes = null
+        $sMessageLessTenMinutes = null,
+        $oCompareWith = null
     ) {
         if (empty($mDate) || $mDate == '0000-00-00') {
             if ($sMessageBadDate) {
@@ -731,18 +733,37 @@ class DateTime
             }
         }
 
-        $aPeriods = ['second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade'];
-        $aLengths = [60, 60, 24, 7, '4.35', 12, 10];
-        $sNow     = Factory::factory('DateTime')->format('U');
+        //  If date is effectively null
+        if ($mDate === '0000-00-00 00:00:00') {
+            return 'Unknown';
+        }
 
-        if (is_int($mDate)) {
-            $iUnixTime = $mDate;
+        $aPeriods     = ['second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade'];
+        $aLengths     = [60, 60, 24, 7, '4.35', 12, 10];
+        $oCompareWith = $oCompareWith ?? Factory::factory('DateTime');
+
+        if ($mDate instanceof \DateTime) {
+            $iTimestamp = $mDate->format('U');
+        } elseif ($mDate instanceof Date) {
+            $iTimestamp = $mDate->getDateTimeObject()->format('U');
+        } elseif (is_int($mDate)) {
+            $iTimestamp = $mDate;
         } else {
-            $iUnixTime = strtotime($mDate);
+            $iTimestamp = strtotime($mDate);
+        }
+
+        if ($oCompareWith instanceof \DateTime) {
+            $iCompareWith = $oCompareWith->format('U');
+        } elseif ($oCompareWith instanceof Date) {
+            $iCompareWith = $oCompareWith->getDateTimeObject()->format('U');
+        } elseif (is_int($oCompareWith)) {
+            $iCompareWith = $oCompareWith;
+        } else {
+            $iCompareWith = strtotime($oCompareWith);
         }
 
         //  Check date supplied is valid
-        if (empty($iUnixTime)) {
+        if (empty($iTimestamp)) {
             if ($sMessageBadDate) {
                 return $sMessageBadDate;
             } else {
@@ -750,23 +771,18 @@ class DateTime
             }
         }
 
-        //  If date is effectively null
-        if ($mDate == '0000-00-00 00:00:00') {
-            return 'Unknown';
-        }
-
         //  Determine past or future date
         $sTense = '';
-        if ($sNow >= $iUnixTime) {
+        if ($iCompareWith >= $iTimestamp) {
 
-            $iDifference = $sNow - $iUnixTime;
+            $iDifference = $iCompareWith - $iTimestamp;
             if ($bIncludeTense) {
                 $sTense = 'ago';
             }
 
         } else {
 
-            $iDifference = $iUnixTime - $sNow;
+            $iDifference = $iTimestamp - $iCompareWith;
             if ($bIncludeTense) {
                 $sTense = 'from now';
             }
@@ -784,7 +800,7 @@ class DateTime
 
         // If it's greater than 1 week and $sMessageGreaterOneWeek is defined, return that
         if (substr($aPeriods[$i], 0, 4) == 'week' && $sMessageGreaterOneWeek !== null) {
-            return $sMessageGreaterOneWeek;
+            return trim($sMessageGreaterOneWeek);
         }
 
         // If it's less than 20 seconds, return 'a moment ago'
@@ -800,7 +816,7 @@ class DateTime
                 (substr($aPeriods[$i], 0, 6) == 'second' && $iDifference <= 60)
             )
         ) {
-            return $sMessageLessTenMinutes;
+            return trim($sMessageLessTenMinutes);
         }
 
         if ($iDifference . ' ' . $aPeriods[$i] . ' ' . $sTense == '1 day ago') {
@@ -808,7 +824,7 @@ class DateTime
         } elseif ($iDifference . ' ' . $aPeriods[$i] . ' ' . $sTense == '1 day from now') {
             return 'tomorrow';
         } else {
-            return $iDifference . ' ' . $aPeriods[$i] . ' ' . $sTense;
+            return trim($iDifference . ' ' . $aPeriods[$i] . ' ' . $sTense);
         }
     }
 

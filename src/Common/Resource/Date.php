@@ -260,4 +260,39 @@ class Date extends Resource
         $oCompareWith = $oCompareWith ?? Factory::factory('DateTime');
         return $this->isAfter($oCompareWith);
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns a human-friendly relative time string (e.g. 3 minutes ago)
+     *
+     * @param bool $bIncludeTense
+     * @param null $sMessageBadDate
+     * @param null $sMessageGreaterOneWeek
+     * @param null $sMessageLessTenMinutes
+     * @param null $oCompareWith
+     *
+     * @return string
+     * @throws FactoryException
+     */
+    public function relative(
+        $bIncludeTense = true,
+        $sMessageBadDate = null,
+        $sMessageGreaterOneWeek = null,
+        $sMessageLessTenMinutes = null,
+        $oCompareWith = null
+    ): string {
+
+        /** @var \Nails\Common\Service\DateTime $oDateTimeService */
+        $oDateTimeService = Factory::service('DateTime');
+
+        return $oDateTimeService->niceTime(
+            $this,
+            $bIncludeTense,
+            $sMessageBadDate,
+            $sMessageGreaterOneWeek,
+            $sMessageLessTenMinutes,
+            $oCompareWith
+        );
+    }
 }

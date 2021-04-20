@@ -123,6 +123,7 @@ if (!function_exists('niceTime')) {
      * @param string  $sMessageBadDate        The message to show if a bad timestamp is supplied
      * @param string  $sMessageGreaterOneWeek The message to show if the timestamp is greater than one week away
      * @param string  $sMessageLessTenMinutes The message to show if the timestamp is less than ten minutes away
+     * @param string  $oCompareWith           The date to compare with
      *
      * @return string
      */
@@ -131,7 +132,8 @@ if (!function_exists('niceTime')) {
         $bIncludeTense = true,
         $sMessageBadDate = null,
         $sMessageGreaterOneWeek = null,
-        $sMessageLessTenMinutes = null
+        $sMessageLessTenMinutes = null,
+        $oCompareWith = null
     ) {
         /** @var \Nails\Common\Service\DateTime $oDateTimeService */
         $oDateTimeService = Factory::service('DateTime');
@@ -140,7 +142,9 @@ if (!function_exists('niceTime')) {
             $bIncludeTense,
             $sMessageBadDate,
             $sMessageGreaterOneWeek,
-            $sMessageLessTenMinutes);
+            $sMessageLessTenMinutes,
+            $oCompareWith
+        );
     }
 }
 
