@@ -446,7 +446,10 @@ class Migrate extends Base
 
             $iPriority = $oMigration->getPriority();
 
-            if ($iPriority > $oModule->start && $iPriority <= $oModule->end) {
+            if (
+                ($oModule->start === null || $iPriority > $oModule->start) &&
+                ($oModule->end === null || $iPriority <= $oModule->end)
+            ) {
                 try {
 
                     $oMigration->execute();
