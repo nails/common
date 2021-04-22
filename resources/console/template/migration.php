@@ -15,13 +15,13 @@ return <<<'EOD'
 
 namespace App\Database\Migration;
 
-use Nails\Common\Console\Migrate\Base;
 use Nails\Common\Interfaces;
+use Nails\Common\Traits;
 
 /**
  * Class Migration{{INDEX}}
  *
- * @package Nails\Database\Migration\App
+ * @package App\Database\Migration
  */
 class Migration{{INDEX}} implements Interfaces\Database\Migration
 {

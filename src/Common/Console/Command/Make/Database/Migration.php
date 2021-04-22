@@ -2,6 +2,8 @@
 
 namespace Nails\Common\Console\Command\Make\Database;
 
+use Nails\Common\Console\Command\Database\Migrate;
+use Nails\Common\Console\Command\Install\Components;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Exception\Console\MigrationExistsException;
 use Nails\Config;
@@ -109,28 +111,15 @@ class Migration extends BaseMaker
 
             if (is_null($aFields['INDEX'])) {
 
-                //  Get the most recent migration and increment it by 1
-                $sPattern    = \Nails\Common\Console\Command\Database\Migrate::VALID_MIGRATION_PATTERN;
-                $aMigrations = [];
-                foreach (new \DirectoryIterator(static::MIGRATION_PATH) as $oFileInfo) {
+                $aMigrations = Migrate::getMigrationsForComponent(
+                    \Nails\Components::getApp(),
+                    Factory::service('PDODatabase')
+                );
 
-                    if ($oFileInfo->isDot()) {
-                        continue;
-                    }
-
-                    //  In the correct format?
-                    if (preg_match($sPattern, $oFileInfo->getFilename(), $aMatches)) {
-                        $aMigrations[] = (int) $aMatches[1];
-                    }
-                }
-
-                sort($aMigrations);
-
-                if (!empty($aMigrations)) {
-                    $aFields['INDEX'] = end($aMigrations) + 1;
-                } else {
-                    $aFields['INDEX'] = 0;
-                }
+                $oLastMigration   = end($aMigrations);
+                $aFields['INDEX'] = empty($oLastMigration)
+                    ? 0
+                    : $oLastMigration->getPriority() + 1;
 
             } elseif (!is_numeric($aFields['INDEX'])) {
                 throw new NailsException('Specified migration index is not a numeric value.');
@@ -141,7 +130,7 @@ class Migration extends BaseMaker
             $this->oOutput->write('Creating migration <comment>' . $aFields['INDEX'] . '</comment>... ');
 
             //  Check for existing controller
-            $sPath = static::MIGRATION_PATH . $aFields['INDEX'] . '.php';
+            $sPath = static::MIGRATION_PATH . 'Migration' . $aFields['INDEX'] . '.php';
             if (file_exists($sPath)) {
                 throw new MigrationExistsException(
                     'Migration "' . $aFields['INDEX'] . '" exists already at path "' . $sPath . '"'

@@ -346,7 +346,7 @@ class Migrate extends Base
     {
         $oState = (object) [
             'slug'       => $oComponent->slug,
-            'migrations' => $this->getMigrationsForComponent($oComponent),
+            'migrations' => static::getMigrationsForComponent($oComponent, $this->oDb),
             'start'      => null,
             'end'        => null,
         ];
@@ -364,11 +364,12 @@ class Migrate extends Base
     /**
      * Returns all migrations for a given component
      *
-     * @param Component $oComponent
+     * @param Component   $oComponent
+     * @param PDODatabase $oDb
      *
      * @return Interfaces\Database\Migration[]
      */
-    private function getMigrationsForComponent(Component $oComponent): array
+    public static function getMigrationsForComponent(Component $oComponent, PDODatabase $oDb): array
     {
         $aClasses = $oComponent
             ->findClasses('Database\\Migration')
@@ -377,7 +378,7 @@ class Migrate extends Base
 
         $aMigrations = [];
         foreach ($aClasses as $sClass) {
-            $aMigrations[] = new $sClass($this->oDb);
+            $aMigrations[] = new $sClass($oDb);
         }
 
         usort($aMigrations, function (Interfaces\Database\Migration $a, Interfaces\Database\Migration $b) {
