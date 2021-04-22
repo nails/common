@@ -11,7 +11,7 @@
  * @link
  */
 
-namespace Nails\Database\Migration\Nails\Common;
+namespace Nails\Common\Database\Migration;
 
 use Nails\Common\Console\Migrate\Base;
 use Nails\Factory;
