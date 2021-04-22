@@ -8,14 +8,14 @@
 return <<<'EOD'
 <?php
 
-namespace App\Database\Seed;
+namespace App\Database\Seeder;
 
 use Nails\Common\Console\Seed\Model;
 
 /**
  * Class {{MODEL_NAME}}
  *
- * @package App\Database\Seed
+ * @package App\Database\Seeder
  */
 class {{MODEL_NAME}} extends Model
 {
