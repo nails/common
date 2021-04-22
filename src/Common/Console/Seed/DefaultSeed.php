@@ -6,7 +6,8 @@ use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Helper\Form;
 use Nails\Common\Service\Locale;
-use Nails\Common\Traits\Model\Localised;
+use Nails\Common\Traits;
+use Nails\Common\Interfaces;
 use Nails\Factory;
 
 /**
@@ -14,8 +15,12 @@ use Nails\Factory;
  *
  * @package Nails\Common\Console\Seed
  */
-class DefaultSeed extends Base
+abstract class DefaultSeed implements Interfaces\Database\Seeder
 {
+    use Traits\Database\Seeder;
+
+    // --------------------------------------------------------------------------
+
     /**
      * The number of items to create
      *
@@ -60,14 +65,13 @@ class DefaultSeed extends Base
      * @return void
      * @throws FactoryException
      */
-    public function execute()
+    public function execute(): self
     {
-        $oModel = Factory::model(static::CONFIG_MODEL_NAME, static::CONFIG_MODEL_PROVIDER);
-
         /** @var Locale $oLocale */
-        $oLocale        = Factory::service('Locale');
-        $oDefaultLocale = $oLocale->getDefautLocale();
+        $oLocale = Factory::service('Locale');
+        $oModel  = Factory::model(static::CONFIG_MODEL_NAME, static::CONFIG_MODEL_PROVIDER);
 
+        $oDefaultLocale   = $oLocale->getDefautLocale();
         $aFieldsDescribed = $oModel->describeFields();
         $aFields          = [];
 
@@ -78,15 +82,20 @@ class DefaultSeed extends Base
         }
 
         for ($i = 0; $i < static::CONFIG_NUM_PER_SEED; $i++) {
+
             $aData = $this->generate($aFields);
-            if (classUses($oModel, Localised::class)) {
+
+            if (classUses($oModel, Traits\Model\Localised::class)) {
                 if (!$oModel->create($aData, false, $oDefaultLocale)) {
                     throw new NailsException('Failed to create item. ' . $oModel->lastError());
                 }
+
             } elseif (!$oModel->create($aData)) {
                 throw new NailsException('Failed to create item. ' . $oModel->lastError());
             }
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -107,30 +116,39 @@ class DefaultSeed extends Base
                 case Form::FIELD_TEXTAREA:
                     $mValue = $this->loremParagraph();
                     break;
+
                 case Form::FIELD_NUMBER:
                     $mValue = $this->randomInteger();
                     break;
+
                 case Form::FIELD_BOOLEAN:
                     $mValue = $this->randomBool();
                     break;
+
                 case Form::FIELD_DATETIME:
                     $mValue = $this->randomDateTime();
                     break;
+
                 case Form::FIELD_DATE:
                     $mValue = $this->randomDateTime(null, null, 'Y-m-d');
                     break;
+
                 case Form::FIELD_TIME:
                     $mValue = $this->randomDateTime(null, null, 'H:i:s');
                     break;
+
                 case Form::FIELD_DROPDOWN:
                     $mValue = $this->randomItem(array_keys($oField->options));
                     break;
+
                 case Form::FIELD_DROPDOWN_MULTIPLE:
                     $mValue = $this->randomItems(array_keys($oField->options));
                     break;
+
                 case 'wysiwyg':
                     $mValue = $this->loremHtml();
                     break;
+
                 default:
                     $mValue = $this->loremWord(3);
                     break;

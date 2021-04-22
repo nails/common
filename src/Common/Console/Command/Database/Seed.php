@@ -2,8 +2,9 @@
 
 namespace Nails\Common\Console\Command\Database;
 
-use Nails\Common\Console\Seed\DefaultSeed;
 use Nails\Common\Helper\Directory;
+use Nails\Common\Interfaces;
+use Nails\Common\Service\PDODatabase;
 use Nails\Components;
 use Nails\Console\Command\Base;
 use Nails\Environment;
@@ -149,6 +150,7 @@ class Seed extends Base
             $oOutput->writeln('Executing seeds...');
             $oOutput->writeln('');
 
+            /** @var PDODatabase $oDb */
             $oDb = Factory::service('PDODatabase');
 
             foreach ($aSeeders as $oSeeder) {
@@ -158,11 +160,13 @@ class Seed extends Base
                 );
 
                 $sClassName = $oSeeder->class;
-                $oClass     = new $sClassName($oDb);
 
-                $oClass->pre();
-                $oClass->execute();
-                $oClass->post();
+                /** @var Interfaces\Database\Seed $oClass */
+                $oClass = new $sClassName($oDb);
+                $oClass
+                    ->pre()
+                    ->execute()
+                    ->post();
 
                 $oOutput->writeln('<info>done</info>');
             }
@@ -201,14 +205,15 @@ class Seed extends Base
         foreach (Components::available() as $oComponent) {
 
             $aSeeds = $oComponent
-                ->findClasses('Seed')
-                ->whichExtend(DefaultSeed::class);
+                ->findClasses('Database\Seeder')
+                ->whichImplement(Interfaces\Database\Seeder::class)
+                ->whichCanBeInstantiated();
 
             foreach ($aSeeds as $sClass) {
                 $aSeedClasses[] = (object) [
                     'component' => $oComponent,
                     'class'     => $sClass,
-                    'priority'  => constant($sClass . '::CONFIG_PRIORITY'),
+                    'priority'  => $sClass::getPriority(),
                 ];
             }
         }
@@ -307,7 +312,7 @@ class Seed extends Base
     protected function stripNamespace($oSeeder): string
     {
         return preg_replace(
-            '/^' . preg_quote($oSeeder->component->namespace . 'Seed\\', '/') . '/',
+            '/^' . preg_quote($oSeeder->component->namespace . 'Database\\Seeder\\', '/') . '/',
             '',
             $oSeeder->class
         );
