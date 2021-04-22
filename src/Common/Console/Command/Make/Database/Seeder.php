@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Seeder extends BaseMaker
 {
     const RESOURCE_PATH = NAILS_COMMON_PATH . 'resources/console/';
-    const SEEDER_PATH   = NAILS_APP_PATH . 'src/Database/Seed/';
+    const SEEDER_PATH   = NAILS_APP_PATH . 'src/Database/Seeder/';
 
     // --------------------------------------------------------------------------
 
