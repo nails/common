@@ -3,6 +3,7 @@
 namespace Nails\Common\Traits\Database;
 
 use Nails\Common\Exception\FactoryException;
+use Nails\Common\Service\PDODatabase;
 use Nails\Common\Traits;
 use Nails\Factory;
 
@@ -39,6 +40,18 @@ trait Seeder
     public function __construct(PDODatabase $oDb)
     {
         $this->oDb = $oDb;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the seeders priority
+     *
+     * @return int
+     */
+    public static function getPriority(): int
+    {
+        return 0;
     }
 
     // --------------------------------------------------------------------------

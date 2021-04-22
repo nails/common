@@ -8,16 +8,16 @@
 return <<<'EOD'
 <?php
 
-namespace App\Seed;
+namespace App\Database\Seed;
 
-use Nails\Common\Console\Seed\DefaultSeed;
+use Nails\Common\Console\Seed\Model;
 
 /**
  * Class {{MODEL_NAME}}
  *
- * @package App\Seed
+ * @package App\Database\Seed
  */
-class {{MODEL_NAME}} extends DefaultSeed
+class {{MODEL_NAME}} extends Model
 {
     const CONFIG_MODEL_NAME = '{{MODEL_NAME}}';
 }

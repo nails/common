@@ -12,14 +12,14 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class Seed
+ * Class Seeder
  *
  * @package Nails\Common\Console\Command\Make\Database
  */
-class Seed extends BaseMaker
+class Seeder extends BaseMaker
 {
     const RESOURCE_PATH = NAILS_COMMON_PATH . 'resources/console/';
-    const SEEDER_PATH   = NAILS_APP_PATH . 'src/Seed/';
+    const SEEDER_PATH   = NAILS_APP_PATH . 'src/Database/Seed/';
 
     // --------------------------------------------------------------------------
 
