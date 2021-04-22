@@ -22,19 +22,19 @@ abstract class Model implements Interfaces\Database\Seeder
     // --------------------------------------------------------------------------
 
     /**
-     * The number of items to create
-     *
-     * @var int
-     */
-    const CONFIG_NUM_PER_SEED = 20;
-
-    /**
      * The model to bind this seeder to
      *
      * @var string
      */
     const CONFIG_MODEL_NAME     = '';
     const CONFIG_MODEL_PROVIDER = 'app';
+
+    /**
+     * The number of items to create
+     *
+     * @var int
+     */
+    const CONFIG_NUM_PER_SEED = 20;
 
     /**
      * Defines the priority of the seeder, useful for ordering
@@ -120,7 +120,7 @@ abstract class Model implements Interfaces\Database\Seeder
      * @return array
      * @throws FactoryException
      */
-    protected function generate($aFields)
+    protected function generate(array $aFields): array
     {
         $aOut = [];
         foreach ($aFields as $oField) {
