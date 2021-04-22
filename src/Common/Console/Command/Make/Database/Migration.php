@@ -12,10 +12,15 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Class Migration
+ *
+ * @package Nails\Common\Console\Command\Make\Database
+ */
 class Migration extends BaseMaker
 {
     const RESOURCE_PATH  = NAILS_COMMON_PATH . 'resources/console/';
-    const MIGRATION_PATH = NAILS_APP_PATH . 'application/migrations/';
+    const MIGRATION_PATH = NAILS_APP_PATH . 'src/Database/Migration/';
 
     // --------------------------------------------------------------------------
 
@@ -46,8 +51,8 @@ class Migration extends BaseMaker
     /**
      * Executes the app
      *
-     * @param  InputInterface  $oInput  The Input Interface provided by Symfony
-     * @param  OutputInterface $oOutput The Output Interface provided by Symfony
+     * @param InputInterface  $oInput  The Input Interface provided by Symfony
+     * @param OutputInterface $oOutput The Output Interface provided by Symfony
      *
      * @return int
      */
@@ -89,8 +94,8 @@ class Migration extends BaseMaker
     /**
      * Create the Model
      *
-     * @throws \Exception
      * @return void
+     * @throws \Exception
      */
     private function createMigration(): void
     {

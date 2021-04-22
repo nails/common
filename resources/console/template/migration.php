@@ -9,21 +9,26 @@ return <<<'EOD'
 <?php
 
 /**
- * Migration:   {{INDEX}}
- * Started:     {{DATE_START}}
+ * Migration: {{INDEX}}
+ * Started:   {{DATE_START}}
  */
 
-namespace Nails\Database\Migration\App;
+namespace App\Database\Migration;
 
 use Nails\Common\Console\Migrate\Base;
+use Nails\Common\Interfaces;
 
 /**
  * Class Migration{{INDEX}}
  *
  * @package Nails\Database\Migration\App
  */
-class Migration{{INDEX}} extends Base
+class Migration{{INDEX}} implements Interfaces\Database\Migration
 {
+    use Traits\Database\Migration;
+
+    // --------------------------------------------------------------------------
+
     /**
      * Execute the migration
      */
