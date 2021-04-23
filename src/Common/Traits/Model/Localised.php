@@ -296,7 +296,7 @@ trait Localised
      * @return string
      * @throws ModelException
      */
-    public function getTableName($bIncludeAlias = false): string
+    public function getTableName(bool $bIncludeAlias = false): string
     {
         $sTable = parent::getTableName() . static::$sLocalisedTableSuffix;
         return $bIncludeAlias ? trim($sTable . ' as `' . $this->getTableAlias() . '`') : $sTable;
