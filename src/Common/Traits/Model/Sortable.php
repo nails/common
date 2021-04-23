@@ -6,6 +6,7 @@ use Nails\Factory;
 
 /**
  * Trait Sortable
+ *
  * @package Nails\Common\Traits\Model
  */
 trait Sortable
@@ -24,9 +25,23 @@ trait Sortable
 
     /**
      * Returns the column on which to sort
+     *
      * @return string
+     * @deprecated Use getColumnSortable
      */
     public function getSortableColumn()
+    {
+        return $this->getColumnSortable();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the column to use for sorting
+     *
+     * @return string
+     */
+    public function getColumnSortable(): string
     {
         return $this->getColumn('sortable', 'order');
     }

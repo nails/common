@@ -29,13 +29,31 @@ trait Copyable
     // --------------------------------------------------------------------------
 
     /**
+     * Returns the column to use as the ID
+     *
+     * @return string
+     */
+    abstract public function getColumnId(): string;
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the column to use as the label
+     *
+     * @return string
+     */
+    abstract public function getColumnLabel(): string;
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Returns protected property $table
      *
      * @param bool $bIncludePrefix Whether to include the table's alias
      *
      * @return string
      */
-    abstract public function getTableName($bIncludePrefix = false);
+    abstract public function getTableName(bool $bIncludePrefix = false): string;
 
     // --------------------------------------------------------------------------
 
@@ -79,7 +97,7 @@ trait Copyable
             'SELECT `%s` FROM `%s` WHERE `%s` = %s;',
             implode('`,`', $this->getCopiedColumns()),
             $this->getTableName(),
-            $this->getColumn('id'),
+            $this->getColumnId(),
             $iId
         );
 
@@ -124,16 +142,23 @@ trait Copyable
     {
         $aColumns = array_keys($this->describeFields());
         $aColumns = array_filter($aColumns, function ($sColumn) {
-            return !in_array($sColumn, [
-                $this->getColumn('id'),
-                $this->getColumn('slug'),
-                $this->getColumn('token'),
-                $this->getColumn('created'),
+            return !in_array($sColumn, array_filter([
+                //  Base model
+                $this->getColumnId(),
                 $this->getColumn('created_by'),
-                $this->getColumn('modified'),
                 $this->getColumn('modified_by'),
                 $this->getColumn('is_deleted'),
-            ]);
+
+                //  Tait\Model\Slug
+                method_exists($this, 'getColumnSlug') ? $this->getColumnSlug() : null,
+
+                //  Tait\Model\Token
+                method_exists($this, 'getColumnToken') ? $this->getColumnToken() : null,
+
+                //  Tait\Model\Timestamps
+                method_exists($this, 'getColumnCreated') ? $this->getColumnCreated() : null,
+                method_exists($this, 'getColumnModified') ? $this->getColumnModified() : null,
+            ]));
         });
 
         return $aColumns;
@@ -148,6 +173,6 @@ trait Copyable
      */
     protected function getCopiedLabelColumn(): string
     {
-        return $this->getColumn('label');
+        return $this->getColumnLabel();
     }
 }

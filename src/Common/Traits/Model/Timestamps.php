@@ -8,6 +8,7 @@ use Nails\Factory;
 
 /**
  * Trait Timestamps
+ *
  * @package Nails\Common\Traits\Model
  */
 trait Timestamps
@@ -44,10 +45,10 @@ trait Timestamps
      *
      * @return bool
      */
-    public function isAutoSetTimestamps()
+    public function isAutoSetTimestamps(): bool
     {
         //  @todo (Pablo - 2019-04-15) - Phase out support for $this->tableAutoSetTimestamps
-        return $this->tableAutoSetTimestamps ?? (defined('static::AUTO_SET_TIMESTAMP') ? static::AUTO_SET_TIMESTAMP : false);
+        return $this->tableAutoSetTimestamps ?? (defined('static::AUTO_SET_TIMESTAMP') ? static::AUTO_SET_TIMESTAMP : true);
     }
 
     // --------------------------------------------------------------------------
@@ -67,17 +68,41 @@ trait Timestamps
 
             $oDate = Factory::factory('DateTime');
 
-            if ($bSetCreated && empty($aData[$this->getColumn('created')])) {
-                $aData[$this->getColumn('created')] = $oDate->format('Y-m-d H:i:s');
+            if ($bSetCreated && empty($aData[$this->getColumnCreated()])) {
+                $aData[$this->getColumnCreated()] = $oDate->format('Y-m-d H:i:s');
             }
-            if (empty($aData[$this->getColumn('modified')])) {
-                $aData[$this->getColumn('modified')] = $oDate->format('Y-m-d H:i:s');
+            if (empty($aData[$this->getColumnModified()])) {
+                $aData[$this->getColumnModified()] = $oDate->format('Y-m-d H:i:s');
             }
         }
 
         $this->bSkipUpdateTimestamp = false;
 
         return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the column to use for `created` timestamp`
+     *
+     * @return string
+     */
+    public function getColumnCreated(): string
+    {
+        return $this->getColumn('created', 'created');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the column to use for `created` timestamp`
+     *
+     * @return string
+     */
+    public function getColumnModified(): string
+    {
+        return $this->getColumn('modified', 'modified');
     }
 
     // --------------------------------------------------------------------------

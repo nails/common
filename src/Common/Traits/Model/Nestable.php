@@ -3,6 +3,7 @@
 namespace Nails\Common\Traits\Model;
 
 use Nails\Common\Exception\FactoryException;
+use Nails\Common\Exception\ModelException;
 use Nails\Common\Service\Database;
 use Nails\Common\Resource;
 use Nails\Factory;
@@ -27,13 +28,31 @@ trait Nestable
     // --------------------------------------------------------------------------
 
     /**
+     * Returns the column to use as the ID
+     *
+     * @return string
+     */
+    abstract public function getColumnId(): string;
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the column to use as the label
+     *
+     * @return string|null
+     */
+    abstract public function getColumnLabel(): ?string;
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Returns protected property $table
      *
      * @param bool $bIncludePrefix Whether to include the table's alias
      *
      * @return string
      */
-    abstract public function getTableName($bIncludePrefix = false);
+    abstract public function getTableName(bool $bIncludePrefix = false): string;
 
     // --------------------------------------------------------------------------
 
@@ -53,8 +72,48 @@ trait Nestable
      * Returns the column to save breadcrumbs
      *
      * @return string
+     * @deprecated Use getColumnBreadcrumbs
      */
     public function getBreadcrumbsColumn()
+    {
+        return $this->getColumnBreadcrumbs();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the column to save the hierarchy
+     *
+     * @return string
+     * @deprecated Use getColumnOrder
+     */
+    public function getOrderColumn()
+    {
+        return $this->getColumnOrder();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the column to save the parent ID
+     *
+     * @return string
+     * @deprecated Use getColumnParentId
+     */
+    public function getParentIdColumn()
+    {
+        return $this->getColumnParentId();
+    }
+
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the column to save breadcrumbs
+     *
+     * @return string
+     */
+    public function getColumnBreadcrumbs()
     {
         return $this->getColumn('breadcrumbs', 'breadcrumbs');
     }
@@ -66,7 +125,7 @@ trait Nestable
      *
      * @return string
      */
-    public function getOrderColumn()
+    public function getColumnOrder()
     {
         return $this->getColumn('order', 'order');
     }
@@ -78,9 +137,9 @@ trait Nestable
      *
      * @return string
      */
-    public function getParentIdColumn()
+    public function getColumnParentId()
     {
-        return $this->getColumn('parentId', 'parent_id');
+        return $this->getColumn('parent_id', 'parent_id');
     }
 
     // --------------------------------------------------------------------------
@@ -136,6 +195,9 @@ trait Nestable
      * Generates breadcrumbs for the item
      *
      * @param int $iItemId The item's ID
+     *
+     * @throws FactoryException
+     * @throws ModelException
      */
     protected function saveBreadcrumbs($iItemId)
     {
@@ -169,15 +231,17 @@ trait Nestable
                 }
             }
 
-            /** @var Database $oDb */
-            $oDb = Factory::service('Database');
-
             //  Save breadcrumbs to the current item
-            $oDb->set($this->getBreadcrumbsColumn(), json_encode($aBreadcrumbs));
-            $oDb->where($this->getColumn('id'), $iItemId);
-            $oDb->update($this->getTableName());
+            parent::update(
+                $iItemId,
+                [
+                    $this->getColumnBreadcrumbs() => json_encode($aBreadcrumbs),
+                ]
+            );
 
             //  Save breadcrumbs of all children
+            /** @var Database $oDb */
+            $oDb = Factory::service('Database');
             $oDb->where('parent_id', $iItemId);
             $aChildren = $oDb->get($this->getTableName())->result();
             foreach ($aChildren as $oItem) {
@@ -214,13 +278,13 @@ trait Nestable
         /** @var Database $oDb */
         $oDb = Factory::service('Database');
         $oDb->select([
-            $this->getColumn('id'),
-            $this->getColumn('parent_id', 'parent_id'),
+            $this->getColumnId(),
+            $this->getColumnParentId(),
         ]);
         if (!$this->isDestructiveDelete()) {
             $oDb->where($this->getColumn('deleted'), false);
         }
-        $oDb->order_by($this->getColumn('label'));
+        $oDb->order_by($this->getColumnLabel());
         $aItems = $oDb->get($this->getTableName())->result();
 
         $iIndex = 0;
@@ -229,8 +293,8 @@ trait Nestable
         );
 
         foreach ($aItems as $oItem) {
-            $oDb->set($this->getOrderColumn(), ++$iIndex);
-            $oDb->where($this->getColumn('id'), $oItem->id);
+            $oDb->set($this->getColumnOrder(), ++$iIndex);
+            $oDb->where($this->getColumnId(), $oItem->id);
             $oDb->update($this->getTableName());
         }
     }
@@ -263,8 +327,8 @@ trait Nestable
     public function buildTree(array $aItems, int $iParentId = null): array
     {
         $aTemp         = [];
-        $sIdColumn     = $this->getColumn('id');
-        $sParentColumn = $this->getColumn('parent_id', 'parent_id');
+        $sIdColumn     = $this->getColumnId();
+        $sParentColumn = $this->getColumnParentId();
         foreach ($aItems as $oItem) {
             if ($oItem->{$sParentColumn} == $iParentId) {
                 $oItem->children = $this->buildTree($aItems, $oItem->{$sIdColumn});
@@ -331,7 +395,7 @@ trait Nestable
      * Retrieves the immediate children of an item
      *
      * @param int   $iId        The ID of the item
-     * @param bool  $bRecursive Whether to recursively fetch children
+     * @param bool  $bRecursive Whetehr to recursively fetch children
      * @param array $aData      Any additional data to pass to the `getAll()` method
      *
      * @return mixed
