@@ -97,6 +97,21 @@ trait Slug
     // --------------------------------------------------------------------------
 
     /**
+     * Returns an array of extracted column for a query
+     *
+     * @param string $sColumn         The column to extract
+     * @param array  $aData           The query data
+     * @param bool   $bIncludeDeleted Whether to include deleted items
+     *
+     * @return mixed[]
+     * @throws FactoryException
+     * @throws ModelException
+     */
+    abstract public function getAllColumn(string $sColumn, array $aData, bool $bIncludeDeleted = false): array;
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Returns whether this model automatically generates slugs or not
      *
      * @return bool
@@ -331,5 +346,22 @@ trait Slug
         return $bMaintainInputOrder
             ? $this->sortItemsByColumn($aItems, $aSlugs, $this->getColumnSlug())
             : $aItems;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the slugs of the objects returned by the query
+     *
+     * @param array $aData           The query data
+     * @param bool  $bIncludeDeleted Whether to include deleted items
+     *
+     * @return string[]
+     * @throws FactoryException
+     * @throws ModelException
+     */
+    public function getSlugs(array $aData = [], bool $bIncludeDeleted = false): array
+    {
+        return $this->getAllColumn($this->getColumnSlug(), $aData, $bIncludeDeleted);
     }
 }

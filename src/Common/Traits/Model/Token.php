@@ -87,6 +87,21 @@ trait Token
     // --------------------------------------------------------------------------
 
     /**
+     * Returns an array of extracted column for a query
+     *
+     * @param string $sColumn         The column to extract
+     * @param array  $aData           The query data
+     * @param bool   $bIncludeDeleted Whether to include deleted items
+     *
+     * @return mixed[]
+     * @throws FactoryException
+     * @throws ModelException
+     */
+    abstract public function getAllColumn(string $sColumn, array $aData, bool $bIncludeDeleted = false): array;
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Returns whether this model automatically generates tokens or not
      *
      * @return bool
@@ -226,5 +241,22 @@ trait Token
         return $bMaintainInputOrder
             ? $this->sortItemsByColumn($aItems, $aTokens, $sColumn)
             : $aItems;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the tokens of the objects returned by the query
+     *
+     * @param array $aData           The query data
+     * @param bool  $bIncludeDeleted Whether to include deleted items
+     *
+     * @return string[]
+     * @throws FactoryException
+     * @throws ModelException
+     */
+    public function getTokens(array $aData = [], bool $bIncludeDeleted = false): array
+    {
+        return $this->getAllColumn($this->getColumnToken(), $aData, $bIncludeDeleted);
     }
 }
