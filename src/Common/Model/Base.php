@@ -1217,8 +1217,8 @@ abstract class Base
             $aData['select'] = [];
         }
 
-        $aData['select'][] = $this->getColumnId();
-        $aData['select'][] = $this->getColumnLabel();
+        $aData['select'][] = $this->getTableAlias(true) . $this->getColumnId();
+        $aData['select'][] = $this->getTableAlias(true) . $this->getColumnLabel();
 
         $aItems = $this->getAllRawQuery($iPage, $iPerPage, $aData, $bIncludeDeleted)->result();
         $aOut   = [];
