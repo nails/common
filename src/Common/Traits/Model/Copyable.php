@@ -40,9 +40,9 @@ trait Copyable
     /**
      * Returns the column to use as the label
      *
-     * @return string
+     * @return string|null
      */
-    abstract public function getColumnLabel(): string;
+    abstract public function getColumnLabel(): ?string;
 
     // --------------------------------------------------------------------------
 
