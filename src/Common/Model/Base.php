@@ -291,6 +291,12 @@ abstract class Base
             $this->getColumnSlug(),
             $this->getColumnToken(),
         ];
+
+        //  @todo (Pablo 2021-04-28) - Backwards compatability; remove this in favour of getSearchableColumns()
+        if (empty($this->searchableFields)) {
+            $this->searchableFields[] = $this->getColumnId();
+            $this->searchableFields[] = $this->getColumnLabel();
+        }
     }
 
     // --------------------------------------------------------------------------
@@ -307,12 +313,7 @@ abstract class Base
      */
     public function getSearchableColumns(): array
     {
-        return !empty($this->searchableFields)
-            ? $this->searchableFields
-            : [
-                $this->getColumnId(),
-                $this->getColumnLabel(),
-            ];
+        return $this->searchableFields;
     }
 
     // --------------------------------------------------------------------------
@@ -963,8 +964,8 @@ abstract class Base
 
         // --------------------------------------------------------------------------
 
-        if (classUses(static::class, Traits\Model\Searchable::class)) {
-            $this->applySearchConditionals($aData, $aData[$sKey]);
+        if (classUses($this, Traits\Model\Searchable::class)) {
+            $this->applySearchConditionals($aData);
         }
 
         // --------------------------------------------------------------------------
@@ -1951,8 +1952,8 @@ abstract class Base
 
         // --------------------------------------------------------------------------
 
-        if (classUses(static::class, Traits\Model\Searchable::class)) {
-            $this->applySearchConditionals($aData, $aData[$sKey]);
+        if (classUses($this, Traits\Model\Searchable::class)) {
+            $this->applySearchConditionals($aData);
         }
 
         // --------------------------------------------------------------------------
@@ -2125,7 +2126,7 @@ abstract class Base
      */
     public function getDefaultSortColumn(): ?string
     {
-        if (classUses(static::class, Traits\Model\Sortable::class)) {
+        if (classUses($this, Traits\Model\Sortable::class)) {
             $sColumn = $this->getSortableColumn();
         } else {
             $sColumn = static::DEFAULT_SORT_COLUMN ?? $this->defaultSortColumn;
