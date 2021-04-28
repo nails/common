@@ -37,6 +37,7 @@ abstract class Base
     use Traits\ErrorHandling;
     use Traits\Caching;
     use Traits\GetCountCommon;
+    use Traits\Model\Searchable;
     use Traits\Model\Slug;
     use Traits\Model\Timestamps;
     use Traits\Model\Token;
@@ -167,13 +168,6 @@ abstract class Base
     const RESOURCE_PROVIDER = null;
 
     /**
-     * The property of the config array which contains the search keywords
-     *
-     * @var string
-     */
-    const KEYWORD_PROPERTY = 'keywords';
-
-    /**
      * Any fields which should be considered sensitive
      *
      * @var string[]
@@ -216,13 +210,6 @@ abstract class Base
      * @var string
      */
     protected $tableIsDeletedColumn = 'is_deleted';
-
-    /**
-     * The columns which should be included when searching by keyword
-     *
-     * @var array
-     */
-    protected $searchableFields = [];
 
     /**
      * Keeps a track of the columns which have been used by getByColumn(); allows
@@ -304,18 +291,28 @@ abstract class Base
             $this->getColumnSlug(),
             $this->getColumnToken(),
         ];
+    }
 
-        /**
-         * Set up default searchable fields. Each field is passed directly to the
-         * `column` parameter in getCountCommon() so can be in any form accepted by that.
-         *
-         * @todo  allow some sort of cleansing callback so that models can prep the
-         * search string if needed.
-         */
-        if (empty($this->searchableFields)) {
-            $this->searchableFields[] = $this->getColumnId();
-            $this->searchableFields[] = $this->getColumnLabel();
-        }
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns an array of columns which should be searchable.
+     *
+     * @return string[]
+     *
+     * @todo (Pablo 2021-04-28) - remove this implementation
+     * This implementation for backwards compatibility. models implementing
+     * Searchable trait should define their own version of this method.
+     *
+     */
+    public function getSearchableColumns(): array
+    {
+        return !empty($this->searchableFields)
+            ? $this->searchableFields
+            : [
+                $this->getColumnId(),
+                $this->getColumnLabel(),
+            ];
     }
 
     // --------------------------------------------------------------------------
@@ -966,8 +963,8 @@ abstract class Base
 
         // --------------------------------------------------------------------------
 
-        if (!empty($aData[static::KEYWORD_PROPERTY])) {
-            $this->applySearchConditionals($aData, $aData[static::KEYWORD_PROPERTY]);
+        if (classUses(static::class, Traits\Model\Searchable::class)) {
+            $this->applySearchConditionals($aData, $aData[$sKey]);
         }
 
         // --------------------------------------------------------------------------
@@ -1496,6 +1493,7 @@ abstract class Base
     }
 
     // --------------------------------------------------------------------------
+
     /**
      * Returns the IDs of the objects rturned by the query
      *
@@ -1945,7 +1943,7 @@ abstract class Base
      * @return int
      * @throws ModelException
      */
-    public function countAll(array $aData = [], $bIncludeDeleted = false)
+    public function countAll(array $aData = [], $bIncludeDeleted = false): int
     {
         /** @var Database $oDb */
         $oDb   = Factory::service('Database');
@@ -1953,8 +1951,8 @@ abstract class Base
 
         // --------------------------------------------------------------------------
 
-        if (!empty($aData[static::KEYWORD_PROPERTY])) {
-            $this->applySearchConditionals($aData, $aData[static::KEYWORD_PROPERTY]);
+        if (classUses(static::class, Traits\Model\Searchable::class)) {
+            $this->applySearchConditionals($aData, $aData[$sKey]);
         }
 
         // --------------------------------------------------------------------------
@@ -1972,81 +1970,6 @@ abstract class Base
         // --------------------------------------------------------------------------
 
         return $oDb->count_all_results($table);
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Searches for objects, optionally paginated.
-     *
-     * @param string   $sKeywords        The search term
-     * @param int|null $iPage            The page number of the results, if null then no pagination
-     * @param int|null $iPerPage         How many items per page of paginated results
-     * @param mixed    $aData            Any data to pass to getCountCommon()
-     * @param bool     $bIncludeDeleted  If non-destructive delete is enabled then this flag allows you to include
-     *                                   deleted items
-     *
-     * @return \stdClass
-     */
-    public function search($sKeywords, $iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false)
-    {
-        //  If the second parameter is an array then treat as if called with search($sKeywords, null, null, $aData);
-        if (is_array($iPage)) {
-            $aData = $iPage;
-            $iPage = null;
-        }
-
-        $aData[static::KEYWORD_PROPERTY] = $sKeywords;
-
-        return (object) [
-            'page'    => $iPage,
-            'perPage' => $iPerPage,
-            'total'   => $this->countAll($aData),
-            'data'    => $this->getAll($iPage, $iPerPage, $aData, $bIncludeDeleted),
-        ];
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Mutates the data array and adds the conditionals for searching
-     *
-     * @param array $aData
-     * @param       $sKeywords
-     */
-    protected function applySearchConditionals(array &$aData, $sKeywords)
-    {
-        if (empty($aData['or_like'])) {
-            $aData['or_like'] = [];
-        }
-
-        $sAlias = $this->getTableAlias(true);
-
-        foreach ($this->searchableFields as $mField) {
-
-            //  If the field is an array then search across the columns concatenated together
-            if (is_array($mField)) {
-
-                $sMappedFields = array_map(function ($sInput) use ($sAlias) {
-                    if (strpos($sInput, '.') !== false || preg_match('/^\(.*\)$/', $sInput)) {
-                        return $sInput;
-                    } else {
-                        return $sAlias . $sInput;
-                    }
-                }, $mField);
-
-                $aData['or_like'][] = ['CONCAT_WS(" ", ' . implode(',', $sMappedFields) . ')', $sKeywords];
-
-            } elseif (preg_match('/^\(.*\)$/', $mField)) {
-                $aData['or_like'][] = [$mField, $sKeywords];
-
-            } elseif (strpos($mField, '.') !== false) {
-                $aData['or_like'][] = [$mField, $sKeywords];
-
-            } else {
-                $aData['or_like'][] = [$sAlias . $mField, $sKeywords];
-            }
-        }
     }
 
     // --------------------------------------------------------------------------
