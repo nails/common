@@ -184,14 +184,32 @@ class Tools
      *
      * @param object|string $mClass The class to test, either as an object or a string
      * @param string        $sTrait The trait to look for
+     * @param bool          $bDeep  Wether to test parent classes too
      *
      * @return bool
      */
-    public static function classUses($mClass, string $sTrait): bool
+    public static function classUses($mClass, string $sTrait, bool $bDeep = true): bool
     {
+        $aTraits = class_uses($mClass);
+
+        if ($bDeep) {
+            do {
+
+                $aTraits = array_merge(class_uses($mClass), $aTraits);
+
+            } while ($mClass = get_parent_class($mClass));
+
+            foreach ($aTraits as $sTestTrait) {
+                $aTraits = array_merge(class_uses($sTestTrait), $aTraits);
+            }
+
+            $aTraits = array_unique($aTraits);
+            $aTraits = array_filter($aTraits);
+        }
+
         return in_array(
             ltrim($sTrait, '\\'),
-            class_uses($mClass)
+            $aTraits
         );
     }
 
