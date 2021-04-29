@@ -134,9 +134,10 @@ trait Searchable
             $aData['or_like'] = [];
         }
 
-        $sAlias = $this->getTableAlias(true);
+        $sAlias             = $this->getTableAlias(true);
+        $aSearchableColumns = array_filter($this->getSearchableColumns());
 
-        foreach ($this->getSearchableColumns() as $mField) {
+        foreach ($aSearchableColumns as $mField) {
 
             //  If the field is an array then search across the columns concatenated together
             if (is_array($mField)) {
