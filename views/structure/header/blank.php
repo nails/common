@@ -5,13 +5,13 @@ use Nails\Common\Service;
 use Nails\Common\Resource;
 
 /**
- * @var Service\Asset     $oAssetService
+ * @var Service\Asset     $oAsset
  * @var Service\Meta      $oMetaService
  * @var Resource\MetaData $oMetaData
  */
 
-$oMetaService  = Factory::service('Meta');
-$oAssetService = Factory::service('Asset');
+$oMetaService = Factory::service('Meta');
+$oAsset       = Factory::service('Asset');
 
 $sHtmlLang    = $oMetaData->getLocale()->getLanguage()->getLabel();
 $sHtmlClasses = $oMetaData->getHtmlClasses()->implode();
@@ -30,7 +30,7 @@ $sBodyClasses = $oMetaData->getBodyClasses()->implode();
         // --------------------------------------------------------------------------
 
         //  Critical CSS
-        echo $oAssetService->criticalCss()->render();
+        echo $oAsset->criticalCss()->render();
 
         // --------------------------------------------------------------------------
 
@@ -41,9 +41,10 @@ $sBodyClasses = $oMetaData->getBodyClasses()->implode();
         // --------------------------------------------------------------------------
 
         //  Assets
-        $oAssetService->output('CSS');
-        $oAssetService->output('CSS-INLINE');
-        $oAssetService->output('JS-INLINE-HEADER');
+        $oAsset->output($oAsset::TYPE_CSS);
+        $oAsset->output($oAsset::TYPE_CSS_INLINE);
+        $oAsset->output($oAsset::TYPE_JS_HEADER);
+        $oAsset->output($oAsset::TYPE_JS_INLINE_HEADER);
 
         ?>
     </head>
