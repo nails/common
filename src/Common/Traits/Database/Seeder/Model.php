@@ -24,7 +24,7 @@ trait Model
      * @throws FactoryException
      * @throws ModelException
      */
-    protected function randomId($sModel, $sProvider, $aData = []): ?int
+    protected function randomId(string $sModel, string $sProvider, array $aData = []): ?int
     {
         $oModel   = Factory::model($sModel, $sProvider);
         $aResults = $oModel->getRandom($aData);
