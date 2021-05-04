@@ -33,6 +33,8 @@ class Asset
      */
     const TYPE_ALL              = 'ALL';
     const TYPE_JS               = 'JS';
+    const TYPE_JS_HEADER        = 'JS-HEADER';
+    const TYPE_JS_FOOTER        = 'JS-FOOTER';
     const TYPE_JS_INLINE        = 'JS-INLINE';
     const TYPE_JS_INLINE_HEADER = 'JS-INLINE-HEADER';
     const TYPE_JS_INLINE_FOOTER = 'JS-INLINE-FOOTER';
@@ -116,6 +118,13 @@ class Asset
      * @var array
      */
     protected $aJs = [];
+
+    /**
+     * Loades JS files (for the header)
+     *
+     * @var array
+     */
+    protected $aJsHeader = [];
 
     /**
      * Loaded inline JS for the header
@@ -289,7 +298,12 @@ class Asset
                 break;
 
             case static::TYPE_JS:
+            case static::TYPE_JS_FOOTER:
                 unset($this->aJs['URL-' . $sAsset]);
+                break;
+
+            case static::TYPE_JS_HEADER:
+                unset($this->aJsHeader['URL-' . $sAsset]);
                 break;
         }
     }
@@ -315,7 +329,12 @@ class Asset
                 break;
 
             case static::TYPE_JS:
+            case static::TYPE_JS_FOOTER:
                 unset($this->aJs['ABSOLUTE-' . $sAsset]);
+                break;
+
+            case static::TYPE_JS_HEADER:
+                unset($this->aJsHeader['ABSOLUTE-' . $sAsset]);
                 break;
         }
     }
@@ -495,7 +514,12 @@ class Asset
                 break;
 
             case static::TYPE_JS:
+            case static::TYPE_JS_FOOTER:
                 $this->aJs['URL-' . $sAsset] = [$sAsset, $bAsync];
+                break;
+
+            case static::TYPE_JS_HEADER:
+                $this->aJsHeader['URL-' . $sAsset] = [$sAsset, $bAsync];
                 break;
         }
     }
@@ -522,7 +546,12 @@ class Asset
                 break;
 
             case static::TYPE_JS:
+            case static::TYPE_JS_FOOTER:
                 $this->aJs['ABSOLUTE-' . $sAsset] = [$this->buildUrl($sAsset), $bAsync];
+                break;
+
+            case static::TYPE_JS_HEADER:
+                $this->aJsHeader['ABSOLUTE-' . $sAsset] = [$this->buildUrl($sAsset), $bAsync];
                 break;
         }
     }
@@ -539,6 +568,7 @@ class Asset
         $this->aCss            = [];
         $this->aCssInline      = [];
         $this->aJs             = [];
+        $this->aJsHeader       = [];
         $this->aJsInlineHeader = [];
         $this->aJsInlineFooter = [];
         return $this;
@@ -553,15 +583,14 @@ class Asset
      */
     public function getLoaded()
     {
-        $oLoaded = (object) [
+        return (object) [
             'css'            => $this->aCss,
             'cssInline'      => $this->aCssInline,
             'js'             => $this->aJs,
+            'jsHeader'       => $this->aJsHeader,
             'jsInlineHeader' => $this->aJsInlineHeader,
             'jsInlineFooter' => $this->aJsInlineFooter,
         ];
-
-        return $oLoaded;
     }
 
     // --------------------------------------------------------------------------
@@ -569,12 +598,12 @@ class Asset
     /**
      * Output the assets for HTML
      *
-     * @param string  $sType   The type of asset to output
-     * @param boolean $bOutput Whether to output to the browser or to return as a string
+     * @param string $sType   The type of asset to output
+     * @param bool   $bOutput Whether to output to the browser or to return as a string
      *
-     * @return string
+     * @return array
      */
-    public function output($sType = self::TYPE_ALL, $bOutput = true)
+    public function output(string $sType = self::TYPE_ALL, bool $bOutput = true): array
     {
         $aOut  = [];
         $sType = strtoupper($sType);
@@ -591,6 +620,13 @@ class Asset
         //  Linked JS
         if (!empty($this->aJs) && ($sType === static::TYPE_JS || $sType === static::TYPE_ALL)) {
             foreach ($this->aJs as $aAsset) {
+                [$sAsset, $bAsync] = $aAsset;
+                $aOut[] = '<script ' . ($bAsync ? 'async ' : '') . 'src="' . $sAsset . '"></script>';
+            }
+        }
+
+        if (!empty($this->aJsHeader) && ($sType === static::TYPE_JS_HEADER || $sType === static::TYPE_ALL)) {
+            foreach ($this->aJsHeader as $aAsset) {
                 [$sAsset, $bAsync] = $aAsset;
                 $aOut[] = '<script ' . ($bAsync ? 'async ' : '') . 'src="' . $sAsset . '"></script>';
             }
@@ -778,7 +814,12 @@ class Asset
                 break;
 
             case static::TYPE_JS:
+            case static::TYPE_JS_FOOTER:
                 $this->aJs[$sKey] = [$this->sBaseModuleUrl . $sModule . '/assets/js/' . $sAsset, $bAsync];
+                break;
+
+            case static::TYPE_JS_HEADER:
+                $this->aJsHeader[$sKey] = [$this->sBaseModuleUrl . $sModule . '/assets/js/' . $sAsset, $bAsync];
                 break;
         }
     }
@@ -928,7 +969,12 @@ class Asset
                 break;
 
             case static::TYPE_JS:
+            case static::TYPE_JS_FOOTER:
                 $this->aJs['APP-' . $sAsset] = [$this->buildUrl($this->sJsDir . $sAsset), $bAsync];
+                break;
+
+            case static::TYPE_JS_HEADER:
+                $this->aJsHeader['APP-' . $sAsset] = [$this->buildUrl($this->sJsDir . $sAsset), $bAsync];
                 break;
         }
     }
@@ -954,7 +1000,12 @@ class Asset
                 break;
 
             case static::TYPE_JS:
+            case static::TYPE_JS_FOOTER:
                 unset($this->aJs['MODULE-' . $sModule . '-' . $sAsset]);
+                break;
+
+            case static::TYPE_JS_HEADER:
+                unset($this->aJsHeader['MODULE-' . $sModule . '-' . $sAsset]);
                 break;
         }
     }
@@ -980,7 +1031,12 @@ class Asset
                 break;
 
             case static::TYPE_JS:
+            case static::TYPE_JS_FOOTER:
                 unset($this->aJs['APP-' . $sAsset]);
+                break;
+
+            case static::TYPE_JS_HEADER:
+                unset($this->aJsHeader['APP-' . $sAsset]);
                 break;
         }
     }
