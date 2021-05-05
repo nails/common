@@ -111,7 +111,7 @@ class MetaData
     /**
      * Sets the SEO locale
      *
-     * @param string $oLocale The locale to set
+     * @param Locale $oLocale The locale to set
      *
      * @return $this
      */
