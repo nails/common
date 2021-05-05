@@ -195,9 +195,9 @@ class Model extends BaseMaker
             if (!$bAutoDetect) {
 
                 $aFields    = $this->getArguments();
-                $aModels    = explode(',', $aFields['MODEL_NAME']);
                 $aModelData = [];
-                sort($aModels);
+                $aModels    = $this->parseClassNames($aFields['MODEL_NAME']);
+
                 foreach ($aModels as $sModelName) {
                     $oModel = $this->prepareModelName($sModelName);
 
@@ -391,8 +391,8 @@ class Model extends BaseMaker
         $sModelName = ucwords($sModelName);
 
         //  Prepare the database table name
-        $sTableName = preg_replace('/[^a-z ]/', '', strtolower($sModelName));
-        $sTableName = preg_replace('/ +/', '_', $sTableName);
+        $sTableName           = preg_replace('/[^a-z ]/', '', strtolower($sModelName));
+        $sTableName           = preg_replace('/ +/', '_', $sTableName);
         $sTableNameWithPrefix = Config::get('APP_DB_PREFIX') . $sTableName;
 
         //  Prepare the model name, namespace, filename etc
