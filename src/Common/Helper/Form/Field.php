@@ -8,6 +8,11 @@ use Nails\Common\Helper\Form;
 use Nails\Common\Service\Input;
 use Nails\Factory;
 
+/**
+ * Class Field
+ *
+ * @package Nails\Common\Helper\Form
+ */
 class Field
 {
     /**
@@ -452,7 +457,7 @@ class Field
      */
     public static function wysiwyg($aField, $sTip = '')
     {
-        $aField['type'] = 'textarea';
+        $aField['type'] = Form::FIELD_TEXTAREA;
         if (empty($aField['class'])) {
             $aField['class'] = '';
         }
