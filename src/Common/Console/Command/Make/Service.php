@@ -89,13 +89,7 @@ class Service extends BaseMaker
         try {
 
             $aToCreate = [];
-            $aServices = array_filter(
-                array_map(function ($sService) {
-                    return implode('/', array_map('ucfirst', explode('/', ucfirst(trim($sService)))));
-                }, explode(',', $aFields['SERVICE_NAME']))
-            );
-
-            sort($aServices);
+            $aServices = $this->parseClassNames($aFields['SERVICE_NAME']);
 
             foreach ($aServices as $sService) {
 

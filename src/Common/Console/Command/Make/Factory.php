@@ -88,13 +88,7 @@ class Factory extends BaseMaker
         try {
 
             $aToCreate  = [];
-            $aFactories = array_filter(
-                array_map(function ($sFactory) {
-                    return implode('/', array_map('ucfirst', explode('/', ucfirst(trim($sFactory)))));
-                }, explode(',', $aFields['FACTORY_NAME']))
-            );
-
-            sort($aFactories);
+            $aFactories = $this->parseClassNames($aFields['FACTORY_NAME']);;
 
             foreach ($aFactories as $sFactory) {
 

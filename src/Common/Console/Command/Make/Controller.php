@@ -94,18 +94,12 @@ class Controller extends BaseMaker
 
         try {
 
-            $aControllers = array_filter(
-                array_map(function ($sController) {
-                    return implode('/', array_map('ucfirst', explode('/', ucfirst(trim($sController)))));
-                }, explode(',', $aFields['CONTROLLER_NAME']))
-            );
+            $aControllers = $this->parseClassNames($aFields['CONTROLLER_NAME']);
             $aMethods     = array_filter(
                 array_map(function ($sMethod) {
                     return lcfirst(trim($sMethod));
                 }, explode(',', $aFields['METHODS']))
             );
-
-            sort($aControllers);
 
             foreach ($aControllers as $sController) {
 

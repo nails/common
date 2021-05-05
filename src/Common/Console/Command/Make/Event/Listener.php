@@ -88,13 +88,7 @@ class Listener extends BaseMaker
         try {
 
             $aToCreate  = [];
-            $aListeners = array_filter(
-                array_map(function ($sListener) {
-                    return implode('/', array_map('ucfirst', explode('/', ucfirst(trim($sListener)))));
-                }, explode(',', $aFields['NAME']))
-            );
-
-            sort($aListeners);
+            $aListeners = $this->parseClassNames($aFields['NAME']);
 
             foreach ($aListeners as $sListener) {
 
