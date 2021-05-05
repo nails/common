@@ -50,6 +50,8 @@ class Form
     const FIELD_TIMECODE          = 'timecode';
     const FIELD_UPLOAD            = 'upload';
     const FIELD_URL               = 'url';
+    const FIELD_WYSIWYG           = 'wysiwyg';
+    const FIELD_WYSIWYG_BASIC     = 'wysiwygBasic';
 
     // --------------------------------------------------------------------------
 
