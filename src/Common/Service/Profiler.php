@@ -255,6 +255,12 @@ class Profiler
                 border: 1px solid #ccc;
                 padding: 0.5rem;
             }
+
+            .<?=static::HTML_CLASS_PROFILER_TABLE_DATA_ROW?>:hover td,
+            .<?=static::HTML_CLASS_PROFILER_TABLE_PROPERTY_ROW?>:hover td {
+                background: #CCCCCC;
+            }
+
         </style>
         <?php
     }
