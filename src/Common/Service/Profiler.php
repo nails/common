@@ -323,8 +323,8 @@ class Profiler
             $iDiff            = $fPreviousTimestamp === null ? 0 : $aMark['Timestamp'] - $fPreviousTimestamp;
             $aReportedMarks[] = [
                 'Label'     => $aMark['Label'],
-                'Diff (s)'  => $iDiff,
-                'Total (s)' => $fTotal + $iDiff,
+                'Diff (s)'  => sprintf('%f', $iDiff),
+                'Total (s)' => sprintf('%f', $fTotal + $iDiff),
             ];
 
             $fPreviousTimestamp = $aMark['Timestamp'];
