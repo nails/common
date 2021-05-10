@@ -18,7 +18,7 @@ interface Settings
     /**
      * Any additional permissions to collect
      *
-     * @return stirng[]
+     * @return string[]
      */
     public function getPermissions(): array;
 
