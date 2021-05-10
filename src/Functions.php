@@ -16,6 +16,11 @@ use Nails\Common\Service\ErrorHandler;
 use Nails\Common\Service\Input;
 use Nails\Config;
 
+/**
+ * Class Functions
+ *
+ * @package Nails
+ */
 class Functions
 {
     /**
@@ -41,7 +46,7 @@ class Functions
      * @return string
      * @throws \Exception
      */
-    public static function generateKey(string $sSalt = null)
+    public static function generateKey(string $sSalt = null): string
     {
         return base64_encode($sSalt . random_bytes(32));
     }
@@ -84,7 +89,7 @@ class Functions
      *
      * @return string
      */
-    public static function getRelativePath($sFrom, $sTo): string
+    public static function getRelativePath(string $sFrom, string $sTo): string
     {
         $aFrom    = explode('/', $sFrom);
         $aTo      = explode('/', $sTo);
@@ -122,15 +127,21 @@ class Functions
     /**
      * Throw an error
      *
-     * @param string $sMessage    The error message
-     * @param string $sSubject    The error subject
-     * @param int    $iStatusCode The status code
+     * @param string $sMessage      The error message
+     * @param string $sSubject      The error subject
+     * @param int    $iStatusCode   The status code
+     * @param bool   $bUseException Whether to use an exception
+     *
+     * @throws \Nails\Common\Exception\FactoryException
+     * @throws \Nails\Common\Exception\NailsException
+     * @throws \Nails\Common\Exception\ViewNotFoundException
+     * @throws \ReflectionException
      */
     public static function showError(
-        $sMessage = '',
-        $sSubject = '',
-        $iStatusCode = 500,
-        $bUseException = true
+        string $sMessage = '',
+        string $sSubject = '',
+        int $iStatusCode = 500,
+        bool $bUseException = true
     ): void {
 
         if (is_array($sMessage)) {
@@ -174,7 +185,7 @@ class Functions
      *
      * @param bool $bLogError Whether to log the error or not
      */
-    public static function show404($bLogError = true): void
+    public static function show404(bool $bLogError = false): void
     {
         /** @var ErrorHandler $oErrorHandler */
         $oErrorHandler = Factory::service('ErrorHandler');

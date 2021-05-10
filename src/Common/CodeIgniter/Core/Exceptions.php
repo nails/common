@@ -92,9 +92,12 @@ class Exceptions extends CI_Exceptions
     // --------------------------------------------------------------------------
 
     /**
-     * Renders the 404 page and halts script execution
+     * Renders the 404 page and halts script execution. This methoid is what
+     * CodeIgniter's show_404 function will call, so acts as an intermediary
+     * to the Nails 404 handler.
      *
-     * @param bool $bLogError Whether to log the error
+     * @param string $sPag      The Page which was a 404
+     * @param bool   $bLogError Whether to log the error
      */
     public function show_404($sPage = '', $bLogError = true)
     {

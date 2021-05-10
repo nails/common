@@ -75,15 +75,8 @@ if (!function_exists('unauthorised')) {
     }
 }
 
-if (!function_exists('show_404')) {
-    function show_404($bLogError = true)
-    {
-        Functions::show404($bLogError);
-    }
-}
-
 if (!function_exists('show404')) {
-    function show404($bLogError = true)
+    function show404(bool $bLogError = false)
     {
         Functions::show404($bLogError);
     }

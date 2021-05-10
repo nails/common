@@ -93,7 +93,7 @@ class ErrorHandler
             return;
         }
 
-        $aErrorHandlers = Components::drivers(\Nails\Common\Constants::MODULE_SLUG, 'ErrorHandler');
+        $aErrorHandlers = Components::drivers('nails/common', 'ErrorHandler');
         $oDefaultDriver = null;
         $aCustomDrivers = [];
         foreach ($aErrorHandlers as $oErrorHandler) {
@@ -267,8 +267,9 @@ class ErrorHandler
      * @throws ReflectionException
      * @throws ViewNotFoundException
      */
-    public function show404($bLogError = true)
+    public function show404(bool $bLogError = false)
     {
+        dd('ErrorHandler::show404', $bLogError);
         $sPage = ArrayHelper::getFromArray('REQUEST_URI', $_SERVER);
 
         /**
