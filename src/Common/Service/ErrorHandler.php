@@ -496,10 +496,19 @@ class ErrorHandler
             $oView = Factory::service('View');
             /** @var Event $oEvent */
             $oEvent = Factory::service('Event');
+
+            $aEventData = [
+                is_numeric($sView)
+                    ? (int) $sView
+                    : HttpCodes::STATUS_INTERNAL_SERVER_ERROR,
+                $sType,
+                &$aData,
+            ];
+
             $oEvent->trigger(
                 Events::VIEW_ERROR_PRE,
                 Events::getEventNamespace(),
-                [$sView, $sType, &$aData]
+                $aEventData
             );
 
             $oView->setData($aData);
@@ -508,7 +517,7 @@ class ErrorHandler
             $oEvent->trigger(
                 Events::VIEW_ERROR_POST,
                 Events::getEventNamespace(),
-                [$sView, $sType, &$aData]
+                $aEventData
             );
 
         } else {
