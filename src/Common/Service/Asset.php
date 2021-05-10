@@ -834,14 +834,14 @@ class Asset
      * Loads an asset from a module's asset directory
      *
      * @param string       $sAsset     The asset to load
-     * @param string       $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string|null  $sForceType Force a particular type of asset (i.e. JS or CSS)
      * @param bool         $bAsync     Whether to load the asset asynchronously
      * @param array|string $mModule    The module to load from
      *
      * @return $this
      * @throws AssetException
      */
-    protected function loadModule(string $sAsset, string $sForceType, bool $bAsync, $mModule): self
+    protected function loadModule(string $sAsset, ?string $sForceType, bool $bAsync, $mModule): self
     {
         if (is_array($mModule)) {
             $sModule   = !empty($mModule[0]) ? $mModule[0] : null;
