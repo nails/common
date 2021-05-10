@@ -269,7 +269,6 @@ class ErrorHandler
      */
     public function show404(bool $bLogError = false)
     {
-        dd('ErrorHandler::show404', $bLogError);
         $sPage = ArrayHelper::getFromArray('REQUEST_URI', $_SERVER);
 
         /**
