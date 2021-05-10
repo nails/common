@@ -16,6 +16,11 @@ use Nails\Common\Events\Base;
 use Nails\Common\Events\Subscription;
 use Nails\Factory;
 
+/**
+ * Class Events
+ *
+ * @package Nails\Common
+ */
 class Events extends Base
 {
     /**
@@ -69,4 +74,22 @@ class Events extends Base
      * @param $sResovledPath string The view's resolved path
      */
     const VIEW_POST = 'VIEW:POST';
+
+    /**
+     * Fired before an error view is rendered
+     *
+     * @param int    $iCode The error code (404, 500, etc)
+     * @param string $sType The type of error (html or cli)
+     * @param array  $aData Data being passed to the view (as a reference)
+     */
+    const VIEW_ERROR_PRE = 'VIEW:ERROR:PRE';
+
+    /**
+     * Fired after an error view is rendered
+     *
+     * @param int    $iCode The error code (404, 500, etc)
+     * @param string $sType The type of error (html or cli)
+     * @param array  $aData Data being passed to the view (as a reference)
+     */
+    const VIEW_ERROR_POST = 'VIEW:ERROR:POST';
 }

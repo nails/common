@@ -495,8 +495,22 @@ class ErrorHandler
 
             /** @var View $oView */
             $oView = Factory::service('View');
+            /** @var Event $oEvent */
+            $oEvent = Factory::service('Event');
+            $oEvent->trigger(
+                Events::VIEW_ERROR_PRE,
+                Events::getEventNamespace(),
+                [$sView, $sType, &$aData]
+            );
+
             $oView->setData($aData);
             echo $oView->load($sValidPath, [], true);
+
+            $oEvent->trigger(
+                Events::VIEW_ERROR_POST,
+                Events::getEventNamespace(),
+                [$sView, $sType, &$aData]
+            );
 
         } else {
             static::halt(
