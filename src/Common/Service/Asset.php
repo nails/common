@@ -261,13 +261,14 @@ class Asset
     /**
      * Unloads an asset
      *
-     * @param mixed  $mAssets        The asset to unload, can be an array or a string
-     * @param string $sAssetLocation The asset's location
-     * @param string $sForceType     The asset's file type (e.g., JS or CSS)
+     * @param string[]|string $mAssets        The asset to unload, can be an array or a string
+     * @param string          $sAssetLocation The asset's location
+     * @param string|null     $sForceType     The asset's file type (e.g., JS or CSS)
      *
-     * @return object
+     * @return $this
+     * @throws AssetException
      */
-    public function unload($mAssets, $sAssetLocation = 'APP', $sForceType = null)
+    public function unload($mAssets, string $sAssetLocation = 'APP', string $sForceType = null): self
     {
         //  Cast as an array
         $aAssets = (array) $mAssets;
@@ -315,9 +316,10 @@ class Asset
      * @param string $sAsset     The asset to unload
      * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
-     * @return void
+     * @return $this
+     * @throws AssetException
      */
-    protected function unloadUrl($sAsset, $sForceType)
+    protected function unloadUrl(string $sAsset, string $sForceType): self
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -336,6 +338,8 @@ class Asset
                 unset($this->aJsHeader['URL-' . $sAsset]);
                 break;
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -346,9 +350,10 @@ class Asset
      * @param string $sAsset     The asset to unload
      * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
-     * @return void
+     * @return $this
+     * @throws AssetException
      */
-    protected function unloadAbsolute($sAsset, $sForceType)
+    protected function unloadAbsolute(string $sAsset, string $sForceType): self
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -367,6 +372,8 @@ class Asset
                 unset($this->aJsHeader['ABSOLUTE-' . $sAsset]);
                 break;
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -374,14 +381,19 @@ class Asset
     /**
      * Unloads an inline asset
      *
-     * @param string $sScript     The inline asset to load, wrap in script tags for JS, or style tags for CSS
-     * @param string $sForceType  Force a particular type of asset (i.e. JS-INLINE or CSS-INLINE)
-     * @param string $sJsLocation Where the inline JS should appear, accepts FOOTER or HEADER
+     * @param string      $sScript     The inline asset to load, wrap in script tags for JS, or style tags for CSS
+     * @param string|null $sForceType  Force a particular type of asset (i.e. JS-INLINE or CSS-INLINE)
+     * @param string      $sJsLocation Where the inline JS should appear, accepts FOOTER or HEADER
      *
-     * @return void
+     * @return $this
+     * @throws AssetException
      */
-    public function unloadInline($sScript = null, $sForceType = null, $sJsLocation = self::JS_LOCATION_FOOTER)
-    {
+    public function unloadInline(
+        string $sScript = null,
+        string $sForceType = null,
+        string $sJsLocation = self::JS_LOCATION_FOOTER
+    ): self {
+
         if (!empty($sScript)) {
 
             $sJsLocation = strtoupper($sJsLocation);
@@ -425,7 +437,7 @@ class Asset
      * @return $this
      * @throws AssetException
      */
-    public function library($sKey): self
+    public function library(string $sKey): self
     {
         if (!array_key_exists($sKey, $this->aLibraries)) {
             throw new AssetException(sprintf(
@@ -462,15 +474,21 @@ class Asset
     /**
      * Loads an asset
      *
-     * @param mixed  $mAssets        The asset to load, can be an array or a string
-     * @param string $sAssetLocation The asset's location
-     * @param string $sForceType     The asset's file type (e.g., JS or CSS)
-     * @param bool   $bAsync         Whether to load the asset asynchronously
+     * @param string[]|string $mAssets        The asset to load, can be an array or a string
+     * @param string          $sAssetLocation The asset's location
+     * @param string|null     $sForceType     The asset's file type (e.g., JS or CSS)
+     * @param bool            $bAsync         Whether to load the asset asynchronously
      *
      * @return $this
+     * @throws AssetException
      */
-    public function load($mAssets, $sAssetLocation = 'APP', $sForceType = null, bool $bAsync = false): self
-    {
+    public function load(
+        $mAssets,
+        string $sAssetLocation = 'APP',
+        string $sForceType = null,
+        bool $bAsync = false
+    ): self {
+
         //  Cast as an array
         $aAssets = (array) $mAssets;
 
@@ -520,9 +538,10 @@ class Asset
      * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      * @param bool   $bAsync     Whether to load the asset asynchronously
      *
-     * @return void
+     * @return $this
+     * @throws AssetException
      */
-    protected function loadUrl($sAsset, $sForceType, bool $bAsync)
+    protected function loadUrl(string $sAsset, string $sForceType, bool $bAsync): self
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -541,6 +560,8 @@ class Asset
                 $this->aJsHeader['URL-' . $sAsset] = [$sAsset, $bAsync];
                 break;
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -552,9 +573,10 @@ class Asset
      * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      * @param bool   $bAsync     Whether to load the asset asynchronously
      *
-     * @return void
+     * @return $this
+     * @throws AssetException
      */
-    protected function loadAbsolute($sAsset, $sForceType, bool $bAsync)
+    protected function loadAbsolute(string $sAsset, string $sForceType, bool $bAsync): self
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -573,6 +595,8 @@ class Asset
                 $this->aJsHeader['ABSOLUTE-' . $sAsset] = [$this->buildUrl($sAsset), $bAsync];
                 break;
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -580,9 +604,9 @@ class Asset
     /**
      * Clears all loaded assets
      *
-     * @return object
+     * @return $this
      */
-    public function clear()
+    public function clear(): self
     {
         $this->aCss            = [];
         $this->aCssInline      = [];
@@ -598,17 +622,17 @@ class Asset
     /**
      * Returns an object containing all loaded assets, useful for debugging.
      *
-     * @return stdClass
+     * @return \stdClass
      */
-    public function getLoaded()
+    public function getLoaded(): \stdClass
     {
         return (object) [
-            'css'            => $this->aCss,
-            'cssInline'      => $this->aCssInline,
-            'js'             => $this->aJs,
-            'jsHeader'       => $this->aJsHeader,
-            'jsInlineHeader' => $this->aJsInlineHeader,
-            'jsInlineFooter' => $this->aJsInlineFooter,
+            static::TYPE_CSS              => $this->aCss,
+            static::TYPE_CSS_INLINE       => $this->aCssInline,
+            static::TYPE_JS               => $this->aJs,
+            static::TYPE_JS_HEADER        => $this->aJsHeader,
+            static::TYPE_JS_INLINE_HEADER => $this->aJsInlineHeader,
+            static::TYPE_JS_INLINE_FOOTER => $this->aJsInlineFooter,
         ];
     }
 
@@ -745,14 +769,15 @@ class Asset
      * Loads an inline asset
      *
      * @param string|\Closure $sScript     The inline asset to load, wrap in script tags for JS, or style tags for CSS
-     * @param string          $sForceType  Force a particular type of asset (i.e. JS-INLINE or CSS-INLINE)
+     * @param string|null     $sForceType  Force a particular type of asset (i.e. JS-INLINE or CSS-INLINE)
      * @param string          $sJsLocation Where the inline JS should appear, accepts FOOTER or HEADER
      *
-     * @return object
+     * @return $this
+     * @throws AssetException
      */
-    public function inline($sScript = null, $sForceType = null, $sJsLocation = self::JS_LOCATION_FOOTER)
+    public function inline($mScript = null, string $sForceType = null, $sJsLocation = self::JS_LOCATION_FOOTER): self
     {
-        if (!empty($sScript)) {
+        if (!empty($mScript)) {
 
             $sJsLocation = strtoupper($sJsLocation);
             if (!in_array($sJsLocation, [static::JS_LOCATION_FOOTER, static::JS_LOCATION_HEADER])) {
@@ -762,37 +787,37 @@ class Asset
                 ));
             }
 
-            if ($sScript instanceof \Closure && empty($sForceType)) {
-                throw new NailsException(
+            if ($mScript instanceof \Closure && empty($sForceType)) {
+                throw new AssetException(
                     'Type must be specified when passing a closure.'
                 );
             }
 
-            $sHash = $sScript instanceof \Closure ? md5(uniqid('inline-closure-')) : md5($sScript);
-            $sType = $this->determineType($sScript, $sForceType);
+            $sHash = $mScript instanceof \Closure ? md5(uniqid('inline-closure-')) : md5($mScript);
+            $sType = $this->determineType($mScript, $sForceType);
 
             switch ($sType) {
 
                 case static::TYPE_CSS_INLINE:
                 case static::TYPE_CSS:
-                    $this->aCssInline['INLINE-CSS-' . $sHash] = $sScript;
+                    $this->aCssInline['INLINE-CSS-' . $sHash] = $mScript;
                     break;
 
                 case static::TYPE_JS_INLINE:
                 case static::TYPE_JS:
                     if ($sJsLocation === static::JS_LOCATION_FOOTER) {
-                        $this->aJsInlineFooter['INLINE-JS-' . $sHash] = $sScript;
+                        $this->aJsInlineFooter['INLINE-JS-' . $sHash] = $mScript;
                     } else {
-                        $this->aJsInlineHeader['INLINE-JS-' . $sHash] = $sScript;
+                        $this->aJsInlineHeader['INLINE-JS-' . $sHash] = $mScript;
                     }
                     break;
 
                 case static::TYPE_JS_INLINE_HEADER:
                 case static::TYPE_JS_INLINE_FOOTER:
                     if ($sType === static::TYPE_JS_INLINE_FOOTER) {
-                        $this->aJsInlineFooter['INLINE-JS-' . $sHash] = $sScript;
+                        $this->aJsInlineFooter['INLINE-JS-' . $sHash] = $mScript;
                     } else {
-                        $this->aJsInlineHeader['INLINE-JS-' . $sHash] = $sScript;
+                        $this->aJsInlineHeader['INLINE-JS-' . $sHash] = $mScript;
                     }
                     break;
             }
@@ -806,14 +831,15 @@ class Asset
     /**
      * Loads an asset from a module's asset directory
      *
-     * @param string $sAsset     The asset to load
-     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
-     * @param bool   $bAsync     Whether to load the asset asynchronously
-     * @param mixed  $mModule    The module to load from
+     * @param string       $sAsset     The asset to load
+     * @param string       $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param bool         $bAsync     Whether to load the asset asynchronously
+     * @param array|string $mModule    The module to load from
      *
-     * @return void
+     * @return $this
+     * @throws AssetException
      */
-    protected function loadModule($sAsset, $sForceType, bool $bAsync, $mModule)
+    protected function loadModule(string $sAsset, string $sForceType, bool $bAsync, $mModule): self
     {
         if (is_array($mModule)) {
             $sModule   = !empty($mModule[0]) ? $mModule[0] : null;
@@ -847,6 +873,8 @@ class Asset
                 ];
                 break;
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -854,45 +882,40 @@ class Asset
     /**
      * Determines the type of asset being loaded
      *
-     * @param string $sAsset     The asset being loaded
-     * @param string $sForceType Forces a particular type (accepts values CSS, JS, CSS-INLINE or JS-INLINE)
+     * @param string      $sAsset     The asset being loaded
+     * @param string|null $sForceType Forces a particular type (accepts values CSS, JS, CSS-INLINE or JS-INLINE)
      *
      * @return string
+     * @throws AssetException
      */
-    protected function determineType($sAsset, $sForceType = null)
+    protected function determineType(string $sAsset, string $sForceType = null): string
     {
         //  Override if nessecary
         if (!empty($sForceType)) {
             return $sForceType;
         }
 
-        // --------------------------------------------------------------------------
-
         //  Look for <style></style>
         if (preg_match('/^<style.*?>.*?<\/style>$/si', $sAsset)) {
             return static::TYPE_CSS_INLINE;
         }
-
-        // --------------------------------------------------------------------------
 
         //  Look for <script></script>
         if (preg_match('/^<script.*?>.*?<\/script>$/si', $sAsset)) {
             return static::TYPE_JS_INLINE;
         }
 
-        // --------------------------------------------------------------------------
-
         //  Look for .css
         if (substr($sAsset, strrpos($sAsset, '.')) === '.css') {
             return static::TYPE_CSS;
         }
 
-        // --------------------------------------------------------------------------
-
         //  Look for .js
         if (substr($sAsset, strrpos($sAsset, '.')) === '.js') {
             return static::TYPE_JS;
         }
+
+        throw new AssetException('Unable to determine type');
     }
 
     // --------------------------------------------------------------------------
@@ -927,6 +950,8 @@ class Asset
      * Appends the cacheBuster string to the asset name, accounts for existing query strings
      *
      * @param string $sAsset The asset's url to append
+     *
+     * @return string
      */
     protected function addCacheBuster(string $sAsset): string
     {
@@ -981,9 +1006,10 @@ class Asset
      * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      * @param bool   $bAsync     Whether to load the asset asynchronously
      *
-     * @return void
+     * @return $this
+     * @throws AssetException
      */
-    protected function loadApp($sAsset, $sForceType, bool $bAsync)
+    protected function loadApp($sAsset, $sForceType, bool $bAsync): self
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -1002,6 +1028,8 @@ class Asset
                 $this->aJsHeader['APP-' . $sAsset] = [$this->buildUrl($this->sJsDir . $sAsset), $bAsync];
                 break;
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -1012,9 +1040,10 @@ class Asset
      * @param string $sAsset     The asset to unload
      * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
-     * @return void
+     * @return $this
+     * @throws AssetException
      */
-    protected function unloadModule($sAsset, $sForceType, $sModule)
+    protected function unloadModule($sAsset, $sForceType, $sModule): self
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -1033,6 +1062,8 @@ class Asset
                 unset($this->aJsHeader['MODULE-' . $sModule . '-' . $sAsset]);
                 break;
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -1043,9 +1074,10 @@ class Asset
      * @param string $sAsset     The asset to unload
      * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
-     * @return void
+     * @return $this
+     * @throws AssetException
      */
-    protected function unloadApp($sAsset, $sForceType)
+    protected function unloadApp($sAsset, $sForceType): self
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -1064,6 +1096,8 @@ class Asset
                 unset($this->aJsHeader['APP-' . $sAsset]);
                 break;
         }
+
+        return $this;
     }
 
     // --------------------------------------------------------------------------
