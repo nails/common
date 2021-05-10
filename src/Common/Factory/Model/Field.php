@@ -56,7 +56,7 @@ class Field
     /**
      * The field's options (applicable to dropdowns only)
      *
-     * @var array
+     * @var string[string|int]
      */
     public $options = [];
 
@@ -322,7 +322,7 @@ class Field
     /**
      * Get the options property
      *
-     * @return array
+     * @return string[string|int]
      */
     public function getOptions(): array
     {
@@ -334,7 +334,7 @@ class Field
     /**
      * Set the options property
      *
-     * @param array $aOptions The options to set
+     * @param string[string|int] $aOptions The options to set
      *
      * @return $this
      */
