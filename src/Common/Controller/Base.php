@@ -13,6 +13,7 @@
 
 namespace Nails\Common\Controller;
 
+use Nails\Common\Constants;
 use Nails\Common\Events;
 use Nails\Common\Exception\AssetException;
 use Nails\Common\Exception\FactoryException;
@@ -30,6 +31,7 @@ use Nails\Common\Service\Profiler;
 use Nails\Common\Service\Session;
 use Nails\Common\Service\Uri;
 use Nails\Common\Service\UserFeedback;
+use Nails\Common\Settings;
 use Nails\Components;
 use Nails\Config;
 use Nails\Environment;
@@ -119,7 +121,7 @@ abstract class Base extends \MX_Controller
         /**
          * Forced maintenance mode?
          */
-        if (appSetting('maintenance_mode_enabled', 'site')) {
+        if (appSetting(Settings\Site::KEY_MAINTENANCE_ENABLED, Constants::MODULE_SLUG)) {
             $this->maintenanceMode(true);
         }
 
@@ -219,12 +221,12 @@ abstract class Base extends \MX_Controller
                 get_instance()->load->add_package_path(Config::get('NAILS_COMMON_PATH'));
                 Factory::service('encrypt');
 
-                $whitelistIp   = (array) appSetting('maintenance_mode_whitelist', 'site');
+                $whitelistIp   = (array) appSetting(Settings\Site::KEY_MAINTENANCE_WHITELIST, Constants::MODULE_SLUG);
                 $isWhiteListed = isIpInRange($oInput->ipAddress(), $whitelistIp);
 
                 //  Customisations
-                $sMaintenanceTitle = $sTitle ? $sTitle : appSetting('maintenance_mode_title', 'site');
-                $sMaintenanceBody  = $sBody ? $sBody : appSetting('maintenance_mode_body', 'site');
+                $sMaintenanceTitle = $sTitle ? $sTitle : appSetting(Settings\Site::KEY_MAINTENANCE_TITLE, Constants::MODULE_SLUG);
+                $sMaintenanceBody  = $sBody ? $sBody : appSetting(Settings\Site::KEY_MAINTENANCE_BODY, Constants::MODULE_SLUG);
 
             } catch (\Exception $e) {
 
@@ -621,30 +623,9 @@ abstract class Base extends \MX_Controller
         $oAsset = Factory::service('Asset');
         $oAsset->compileGlobalData();
 
-        $sCustomJs = appSetting('site_custom_js', 'site');
+        $sCustomJs = appSetting(Settings\Site::KEY_CUSTOM_JS, Constants::MODULE_SLUG);
         if (!empty($sCustomJs)) {
             $oAsset->inline($sCustomJs, 'JS');
-        }
-
-        // --------------------------------------------------------------------------
-
-        /**
-         * If a Google Analytics profile has been specified then include that too
-         */
-        $sGoogleAnalyticsProfile = appSetting('google_analytics_account', 'site');
-        if (!empty($sGoogleAnalyticsProfile)) {
-            $oAsset->load(
-                'https://www.googletagmanager.com/gtag/js?id=' . $sGoogleAnalyticsProfile,
-                null,
-                'JS',
-                true
-            );
-            $oAsset->inline('
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag(\'js\', new Date());
-                gtag(\'config\', \'' . $sGoogleAnalyticsProfile . '\');
-            ', 'JS');
         }
 
         // --------------------------------------------------------------------------
@@ -666,7 +647,7 @@ abstract class Base extends \MX_Controller
     {
         /** @var Asset $oAsset */
         $oAsset     = Factory::service('Asset');
-        $sCustomCss = appSetting('site_custom_css', 'site');
+        $sCustomCss = appSetting(Settings\Site::KEY_CUSTOM_CSS, Constants::MODULE_SLUG);
         if (!empty($sCustomCss)) {
             $oAsset->inline($sCustomCss, 'CSS');
         }
