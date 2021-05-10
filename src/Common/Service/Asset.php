@@ -834,11 +834,17 @@ class Asset
 
             case static::TYPE_JS:
             case static::TYPE_JS_FOOTER:
-                $this->aJs[$sKey] = [$this->addCacheBuster($this->sBaseModuleUrl . $sModule . '/assets/js/' . $sAsset), $bAsync];
+                $this->aJs[$sKey] = [
+                    $this->addCacheBuster($this->sBaseModuleUrl . $sModule . '/assets/js/' . $sAsset),
+                    $bAsync,
+                ];
                 break;
 
             case static::TYPE_JS_HEADER:
-                $this->aJsHeader[$sKey] = [$this->addCacheBuster($this->sBaseModuleUrl . $sModule . '/assets/js/' . $sAsset), $bAsync];
+                $this->aJsHeader[$sKey] = [
+                    $this->addCacheBuster($this->sBaseModuleUrl . $sModule . '/assets/js/' . $sAsset),
+                    $bAsync,
+                ];
                 break;
         }
     }
