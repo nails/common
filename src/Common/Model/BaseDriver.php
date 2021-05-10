@@ -13,6 +13,7 @@
 
 namespace Nails\Common\Model;
 
+use Nails\Common\Exception\NailsException;
 use Nails\Common\Factory\Component;
 use Nails\Components;
 
@@ -24,6 +25,15 @@ abstract class BaseDriver extends BaseComponent
      * @var string
      */
     protected $sComponentType = 'driver';
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * The interface which the drivers must implement
+     *
+     * @var string|null
+     */
+    protected $sMustImplement = null;
 
     // --------------------------------------------------------------------------
 
@@ -50,13 +60,12 @@ abstract class BaseDriver extends BaseComponent
         }
 
         if (isset($this->aInstances[$sSlug])) {
-
             return $this->aInstances[$sSlug];
 
         } else {
 
             foreach ($this->aComponents as $oDriverConfig) {
-                if ($sSlug == $oDriverConfig->slug) {
+                if ($sSlug === $oDriverConfig->slug) {
                     $oDriver = $oDriverConfig;
                     break;
                 }
@@ -64,14 +73,23 @@ abstract class BaseDriver extends BaseComponent
 
             if (!empty($oDriver)) {
 
-                $this->aInstances[$oDriver->slug] = Components::getDriverInstance($oDriver);
+                $oInstance = Components::getDriverInstance($oDriver);
+
+                if ($this->sMustImplement && !classImplements($oInstance, $this->sMustImplement)) {
+                    throw new NailsException(sprintf(
+                        'Driver "%s" must implement "%s"',
+                        get_class($oInstance),
+                        $this->sMustImplement
+                    ));
+                }
 
                 //  Apply driver configurations
                 $aSettings = array_merge(
-                    ['sSlug' => $oDriver->slug],
-                    appSetting(null, $oDriver->slug)
+                    ['sSlug' => $sSlug],
+                    appSetting(null, $sSlug)
                 );
 
+                $this->aInstances[$sSlug] = $oInstance;
                 $this->aInstances[$sSlug]->setConfig($aSettings);
 
                 return $this->aInstances[$sSlug];
