@@ -439,6 +439,8 @@ class Asset
      */
     public function library(string $sKey): self
     {
+        $sKey = strtoupper($sKey);
+
         if (!array_key_exists($sKey, $this->aLibraries)) {
             throw new AssetException(sprintf(
                 '"%s" is not a valid asset library',
@@ -446,7 +448,7 @@ class Asset
             ));
         }
 
-        foreach ($this->aLibraries as $sUrls) {
+        foreach ($this->aLibraries[$sKey] as $sUrls) {
             $this->load($sUrls);
         }
 
