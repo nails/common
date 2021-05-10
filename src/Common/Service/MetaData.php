@@ -16,6 +16,9 @@ class MetaData
     /** @var string[] */
     protected $aTitles = [];
 
+    /** @var bool bool */
+    protected $bTitleAppendAppName = true;
+
     /** @var Locale */
     protected $oLocale;
 
@@ -97,13 +100,42 @@ class MetaData
                         $this->aTitles,
                         array_filter([
                             $this->title,
-                            Config::get('APP_NAME'),
+                            $this->isTitleAppendAppName()
+                                ? Config::get('APP_NAME')
+                                : null,
                         ])
                     )
                 )
             ),
             $this->sTitleSeparator
         );
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Set whether to append the app name to the titles
+     *
+     * @param bool $bAppend Whether to append the app name to the titles
+     *
+     * @return $this
+     */
+    public function setTitleAppendAppName(bool $bAppend): self
+    {
+        $this->bTitleAppendAppName = $bAppend;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Whether to append the app name to the titles
+     *
+     * @return bool
+     */
+    public function isTitleAppendAppName(): bool
+    {
+        return $this->bTitleAppendAppName;
     }
 
     // --------------------------------------------------------------------------
