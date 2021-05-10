@@ -407,6 +407,10 @@ class ErrorHandler
         $bFlushBuffer = true
     ) {
 
+        $iCode = is_numeric($sView)
+            ? (int) $sView
+            : HttpCodes::STATUS_INTERNAL_SERVER_ERROR;
+
         //  Stops cascading errors if CI isn't available
         if (!class_exists('MX_LANG')) {
 
@@ -426,9 +430,7 @@ class ErrorHandler
             static::halt(
                 $sMessage,
                 $sSubject,
-                is_numeric($sView)
-                    ? (int) $sView
-                    : HttpCodes::STATUS_INTERNAL_SERVER_ERROR
+                $iCode
             );
         }
 
@@ -443,10 +445,51 @@ class ErrorHandler
         }
 
         /** @var Input $oInput */
-        $oInput = Factory::service('Input');
-        $sType  = $oInput::isCli() ? 'cli' : 'html';
+        $oInput     = Factory::service('Input');
+        $sType      = $oInput::isCli() ? 'cli' : 'html';
+        $sValidPath = static::getValidPath($sView, $sType);
+
+        if ($sValidPath) {
+
+            /** @var View $oView */
+            $oView = Factory::service('View');
+            /** @var Event $oEvent */
+            $oEvent = Factory::service('Event');
+
+            static::triggerErrorEvent(Events::VIEW_ERROR_PRE, $iCode, $sType, $aData);
+            static::setErrorPageTitle($iCode);
+
+            $oView->setData($aData);
+            echo $oView->load($sValidPath, [], true);
+
+            static::triggerErrorEvent(Events::VIEW_ERROR_POST, $iCode, $sType, $aData);
+
+        } else {
+            static::halt(
+                getFromArray('sMessage', $aData),
+                getFromArray('sSubject', $aData),
+                $iCode
+            );
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Gets a valid apth for the view, if possible
+     *
+     * @param string $sView The view to load
+     * @param string $sType the type
+     *
+     * @return string|null
+     * @throws \Nails\Common\Exception\FactoryException
+     * @throws \ReflectionException
+     */
+    protected static function getValidPath(string $sView, string $sType): ?string
+    {
         $aPaths = [];
 
+        /** @var \CI_Router $oRouter */
         $oRouter     = Factory::service('Router');
         $sController = ucfirst($oRouter->fetch_class());
 
@@ -482,53 +525,67 @@ class ErrorHandler
             $sView . '.php',
         ]);
 
-        $sValidPath = null;
         foreach ($aPaths as $sPath) {
             if (file_exists($sPath)) {
-                $sValidPath = $sPath;
-                break;
+                return $sPath;
             }
         }
 
-        if ($sValidPath) {
+        return null;
+    }
 
-            /** @var View $oView */
-            $oView = Factory::service('View');
-            /** @var Event $oEvent */
-            $oEvent = Factory::service('Event');
+    // --------------------------------------------------------------------------
 
-            $aEventData = [
-                is_numeric($sView)
-                    ? (int) $sView
-                    : HttpCodes::STATUS_INTERNAL_SERVER_ERROR,
+    /**
+     * Triggers error related events
+     *
+     * @param string $sEvent The event to trigger
+     * @param int    $iCode  The error code
+     * @param string $sType  The error type
+     * @param array  $aData  The error data
+     *
+     * @throws \Nails\Common\Exception\FactoryException
+     */
+    protected static function triggerErrorEvent(string $sEvent, int $iCode, string $sType, array &$aData): void
+    {
+        /** @var Event $oEvent */
+        $oEvent = Factory::service('Event');
+        $oEvent->trigger(
+            $sEvent,
+            Events::getEventNamespace(),
+            [
+                $iCode,
                 $sType,
                 &$aData,
-            ];
+            ]
+        );
+    }
 
-            $oEvent->trigger(
-                Events::VIEW_ERROR_PRE,
-                Events::getEventNamespace(),
-                $aEventData
-            );
+    // --------------------------------------------------------------------------
 
-            $oView->setData($aData);
-            echo $oView->load($sValidPath, [], true);
-
-            $oEvent->trigger(
-                Events::VIEW_ERROR_POST,
-                Events::getEventNamespace(),
-                $aEventData
-            );
-
-        } else {
-            static::halt(
-                getFromArray('sMessage', $aData),
-                getFromArray('sSubject', $aData),
-                is_numeric($sView)
-                    ? (int) $sView
-                    : HttpCodes::STATUS_INTERNAL_SERVER_ERROR
-            );
-        }
+    /**
+     * Sets the title for the error page
+     *
+     * @param int $iCode The error code being rendered
+     *
+     * @return string
+     * @throws \Nails\Common\Exception\FactoryException
+     */
+    protected static function setErrorPageTitle(int $iCode): void
+    {
+        /** @var \Nails\Common\Service\MetaData $oMetaData */
+        $oMetaData = \Nails\Factory::service('MetaData');
+        $oMetaData
+            ->setTitles(array_filter([
+                Config::get(
+                    'ERROR_TITLE_' . $iCode,
+                    sprintf(
+                        '%d %s',
+                        $iCode,
+                        HttpCodes::getByCode($iCode)
+                    )
+                ),
+            ]));
     }
 
     // --------------------------------------------------------------------------
