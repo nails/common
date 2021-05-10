@@ -141,7 +141,7 @@ class Event
      *
      * @return $this
      */
-    public function trigger($sEvent, $sNamespace = 'nails/common', $aData = []): self
+    public function trigger($sEvent, $sNamespace = \Nails\Common\Constants::MODULE_SLUG, $aData = []): self
     {
         $this->addHistory($sEvent, $sNamespace);
 
@@ -170,7 +170,7 @@ class Event
      *
      * @return $this
      */
-    protected function addHistory($sEvent, $sNamespace = 'nails/common'): self
+    protected function addHistory($sEvent, $sNamespace = \Nails\Common\Constants::MODULE_SLUG): self
     {
         if (!array_key_exists($sNamespace, $this->aHistory)) {
             $this->aHistory[$sNamespace] = [];
@@ -259,7 +259,7 @@ class Event
      *
      * @return bool
      */
-    public function hasBeenTriggered($sEvent, $sNamespace = 'nails/common'): bool
+    public function hasBeenTriggered($sEvent, $sNamespace = \Nails\Common\Constants::MODULE_SLUG): bool
     {
         return (bool) $this->getHistory($sNamespace, $sEvent);
     }

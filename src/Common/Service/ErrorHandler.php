@@ -93,7 +93,7 @@ class ErrorHandler
             return;
         }
 
-        $aErrorHandlers = Components::drivers('nails/common', 'ErrorHandler');
+        $aErrorHandlers = Components::drivers(\Nails\Common\Constants::MODULE_SLUG, 'ErrorHandler');
         $oDefaultDriver = null;
         $aCustomDrivers = [];
         foreach ($aErrorHandlers as $oErrorHandler) {

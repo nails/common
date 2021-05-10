@@ -45,7 +45,7 @@ class Rewrite extends Base
             $oEventService = Factory::service('Event');
             $oEventService->trigger(
                 Events::ROUTES_UPDATE,
-                'nails/common',
+                \Nails\Common\Constants::MODULE_SLUG,
                 [null, $oOutput]
             );
 

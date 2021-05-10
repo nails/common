@@ -82,8 +82,11 @@ class Form
      * @return string
      * @throws NailsException
      */
-    public function render(string $sField, array $aData = [], string $sNamespace = 'nails/common'): string
-    {
+    public function render(
+        string $sField,
+        array $aData = [],
+        string $sNamespace = \Nails\Common\Constants::MODULE_SLUG
+    ): string {
         $sKey = $sNamespace . '::' . $sField;
         if (!array_key_exists($sKey, $this->aFields)) {
             throw new NailsException(

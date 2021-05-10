@@ -27,7 +27,7 @@ abstract class Subscription implements Interfaces\Event\Subscription
      *
      * @var string
      */
-    protected $sNamespace = 'nails/common';
+    protected $sNamespace = \Nails\Common\Constants::MODULE_SLUG;
 
     /**
      * The callback to execute when triggered

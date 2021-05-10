@@ -140,7 +140,7 @@ final class Components
         $aSkins   = [];
 
         foreach ($aOut as $oComponent) {
-            if ($oComponent->slug === 'nails/common') {
+            if ($oComponent->slug === \Nails\Common\Constants::MODULE_SLUG) {
                 $aCommon[] = $oComponent;
             } elseif ($oComponent->type === 'module') {
                 $aModules[] = $oComponent;

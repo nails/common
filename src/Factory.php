@@ -275,7 +275,7 @@ class Factory
      */
     public static function setProperty(string $sPropertyName, $mPropertyValue, ?string $sComponentName = ''): void
     {
-        $sComponentName = empty($sComponentName) ? 'nails/common' : $sComponentName;
+        $sComponentName = empty($sComponentName) ? \Nails\Common\Constants::MODULE_SLUG : $sComponentName;
 
         if (!self::$aContainers[$sComponentName]['properties']->offsetExists($sPropertyName)) {
             throw new FactoryException(
@@ -430,7 +430,7 @@ class Factory
      */
     public static function helper(string $sHelperName, ?string $sComponentName = ''): void
     {
-        $sComponentName = empty($sComponentName) ? 'nails/common' : $sComponentName;
+        $sComponentName = empty($sComponentName) ? \Nails\Common\Constants::MODULE_SLUG : $sComponentName;
         $oComponent     = Components::getBySlug($sComponentName);
 
         if (empty(self::$aLoadedHelpers[$sComponentName][$sHelperName])) {
@@ -476,7 +476,7 @@ class Factory
      */
     private static function getService(string $sServiceType, string $sServiceName, ?string $sComponentName = '')
     {
-        $sComponentName = empty($sComponentName) ? 'nails/common' : $sComponentName;
+        $sComponentName = empty($sComponentName) ? \Nails\Common\Constants::MODULE_SLUG : $sComponentName;
 
         if (!array_key_exists($sComponentName, self::$aContainers)) {
             throw new FactoryException(
