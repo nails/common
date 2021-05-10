@@ -143,6 +143,11 @@ class Asset
     /** @var CriticalCss */
     protected $oCriticalCss;
 
+    /**
+     * @var array[]
+     */
+    protected $aLibraries = [];
+
     // --------------------------------------------------------------------------
 
     /**
@@ -176,6 +181,31 @@ class Asset
             $sBaseUrlSecure,
             $sBaseModuleUrlSecure
         );
+
+        $this
+            ->addLibrary('CKEDITOR', [
+                'https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.16.0/ckeditor.js',
+                'https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.16.0/adapters/jquery.min.js',
+            ])
+            ->addLibrary('JQUERYUI', [
+                'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js',
+                'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.min.css',
+                'https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.js',
+                'https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.css',
+            ])
+            ->addLibrary('SELECT2', [
+                'https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.min.js',
+                'https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.min.css',
+            ])
+            ->addLibrary('KNOCKOUT', [
+                'https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-latest.min.js',
+            ])
+            ->addLibrary('MUSTACHE', [
+                'https://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.8.2/mustache.min.js',
+            ])
+            ->addLibrary('MOMENT', [
+                'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js',
+            ]);
     }
 
     // --------------------------------------------------------------------------
@@ -390,51 +420,40 @@ class Asset
     /**
      * Loads a set of assets
      *
-     * @param string $sLibrary The library to load
+     * @param string $sKey The library to load
      *
-     * @return object
+     * @return $this
+     * @throws AssetException
      */
-    public function library($sLibrary)
+    public function library($sKey): self
     {
-        switch (strtoupper($sLibrary)) {
-
-            case 'CKEDITOR':
-                $this
-                    //  Using minified version breaks... unsure why
-                    ->load('https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.16.0/ckeditor.js')
-                    ->load('https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.16.0/adapters/jquery.min.js');
-                break;
-
-            case 'JQUERYUI':
-                $this
-                    ->load('https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js')
-                    ->load('https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.min.css')
-                    ->load('https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.js')
-                    ->load('https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.css');
-                break;
-
-            case 'SELECT2':
-                $this
-                    ->load('https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.min.js')
-                    ->load('https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.min.css');
-                break;
-
-            case 'KNOCKOUT':
-                $this
-                    ->load('https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-latest.min.js');
-                break;
-
-            case 'MUSTACHE':
-                $this
-                    ->load('https://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.8.2/mustache.min.js');
-                break;
-
-            case 'MOMENT':
-                $this
-                    ->load('https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js');
-                break;
+        if (!array_key_exists($sKey, $this->aLibraries)) {
+            throw new AssetException(sprintf(
+                '"%s" is not a valid asset library',
+                $sKey
+            ));
         }
 
+        foreach ($this->aLibraries as $sUrls) {
+            $this->load($sUrls);
+        }
+
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Adds a new library
+     *
+     * @param string $sKey  The library key
+     * @param array  $aUrls The URLs the library loads
+     *
+     * @return $this
+     */
+    public function addLibrary(string $sKey, array $aUrls): self
+    {
+        $this->aLibraries[strtoupper($sKey)] = $aUrls;
         return $this;
     }
 
