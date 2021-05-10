@@ -46,7 +46,7 @@ final class Environment
      *
      * @return string
      */
-    public static function get()
+    public static function get(): string
     {
         if (empty(self::$sEnvironment)) {
 
@@ -79,7 +79,7 @@ final class Environment
      *
      * @param string $sEnvironment The environment to set
      */
-    private static function set($sEnvironment)
+    private static function set(string $sEnvironment): void
     {
         self::isValid($sEnvironment);
         self::$sEnvironment = trim(strtoupper($sEnvironment));
@@ -90,11 +90,11 @@ final class Environment
     /**
      * Returns whether the environment is the supplied environment
      *
-     * @param array|string $mEnvironment The environment(s) to query
+     * @param string[]|string $mEnvironment The environment(s) to query
      *
-     * @return boolean
+     * @return bool
      */
-    public static function is($mEnvironment)
+    public static function is($mEnvironment): bool
     {
         if (is_array($mEnvironment)) {
             return array_search(self::get(), array_map('strtoupper', $mEnvironment)) !== false;
@@ -110,9 +110,9 @@ final class Environment
      *
      * @param string $sEnvironment The environment to query
      *
-     * @return boolean
+     * @return bool
      */
-    public static function not($sEnvironment)
+    public static function not(string $sEnvironment): bool
     {
         return self::get() !== strtoupper($sEnvironment);
     }
@@ -122,16 +122,16 @@ final class Environment
     /**
      * Lists the available environments
      *
-     * @return string[]
+     * @return string[string]
      */
     public static function available(): array
     {
         return [
-            self::ENV_PROD,
-            self::ENV_STAGE,
-            self::ENV_DEV,
-            self::ENV_TEST,
-            self::ENV_HTTP_TEST,
+            self::ENV_PROD      => self::ENV_PROD,
+            self::ENV_STAGE     => self::ENV_STAGE,
+            self::ENV_DEV       => self::ENV_DEV,
+            self::ENV_TEST      => self::ENV_TEST,
+            self::ENV_HTTP_TEST => self::ENV_HTTP_TEST,
         ];
     }
 
