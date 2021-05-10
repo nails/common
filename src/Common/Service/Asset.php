@@ -262,13 +262,13 @@ class Asset
      * Unloads an asset
      *
      * @param string[]|string $mAssets        The asset to unload, can be an array or a string
-     * @param string          $sAssetLocation The asset's location
+     * @param string|null     $sAssetLocation The asset's location
      * @param string|null     $sForceType     The asset's file type (e.g., JS or CSS)
      *
      * @return $this
      * @throws AssetException
      */
-    public function unload($mAssets, string $sAssetLocation = 'APP', string $sForceType = null): self
+    public function unload($mAssets, ?string $sAssetLocation = 'APP', string $sForceType = null): self
     {
         //  Cast as an array
         $aAssets = (array) $mAssets;
@@ -313,13 +313,13 @@ class Asset
     /**
      * Unloads an asset supplied as a URL
      *
-     * @param string $sAsset     The asset to unload
-     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string      $sAsset     The asset to unload
+     * @param string|null $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
      * @return $this
      * @throws AssetException
      */
-    protected function unloadUrl(string $sAsset, string $sForceType): self
+    protected function unloadUrl(string $sAsset, ?string $sForceType): self
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -347,13 +347,13 @@ class Asset
     /**
      * Unloads an asset supplied as an absolute URL
      *
-     * @param string $sAsset     The asset to unload
-     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string      $sAsset     The asset to unload
+     * @param string|null $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
      * @return $this
      * @throws AssetException
      */
-    protected function unloadAbsolute(string $sAsset, string $sForceType): self
+    protected function unloadAbsolute(string $sAsset, ?string $sForceType): self
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -475,7 +475,7 @@ class Asset
      * Loads an asset
      *
      * @param string[]|string $mAssets        The asset to load, can be an array or a string
-     * @param string          $sAssetLocation The asset's location
+     * @param string|null     $sAssetLocation The asset's location
      * @param string|null     $sForceType     The asset's file type (e.g., JS or CSS)
      * @param bool            $bAsync         Whether to load the asset asynchronously
      *
@@ -484,7 +484,7 @@ class Asset
      */
     public function load(
         $mAssets,
-        string $sAssetLocation = 'APP',
+        ?string $sAssetLocation = 'APP',
         string $sForceType = null,
         bool $bAsync = false
     ): self {
@@ -534,14 +534,14 @@ class Asset
     /**
      * Loads an asset supplied as a URL
      *
-     * @param string $sAsset     The asset to load
-     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
-     * @param bool   $bAsync     Whether to load the asset asynchronously
+     * @param string      $sAsset     The asset to load
+     * @param string|null $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param bool        $bAsync     Whether to load the asset asynchronously
      *
      * @return $this
      * @throws AssetException
      */
-    protected function loadUrl(string $sAsset, string $sForceType, bool $bAsync): self
+    protected function loadUrl(string $sAsset, ?string $sForceType, bool $bAsync): self
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -569,14 +569,14 @@ class Asset
     /**
      * Loads an asset supplied as an absolute URL
      *
-     * @param string $sAsset     The asset to load
-     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
-     * @param bool   $bAsync     Whether to load the asset asynchronously
+     * @param string      $sAsset     The asset to load
+     * @param string|null $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param bool        $bAsync     Whether to load the asset asynchronously
      *
      * @return $this
      * @throws AssetException
      */
-    protected function loadAbsolute(string $sAsset, string $sForceType, bool $bAsync): self
+    protected function loadAbsolute(string $sAsset, ?string $sForceType, bool $bAsync): self
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -1002,14 +1002,14 @@ class Asset
     /**
      * Loads an asset from the app's asset directory
      *
-     * @param string $sAsset     The asset to load
-     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
-     * @param bool   $bAsync     Whether to load the asset asynchronously
+     * @param string      $sAsset     The asset to load
+     * @param string|null $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param bool        $bAsync     Whether to load the asset asynchronously
      *
      * @return $this
      * @throws AssetException
      */
-    protected function loadApp($sAsset, $sForceType, bool $bAsync): self
+    protected function loadApp(string $sAsset, ?string $sForceType, bool $bAsync): self
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -1037,13 +1037,14 @@ class Asset
     /**
      * Unloads an asset from the app's asset directory
      *
-     * @param string $sAsset     The asset to unload
-     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string      $sAsset     The asset to unload
+     * @param string|null $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string      $sModule    The module to unload form
      *
      * @return $this
      * @throws AssetException
      */
-    protected function unloadModule($sAsset, $sForceType, $sModule): self
+    protected function unloadModule(string $sAsset, ?string $sForceType, string $sModule): self
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -1071,13 +1072,13 @@ class Asset
     /**
      * Unloads an asset from the app's asset directory
      *
-     * @param string $sAsset     The asset to unload
-     * @param string $sForceType Force a particular type of asset (i.e. JS or CSS)
+     * @param string      $sAsset     The asset to unload
+     * @param string|null $sForceType Force a particular type of asset (i.e. JS or CSS)
      *
      * @return $this
      * @throws AssetException
      */
-    protected function unloadApp($sAsset, $sForceType): self
+    protected function unloadApp(string $sAsset, ?string $sForceType): self
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
