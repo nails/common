@@ -268,15 +268,15 @@ final class Components
                     ? $aComposer['name']
                     : static::$sAppSlug,
 
-                'description' => ArrayHelper::getFromArray('description', $aNails, ArrayHelper::getFromArray('description', $aComposer)),
-                'homepage'    => ArrayHelper::getFromArray('homepage', $aNails, ArrayHelper::getFromArray('homepage', $aComposer)),
-                'authors'     => ArrayHelper::getFromArray('authors', $aNails, ArrayHelper::getFromArray('authors', $aComposer)),
+                'description' => ArrayHelper::get('description', $aNails, ArrayHelper::get('description', $aComposer)),
+                'homepage'    => ArrayHelper::get('homepage', $aNails, ArrayHelper::get('homepage', $aComposer)),
+                'authors'     => ArrayHelper::get('authors', $aNails, ArrayHelper::get('authors', $aComposer)),
                 'extra'       => (object) [
                     'nails' => (object) [
                         'namespace'  => $aNails['namespace'] ?? static::$oAppNamespace,
-                        'moduleName' => ArrayHelper::getFromArray('moduleName', $aNails, ''),
-                        'data'       => ArrayHelper::getFromArray('data', $aNails, (object) []),
-                        'autoload'   => ArrayHelper::getFromArray('autoload', $aNails, (object) []),
+                        'moduleName' => ArrayHelper::get('moduleName', $aNails, ''),
+                        'data'       => ArrayHelper::get('data', $aNails, (object) []),
+                        'autoload'   => ArrayHelper::get('autoload', $aNails, (object) []),
                     ],
                 ],
             ],

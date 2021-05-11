@@ -220,7 +220,7 @@ class Mime
      */
     public function getExtensionsForMime(string $sMime): array
     {
-        return ArrayHelper::getFromArray($sMime, static::$aMapMimeToExtensions, []);
+        return ArrayHelper::get($sMime, static::$aMapMimeToExtensions, []);
     }
 
     // --------------------------------------------------------------------------
@@ -234,6 +234,6 @@ class Mime
      */
     public function getMimesForExtension(string $sExtension): array
     {
-        return ArrayHelper::getFromArray($sExtension, static::$aMapExtensionToMimes, []);
+        return ArrayHelper::get($sExtension, static::$aMapExtensionToMimes, []);
     }
 }

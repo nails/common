@@ -72,21 +72,21 @@ final class Component
         $aPackage   = (array) $oPackage;
         $aNailsData = !empty($aPackage['extra']->nails) ? (array) $aPackage['extra']->nails : [];
 
-        $this->slug         = ArrayHelper::getFromArray(['slug', 'name'], $aPackage);
-        $this->namespace    = ArrayHelper::getFromArray('namespace', $aNailsData);
-        $this->name         = ArrayHelper::getFromArray('name', $aNailsData, $this->slug);
-        $this->description  = ArrayHelper::getFromArray('description', $aNailsData, ArrayHelper::getFromArray('description', $aPackage));
-        $this->homepage     = ArrayHelper::getFromArray('homepage', $aNailsData, ArrayHelper::getFromArray('homepage', $aPackage));
-        $this->authors      = ArrayHelper::getFromArray('authors', $aNailsData, ArrayHelper::getFromArray('authors', $aPackage));
+        $this->slug         = ArrayHelper::get(['slug', 'name'], $aPackage);
+        $this->namespace    = ArrayHelper::get('namespace', $aNailsData);
+        $this->name         = ArrayHelper::get('name', $aNailsData, $this->slug);
+        $this->description  = ArrayHelper::get('description', $aNailsData, ArrayHelper::get('description', $aPackage));
+        $this->homepage     = ArrayHelper::get('homepage', $aNailsData, ArrayHelper::get('homepage', $aPackage));
+        $this->authors      = ArrayHelper::get('authors', $aNailsData, ArrayHelper::get('authors', $aPackage));
         $this->path         = rtrim($sAbsolutePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         $this->relativePath = rtrim($sRelativePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-        $this->moduleName   = ArrayHelper::getFromArray('moduleName', $aNailsData, '');
-        $this->data         = ArrayHelper::getFromArray('data', $aNailsData, (object) []);
-        $this->type         = ArrayHelper::getFromArray('type', $aNailsData, '');
-        $this->subType      = ArrayHelper::getFromArray('subType', $aNailsData, '');
-        $this->forModule    = ArrayHelper::getFromArray('forModule', $aNailsData, '');
-        $this->autoload     = ArrayHelper::getFromArray('autoload', $aNailsData, (object) []);
-        $this->scripts      = ArrayHelper::getFromArray('scripts', $aNailsData, (object) []);
+        $this->moduleName   = ArrayHelper::get('moduleName', $aNailsData, '');
+        $this->data         = ArrayHelper::get('data', $aNailsData, (object) []);
+        $this->type         = ArrayHelper::get('type', $aNailsData, '');
+        $this->subType      = ArrayHelper::get('subType', $aNailsData, '');
+        $this->forModule    = ArrayHelper::get('forModule', $aNailsData, '');
+        $this->autoload     = ArrayHelper::get('autoload', $aNailsData, (object) []);
+        $this->scripts      = ArrayHelper::get('scripts', $aNailsData, (object) []);
         $this->fromApp      = $bIsApp;
 
         if (!empty($this->namespace)) {

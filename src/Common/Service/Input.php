@@ -205,7 +205,7 @@ class Input
         $aOut = [];
         foreach ($aRequestedKeys as $sKey) {
             if (array_key_exists($sKey, $aArrayKeysMap)) {
-                $aOut[$aArrayKeysMap[$sKey]] = ArrayHelper::getFromArray($aArrayKeysMap[$sKey], $aArray);
+                $aOut[$aArrayKeysMap[$sKey]] = ArrayHelper::get($aArrayKeysMap[$sKey], $aArray);
                 if ($bXssClean) {
                     $aOut[$aArrayKeysMap[$sKey]] = Factory::service('Security')
                         ->xss_clean($aOut[$aArrayKeysMap[$sKey]]);

@@ -982,8 +982,8 @@ abstract class Base
                 $iPerPage = $aData['limit'];
             } elseif (is_array($aData['limit'])) {
                 //  Consider the first element to be the page number and the second the number of results
-                $iPage    = Helper\ArrayHelper::getFromArray(0, $aData['limit'], 0);
-                $iPerPage = Helper\ArrayHelper::getFromArray(1, $aData['limit']);
+                $iPage    = Helper\ArrayHelper::get(0, $aData['limit'], 0);
+                $iPerPage = Helper\ArrayHelper::get(1, $aData['limit']);
             }
         }
 
@@ -1123,8 +1123,8 @@ abstract class Base
                     $aTriggers[]             = $mTrigger;
                     $aTriggerData[$mTrigger] = [];
                 } elseif (is_array($mTrigger)) {
-                    $sArrayTrigger     = Helper\ArrayHelper::getFromArray(0, $mTrigger) ?: Helper\ArrayHelper::getFromArray('trigger', $mTrigger);
-                    $aArrayTriggerData = Helper\ArrayHelper::getFromArray(1, $mTrigger) ?: Helper\ArrayHelper::getFromArray('data', $mTrigger, []);
+                    $sArrayTrigger     = Helper\ArrayHelper::get(0, $mTrigger) ?: Helper\ArrayHelper::get('trigger', $mTrigger);
+                    $aArrayTriggerData = Helper\ArrayHelper::get(1, $mTrigger) ?: Helper\ArrayHelper::get('data', $mTrigger, []);
                     if (!empty($sArrayTrigger)) {
                         $aTriggers[]                  = $sArrayTrigger;
                         $aTriggerData[$sArrayTrigger] = $aArrayTriggerData;
@@ -1156,7 +1156,7 @@ abstract class Base
                 //  Merge any data defined with the expandable field with any custom data added by the expansion
                 $aMergedData = array_merge(
                     $oExpandableField->data,
-                    Helper\ArrayHelper::getFromArray($oExpandableField->trigger, $aTriggerData, [])
+                    Helper\ArrayHelper::get($oExpandableField->trigger, $aTriggerData, [])
                 );
 
                 if ($oExpandableField->type === static::EXPANDABLE_TYPE_SINGLE) {
@@ -2214,7 +2214,7 @@ abstract class Base
             'provider'    => $aOptions['provider'],
 
             //  Any data to pass to the getAll (every time)
-            'data'        => Helper\ArrayHelper::getFromArray('data', $aOptions, []),
+            'data'        => Helper\ArrayHelper::get('data', $aOptions, []),
 
             /**
              * The ID column to use; for EXPANDABLE_TYPE_SINGLE this is property of the
@@ -2224,7 +2224,7 @@ abstract class Base
             'id_column'   => $aOptions['id_column'],
 
             //  Whether the field is expanded by default
-            'auto_expand' => Helper\ArrayHelper::getFromArray('auto_expand', $aOptions, false),
+            'auto_expand' => Helper\ArrayHelper::get('auto_expand', $aOptions, false),
 
             //  Whether to automatically save expanded objects when the trigger is
             //  passed as a key to the create or update methods
@@ -2594,8 +2594,8 @@ abstract class Base
     {
         preg_match('/^(.*?)(\((.+?)\)(.*))?$/', $oDbField->Type, $aMatches);
 
-        $sType       = Helper\ArrayHelper::getFromArray(1, $aMatches, 'text');
-        $sTypeConfig = trim(Helper\ArrayHelper::getFromArray(3, $aMatches));
+        $sType       = Helper\ArrayHelper::get(1, $aMatches, 'text');
+        $sTypeConfig = trim(Helper\ArrayHelper::get(3, $aMatches));
         $iLength     = is_numeric($sTypeConfig) ? (int) $sTypeConfig : null;
 
         switch ($sType) {
@@ -2705,9 +2705,9 @@ abstract class Base
     {
         preg_match('/^(.*?)(\((.+?)\)(.*))?$/', $oDbField->Type, $aMatches);
 
-        $sType   = Helper\ArrayHelper::getFromArray(1, $aMatches, 'text');
-        $iLength = Helper\ArrayHelper::getFromArray(3, $aMatches);
-        $sExtra  = trim(strtolower(Helper\ArrayHelper::getFromArray(4, $aMatches)));
+        $sType   = Helper\ArrayHelper::get(1, $aMatches, 'text');
+        $iLength = Helper\ArrayHelper::get(3, $aMatches);
+        $sExtra  = trim(strtolower(Helper\ArrayHelper::get(4, $aMatches)));
 
         switch ($sType) {
 

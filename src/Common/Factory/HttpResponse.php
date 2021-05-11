@@ -92,7 +92,7 @@ class HttpResponse
      */
     public function getHeader($sHeader)
     {
-        return ArrayHelper::getFromArray($sHeader, $this->oResponse->getHeaders());
+        return ArrayHelper::get($sHeader, $this->oResponse->getHeaders());
     }
 
     // --------------------------------------------------------------------------

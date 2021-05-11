@@ -221,29 +221,29 @@ class Field
         }
 
         $oField = (object) [
-            'id'          => ArrayHelper::getFromArray('id', $aField, null),
-            'type'        => ArrayHelper::getFromArray('type', $aField, null),
-            'oddeven'     => ArrayHelper::getFromArray('oddeven', $aField, null),
-            'key'         => ArrayHelper::getFromArray('key', $aField, null),
-            'label'       => ArrayHelper::getFromArray('label', $aField, null),
-            'default'     => ArrayHelper::getFromArray('default', $aField, null),
-            'sub_label'   => ArrayHelper::getFromArray('sub_label', $aField, null),
-            'required'    => ArrayHelper::getFromArray('required', $aField, false),
-            'placeholder' => ArrayHelper::getFromArray('placeholder', $aField, null),
-            'class'       => ArrayHelper::getFromArray('class', $aField, false),
-            'data'        => ArrayHelper::getFromArray('data', $aField, []),
-            'readonly'    => ArrayHelper::getFromArray('readonly', $aField, false),
-            'info'        => ArrayHelper::getFromArray('info', $aField, false),
-            'info_class'  => ArrayHelper::getFromArray('info_class', $aField, false),
-            'tip'         => ArrayHelper::getFromArray('tip', $aField, $sTip),
-            'error'       => ArrayHelper::getFromArray('error', $aField, null),
-            'html'        => ArrayHelper::getFromArray('html', $aField, ''),
+            'id'          => ArrayHelper::get('id', $aField, null),
+            'type'        => ArrayHelper::get('type', $aField, null),
+            'oddeven'     => ArrayHelper::get('oddeven', $aField, null),
+            'key'         => ArrayHelper::get('key', $aField, null),
+            'label'       => ArrayHelper::get('label', $aField, null),
+            'default'     => ArrayHelper::get('default', $aField, null),
+            'sub_label'   => ArrayHelper::get('sub_label', $aField, null),
+            'required'    => ArrayHelper::get('required', $aField, false),
+            'placeholder' => ArrayHelper::get('placeholder', $aField, null),
+            'class'       => ArrayHelper::get('class', $aField, false),
+            'data'        => ArrayHelper::get('data', $aField, []),
+            'readonly'    => ArrayHelper::get('readonly', $aField, false),
+            'info'        => ArrayHelper::get('info', $aField, false),
+            'info_class'  => ArrayHelper::get('info_class', $aField, false),
+            'tip'         => ArrayHelper::get('tip', $aField, $sTip),
+            'error'       => ArrayHelper::get('error', $aField, null),
+            'html'        => ArrayHelper::get('html', $aField, ''),
         ];
 
         if (is_array($oField->tip) && !empty($oField->tip['title'])) {
             $oTip = (object) [
-                'class' => ArrayHelper::getFromArray('class', $oField->tip, 'tip'),
-                'title' => ArrayHelper::getFromArray('title', $oField->tip, null),
+                'class' => ArrayHelper::get('class', $oField->tip, 'tip'),
+                'title' => ArrayHelper::get('title', $oField->tip, null),
             ];
         } elseif (is_string($oField->tip) && !empty($oField->tip)) {
             $oTip = (object) [
@@ -1214,8 +1214,8 @@ class Field
      */
     public static function submit(array $aField)
     {
-        $sKey     = ArrayHelper::getFromArray('key', $aField, []);
-        $sDefault = ArrayHelper::getFromArray('default', $aField, '');
+        $sKey     = ArrayHelper::get('key', $aField, []);
+        $sDefault = ArrayHelper::get('default', $aField, '');
 
         $aField['html'] = Form::submit($sKey, $sDefault);
         return static::html($aField);
@@ -1232,8 +1232,8 @@ class Field
      */
     public static function button(array $aField)
     {
-        $sKey     = ArrayHelper::getFromArray('key', $aField, []);
-        $sDefault = ArrayHelper::getFromArray('default', $aField, '');
+        $sKey     = ArrayHelper::get('key', $aField, []);
+        $sDefault = ArrayHelper::get('default', $aField, '');
 
         $aField['html'] = Form::button($sKey, $sDefault);
         return static::html($aField);

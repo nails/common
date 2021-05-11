@@ -117,8 +117,8 @@ class ErrorHandler
             $oErrorHandler = $oDefaultDriver;
         }
 
-        $sDriverNamespace = ArrayHelper::getFromArray('namespace', (array) $oErrorHandler->data);
-        $sDriverClass     = ArrayHelper::getFromArray('class', (array) $oErrorHandler->data);
+        $sDriverNamespace = ArrayHelper::get('namespace', (array) $oErrorHandler->data);
+        $sDriverClass     = ArrayHelper::get('class', (array) $oErrorHandler->data);
         $sClassName       = $sDriverNamespace . $sDriverClass;
 
         if (!class_exists($sClassName)) {
@@ -183,8 +183,8 @@ class ErrorHandler
     public function getDefaultDriverClass()
     {
         $oDriver          = $this->getDefaultDriver();
-        $sDriverNamespace = ArrayHelper::getFromArray('namespace', (array) $oDriver->data);
-        $sDriverClass     = ArrayHelper::getFromArray('class', (array) $oDriver->data);
+        $sDriverNamespace = ArrayHelper::get('namespace', (array) $oDriver->data);
+        $sDriverClass     = ArrayHelper::get('class', (array) $oDriver->data);
         return $sDriverNamespace . $sDriverClass;
     }
 
@@ -269,7 +269,7 @@ class ErrorHandler
      */
     public function show404(bool $bLogError = false)
     {
-        $sPage = ArrayHelper::getFromArray('REQUEST_URI', $_SERVER);
+        $sPage = ArrayHelper::get('REQUEST_URI', $_SERVER);
 
         /**
          * By default we log this, but allow a dev to skip it. Additionally, skip
@@ -283,7 +283,7 @@ class ErrorHandler
          * If you disagree, open up an issue and we'll work something out.
          */
 
-        $sRequestMethod = isset($_SERVER) ? strtoupper(ArrayHelper::getFromArray('REQUEST_METHOD', $_SERVER)) : '';
+        $sRequestMethod = isset($_SERVER) ? strtoupper(ArrayHelper::get('REQUEST_METHOD', $_SERVER)) : '';
 
         if ($bLogError && $sRequestMethod != 'HEAD') {
             log_message('error', '404 Page Not Found --> ' . $sPage);
@@ -333,7 +333,7 @@ class ErrorHandler
         if ($bForceView || (function_exists('isLoggedIn') && isLoggedIn())) {
 
             if ($bLogError) {
-                $sPage = ArrayHelper::getFromArray('REQUEST_URI', $_SERVER);
+                $sPage = ArrayHelper::get('REQUEST_URI', $_SERVER);
                 log_message('error', '401 Unauthorised --> ' . $sPage);
             }
 

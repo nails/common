@@ -202,9 +202,9 @@ trait GetCountCommon
                 $oDb->escape($mValue),
             ];
         } else {
-            $sOperator = ArrayHelper::getFromArray(0, $mValue);
-            $sValue    = ArrayHelper::getFromArray(1, $mValue);
-            $bEscape   = (bool) ArrayHelper::getFromArray(2, $mValue, true);
+            $sOperator = ArrayHelper::get(0, $mValue);
+            $sValue    = ArrayHelper::get(1, $mValue);
+            $bEscape   = (bool) ArrayHelper::get(2, $mValue, true);
             $aBits     = [
                 $oDb->escape_str($sColumn, false),
                 $sOperator,

@@ -85,7 +85,7 @@ if (!function_exists('show404')) {
 if (!function_exists('getFromArray')) {
     function getFromArray($mKey, $aArray, $mDefault = null)
     {
-        return ArrayHelper::getFromArray($mKey, $aArray, $mDefault);
+        return ArrayHelper::get($mKey, $aArray, $mDefault);
     }
 }
 

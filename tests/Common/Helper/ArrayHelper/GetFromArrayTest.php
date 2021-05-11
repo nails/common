@@ -20,52 +20,52 @@ class GetFromArrayTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Helper\ArrayHelper::getFromArray()
+     * @covers \Nails\Common\Helper\ArrayHelper::get()
      */
     public function test_getfromarray_valid_key(): void
     {
         $this->assertEquals(
             $this->aTestArray['foo'],
-            ArrayHelper::getFromArray('foo', $this->aTestArray)
+            ArrayHelper::get('foo', $this->aTestArray)
         );
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Helper\ArrayHelper::getFromArray()
+     * @covers \Nails\Common\Helper\ArrayHelper::get()
      */
     public function test_getfromarray_invalid_key(): void
     {
         $this->assertEquals(
             null,
-            ArrayHelper::getFromArray('invalid', $this->aTestArray)
+            ArrayHelper::get('invalid', $this->aTestArray)
         );
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Helper\ArrayHelper::getFromArray()
+     * @covers \Nails\Common\Helper\ArrayHelper::get()
      */
     public function test_getfromarray_cascading_keys(): void
     {
         $this->assertEquals(
             $this->aTestArray['fizz'],
-            ArrayHelper::getFromArray(['invalid', 'fizz'], $this->aTestArray)
+            ArrayHelper::get(['invalid', 'fizz'], $this->aTestArray)
         );
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Helper\ArrayHelper::getFromArray()
+     * @covers \Nails\Common\Helper\ArrayHelper::get()
      */
     public function test_getfromarray_default_value(): void
     {
         $this->assertEquals(
             'default',
-            ArrayHelper::getFromArray('invalid', $this->aTestArray, 'default')
+            ArrayHelper::get('invalid', $this->aTestArray, 'default')
         );
     }
 }

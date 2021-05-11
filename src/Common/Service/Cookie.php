@@ -77,7 +77,7 @@ class Cookie
      */
     public function read(string $sKey): ?Resource\Cookie
     {
-        return ArrayHelper::getFromArray($sKey, $this->aCookies, null);
+        return ArrayHelper::get($sKey, $this->aCookies, null);
     }
 
     // --------------------------------------------------------------------------

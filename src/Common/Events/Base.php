@@ -183,8 +183,8 @@ abstract class Base
                 'constant'    => get_called_class() . '::' . $sConstant,
                 'namespace'   => static::getEventNamespace(),
                 'value'       => $sValue,
-                'description' => ArrayHelper::getFromArray($sConstant, static::$aDescriptions),
-                'arguments'   => ArrayHelper::getFromArray($sConstant, static::$aArguments),
+                'description' => ArrayHelper::get($sConstant, static::$aDescriptions),
+                'arguments'   => ArrayHelper::get($sConstant, static::$aArguments),
             ];
         }
 

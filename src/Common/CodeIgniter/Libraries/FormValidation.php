@@ -145,8 +145,8 @@ class FormValidation extends CI_Form_validation
     public function item_count(array $aArray, $sParam)
     {
         $aParams  = preg_replace('/[^0-9]/', '', explode(',', $sParam));
-        $mFloor   = ArrayHelper::getFromArray(0, $aParams, 0);
-        $mCeiling = ArrayHelper::getFromArray(1, $aParams, INF);
+        $mFloor   = ArrayHelper::get(0, $aParams, 0);
+        $mCeiling = ArrayHelper::get(1, $aParams, INF);
 
         if (substr($sParam, 0, 1) === '(' && substr($sParam, -1, 1) === ')') {
             $mFloor++;
@@ -1117,10 +1117,10 @@ class FormValidation extends CI_Form_validation
     public function is_unique($sString, $sParameters)
     {
         $aParameters   = explode('.', $sParameters);
-        $sTable        = ArrayHelper::getFromArray(0, $aParameters);
-        $sColumn       = ArrayHelper::getFromArray(1, $aParameters);
-        $sIgnoreId     = ArrayHelper::getFromArray(2, $aParameters);
-        $sIgnoreColumn = ArrayHelper::getFromArray(3, $aParameters, 'id');
+        $sTable        = ArrayHelper::get(0, $aParameters);
+        $sColumn       = ArrayHelper::get(1, $aParameters);
+        $sIgnoreId     = ArrayHelper::get(2, $aParameters);
+        $sIgnoreColumn = ArrayHelper::get(3, $aParameters, 'id');
 
         /** @var Database $oDb */
         $oDb = Factory::service('Database');

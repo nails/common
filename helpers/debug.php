@@ -221,7 +221,7 @@ if (!function_exists('deprecatedError')) {
         //  Attempt to determine where the deprecation was thrown;
         //  0 is this function, 1 is where it was thrown, 2 should be the caller
         $aDebug  = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
-        $aCaller = ArrayHelper::getFromArray(2, $aDebug);
+        $aCaller = ArrayHelper::get(2, $aDebug);
         if (!empty($aCaller)) {
 
             if (!empty($aCaller['class'])) {

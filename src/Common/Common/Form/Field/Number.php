@@ -21,7 +21,7 @@ class Number extends Text
     public function render(array $aData = []): string
     {
         $aData['type'] = 'email';
-        $aData['step'] = ArrayHelper::getFromArray('step', $aData, 'any');
+        $aData['step'] = ArrayHelper::get('step', $aData, 'any');
         return parent::render($aData);
     }
 }

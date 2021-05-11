@@ -31,7 +31,7 @@ class ArrayHelper
      *
      * @return mixed
      */
-    public static function getFromArray($mKey, array $aArray, $mDefault = null)
+    public static function get($mKey, array $aArray, $mDefault = null)
     {
         $aKeys = (array) $mKey;
         foreach ($aKeys as $sKey) {
