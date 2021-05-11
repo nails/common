@@ -277,7 +277,7 @@ class ArrayHelper
      *
      * @return array
      */
-    public static function arrayExtractProperty(array $aInput, $sProperty)
+    public static function extract(array $aInput, $sProperty)
     {
         $aOutput = [];
         foreach ($aInput as $mItem) {

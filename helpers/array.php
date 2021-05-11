@@ -89,7 +89,7 @@ if (!function_exists('in_array_multi')) {
 if (!function_exists('arrayExtractProperty')) {
     function arrayExtractProperty(array $aInput, $sProperty)
     {
-        return ArrayHelper::arrayExtractProperty($aInput, $sProperty);
+        return ArrayHelper::extract($aInput, $sProperty);
     }
 }
 
