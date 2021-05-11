@@ -147,9 +147,9 @@ class HttpCodes
      *
      * @param $iCode integer The numerical HTTP status code
      *
-     * @return null
+     * @return string|null
      */
-    public static function getByCode($iCode)
+    public static function getByCode($iCode): ?string
     {
         $sConstant = 'static::STATUS_' . $iCode;
         if (defined($sConstant)) {
