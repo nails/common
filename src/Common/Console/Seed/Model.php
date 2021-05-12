@@ -182,6 +182,11 @@ abstract class Model implements Interfaces\Database\Seeder
         //  Special Cases, model dependant
         $oModel = Factory::model(static::CONFIG_MODEL_NAME, static::CONFIG_MODEL_PROVIDER);
 
+        //  Labels
+        if ($oModel->getColumnLabel()) {
+            $aOut[$oModel->getColumnLabel()] = ucwords($aOut[$oModel->getColumnLabel()]);
+        }
+
         //  Slugs
         //  If these are being automatically generated then let the model do the hard work
         if ($oModel->isAutoSetSlugs()) {
