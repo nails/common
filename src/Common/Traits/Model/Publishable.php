@@ -78,6 +78,18 @@ trait Publishable
     // --------------------------------------------------------------------------
 
     /**
+     * Returns the column to use for the date an item expires
+     *
+     * @return string|null
+     */
+    public function getColumnDateExpire(): ?string
+    {
+        return $this->getColumn('date_expire', 'date_expire');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Returns only published items
      *
      * @param array $aData The query data
@@ -156,8 +168,11 @@ trait Publishable
      */
     protected function addPublishedQueryConditionals(array $aData, bool $bIsPublished = true): array
     {
+        /** @var \DateTime $oNow */
+        $oNow                 = Factory::factory('DateTime');
         $sColumnIsPublished   = $this->getColumnIsPublished();
         $sColumnDatePublished = $this->getColumnDatePublished();
+        $sColumnDateExpire    = $this->getColumnDateExpire();
 
         if (empty($aData['where'])) {
             $aData['where'] = [];
@@ -168,12 +183,19 @@ trait Publishable
         }
 
         if ($sColumnDatePublished) {
-            /** @var \DateTime $oNow */
-            $oNow             = Factory::factory('DateTime');
-            $adata['where'][] = sprintf(
+            $aData['where'][] = sprintf(
                 '(`%1$s` IS NULL OR `%1$s` %2$s %3$s)',
                 $sColumnDatePublished,
                 $bIsPublished ? '<=' : '>',
+                $oNow->format('Y-m-d H:i:s')
+            );
+        }
+
+        if ($sColumnDateExpire) {
+            $aData['where'][] = sprintf(
+                '(`%1$s` IS NULL OR `%1$s` %2$s %3$s)',
+                $sColumnDateExpire,
+                $bIsPublished ? '>' : '<=',
                 $oNow->format('Y-m-d H:i:s')
             );
         }
