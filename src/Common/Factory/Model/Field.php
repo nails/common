@@ -538,6 +538,16 @@ class Field
     public function setIsRequired(bool $bValue)
     {
         $this->required = $bValue;
+
+        if ($bValue) {
+            //  Using addValidation() will result in an infiniate loop
+            $this->validation[] = FormValidation::RULE_REQUIRED;
+        } else {
+            $this->validation = array_filter($this->validation, function ($sRule) {
+                return $sRule !== FormValidation::RULE_REQUIRED;
+            });
+        }
+
         return $this;
     }
 
