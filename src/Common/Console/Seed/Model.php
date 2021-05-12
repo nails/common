@@ -239,7 +239,7 @@ abstract class Model implements Interfaces\Database\Seeder
      */
     protected function generateSlugs(\Nails\Common\Model\Base $oModel, &$aOut): self
     {
-        if (classImplements($oModel, Traits\Model\Slug::class) && $oModel->isAutoSetSlugs()) {
+        if (classUses($oModel, Traits\Model\Slug::class) && $oModel->isAutoSetSlugs()) {
             $sColumn = $oModel->getColumnSlug();
             unset($aOut[$sColumn]);
         }
@@ -260,7 +260,7 @@ abstract class Model implements Interfaces\Database\Seeder
      */
     protected function generateTokens(\Nails\Common\Model\Base $oModel, &$aOut): self
     {
-        if (classImplements($oModel, Traits\Model\Token::class) && $oModel->isAutoSetTokens()) {
+        if (classUses($oModel, Traits\Model\Token::class) && $oModel->isAutoSetTokens()) {
             $sColumn = $oModel->getColumnToken();
             unset($aOut[$sColumn]);
         }
@@ -281,7 +281,7 @@ abstract class Model implements Interfaces\Database\Seeder
      */
     protected function generatePublishable(\Nails\Common\Model\Base $oModel, &$aOut): self
     {
-        if (classImplements($oModel, Traits\Model\Publishable::class)) {
+        if (classUses($oModel, Traits\Model\Publishable::class)) {
             //  Ensure the expiration is after the publish date
             $sColumnPublished = $oModel->getColumnDateExpire();
             $sColumnExpire    = $oModel->getColumnDateExpire();
