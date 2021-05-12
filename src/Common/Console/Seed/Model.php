@@ -289,5 +289,7 @@ abstract class Model implements Interfaces\Database\Seeder
                 $aOut[$sColumnExpire] = $this->randomDateTime($aOut[$sColumnPublished]);
             }
         }
+
+        return $this;
     }
 }
