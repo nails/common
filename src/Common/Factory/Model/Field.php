@@ -246,7 +246,7 @@ class Field
      */
     public function getValidation(): array
     {
-        return array_unique($this->validation);
+        return array_values(array_unique($this->validation));
     }
 
     // --------------------------------------------------------------------------
