@@ -43,7 +43,7 @@ class Field
     /**
      * The field's validation rules
      *
-     * @var array
+     * @var string[int]
      */
     public $validation = [];
 
@@ -99,7 +99,7 @@ class Field
     /**
      * The field's data
      *
-     * @var array
+     * @var string[string]
      */
     public $data = [];
 
@@ -242,7 +242,7 @@ class Field
     /**
      * Get the validation property
      *
-     * @return array
+     * @return string[]
      */
     public function getValidation(): array
     {
@@ -285,10 +285,13 @@ class Field
 
     /**
      * Sets field as required if the validation determines it as so
+     *
+     * @return $this
      */
-    private function checkIfFieldIsRequired()
+    private function checkIfFieldIsRequired(): self
     {
         $this->setIsRequired(in_array(FormValidation::RULE_REQUIRED, $this->validation));
+        return $this;
     }
 
     // --------------------------------------------------------------------------
