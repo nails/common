@@ -4,6 +4,7 @@ namespace Nails\Common\Console\Seed;
 
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
+use Nails\Common\Factory\Model\Field;
 use Nails\Common\Helper\Form;
 use Nails\Common\Service\Locale;
 use Nails\Common\Traits;
@@ -115,92 +116,178 @@ abstract class Model implements Interfaces\Database\Seeder
     /**
      * Generate a new item
      *
-     * @param array $aFields The fields to generate
+     * @param Field[] $aFields The fields to generate
      *
-     * @return array
+     * @return mixed[]
      * @throws FactoryException
      */
     protected function generate(array $aFields): array
     {
         $aOut = [];
         foreach ($aFields as $oField) {
-            switch ($oField->type) {
-                case Form::FIELD_TEXTAREA:
-                    $mValue = $this->loremParagraph();
-                    break;
-
-                case Form::FIELD_NUMBER:
-                    $mValue = $this->randomInteger();
-                    break;
-
-                case Form::FIELD_BOOLEAN:
-                    $mValue = $this->randomBool();
-                    break;
-
-                case Form::FIELD_DATETIME:
-                    $mValue = $this->randomDateTime();
-                    break;
-
-                case Form::FIELD_DATE:
-                    $mValue = $this->randomDateTime(null, null, 'Y-m-d');
-                    break;
-
-                case Form::FIELD_TIME:
-                    $mValue = $this->randomDateTime(null, null, 'H:i:s');
-                    break;
-
-                case Form::FIELD_DROPDOWN:
-                    $mValue = $this->randomItem(array_keys($oField->options));
-                    break;
-
-                case Form::FIELD_DROPDOWN_MULTIPLE:
-                    $mValue = $this->randomItems(array_keys($oField->options));
-                    break;
-
-                case Form::FIELD_URL:
-                    $mValue = $this->url();
-                    break;
-
-                case 'wysiwyg':
-                    $mValue = $this->loremHtml();
-                    break;
-
-                default:
-                    $mValue = $this->loremWord(rand(3, 6));
-                    break;
-            }
-
-            //  Ensure the value isn't too long
-            if (!empty($oField->max_length) && strlen($mValue) > $oField->max_length) {
-                $mValue = substr($mValue, 0, $oField->max_length);
-            }
-
             $sKey        = preg_replace('/\[\]$/', '', $oField->key);
-            $aOut[$sKey] = $mValue;
+            $aOut[$sKey] = $this->generateValue($oField);
         }
 
         //  Special Cases, model dependant
         $oModel = Factory::model(static::CONFIG_MODEL_NAME, static::CONFIG_MODEL_PROVIDER);
 
-        //  Labels
-        if ($oModel->getColumnLabel()) {
-            $aOut[$oModel->getColumnLabel()] = ucwords($aOut[$oModel->getColumnLabel()]);
-        }
-
-        //  Slugs
-        //  If these are being automatically generated then let the model do the hard work
-        if ($oModel->isAutoSetSlugs()) {
-            $sColumn = $oModel->getColumn('slug');
-            unset($aOut[$sColumn]);
-        }
-
-        //  Tokens
-        //  If these are being automatically generated then let the model do the hard work
-        if ($oModel->isAutoSetTokens()) {
-            $sColumn = $oModel->getColumn('token');
-            unset($aOut[$sColumn]);
-        }
+        $this
+            ->generateLabel($oModel, $aOut)
+            ->generateSlugs($oModel, $aOut)
+            ->generateTokens($oModel, $aOut)
+            ->generatePublishable($oModel, $aOut);
 
         return $aOut;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Generates a value appropriate for the field
+     *
+     * @param Field $oField The field to generate a value for
+     *
+     * @return mixed
+     */
+    protected function generateValue(Field $oField)
+    {
+        switch ($oField->type) {
+            case Form::FIELD_TEXTAREA:
+                $mValue = $this->loremParagraph();
+                break;
+
+            case Form::FIELD_NUMBER:
+                $mValue = $this->randomInteger();
+                break;
+
+            case Form::FIELD_BOOLEAN:
+                $mValue = $this->randomBool();
+                break;
+
+            case Form::FIELD_DATETIME:
+                $mValue = $this->randomDateTime();
+                break;
+
+            case Form::FIELD_DATE:
+                $mValue = $this->randomDateTime(null, null, 'Y-m-d');
+                break;
+
+            case Form::FIELD_TIME:
+                $mValue = $this->randomDateTime(null, null, 'H:i:s');
+                break;
+
+            case Form::FIELD_DROPDOWN:
+                $mValue = $this->randomItem(array_keys($oField->options));
+                break;
+
+            case Form::FIELD_DROPDOWN_MULTIPLE:
+                $mValue = $this->randomItems(array_keys($oField->options));
+                break;
+
+            case Form::FIELD_URL:
+                $mValue = $this->url();
+                break;
+
+            case 'wysiwyg':
+                $mValue = $this->loremHtml();
+                break;
+
+            default:
+                $mValue = $this->loremWord(rand(3, 6));
+                break;
+        }
+
+        //  Ensure the value isn't too long
+        if (!empty($oField->max_length) && strlen($mValue) > $oField->max_length) {
+            $mValue = substr($mValue, 0, $oField->max_length);
+        }
+
+        return $mValue;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * If the model ahs a label column, then title case the label
+     *
+     * @param \Nails\Common\Model\Base $oModel The model being seeded
+     * @param mixed[]                  $aOut   The output array
+     *
+     * @return $this
+     */
+    protected function generateLabel(\Nails\Common\Model\Base $oModel, &$aOut): self
+    {
+        $sColumn = $oModel->getColumnLabel();
+        if ($sColumn) {
+            $aOut[$sColumn] = title_case($aOut[$sColumn]);
+        }
+
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * If the model supports slugs, and slugs are automatic, unset and allow the
+     * model to set the slug on creation.
+     *
+     * @param \Nails\Common\Model\Base $oModel The model being seeded
+     * @param mixed[]                  $aOut   The output array
+     *
+     * @return $this
+     */
+    protected function generateSlugs(\Nails\Common\Model\Base $oModel, &$aOut): self
+    {
+        if (classImplements($oModel, Traits\Model\Slug::class) && $oModel->isAutoSetSlugs()) {
+            $sColumn = $oModel->getColumnSlug();
+            unset($aOut[$sColumn]);
+        }
+
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * If the model supports tokens, and tokens are automatic, unset and allow the
+     * model to set the token on creation.
+     *
+     * @param \Nails\Common\Model\Base $oModel The model being seeded
+     * @param mixed[]                  $aOut   The output array
+     *
+     * @return $this
+     */
+    protected function generateTokens(\Nails\Common\Model\Base $oModel, &$aOut): self
+    {
+        if (classImplements($oModel, Traits\Model\Token::class) && $oModel->isAutoSetTokens()) {
+            $sColumn = $oModel->getColumnToken();
+            unset($aOut[$sColumn]);
+        }
+
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * If the model supports expiration dates, then ensure the expiration date is
+     * after the published date.
+     *
+     * @param \Nails\Common\Model\Base $oModel The model being seeded
+     * @param mixed[]                  $aOut   The output array
+     *
+     * @return $this
+     */
+    protected function generatePublishable(\Nails\Common\Model\Base $oModel, &$aOut): self
+    {
+        if (classImplements($oModel, Traits\Model\Publishable::class)) {
+            //  Ensure the expiration is after the publish date
+            $sColumnPublished = $oModel->getColumnDateExpire();
+            $sColumnExpire    = $oModel->getColumnDateExpire();
+            if ($sColumnExpire && $sColumnPublished) {
+                $aOut[$sColumnExpire] = $this->randomDateTime($aOut[$sColumnPublished]);
+            }
+        }
     }
 }
