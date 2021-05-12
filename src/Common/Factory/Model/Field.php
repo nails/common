@@ -2,6 +2,7 @@
 
 namespace Nails\Common\Factory\Model;
 
+use Nails\Common\Helper;
 use Nails\Common\Service\FormValidation;
 
 /**
@@ -30,7 +31,7 @@ class Field
      *
      * @var string
      */
-    public $type = 'text';
+    public $type = Helper\Form::FIELD_TEXT;
 
     /**
      * Whether the field can be null
