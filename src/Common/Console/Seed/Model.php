@@ -157,6 +157,10 @@ abstract class Model implements Interfaces\Database\Seeder
                     $mValue = $this->randomItems(array_keys($oField->options));
                     break;
 
+                case Form::FIELD_URL:
+                    $mValue = $this->url();
+                    break;
+
                 case 'wysiwyg':
                     $mValue = $this->loremHtml();
                     break;
