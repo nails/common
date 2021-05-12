@@ -2688,6 +2688,11 @@ abstract class Base
                 break;
         }
 
+        //  Sniff for URLs
+        if (preg_match('/_url$/', $oField->getKey())) {
+            $oField->setType(Helper\Form::FIELD_URL);
+        }
+
         return $this;
     }
 
