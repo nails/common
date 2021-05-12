@@ -166,7 +166,7 @@ abstract class Model implements Interfaces\Database\Seeder
                     break;
 
                 default:
-                    $mValue = $this->loremWord(3);
+                    $mValue = $this->loremWord(rand(3, 6));
                     break;
             }
 
