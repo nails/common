@@ -43,7 +43,7 @@ class Field
     /**
      * The field's validation rules
      *
-     * @var string[int]
+     * @var string[]|\Closure[]
      */
     public $validation = [];
 
@@ -246,7 +246,7 @@ class Field
      */
     public function getValidation(): array
     {
-        return array_values(array_unique($this->validation));
+        return array_values(array_unique($this->validation, SORT_REGULAR));
     }
 
     // --------------------------------------------------------------------------
@@ -270,13 +270,13 @@ class Field
     /**
      * Adds a new rule to the stack
      *
-     * @param string $sRule The value to set
+     * @param string|\Closure $mRule The value to set
      *
      * @return $this
      */
-    public function addValidation(string $sRule): self
+    public function addValidation($mRule): self
     {
-        $this->validation[] = $sRule;
+        $this->validation[] = $mRule;
         $this->checkIfFieldIsRequired();
         return $this;
     }
