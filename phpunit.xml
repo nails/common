@@ -7,5 +7,6 @@
     </testsuites>
     <php>
         <const name="PHPUNIT_NAILS_COMMON_TEST_SUITE" value="true"/>
+        <const name="PRIVATE_KEY" value="abc123"/>
     </php>
 </phpunit>
