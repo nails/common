@@ -5,7 +5,7 @@ use Nails\Common\Helper\Timecode;
 if (!function_exists('timecodeToSeconds')) {
     function timecodeToSeconds(string $sTimecode): int
     {
-        return Timecode::toSeconds($isTimecode);
+        return Timecode::toSeconds($sTimecode);
     }
 }
 
