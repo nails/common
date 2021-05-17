@@ -158,6 +158,7 @@ abstract class Model implements Interfaces\Database\Seeder
                 break;
 
             case Form::FIELD_NUMBER:
+            case Form::FIELD_TIMECODE:
                 $mValue = $this->randomInteger();
                 break;
 
