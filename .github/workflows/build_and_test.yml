@@ -11,24 +11,24 @@ jobs:
             -   name: Setup PHP, with composer and extensions
                 uses: shivammathur/setup-php@v2
                 with:
-                    php-version: 7.3
+                    php-version: 7.4
 
             -   name: Cache Composer dependencies
                 uses: actions/cache@v1
                 with:
                     path: vendor
-                    key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-                    restore-keys: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+                    key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+                    restore-keys: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
 
             -   name: Cache Yarn dependencies
                 uses: actions/cache@v1
                 with:
                     path: node_modules
-                    key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-                    restore-keys: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                    key: ${{ runner.os }}-yarn-${{ hashFiles('**/package.json') }}
+                    restore-keys: ${{ runner.os }}-yarn-${{ hashFiles('**/package.json') }}
 
             -   name: Install Composer dependencies
-                run: composer install
+                run: composer upate
 
             -   name: Install Yarn dependencies
                 run: yarn install
