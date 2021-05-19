@@ -31,7 +31,7 @@ class MetaData
     /** @var string[] */
     protected $aKeywords = [];
 
-    /** @var string */
+    /** @var string|null */
     protected $sImageUrl = '';
 
     /** @var int */
@@ -251,11 +251,11 @@ class MetaData
     /**
      * Sets the Image URL
      *
-     * @param string $sImageUrl The image URL to set
+     * @param string|null $sImageUrl The image URL to set
      *
      * @return $this
      */
-    public function setImageUrl(string $sImageUrl): self
+    public function setImageUrl(?string $sImageUrl): self
     {
         $this->sImageUrl = $sImageUrl;
         return $this;
@@ -266,9 +266,9 @@ class MetaData
     /**
      * Gets the Image URL
      *
-     * @return string
+     * @return string|null
      */
-    public function getImageUrl(): string
+    public function getImageUrl(): ?string
     {
         return $this->sImageUrl;
     }
