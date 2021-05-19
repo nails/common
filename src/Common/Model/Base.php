@@ -1124,11 +1124,10 @@ abstract class Base
                     $aTriggerData[$mTrigger] = [];
                 } elseif (is_array($mTrigger)) {
                     $sArrayTrigger     = Helper\ArrayHelper::get(0, $mTrigger) ?: Helper\ArrayHelper::get('trigger', $mTrigger);
-                    $sArrayTrigger     = preg_replace('/\:count$/', '', $sArrayTrigger);
                     $aArrayTriggerData = Helper\ArrayHelper::get(1, $mTrigger) ?: Helper\ArrayHelper::get('data', $mTrigger, []);
                     if (!empty($sArrayTrigger)) {
-                        $aTriggers[]                  = $sArrayTrigger;
-                        $aTriggerData[$sArrayTrigger] = $aArrayTriggerData;
+                        $aTriggers[]                                                  = $sArrayTrigger;
+                        $aTriggerData[preg_replace('/\:count$/', '', $sArrayTrigger)] = $aArrayTriggerData;
                     }
                 }
             }
