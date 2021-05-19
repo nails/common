@@ -22,29 +22,29 @@ class MetaData
     /** @var Locale */
     protected $oLocale;
 
-    /** @var string */
-    protected $sDescription = '';
+    /** @var string|null */
+    protected $sDescription;
 
-    /** @var string */
-    protected $sCanonicalUrl = '';
+    /** @var string|null */
+    protected $sCanonicalUrl;
 
     /** @var string[] */
     protected $aKeywords = [];
 
     /** @var string|null */
-    protected $sImageUrl = '';
+    protected $sImageUrl;
 
-    /** @var int */
-    protected $iImageWidth = null;
+    /** @var int|null */
+    protected $iImageWidth;
 
-    /** @var int */
-    protected $iImageHeight = null;
+    /** @var int|null */
+    protected $iImageHeight;
 
-    /** @var string */
-    protected $sThemeColour = '';
+    /** @var string|null */
+    protected $sThemeColour;
 
-    /** @var string */
-    protected $sTwitterHandle = '';
+    /** @var string|null */
+    protected $sTwitterHandle;
 
     /** @var string[] */
     protected $aHtmlClasses = [];
@@ -170,11 +170,11 @@ class MetaData
     /**
      * Sets the SEO description
      *
-     * @param string $sDescription The description to set
+     * @param string|null $sDescription The description to set
      *
      * @return $this
      */
-    public function setDescription(string $sDescription): self
+    public function setDescription(?string $sDescription): self
     {
         $this->sDescription = $sDescription;
         return $this;
@@ -185,9 +185,9 @@ class MetaData
     /**
      * Gets the SEO description
      *
-     * @return string
+     * @return string|null
      */
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->sDescription;
     }
@@ -197,11 +197,11 @@ class MetaData
     /**
      * Sets the canonical URL
      *
-     * @param string $sCanonicalUrl The canonical URL to set
+     * @param string|null $sCanonicalUrl The canonical URL to set
      *
      * @return $this
      */
-    public function setCanonicalUrl(string $sCanonicalUrl): self
+    public function setCanonicalUrl(?string $sCanonicalUrl): self
     {
         $this->sCanonicalUrl = $sCanonicalUrl;
         return $this;
@@ -212,9 +212,9 @@ class MetaData
     /**
      * Gets the canonical URL
      *
-     * @return string
+     * @return string|null
      */
-    public function getCanonicalUrl(): string
+    public function getCanonicalUrl(): ?string
     {
         return $this->sCanonicalUrl;
     }
@@ -278,11 +278,11 @@ class MetaData
     /**
      * Sets the Image width
      *
-     * @param int $iImageWidth The image width to set
+     * @param int|null $iImageWidth The image width to set
      *
      * @return $this
      */
-    public function setImageWidth(int $iImageWidth): self
+    public function setImageWidth(?int $iImageWidth): self
     {
         $this->iImageWidth = $iImageWidth;
         return $this;
@@ -293,9 +293,9 @@ class MetaData
     /**
      * Gets the Image width
      *
-     * @return int
+     * @return int|null
      */
-    public function getImageWidth(): int
+    public function getImageWidth(): ?int
     {
         return $this->iImageWidth;
     }
@@ -305,11 +305,11 @@ class MetaData
     /**
      * Sets the Image height
      *
-     * @param int $iImageHeight The image height to set
+     * @param int|null $iImageHeight The image height to set
      *
      * @return $this
      */
-    public function setImageHeight(int $iImageHeight): self
+    public function setImageHeight(?int $iImageHeight): self
     {
         $this->iImageHeight = $iImageHeight;
         return $this;
@@ -320,9 +320,9 @@ class MetaData
     /**
      * Gets the Image height
      *
-     * @return int
+     * @return int|null
      */
-    public function getImageHeight(): int
+    public function getImageHeight(): ?int
     {
         return $this->iImageHeight;
     }
@@ -332,11 +332,11 @@ class MetaData
     /**
      * Sets the theme colour
      *
-     * @param string $sThemeColour The theme colour to set
+     * @param string|null $sThemeColour The theme colour to set
      *
      * @return $this
      */
-    public function setThemeColour(string $sThemeColour): self
+    public function setThemeColour(?string $sThemeColour): self
     {
         $this->sThemeColour = $sThemeColour;
         return $this;
@@ -347,9 +347,9 @@ class MetaData
     /**
      * Gets the theme colour
      *
-     * @return string
+     * @return string|null
      */
-    public function getThemeColour(): string
+    public function getThemeColour(): ?string
     {
         return $this->sThemeColour;
     }
@@ -359,11 +359,11 @@ class MetaData
     /**
      * Sets the Twitter handle
      *
-     * @param string $sTwitterHandle The Twitter handle to set
+     * @param string|null $sTwitterHandle The Twitter handle to set
      *
      * @return $this
      */
-    public function setTwitterHandle(string $sTwitterHandle): self
+    public function setTwitterHandle(?string $sTwitterHandle): self
     {
         $this->sTwitterHandle = $sTwitterHandle;
         return $this;
@@ -374,9 +374,9 @@ class MetaData
     /**
      * Gets the Twitter handle
      *
-     * @return string
+     * @return string|null
      */
-    public function getTwitterHandle(): string
+    public function getTwitterHandle(): ?string
     {
         return $this->sTwitterHandle;
     }
