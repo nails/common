@@ -727,16 +727,16 @@ class Model extends BaseMaker
     {
         return [
             //  Service definition
-            implode("\n", [
+            implode(PHP_EOL, [
                 str_repeat(' ', $this->iServicesIndent) . '\'' . $oModel->service_name . '\' => function () {',
-                str_repeat(' ', $this->iServicesIndent) . '    return new ' . $oModel->class_path . '();',
+                str_repeat(' ', $this->iServicesIndent) . '    return new \\' . $oModel->class_path . '();',
                 str_repeat(' ', $this->iServicesIndent) . '},',
             ]),
 
             //  Resource definition
-            implode("\n", [
+            implode(PHP_EOL, [
                 str_repeat(' ', $this->iServicesIndent) . '\'' . $oModel->service_name . '\' => function ($oObj) {',
-                str_repeat(' ', $this->iServicesIndent) . '    return new ' . $oModel->resource_class_path . '($oObj);',
+                str_repeat(' ', $this->iServicesIndent) . '    return new \\' . $oModel->resource_class_path . '($oObj);',
                 str_repeat(' ', $this->iServicesIndent) . '},',
             ]),
         ];
@@ -770,13 +770,13 @@ class Model extends BaseMaker
         $aClasses   = array_filter($aClasses);
         sort($aClasses);
         $aClasses    = array_values($aClasses);
-        $sStatements = implode("\n", array_map(function ($sClass) {
+        $sStatements = implode(PHP_EOL, array_map(function ($sClass) {
             return 'use ' . $sClass . ';';
         }, $aClasses));
 
         //  Write the imports after `namespace`
         $sFile = preg_replace('/^use.+?;(\n\n|\nclass)/sm', '', $sFile);
-        $sFile = preg_replace('/^(namespace .+)$\n/m', "$1\n\n" . $sStatements . "\n", $sFile);
+        $sFile = preg_replace('/^(namespace .+)$\n/m', "$1\n\n" . $sStatements . PHP_EOL, $sFile);
 
         // --------------------------------------------------------------------------
 
@@ -793,13 +793,13 @@ class Model extends BaseMaker
         $aClasses   = array_filter($aClasses);
         sort($aClasses);
         $aClasses    = array_values($aClasses);
-        $sStatements = implode("\n", array_map(function ($sClass) {
+        $sStatements = implode(PHP_EOL, array_map(function ($sClass) {
             return '    use ' . $sClass . ';';
         }, $aClasses));
 
         //  Write the statements after the class definition
         $sFile = preg_replace('/^    use.+?;(\n\n|\nclass)/sm', '', $sFile);
-        $sFile = preg_replace('/^(class .+)$\n^{$/m', "$1\n{\n" . $sStatements . "\n", $sFile);
+        $sFile = preg_replace('/^(class .+)$\n^{$/m', "$1\n{\n" . $sStatements . PHP_EOL, $sFile);
 
         // --------------------------------------------------------------------------
 
