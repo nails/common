@@ -616,6 +616,12 @@ class Asset
         $this->aJsHeader       = [];
         $this->aJsInlineHeader = [];
         $this->aJsInlineFooter = [];
+
+        $this
+            ->criticalCss()
+            ->setDeferredStylesheet('')
+            ->setInlineCss([]);
+
         return $this;
     }
 
