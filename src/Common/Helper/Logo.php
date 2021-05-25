@@ -70,9 +70,21 @@ class Logo
         }
 
         if (Config::get('NAILS_BRANDING')) {
-            return Config::get('NAILS_ASSETS_URL'). 'img/nails-logo.png';
+            return static::nails();
         }
 
         return null;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Retursn the path to the nails logo
+     *
+     * @return string
+     */
+    public static function nails(): string
+    {
+        return Config::get('NAILS_ASSETS_URL') . 'img/nails-logo.png';
     }
 }
