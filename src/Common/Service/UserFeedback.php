@@ -79,7 +79,30 @@ class UserFeedback
         $sType    = strtoupper(trim($sType));
         $sMessage = trim($sMessage);
 
+        $this->validateType($sType);
+
         $this->aMessages[$sType] = $sMessage;
+
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Validates a given type
+     *
+     * @param string $sType The type to validate
+     *
+     * @return $this
+     */
+    protected function validateType(string $sType): self
+    {
+        if (!in_array($sType, $this->getTypes())) {
+            throw new \InvalidArgumentException(sprintf(
+                '`type` must be one of: %s',
+                implode(', ', $this->getTypes())
+            ));
+        }
 
         return $this;
     }
@@ -112,7 +135,42 @@ class UserFeedback
     public function get(string $sType): string
     {
         $sType = strtoupper(trim($sType));
+        $this->validateType($sType);
+
         return $this->aMessages[$sType] ?? '';
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the valid types of feeback
+     *
+     * @return string[]
+     */
+    public function getTypes(): array
+    {
+        return [
+            static::TYPE_SUCCESS,
+            static::TYPE_ERROR,
+            static::TYPE_WARNING,
+            static::TYPE_INFO,
+            static::TYPE_POSITIVE,
+            static::TYPE_NEGATIVE,
+            static::TYPE_MESSAGE,
+            static::TYPE_NOTICE,
+        ];
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns all the stored messages
+     *
+     * @return string[]
+     */
+    public function getAll(): array
+    {
+        return $this->aMessages;
     }
 
     // --------------------------------------------------------------------------
@@ -129,6 +187,7 @@ class UserFeedback
         if (empty($sType)) {
             $this->aMessages = [];
         } else {
+            $this->validateType($sType);
             $this->aMessages[$sType] = '';
         }
 
