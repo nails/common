@@ -27,16 +27,16 @@ class UserFeedback
 {
     const SESSION_KEY = 'NailsUserFeedback';
 
-    const TYPE_SUCCESS = 'success';
-    const TYPE_ERROR   = 'error';
-    const TYPE_WARNING = 'warning';
-    const TYPE_INFO    = 'info';
+    const TYPE_SUCCESS = 'SUCCESS';
+    const TYPE_ERROR   = 'ERROR';
+    const TYPE_WARNING = 'WARNING';
+    const TYPE_INFO    = 'INFO';
 
     //  Deprecated
-    const TYPE_POSITIVE = 'positive';
-    const TYPE_NEGATIVE = 'negative';
-    const TYPE_MESSAGE  = 'message';
-    const TYPE_NOTICE   = 'notice';
+    const TYPE_POSITIVE = 'POSITIVE';
+    const TYPE_NEGATIVE = 'NEGATIVE';
+    const TYPE_MESSAGE  = 'MESSAGE';
+    const TYPE_NOTICE   = 'NOTICE';
 
     // --------------------------------------------------------------------------
 
@@ -99,8 +99,9 @@ class UserFeedback
     {
         if (!in_array($sType, $this->getTypes())) {
             throw new \InvalidArgumentException(sprintf(
-                '`type` must be one of: %s',
-                implode(', ', $this->getTypes())
+                '`type` must be one of: %s. "%s" received.',
+                implode(', ', $this->getTypes()),
+                $sType
             ));
         }
 
