@@ -60,8 +60,12 @@ class UserFeedback
      */
     public function __construct(Session $oSession = null)
     {
-        $this->oSession    = $oSession ?? Factory::service('Session');
-        $this->aMessages   = $this->oSession->getFlashData(static::SESSION_KEY) ?: [];
+        $this->oSession  = $oSession ?? Factory::service('Session');
+        $this->aMessages = json_decode($this->oSession->getFlashData(static::SESSION_KEY), true);
+
+        if (!is_array($this->aMessages)) {
+            $this->aMessages = [];
+        }
     }
 
     // --------------------------------------------------------------------------
@@ -119,8 +123,9 @@ class UserFeedback
     {
         $this->oSession->setFlashData(
             static::SESSION_KEY,
-            $this->aMessages
+            json_encode($this->aMessages)
         );
+
         return $this;
     }
 
