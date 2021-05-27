@@ -361,8 +361,8 @@ class ErrorHandler
 
         } else {
 
-            /** @var Session $oSession */
-            $oSession = Factory::service('Session');
+            /** @var UserFeedback $oSession */
+            $oUserFeedback = Factory::service('UserFeedback');
             /** @var Input $oInput */
             $oInput = Factory::service('Input');
 
@@ -370,7 +370,7 @@ class ErrorHandler
                 $sFlashMessage = 'Sorry, you need to be logged in to see that page.';
             }
 
-            $oSession->setFlashData('error', $sFlashMessage);
+            $oUserFeedback->error($sFlashMessage);
 
             if (is_null($sReturnUrl)) {
                 if ($oInput->server('REQUEST_URI')) {
