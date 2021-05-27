@@ -595,16 +595,17 @@ abstract class Base extends \MX_Controller
         /** @var UserFeedback $oUserFeedback */
         $oUserFeedback = Factory::service('UserFeedback');
 
-        $aData['error']    = $oUserFeedback->get('error') ?: $oSession->getFlashData('error');
-        $aData['negative'] = $oUserFeedback->get('negative') ?: $oSession->getFlashData('negative');
-        $aData['success']  = $oUserFeedback->get('success') ?: $oSession->getFlashData('success');
-        $aData['positive'] = $oUserFeedback->get('positive') ?: $oSession->getFlashData('positive');
-        $aData['info']     = $oUserFeedback->get('info') ?: $oSession->getFlashData('info');
-        $aData['warning']  = $oUserFeedback->get('message') ?: $oSession->getFlashData('warning');
+        //  @todo (Pablo - 2021-05-27) - Remove the fallback to the session
+        $aData['error']    = $oUserFeedback->getError() ?: $oSession->getFlashData('error');
+        $aData['success']  = $oUserFeedback->getSuccess() ?: $oSession->getFlashData('success');
+        $aData['info']     = $oUserFeedback->getInfo() ?: $oSession->getFlashData('info');
+        $aData['warning']  = $oUserFeedback->getMessage() ?: $oSession->getFlashData('warning');
 
-        //  @deprecated
-        $aData['message'] = $oUserFeedback->get('message') ?: $oSession->getFlashData('message');
-        $aData['notice']  = $oUserFeedback->get('notice') ?: $oSession->getFlashData('notice');
+        //  @deprecated (Pablo - 2021-05-27)
+        $aData['negative'] = $oUserFeedback->getNegative() ?: $oSession->getFlashData('negative');
+        $aData['positive'] = $oUserFeedback->getPositive() ?: $oSession->getFlashData('positive');
+        $aData['message'] = $oUserFeedback->getMessage() ?: $oSession->getFlashData('message');
+        $aData['notice']  = $oUserFeedback->getNotice() ?: $oSession->getFlashData('notice');
     }
 
     // --------------------------------------------------------------------------
@@ -627,8 +628,6 @@ abstract class Base extends \MX_Controller
         if (!empty($sCustomJs)) {
             $oAsset->inline($sCustomJs, 'JS');
         }
-
-        // --------------------------------------------------------------------------
 
         return $this;
     }
