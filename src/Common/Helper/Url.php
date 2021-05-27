@@ -76,6 +76,12 @@ class Url
 
         // --------------------------------------------------------------------------
 
+        /** @var \Nails\Common\Service\UserFeedback $oUserFeedback */
+        $oUserFeedback = Factory::service('UserFeedback');
+        $oUserFeedback->persist();
+
+        // --------------------------------------------------------------------------
+
         if (!preg_match('#^https?://#i', $sUrl)) {
             $sUrl = siteUrl($sUrl);
         }
