@@ -25,38 +25,45 @@ class Rebuild extends Base
      */
     protected function configure()
     {
-        $this->setName('db:rebuild');
-        $this->setDescription('Drops every table in the database and runs migrations');
-        $this->addOption(
-            'dbHost',
-            null,
-            InputOption::VALUE_OPTIONAL,
-            'Database Host'
-        );
-        $this->addOption(
-            'dbUser',
-            null,
-            InputOption::VALUE_OPTIONAL,
-            'Database User'
-        );
-        $this->addOption(
-            'dbPass',
-            null,
-            InputOption::VALUE_OPTIONAL,
-            'Database Password'
-        );
-        $this->addOption(
-            'dbName',
-            null,
-            InputOption::VALUE_OPTIONAL,
-            'Database Name'
-        );
-        $this->addOption(
-            'dbPort',
-            null,
-            InputOption::VALUE_OPTIONAL,
-            'Database Port'
-        );
+        $this
+            ->setName('db:rebuild')
+            ->setDescription('Drops every table in the database and runs migrations')
+            ->addOption(
+                'force',
+                null,
+                InputOption::VALUE_NONE,
+                'Forces the rebuild'
+            )
+            ->addOption(
+                'dbHost',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Database Host'
+            )
+            ->addOption(
+                'dbUser',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Database User'
+            )
+            ->addOption(
+                'dbPass',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Database Password'
+            )
+            ->addOption(
+                'dbName',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Database Name'
+            )
+            ->addOption(
+                'dbPort',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Database Port'
+            );
     }
 
     // --------------------------------------------------------------------------
