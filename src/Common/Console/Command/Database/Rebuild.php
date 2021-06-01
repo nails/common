@@ -86,7 +86,7 @@ class Rebuild extends Base
         // --------------------------------------------------------------------------
 
         //  Check environment
-        if (Environment::is(Environment::ENV_PROD)) {
+        if (Environment::is(Environment::ENV_PROD) && empty($oInput->getOption('force'))) {
             $this->banner('WARNING: The app is in PRODUCTION', 'error');
             $oOutput->writeln('<error>Aborting rebuild.</error>');
             return static::EXIT_CODE_FAILURE;
