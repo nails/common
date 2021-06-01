@@ -219,7 +219,7 @@ abstract class Base extends \MX_Controller
                 //  Load the encryption service. Set the package path so it is loaded correctly
                 //  (this runs early, before the paths are added)
                 get_instance()->load->add_package_path(Config::get('NAILS_COMMON_PATH'));
-                Factory::service('encrypt');
+                Factory::service('Encrypt');
 
                 $whitelistIp   = (array) appSetting(Settings\Site::KEY_MAINTENANCE_WHITELIST, Constants::MODULE_SLUG);
                 $isWhiteListed = isIpInRange($oInput->ipAddress(), $whitelistIp);
