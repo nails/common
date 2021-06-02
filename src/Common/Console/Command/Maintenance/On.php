@@ -2,6 +2,8 @@
 
 namespace Nails\Common\Console\Command\Maintenance;
 
+use Nails\Common\Constants;
+use Nails\Common\Settings\Site;
 use Nails\Console\Command\Base;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -44,6 +46,8 @@ class On extends Base
         parent::execute($oInput, $oOutput);
 
         touch(static::MAINTENANCE_FILE);
+
+        setAppSetting(Site::KEY_MAINTENANCE_ENABLED, Constants::MODULE_SLUG, true);
 
         $oOutput->writeln('Maintenance mode turned <comment>ON</comment>');
 

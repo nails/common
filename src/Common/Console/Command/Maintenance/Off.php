@@ -2,6 +2,8 @@
 
 namespace Nails\Common\Console\Command\Maintenance;
 
+use Nails\Common\Constants;
+use Nails\Common\Settings\Site;
 use Nails\Console\Command\Base;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -42,6 +44,8 @@ class Off extends Base
         if (is_file(On::MAINTENANCE_FILE)) {
             unlink(On::MAINTENANCE_FILE);
         }
+
+        setAppSetting(Site::KEY_MAINTENANCE_ENABLED, Constants::MODULE_SLUG, false);
 
         $oOutput->writeln('Maintenance mode turned <comment>OFF</comment>');
 
