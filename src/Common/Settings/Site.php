@@ -198,4 +198,32 @@ class Site implements Interfaces\Component\Settings
             $oMaintenanceBody,
         ];
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Takes a multi line input and converts it into an array
+     *
+     * @param string $sInput The input string
+     *
+     * @return array
+     */
+    protected function prepareWhitelist($sInput)
+    {
+        $sWhitelistRaw = $sInput;
+        $sWhitelistRaw = str_replace("\n\r", "\n", $sWhitelistRaw);
+        $aWhitelistRaw = explode("\n", $sWhitelistRaw);
+        $aWhitelist    = [];
+
+        foreach ($aWhitelistRaw as $sLine) {
+            $aWhitelist = array_merge(explode(',', $sLine), $aWhitelist);
+        }
+
+        $aWhitelist = array_map('trim', $aWhitelist);
+        $aWhitelist = array_unique($aWhitelist);
+        $aWhitelist = array_filter($aWhitelist);
+        $aWhitelist = array_values($aWhitelist);
+
+        return $aWhitelist;
+    }
 }
