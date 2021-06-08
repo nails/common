@@ -177,20 +177,9 @@ class Date extends Resource
     {
         if (!$this->raw) {
             return true;
-        } elseif ($oCompareWith instanceof \DateTime) {
-            //  Nothing to do
-        } elseif ($oCompareWith instanceof self) {
-            $oCompareWith = $oCompareWith->getDateTimeObject();
-        } else {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Expected object of type %s or %s, got %s',
-                    \DateTime::class,
-                    self::class,
-                    gettype($oCompareWith)
-                )
-            );
         }
+
+        $oCompareWith = $this->inferDateTimeObject($oCompareWith);
 
         return $this->getDateTimeObject() < $oCompareWith;
 
@@ -209,20 +198,9 @@ class Date extends Resource
     {
         if (!$this->raw) {
             return false;
-        } elseif ($oCompareWith instanceof \DateTime) {
-            //  Nothing to do
-        } elseif ($oCompareWith instanceof self) {
-            $oCompareWith = $oCompareWith->getDateTimeObject();
-        } else {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Expected object of type %s or %s, got %s',
-                    \DateTime::class,
-                    self::class,
-                    gettype($oCompareWith)
-                )
-            );
         }
+
+        $oCompareWith = $this->inferDateTimeObject($oCompareWith);
 
         return $this->getDateTimeObject() > $oCompareWith;
     }
@@ -259,6 +237,34 @@ class Date extends Resource
         /** @var \DateTime|self $oCompareWith */
         $oCompareWith = $oCompareWith ?? Factory::factory('DateTime');
         return $this->isAfter($oCompareWith);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Infers the date time object from the supplied object
+     *
+     * @param \Datetime|self $oDateTime The date to inspect
+     *
+     * @return \DateTime
+     */
+    protected function inferDateTimeObject($oDateTime): \DateTime
+    {
+        if ($oDateTime instanceof \DateTime) {
+            return $oDateTime;
+
+        } elseif ($oDateTime instanceof self) {
+            return $oDateTime->getDateTimeObject();
+        }
+
+        throw new \InvalidArgumentException(
+            sprintf(
+                'Expected object of type %s or %s, got %s',
+                \DateTime::class,
+                self::class,
+                gettype($oDateTime)
+            )
+        );
     }
 
     // --------------------------------------------------------------------------
