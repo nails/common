@@ -208,6 +208,45 @@ class Date extends Resource
     // --------------------------------------------------------------------------
 
     /**
+     * Returns whether the date is between two supplied dates
+     *
+     * @param \DateTime|self|null $oCompareWithLower The lower bound
+     * @param \DateTime|self|null $oCompareWithUpper The upper bound
+     * @param bool                $bInclusive        Whether to include the date bounds
+     *
+     * @return bool
+     */
+    public function isBetween($oCompareWithLower, $oCompareWithUpper, bool $bInclusive = true): bool
+    {
+        if (!$this->raw) {
+            return false;
+        }
+
+        $oCompareWithLower = $oCompareWithLower ? $this->inferDateTimeObject($oCompareWithLower) : null;
+        $oCompareWithUpper = $oCompareWithUpper ? $this->inferDateTimeObject($oCompareWithUpper) : null;
+
+        if ($oCompareWithLower) {
+            $bIsAfter = $bInclusive
+                ? $this->getDateTimeObject() >= $oCompareWithLower
+                : $this->getDateTimeObject() > $oCompareWithLower;
+        } else {
+            $bIsAfter = true;
+        }
+
+        if ($oCompareWithUpper) {
+            $bIsBefore = $bInclusive
+                ? $this->getDateTimeObject() <= $oCompareWithUpper
+                : $this->getDateTimeObject() < $oCompareWithUpper;
+        } else {
+            $bIsBefore = true;
+        }
+
+        return $bIsAfter && $bIsBefore;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Returns whether the date time is in the past
      *
      * @param \DateTime|self|null $oCompareWith The date to compare with
