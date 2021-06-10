@@ -149,6 +149,13 @@ if (!function_exists('form_field_timecode')) {
     }
 }
 
+if (!function_exists('form_field_upload')) {
+    function form_field_upload($aField, $aOptions = null, $sTip = '')
+    {
+        return Form\Field::upload($aField, $aOptions, $sTip);
+    }
+}
+
 if (!function_exists('form_field_submit')) {
     function form_field_submit($aField)
     {

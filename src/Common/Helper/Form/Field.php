@@ -1250,7 +1250,11 @@ class Field
      */
     public static function upload(array $aField)
     {
-        $aField['html'] = Form::upload($aField);
+        $aField['html'] = Form::upload(array_filter([
+            'name'   => ArrayHelper::get('key', $aField),
+            'accept' => ArrayHelper::get('accept', $aField),
+        ]));
+
         return static::html($aField);
     }
 
