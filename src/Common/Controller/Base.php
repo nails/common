@@ -599,7 +599,7 @@ abstract class Base extends \MX_Controller
         $aData['error']    = $oUserFeedback->getError() ?: $oSession->getFlashData('error');
         $aData['success']  = $oUserFeedback->getSuccess() ?: $oSession->getFlashData('success');
         $aData['info']     = $oUserFeedback->getInfo() ?: $oSession->getFlashData('info');
-        $aData['warning']  = $oUserFeedback->getMessage() ?: $oSession->getFlashData('warning');
+        $aData['warning']  = $oUserFeedback->getWarning() ?: $oSession->getFlashData('warning');
 
         //  @deprecated (Pablo - 2021-05-27)
         $aData['negative'] = $oUserFeedback->getNegative() ?: $oSession->getFlashData('negative');
