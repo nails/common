@@ -786,7 +786,7 @@ abstract class Base
 
             $oDb->transaction()->start();
             while ($oResult = $oResults->unbuffered_row()) {
-                if (!$this->delete($oResult->id)) {
+                if (!$this->delete((int) $oResult->id)) {
                     throw new ModelException('Failed to delete item with ID ' . $oResult->id . '. ' . $this->lastError());
                 }
             }
