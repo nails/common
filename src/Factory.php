@@ -662,4 +662,38 @@ class Factory
             return false;
         }
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * List factory keys
+     *
+     * @param string|null $sType      Filter by type
+     * @param string|null $sComponent Filter by component
+     *
+     * @return array
+     */
+    public static function listKeys(string $sType = null, string $sComponent = null): array
+    {
+        $aOut = [];
+
+        foreach (static::$aContainers as $sContainerComponent => $aContainer) {
+            if ($sComponent === null || $sComponent === $sContainerComponent) {
+
+                if (!array_key_exists($sContainerComponent, $aOut)) {
+                    $aOut[$sContainerComponent] = [];
+                }
+
+                /** @var \Pimple\Container $oItem */
+                foreach ($aContainer as $sContainerType => $oItem) {
+
+                    if ($sType === null || $sType === $sContainerType) {
+                        $aOut[$sContainerComponent][$sContainerType] = $oItem->keys();
+                    }
+                }
+            }
+        }
+
+        return $aOut;
+    }
 }
