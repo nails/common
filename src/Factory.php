@@ -21,6 +21,15 @@ use Pimple\Container;
 
 class Factory
 {
+    const TYPE_SERVICE  = 'SERVICE';
+    const TYPE_MODEL    = 'MODEL';
+    const TYPE_FACTORY  = 'FACTORY';
+    const TYPE_RESOURCE = 'RESOURCE';
+    const TYPE_HELPER   = 'HELPER';
+    const TYPE_PROPERTY = 'PROPERTY';
+
+    // --------------------------------------------------------------------------
+
     /**
      * Contains an array of containers; each component gets its own element so as
      * to avoid naming collisions.
@@ -34,7 +43,10 @@ class Factory
      *
      * @var array
      */
-    private static $aLoadedItems = ['SERVICES' => [], 'MODELS' => []];
+    private static $aLoadedItems = [
+        self::TYPE_SERVICE => [],
+        self::TYPE_MODEL   => [],
+    ];
 
     /**
      * Tracks which helpers have been loaded
@@ -66,11 +78,11 @@ class Factory
 
             //  Properties
             if (!empty($aComponentServices['properties'])) {
-                if (empty(self::$aContainers[$sComponentName]['properties'])) {
-                    self::$aContainers[$sComponentName]['properties'] = new Container();
+                if (empty(self::$aContainers[$sComponentName][self::TYPE_PROPERTY])) {
+                    self::$aContainers[$sComponentName][self::TYPE_PROPERTY] = new Container();
                 }
                 foreach ($aComponentServices['properties'] as $sKey => $mValue) {
-                    self::$aContainers[$sComponentName]['properties'][$sKey] = $mValue;
+                    self::$aContainers[$sComponentName][self::TYPE_PROPERTY][$sKey] = $mValue;
                 }
             }
 
@@ -83,11 +95,11 @@ class Factory
              * item's constructor
              */
             if (!empty($aComponentServices['services'])) {
-                if (empty(self::$aContainers[$sComponentName]['services'])) {
-                    self::$aContainers[$sComponentName]['services'] = new Container();
+                if (empty(self::$aContainers[$sComponentName][self::TYPE_SERVICE])) {
+                    self::$aContainers[$sComponentName][self::TYPE_SERVICE] = new Container();
                 }
                 foreach ($aComponentServices['services'] as $sKey => $cCallable) {
-                    self::$aContainers[$sComponentName]['services'][$sKey] = function () use ($sKey, $cCallable) {
+                    self::$aContainers[$sComponentName][self::TYPE_SERVICE][$sKey] = function () use ($sKey, $cCallable) {
                         return $cCallable;
                     };
                 }
@@ -102,11 +114,11 @@ class Factory
              * item's constructor
              */
             if (!empty($aComponentServices['models'])) {
-                if (empty(self::$aContainers[$sComponentName]['models'])) {
-                    self::$aContainers[$sComponentName]['models'] = new Container();
+                if (empty(self::$aContainers[$sComponentName][self::TYPE_MODEL])) {
+                    self::$aContainers[$sComponentName][self::TYPE_MODEL] = new Container();
                 }
                 foreach ($aComponentServices['models'] as $sKey => $cCallable) {
-                    self::$aContainers[$sComponentName]['models'][$sKey] = function () use ($cCallable) {
+                    self::$aContainers[$sComponentName][self::TYPE_MODEL][$sKey] = function () use ($cCallable) {
                         return $cCallable;
                     };
                 }
@@ -121,8 +133,8 @@ class Factory
              * item's constructor
              */
             if (!empty($aComponentServices['factories'])) {
-                if (empty(self::$aContainers[$sComponentName]['factories'])) {
-                    self::$aContainers[$sComponentName]['factories'] = new Container();
+                if (empty(self::$aContainers[$sComponentName][self::TYPE_FACTORY])) {
+                    self::$aContainers[$sComponentName][self::TYPE_FACTORY] = new Container();
                 }
                 foreach ($aComponentServices['factories'] as $sKey => $cCallable) {
 
@@ -130,7 +142,7 @@ class Factory
                         return $cCallable;
                     };
 
-                    self::$aContainers[$sComponentName]['factories'][$sKey] = self::$aContainers[$sComponentName]['factories']
+                    self::$aContainers[$sComponentName][self::TYPE_FACTORY][$sKey] = self::$aContainers[$sComponentName][self::TYPE_FACTORY]
                         ->factory($cWrapper);
                 }
             }
@@ -144,8 +156,8 @@ class Factory
              * item's constructor
              */
             if (!empty($aComponentServices['resources'])) {
-                if (empty(self::$aContainers[$sComponentName]['resources'])) {
-                    self::$aContainers[$sComponentName]['resources'] = new Container();
+                if (empty(self::$aContainers[$sComponentName][self::TYPE_RESOURCE])) {
+                    self::$aContainers[$sComponentName][self::TYPE_RESOURCE] = new Container();
                 }
                 foreach ($aComponentServices['resources'] as $sKey => $cCallable) {
 
@@ -153,7 +165,7 @@ class Factory
                         return $cCallable;
                     };
 
-                    self::$aContainers[$sComponentName]['resources'][$sKey] = self::$aContainers[$sComponentName]['resources']
+                    self::$aContainers[$sComponentName][self::TYPE_RESOURCE][$sKey] = self::$aContainers[$sComponentName][self::TYPE_RESOURCE]
                         ->factory($cWrapper);
                 }
             }
@@ -252,7 +264,7 @@ class Factory
      */
     public static function property(string $sPropertyName, ?string $sComponentName = '')
     {
-        $mProperty = self::getService('properties', $sPropertyName, $sComponentName);
+        $mProperty = self::getService(self::TYPE_PROPERTY, $sPropertyName, $sComponentName);
 
         if (is_callable($mProperty)) {
             return $mProperty();
@@ -277,14 +289,13 @@ class Factory
     {
         $sComponentName = empty($sComponentName) ? \Nails\Common\Constants::MODULE_SLUG : $sComponentName;
 
-        if (!self::$aContainers[$sComponentName]['properties']->offsetExists($sPropertyName)) {
+        if (!self::$aContainers[$sComponentName][self::TYPE_PROPERTY]->offsetExists($sPropertyName)) {
             throw new FactoryException(
-                'Property "' . $sPropertyName . '" is not provided by component "' . $sComponentName . '"',
-                0
+                'Property "' . $sPropertyName . '" is not provided by component "' . $sComponentName . '"'
             );
         }
 
-        self::$aContainers[$sComponentName]['properties'][$sPropertyName] = $mPropertyValue;
+        self::$aContainers[$sComponentName][self::TYPE_PROPERTY][$sPropertyName] = $mPropertyValue;
     }
 
     // --------------------------------------------------------------------------
@@ -302,8 +313,8 @@ class Factory
     public static function service(string $sServiceName, ?string $sComponentName = ''): object
     {
         return static::getServiceOrModel(
-            static::$aLoadedItems['SERVICES'],
-            'services',
+            static::$aLoadedItems[self::TYPE_SERVICE],
+            self::TYPE_SERVICE,
             $sServiceName,
             $sComponentName,
             array_slice(func_get_args(), 2)
@@ -324,8 +335,8 @@ class Factory
     public static function model(string $sModelName, ?string $sComponentName = ''): Base
     {
         return static::getServiceOrModel(
-            static::$aLoadedItems['MODELS'],
-            'models',
+            static::$aLoadedItems[self::TYPE_MODEL],
+            self::TYPE_MODEL,
             $sModelName,
             $sComponentName,
             array_slice(func_get_args(), 2)
@@ -393,7 +404,7 @@ class Factory
     public static function factory(string $sFactoryName, ?string $sComponentName = ''): object
     {
         return call_user_func_array(
-            self::getService('factories', $sFactoryName, $sComponentName),
+            self::getService(self::TYPE_FACTORY, $sFactoryName, $sComponentName),
             array_slice(func_get_args(), 2)
         );
     }
@@ -412,7 +423,7 @@ class Factory
     public static function resource(string $sResourceName, ?string $sComponentName = ''): Resource
     {
         return call_user_func_array(
-            self::getService('resources', $sResourceName, $sComponentName),
+            self::getService(self::TYPE_RESOURCE, $sResourceName, $sComponentName),
             array_slice(func_get_args(), 2)
         );
     }
@@ -513,6 +524,7 @@ class Factory
         array_push($aComponents, $oApp);
 
         foreach ($aComponents as $oModule) {
+
             //  Helpers
             if (!empty($oModule->autoload->helpers)) {
                 foreach ($oModule->autoload->helpers as $sHelper) {
@@ -524,6 +536,7 @@ class Factory
                     }
                 }
             }
+
             //  Services
             if (!empty($oModule->autoload->services)) {
                 foreach ($oModule->autoload->services as $sService) {
@@ -549,14 +562,21 @@ class Factory
      */
     protected static function extractAutoLoadItemsFromComposerJson(string $sPath): \stdClass
     {
-        $oOut = (object) ['helpers' => [], 'services' => []];
+        $oOut = (object) [
+            'helpers'  => [],
+            'services' => [],
+        ];
+
         if (File::fileExistsCS($sPath)) {
+
             $oAppComposer = json_decode(file_get_contents($sPath));
+
             if (!empty($oAppComposer->extra->nails->autoload->helpers)) {
                 foreach ($oAppComposer->extra->nails->autoload->helpers as $sHelper) {
                     $oOut->helpers[] = $sHelper;
                 }
             }
+
             if (!empty($oAppComposer->extra->nails->autoload->services)) {
                 foreach ($oAppComposer->extra->nails->autoload->services as $sService) {
                     $oOut->services[] = $sService;
@@ -580,7 +600,7 @@ class Factory
     public static function destroyService(string $sServiceName, ?string $sComponentName = ''): bool
     {
         return static::destroyServiceOrModel(
-            static::$aLoadedItems['SERVICES'],
+            static::$aLoadedItems[self::TYPE_SERVICE],
             null,
             $sServiceName,
             $sComponentName
@@ -600,7 +620,7 @@ class Factory
     public static function destroyModel(string $sModelName, ?string $sComponentName = ''): bool
     {
         return static::destroyServiceOrModel(
-            static::$aLoadedItems['MODELS'],
+            static::$aLoadedItems[self::TYPE_MODEL],
             null,
             $sModelName,
             $sComponentName
@@ -618,15 +638,15 @@ class Factory
      */
     public static function destroy(object $oInstance): bool
     {
-        foreach (static::$aLoadedItems['SERVICES'] as $sKey => $oItem) {
+        foreach (static::$aLoadedItems[self::TYPE_SERVICE] as $sKey => $oItem) {
             if ($oItem === $oInstance) {
-                return static::destroyServiceOrModel(static::$aLoadedItems['SERVICES'], $sKey);
+                return static::destroyServiceOrModel(static::$aLoadedItems[self::TYPE_SERVICE], $sKey);
             }
         }
 
-        foreach (static::$aLoadedItems['MODELS'] as $sKey => $oItem) {
+        foreach (static::$aLoadedItems[self::TYPE_MODEL] as $sKey => $oItem) {
             if ($oItem === $oInstance) {
-                return static::destroyServiceOrModel(static::$aLoadedItems['MODELS'], $sKey);
+                return static::destroyServiceOrModel(static::$aLoadedItems[self::TYPE_MODEL], $sKey);
             }
         }
 
