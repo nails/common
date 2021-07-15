@@ -245,6 +245,68 @@ class Database
     // --------------------------------------------------------------------------
 
     /**
+     * Returns the connection's host
+     *
+     * @return string
+     */
+    public function getDbHost(): string
+    {
+        return (string) Config::get('DB_HOST');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the connection's username
+     *
+     * @return string
+     */
+    public function getDbUsername(): string
+    {
+        return (string) Config::get('DB_USERNAME');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the connection's password
+     *
+     * @return string
+     */
+    public function getDbPassword(): string
+    {
+        return (string) Config::get('DB_HOST');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the connection's port
+     *
+     * @return string
+     */
+    public function getDbPort(): string
+    {
+        return (string) Config::get('DB_PORT');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the connection's database
+     *
+     * @return string
+     */
+    public function getDbDatabase(): string
+    {
+        return Environment::is([Environment::ENV_TEST, Environment::ENV_HTTP_TEST])
+            ? Testing::DB_NAME
+            : (string) Config::get('DB_DATABASE');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Clears the query history and other memory hogs
      *
      * @return Database
