@@ -363,37 +363,44 @@ return [
     ],
 
     'factories' => [
-        'AssetCriticalCss'        => function (Service\Asset $oAsset): \Nails\Common\Factory\Asset\CriticalCss {
+        'AssetCriticalCss'           => function (Service\Asset $oAsset): \Nails\Common\Factory\Asset\CriticalCss {
             if (class_exists('\App\Common\Factory\Asset\CriticalCss')) {
                 return new \App\Common\Factory\Asset\CriticalCss($oAsset);
             } else {
                 return new \Nails\Common\Factory\Asset\CriticalCss($oAsset);
             }
         },
-        'ComponentSetting'        => function (): \Nails\Components\Setting {
+        'ComponentSetting'           => function (): \Nails\Components\Setting {
             return new \Nails\Components\Setting();
         },
-        'DatabaseTransaction'     => function (Service\Database $oDatabase): \Nails\Common\Factory\Database\Transaction {
+        'DatabaseForeignKeyCheck'    => function (Service\Database $oDatabase): \Nails\Common\Factory\Database\ForeignKeyCheck {
+            if (class_exists('\App\Common\Factory\Database\ForeignKeyCheck')) {
+                return new \App\Common\Factory\Database\ForeignKeyCheck($oDatabase);
+            } else {
+                return new \Nails\Common\Factory\Database\ForeignKeyCheck($oDatabase);
+            }
+        },
+        'DatabaseTransaction'        => function (Service\Database $oDatabase): \Nails\Common\Factory\Database\Transaction {
             if (class_exists('\App\Common\Factory\Database\Transaction')) {
                 return new \App\Common\Factory\Database\Transaction($oDatabase);
             } else {
                 return new \Nails\Common\Factory\Database\Transaction($oDatabase);
             }
         },
-        'DateTime'                => function ($sTime = null, DateTimeZone $oTimeZone = null): \DateTime {
+        'DateTime'                   => function ($sTime = null, DateTimeZone $oTimeZone = null): \DateTime {
             return new \DateTime(
                 $sTime ?? Config::get('NAILS_TIME_NOW', 'now'),
                 $oTimeZone
             );
         },
-        'EventSubscription'       => function (): \Nails\Common\Events\Subscription {
+        'EventSubscription'          => function (): \Nails\Common\Events\Subscription {
             if (class_exists('\App\Common\Events\Subscription')) {
                 return new \App\Common\Events\Subscription();
             } else {
                 return new \Nails\Common\Events\Subscription();
             }
         },
-        'FormValidationValidator' => function (
+        'FormValidationValidator'    => function (
             array $aRules = [],
             array $aMessages = [],
             array $aData = []
@@ -404,14 +411,14 @@ return [
                 return new \Nails\Common\Factory\Service\FormValidation\Validator($aRules, $aMessages, $aData);
             }
         },
-        'HttpClient'              => function (array $aConfig = []): \GuzzleHttp\Client {
+        'HttpClient'                 => function (array $aConfig = []): \GuzzleHttp\Client {
             if (class_exists('\App\Common\HttpClient')) {
                 return new \App\Common\HttpClient($aConfig);
             } else {
                 return new \GuzzleHttp\Client($aConfig);
             }
         },
-        'HttpRequestDelete'       => function (
+        'HttpRequestDelete'          => function (
             string $sBaseUri = '',
             string $sPath = '',
             array $aHeaders = []
@@ -422,7 +429,7 @@ return [
                 return new \Nails\Common\Factory\HttpRequest\Delete($sBaseUri, $sPath, $aHeaders);
             }
         },
-        'HttpRequestGet'          => function (
+        'HttpRequestGet'             => function (
             string $sBaseUri = '',
             string $sPath = '',
             array $aHeaders = []
@@ -433,7 +440,7 @@ return [
                 return new \Nails\Common\Factory\HttpRequest\Get($sBaseUri, $sPath, $aHeaders);
             }
         },
-        'HttpRequestPatch'        => function (
+        'HttpRequestPatch'           => function (
             string $sBaseUri = '',
             string $sPath = '',
             array $aHeaders = []
@@ -444,7 +451,7 @@ return [
                 return new \Nails\Common\Factory\HttpRequest\Patch($sBaseUri, $sPath, $aHeaders);
             }
         },
-        'HttpRequestPost'         => function (
+        'HttpRequestPost'            => function (
             string $sBaseUri = '',
             string $sPath = '',
             array $aHeaders = []
@@ -455,7 +462,7 @@ return [
                 return new \Nails\Common\Factory\HttpRequest\Post($sBaseUri, $sPath, $aHeaders);
             }
         },
-        'HttpRequestPut'          => function (
+        'HttpRequestPut'             => function (
             string $sBaseUri = '',
             string $sPath = '',
             array $aHeaders = []
@@ -466,7 +473,7 @@ return [
                 return new \Nails\Common\Factory\HttpRequest\Put($sBaseUri, $sPath, $aHeaders);
             }
         },
-        'HttpRequestOptions'      => function (
+        'HttpRequestOptions'         => function (
             string $sBaseUri = '',
             string $sPath = '',
             array $aHeaders = []
@@ -477,7 +484,7 @@ return [
                 return new \Nails\Common\Factory\HttpRequest\Options($sBaseUri, $sPath, $aHeaders);
             }
         },
-        'HttpRequestHead'         => function (
+        'HttpRequestHead'            => function (
             string $sBaseUri = '',
             string $sPath = '',
             array $aHeaders = []
@@ -488,7 +495,7 @@ return [
                 return new \Nails\Common\Factory\HttpRequest\Head($sBaseUri, $sPath, $aHeaders);
             }
         },
-        'HttpResponse'            => function (
+        'HttpResponse'               => function (
             GuzzleHttp\Psr7\Response $oClient,
             \Nails\Common\Factory\HttpRequest $oRequest
         ): \Nails\Common\Factory\HttpResponse {
@@ -498,7 +505,7 @@ return [
                 return new \Nails\Common\Factory\HttpResponse($oClient, $oRequest);
             }
         },
-        'Locale'                  => function (
+        'Locale'                     => function (
             \Nails\Common\Factory\Locale\Language $oLanguage = null,
             \Nails\Common\Factory\Locale\Region $oRegion = null,
             \Nails\Common\Factory\Locale\Script $oScript = null
@@ -509,7 +516,7 @@ return [
                 return new \Nails\Common\Factory\Locale($oLanguage, $oRegion, $oScript);
             }
         },
-        'LocaleLanguage'          => function (
+        'LocaleLanguage'             => function (
             string $sLabel = ''
         ): \Nails\Common\Factory\Locale\Language {
             if (class_exists('\App\Common\Factory\Locale\Language')) {
@@ -518,7 +525,7 @@ return [
                 return new \Nails\Common\Factory\Locale\Language($sLabel);
             }
         },
-        'LocaleRegion'            => function (
+        'LocaleRegion'               => function (
             string $sLabel = ''
         ): \Nails\Common\Factory\Locale\Region {
             if (class_exists('\App\Common\Factory\Locale\Region')) {
@@ -527,7 +534,7 @@ return [
                 return new \Nails\Common\Factory\Locale\Region($sLabel);
             }
         },
-        'LocaleScript'            => function (
+        'LocaleScript'               => function (
             string $sLabel = ''
         ): \Nails\Common\Factory\Locale\Script {
             if (class_exists('\App\Common\Factory\Locale\Script')) {
@@ -536,25 +543,39 @@ return [
                 return new \Nails\Common\Factory\Locale\Script($sLabel);
             }
         },
-        'Logger'                  => function (): \Nails\Common\Factory\Logger {
+        'Logger'                     => function (): \Nails\Common\Factory\Logger {
             if (class_exists('\App\Common\Factory\Logger')) {
                 return new \App\Common\Factory\Logger();
             } else {
                 return new \Nails\Common\Factory\Logger();
             }
         },
-        'ModelField'              => function (): \Nails\Common\Factory\Model\Field {
+        'ModelField'                 => function (): \Nails\Common\Factory\Model\Field {
             if (class_exists('\App\Common\Factory\Model\Field')) {
                 return new \App\Common\Factory\Model\Field();
             } else {
                 return new \Nails\Common\Factory\Model\Field();
             }
         },
-        'Pagination'              => function (): \Nails\Common\Factory\Pagination {
+        'Pagination'                 => function (): \Nails\Common\Factory\Pagination {
             if (class_exists('\App\Common\Factory\Pagination')) {
                 return new \App\Common\Factory\Pagination();
             } else {
                 return new \Nails\Common\Factory\Pagination();
+            }
+        },
+        'PDODatabaseForeignKeyCheck' => function (): \Nails\Common\Factory\PDODatabase\ForeignKeyCheck {
+            if (class_exists('\App\Common\Factory\PDODatabase\ForeignKeyCheck')) {
+                return new \App\Common\Factory\PDODatabase\ForeignKeyCheck();
+            } else {
+                return new \Nails\Common\Factory\PDODatabase\ForeignKeyCheck;
+            }
+        },
+        'PDODatabaseTransaction'     => function (): \Nails\Common\Factory\PDODatabase\Transaction {
+            if (class_exists('\App\Common\Factory\PDODatabase\Transaction')) {
+                return new \App\Common\Factory\PDODatabase\Transaction();
+            } else {
+                return new \Nails\Common\Factory\PDODatabase\Transaction;
             }
         },
     ],

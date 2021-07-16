@@ -13,6 +13,10 @@ namespace Nails\Common\Service;
 use Exception;
 use Nails\Common\Exception\Database\ConnectionException;
 use Nails\Common\Exception\Database\TransactionException;
+use Nails\Common\Exception\FactoryException;
+use Nails\Common\Factory\PDODatabase\ForeignKeyCheck;
+use Nails\Common\Factory\PDODatabase\Transaction;
+use Nails\Factory;
 use PDO;
 use PDOStatement;
 
@@ -29,13 +33,6 @@ class PDODatabase
      * @var PDO
      */
     protected $oDb;
-
-    /**
-     * Whether a transaction is currently running or not
-     *
-     * @var bool
-     */
-    protected $bIsTransactionRunning = false;
 
     // --------------------------------------------------------------------------
 
@@ -185,93 +182,36 @@ class PDODatabase
     // --------------------------------------------------------------------------
 
     /**
-     * Starts a DB transaction
+     * Returns the Transaction object
      *
-     * @return $this
-     * @throws TransactionException
+     * @return Transaction
      * @throws ConnectionException
+     * @throws FactoryException
      */
-    public function transactionStart(): self
+    public function transaction(): Transaction
     {
         if (empty($this->oDb)) {
             $this->connect();
         }
 
-        try {
-
-            $this->oDb->beginTransaction();
-            $this->bIsTransactionRunning = true;
-
-        } catch (Exception $e) {
-            throw new TransactionException($e->getMessage(), $e->getCode());
-        }
-
-        return $this;
+        return Factory::factory('PDODatabaseTransaction', null, $this);
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Commits a DB transaction
+     * Returns the ForeignKeyCheck object
      *
-     * @return $this
-     * @throws TransactionException
+     * @return ForeignKeyCheck
      * @throws ConnectionException
+     * @throws FactoryException
      */
-    public function transactionCommit(): self
+    public function foreignKeyCheck(): ForeignKeyCheck
     {
         if (empty($this->oDb)) {
             $this->connect();
         }
 
-        try {
-
-            $this->oDb->commit();
-            $this->bIsTransactionRunning = false;
-
-        } catch (Exception $e) {
-            throw new TransactionException($e->getMessage(), $e->getCode());
-        }
-
-        return $this;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Rolls back a DB transaction
-     *
-     * @return $this
-     * @throws TransactionException
-     * @throws ConnectionException
-     */
-    public function transactionRollback(): self
-    {
-        if (empty($this->oDb)) {
-            $this->connect();
-        }
-
-        try {
-
-            $this->oDb->rollback();
-            $this->bIsTransactionRunning = false;
-
-        } catch (Exception $e) {
-            throw new TransactionException($e->getMessage(), $e->getCode());
-        }
-
-        return $this;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Returns whether a transaction is currently running
-     *
-     * @return bool
-     */
-    public function isTransactionRunning(): bool
-    {
-        return $this->bIsTransactionRunning;
+        return Factory::factory('PDODatabaseForeignKeyCheck', null, $this);
     }
 }

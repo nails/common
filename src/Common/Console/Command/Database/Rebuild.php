@@ -107,13 +107,13 @@ class Rebuild extends Base
         }
 
         //  Get the DB object
+        /** @var \Nails\Common\Service\PDODatabase $oDb */
         $oDb = Factory::service('PDODatabase');
         $oDb->connect($sDbHost, $sDbUser, $sDbPass, $sDbName, $iDbPort);
 
         // --------------------------------------------------------------------------
 
         //  Which tables are we going to drop; all those which match our prefixes
-        $oDb      = Factory::service('PDODatabase');
         $oResult  = $oDb->query('SHOW TABLES');
         $aResults = $oResult->fetchAll(\PDO::FETCH_OBJ);
         $aTables  = [];
@@ -136,11 +136,16 @@ class Rebuild extends Base
         if ($this->confirm('Continue?', true)) {
             $oOutput->writeln('');
             $oOutput->write('Dropping tables... ');
-            $oDb->query('SET FOREIGN_KEY_CHECKS = 0;');
+
+            $oForeignKeyChecks = $oDb->foreignKeyCheck();
+            $oForeignKeyChecks->off();
+
             foreach ($aTables as $sTable) {
                 $oDb->query('DROP TABLE IF EXISTS `' . $sTable . '`;');
             }
-            $oDb->query('SET FOREIGN_KEY_CHECKS = 1;');
+
+            $oForeignKeyChecks->on();
+
             $oOutput->writeln('<info>done</info>');
             $oOutput->write('Migrating database... ');
             $iExitCode = $this->callCommand(

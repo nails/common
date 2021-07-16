@@ -178,12 +178,10 @@ class Migrate extends Base
             $iNumMigrations += !empty($aEnabledModules) ? count($aEnabledModules) : 0;
 
             //  Disable foreign key checks
-            $oResult = $this->oDb->query('SHOW Variables WHERE Variable_name=\'FOREIGN_KEY_CHECKS\'')
-                ->fetch(\PDO::FETCH_OBJ);
-
-            $sOldForeignKeyChecks = $oResult->Value;
-
-            $this->oDb->query('SET FOREIGN_KEY_CHECKS = 0;');
+            $oForeignKeyChecks = $this->oDb->foreignKeyCheck();
+            $oForeignKeyChecks
+                ->saveCurrent()
+                ->off();
 
             //  Migrate the modules
             if (!empty($aEnabledModules)) {
@@ -199,10 +197,8 @@ class Migrate extends Base
                 }
             }
 
-            // --------------------------------------------------------------------------
-
             //  Restore previous foreign key checks
-            $this->oDb->query('SET FOREIGN_KEY_CHECKS = \'' . $sOldForeignKeyChecks . '\';');
+            $oForeignKeyChecks->restorePrevious();
 
             // --------------------------------------------------------------------------
 

@@ -829,9 +829,6 @@ class Model extends BaseMaker
         $oLocale = Factory::service('Locale');
 
         $aQueries = [
-            //  Disable foreign key checks so we can shift the tables about
-            'SET FOREIGN_KEY_CHECKS = 0;',
-
             //  Rename the existing table (and data)
             'RENAME TABLE `' . $oModel->table_with_prefix . '` TO `' . $oModel->table_with_prefix . '_localised`;',
 
@@ -857,14 +854,17 @@ class Model extends BaseMaker
             //  Update the columns with the default language
             'UPDATE `' . $oModel->table_with_prefix . '_localised` SET `language` = "' . $oLocale->get()->getLanguage() . '"',
             'UPDATE `' . $oModel->table_with_prefix . '_localised` SET `region` = "' . $oLocale->get()->getRegion() . '"',
-
-            //  Re-enable foreign key checks
-            'SET FOREIGN_KEY_CHECKS = 1;',
         ];
+
+        //  Disable foreign key checks so we can shift the tables about
+        $oForeignKeyChecks = $oDb->foreignKeyCheck();
+        $oForeignKeyChecks->off();
 
         array_walk($aQueries, function ($sQuery) use ($oDb) {
             $oDb->query($sQuery);
         });
+
+        $oForeignKeyChecks->on();
 
         $this->warning(array_merge(['Remember to add migrations!', ''], $aQueries));
 

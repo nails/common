@@ -20,6 +20,7 @@ use CI_DB_mysqli_driver;
 use Nails\Common\Exception\Database\ConnectionException;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Factory\Database\Transaction;
+use Nails\Common\Factory\Database\ForeignKeyCheck;
 use Nails\Config;
 use Nails\Environment;
 use Nails\Factory;
@@ -130,9 +131,6 @@ class Database
      * @var CI_DB_mysqli_driver
      */
     private $oDb;
-
-    /** @var Transaction */
-    protected $oTransaction;
 
     // --------------------------------------------------------------------------
 
@@ -385,11 +383,20 @@ class Database
      */
     public function transaction(): Transaction
     {
-        if (empty($this->oTransaction)) {
-            $this->oTransaction = Factory::factory('DatabaseTransaction', null, $this);
-        }
+        return Factory::factory('DatabaseTransaction', null, $this);
+    }
 
-        return $this->oTransaction;
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the ForeignKeyCheck object
+     *
+     * @return ForeignKeyCheck
+     * @throws \Nails\Common\Exception\FactoryException
+     */
+    public function foreignKeyCheck(): ForeignKeyCheck
+    {
+        return Factory::factory('DatabaseForeignKeyCheck', null, $this);
     }
 
     // --------------------------------------------------------------------------
