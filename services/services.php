@@ -564,18 +564,22 @@ return [
                 return new \Nails\Common\Factory\Pagination();
             }
         },
-        'PDODatabaseForeignKeyCheck' => function (): \Nails\Common\Factory\PDODatabase\ForeignKeyCheck {
+        'PDODatabaseForeignKeyCheck' => function (
+            Service\PDODatabase $oDatabase
+        ): \Nails\Common\Factory\PDODatabase\ForeignKeyCheck {
             if (class_exists('\App\Common\Factory\PDODatabase\ForeignKeyCheck')) {
-                return new \App\Common\Factory\PDODatabase\ForeignKeyCheck();
+                return new \App\Common\Factory\PDODatabase\ForeignKeyCheck($oDatabase);
             } else {
-                return new \Nails\Common\Factory\PDODatabase\ForeignKeyCheck;
+                return new \Nails\Common\Factory\PDODatabase\ForeignKeyCheck($oDatabase);
             }
         },
-        'PDODatabaseTransaction'     => function (): \Nails\Common\Factory\PDODatabase\Transaction {
+        'PDODatabaseTransaction'     => function (
+            Service\PDODatabase $oDatabase
+        ): \Nails\Common\Factory\PDODatabase\Transaction {
             if (class_exists('\App\Common\Factory\PDODatabase\Transaction')) {
-                return new \App\Common\Factory\PDODatabase\Transaction();
+                return new \App\Common\Factory\PDODatabase\Transaction($oDatabase);
             } else {
-                return new \Nails\Common\Factory\PDODatabase\Transaction;
+                return new \Nails\Common\Factory\PDODatabase\Transaction($oDatabase);
             }
         },
     ],
