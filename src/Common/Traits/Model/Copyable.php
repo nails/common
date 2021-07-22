@@ -155,9 +155,11 @@ trait Copyable
 
                 //  Base model
                 $this->getColumnId(),
-                $this->getColumn('created_by'),
-                $this->getColumn('modified_by'),
                 $this->getColumnIsDeleted(),
+
+                //  Trait\Model\User
+                method_exists($this, 'getColumnCreatedBy') ? $this->getColumnCreatedBy() : null,
+                method_exists($this, 'getColumnModifiedBy') ? $this->getColumnModifiedBy() : null,
 
                 //  Trait\Model\Slug
                 method_exists($this, 'getColumnSlug') ? $this->getColumnSlug() : null,
