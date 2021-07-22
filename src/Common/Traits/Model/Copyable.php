@@ -159,13 +159,13 @@ trait Copyable
                 $this->getColumn('modified_by'),
                 $this->getColumnIsDeleted(),
 
-                //  Tait\Model\Slug
+                //  Trait\Model\Slug
                 method_exists($this, 'getColumnSlug') ? $this->getColumnSlug() : null,
 
-                //  Tait\Model\Token
+                //  Trait\Model\Token
                 method_exists($this, 'getColumnToken') ? $this->getColumnToken() : null,
 
-                //  Tait\Model\Timestamps
+                //  Trait\Model\Timestamps
                 method_exists($this, 'getColumnCreated') ? $this->getColumnCreated() : null,
                 method_exists($this, 'getColumnModified') ? $this->getColumnModified() : null,
             ]));
