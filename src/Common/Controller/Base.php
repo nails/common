@@ -596,16 +596,16 @@ abstract class Base extends \MX_Controller
         $oUserFeedback = Factory::service('UserFeedback');
 
         //  @todo (Pablo - 2021-05-27) - Remove the fallback to the session
-        $aData['error']    = $oUserFeedback->getError() ?: $oSession->getFlashData('error');
-        $aData['success']  = $oUserFeedback->getSuccess() ?: $oSession->getFlashData('success');
-        $aData['info']     = $oUserFeedback->getInfo() ?: $oSession->getFlashData('info');
-        $aData['warning']  = $oUserFeedback->getWarning() ?: $oSession->getFlashData('warning');
+        $aData['error']   = $oUserFeedback->getError() ?: $oSession->getFlashData('error');
+        $aData['success'] = $oUserFeedback->getSuccess() ?: $oSession->getFlashData('success');
+        $aData['info']    = $oUserFeedback->getInfo() ?: $oSession->getFlashData('info');
+        $aData['warning'] = $oUserFeedback->getWarning() ?: $oSession->getFlashData('warning');
 
         //  @deprecated (Pablo - 2021-05-27)
         $aData['negative'] = $oUserFeedback->getNegative() ?: $oSession->getFlashData('negative');
         $aData['positive'] = $oUserFeedback->getPositive() ?: $oSession->getFlashData('positive');
-        $aData['message'] = $oUserFeedback->getMessage() ?: $oSession->getFlashData('message');
-        $aData['notice']  = $oUserFeedback->getNotice() ?: $oSession->getFlashData('notice');
+        $aData['message']  = $oUserFeedback->getMessage() ?: $oSession->getFlashData('message');
+        $aData['notice']   = $oUserFeedback->getNotice() ?: $oSession->getFlashData('notice');
     }
 
     // --------------------------------------------------------------------------
