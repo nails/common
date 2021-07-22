@@ -62,6 +62,15 @@ trait Localised
     // --------------------------------------------------------------------------
 
     /**
+     * Returns the column to use as the is_deleted
+     *
+     * @return string|null
+     */
+    abstract public function getColumnIsDeleted(): ?string;
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Returns the column to use for the locale language
      *
      * @return string
@@ -483,7 +492,7 @@ trait Localised
             } else {
                 $bResult = $this->update(
                     $iId,
-                    [$this->getColumn('is_deleted') => true],
+                    [$this->getColumnIsDeleted() => true],
                     $oLocale
                 );
             }
@@ -558,7 +567,7 @@ trait Localised
                 'Restore not available when destructive delete is enabled'
             );
 
-        } elseif ($this->update($iId, [$this->getColumn('is_deleted') => false], $oLocale)) {
+        } elseif ($this->update($iId, [$this->getColumnIsDeleted() => false], $oLocale)) {
             $this->triggerEvent(static::EVENT_RESTORED, [$iId]);
             return true;
         }

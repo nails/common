@@ -47,6 +47,15 @@ trait Copyable
     // --------------------------------------------------------------------------
 
     /**
+     * Returns the column to use as the is_deleted
+     *
+     * @return string|null
+     */
+    abstract public function getColumnIsDeleted(): ?string;
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Returns protected property $table
      *
      * @param bool $bIncludePrefix Whether to include the table's alias
@@ -143,11 +152,12 @@ trait Copyable
         $aColumns = array_keys($this->describeFields());
         $aColumns = array_filter($aColumns, function ($sColumn) {
             return !in_array($sColumn, array_filter([
+
                 //  Base model
                 $this->getColumnId(),
                 $this->getColumn('created_by'),
                 $this->getColumn('modified_by'),
-                $this->getColumn('is_deleted'),
+                $this->getColumnIsDeleted(),
 
                 //  Tait\Model\Slug
                 method_exists($this, 'getColumnSlug') ? $this->getColumnSlug() : null,
