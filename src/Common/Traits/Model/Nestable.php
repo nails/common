@@ -46,6 +46,15 @@ trait Nestable
     // --------------------------------------------------------------------------
 
     /**
+     * Returns the column to use as the is_deleted
+     *
+     * @return string|null
+     */
+    abstract public function getColumnIsDeleted(): ?string;
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Returns protected property $table
      *
      * @param bool $bIncludePrefix Whether to include the table's alias
@@ -282,7 +291,7 @@ trait Nestable
             $this->getColumnParentId(),
         ]);
         if (!$this->isDestructiveDelete()) {
-            $oDb->where($this->getColumn('deleted'), false);
+            $oDb->where($this->getColumnIsDeleted(), false);
         }
         $oDb->order_by($this->getColumnLabel());
         $aItems = $oDb->get($this->getTableName())->result();

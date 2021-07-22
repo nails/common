@@ -208,7 +208,7 @@ trait Localised
         //  Ensure each row knows about the other items available
         $sQuery = 'SELECT GROUP_CONCAT(CONCAT(`others`.`language`, \'_\', `others`.`region`)) FROM ' . $sTable . ' `others` WHERE `others`.`id` = `' . $sAlias . '`.`id`';
         if (!$this->isDestructiveDelete()) {
-            $sQuery .= ' AND `others`.`' . $this->getColumn('deleted') . '` = 0';
+            $sQuery .= ' AND `others`.`' . $this->getColumnIsDeleted() . '` = 0';
         }
         $aData['select'][] = '(' . $sQuery . ') available_locales';
     }
