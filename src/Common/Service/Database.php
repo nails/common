@@ -60,7 +60,7 @@ use Nails\Testing;
  * @method \CI_DB_query_builder offset($offset)
  * @method \CI_DB_query_builder set($key, $value = '', $escape = null)
  * @method string get_compiled_select($table = '', $reset = true)
- * @method \CI_DB_query_builder get($table = '', $limit = null, $offset = null)
+ * @method \CI_DB_result get($table = '', $limit = null, $offset = null)
  * @method int count_all_results($table = '', $reset = true)
  * @method \CI_DB_result get_where($table = '', $where = null, $limit = null, $offset = null)
  * @method int insert_batch($table, $set = null, $escape = null, $batch_size = 100)
