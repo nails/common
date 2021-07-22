@@ -205,13 +205,6 @@ abstract class Base
     // --------------------------------------------------------------------------
 
     /**
-     * The name of the "deleted" column
-     *
-     * @var string
-     */
-    protected $tableIsDeletedColumn = 'is_deleted';
-
-    /**
      * Keeps a track of the columns which have been used by getByColumn(); allows
      * for us to more easily invalidate caches
      *
@@ -693,7 +686,7 @@ abstract class Base
      *
      * If destructive deletion is enabled then this method will permanently
      * destroy the object. If Non-destructive deletion is enabled then the
-     * $this->getColumn('is_deleted') field will be set to true.
+     * $this->getColumnIsDeleted() field will be set to true.
      *
      * @param int $iId The ID of the object to mark as deleted
      *
@@ -714,7 +707,7 @@ abstract class Base
         if ($this->isDestructiveDelete()) {
             $bResult = $this->destroy($iId);
         } else {
-            $bResult = $this->update($iId, [$this->getColumn('is_deleted') => true]);
+            $bResult = $this->update($iId, [$this->getColumnIsDeleted() => true]);
         }
 
         if ($bResult) {
@@ -806,7 +799,7 @@ abstract class Base
      * Unmarks an object as deleted
      *
      * If destructive deletion is enabled then this method will return null.
-     * If Non-destructive deletion is enabled then the $this->getColumn('is_deleted')
+     * If Non-destructive deletion is enabled then the $this->getColumnIsDeleted()
      * field will be set to false.
      *
      * @param int $iId The ID of the object to restore
@@ -821,7 +814,7 @@ abstract class Base
 
         if ($this->isDestructiveDelete()) {
             return null;
-        } elseif ($this->update($iId, [$this->getColumn('is_deleted') => false])) {
+        } elseif ($this->update($iId, [$this->getColumnIsDeleted() => false])) {
             $this->triggerEvent(static::EVENT_RESTORED, [$iId, $this]);
             return true;
         }
@@ -1009,7 +1002,7 @@ abstract class Base
 
         //  If non-destructive delete is enabled then apply the delete query
         if (!$this->isDestructiveDelete() && !$bIncludeDeleted) {
-            $oDb->where($this->getTableAlias(true) . $this->getColumn('is_deleted'), false);
+            $oDb->where($this->getTableAlias(true) . $this->getColumnIsDeleted(), false);
         }
 
         // --------------------------------------------------------------------------
@@ -1965,7 +1958,7 @@ abstract class Base
 
         //  If non-destructive delete is enabled then apply the delete query
         if (!$this->isDestructiveDelete() && !$bIncludeDeleted) {
-            $oDb->where($this->getTableAlias(true) . $this->getColumn('is_deleted'), false);
+            $oDb->where($this->getTableAlias(true) . $this->getColumnIsDeleted(), false);
         }
 
         // --------------------------------------------------------------------------
@@ -2457,7 +2450,6 @@ abstract class Base
     {
         return $this->getColumn('id', 'id');
     }
-
     // --------------------------------------------------------------------------
 
     /**
@@ -2468,6 +2460,18 @@ abstract class Base
     public function getColumnLabel(): ?string
     {
         return $this->getColumn('label', 'label');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the column to use as the is_deleted
+     *
+     * @return string|null
+     */
+    public function getColumnIsDeleted(): ?string
+    {
+        return $this->getColumn('is_deleted', 'is_deleted');
     }
 
     // --------------------------------------------------------------------------
