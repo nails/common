@@ -343,7 +343,7 @@ class Field
      *
      * @return string
      */
-    public static function email($aField, $sTip = '')
+    public static function email($aField, $sTip = ''): string
     {
         $aField['type'] = Form::FIELD_EMAIL;
         return static::render($aField, $sTip);
@@ -359,7 +359,7 @@ class Field
      *
      * @return string
      */
-    public static function number($aField, $sTip = '')
+    public static function number($aField, $sTip = ''): string
     {
         $aField['type'] = Form::FIELD_NUMBER;
         return static::render($aField, $sTip);
@@ -375,7 +375,7 @@ class Field
      *
      * @return string
      */
-    public static function url($aField, $sTip = '')
+    public static function url($aField, $sTip = ''): string
     {
         $aField['type'] = Form::FIELD_URL;
         return static::render($aField, $sTip);
@@ -391,7 +391,7 @@ class Field
      *
      * @return string
      */
-    public static function tel($aField, $sTip = '')
+    public static function tel($aField, $sTip = ''): string
     {
         $aField['type'] = Form::FIELD_TEL;
         return static::render($aField, $sTip);
@@ -407,7 +407,7 @@ class Field
      *
      * @return string
      */
-    public static function color($aField, $sTip = '')
+    public static function color($aField, $sTip = ''): string
     {
         $aField['type'] = Form::FIELD_COLOR;
         return static::render($aField, $sTip);
@@ -423,7 +423,7 @@ class Field
      *
      * @return string
      */
-    public static function password($aField, $sTip = '')
+    public static function password($aField, $sTip = ''): string
     {
         $aField['type'] = Form::FIELD_PASSWORD;
         return static::render($aField, $sTip);
@@ -439,7 +439,7 @@ class Field
      *
      * @return string
      */
-    public static function textarea($aField, $sTip = '')
+    public static function textarea($aField, $sTip = ''): string
     {
         $aField['type'] = Form::FIELD_TEXTAREA;
         return static::render($aField, $sTip);
@@ -475,7 +475,7 @@ class Field
      *
      * @return string
      */
-    public static function wysiwyg($aField, $sTip = '')
+    public static function wysiwyg($aField, $sTip = ''): string
     {
         $aField['type'] = Form::FIELD_TEXTAREA;
         if (empty($aField['class'])) {
@@ -495,7 +495,7 @@ class Field
      *
      * @return string
      */
-    public static function wysiwygBasic($aField, $sTip = '')
+    public static function wysiwygBasic($aField, $sTip = ''): string
     {
         if (empty($aField['class'])) {
             $aField['class'] = '';
@@ -514,7 +514,7 @@ class Field
      *
      * @return string
      */
-    public static function text($aField, $sTip = '')
+    public static function text($aField, $sTip = ''): string
     {
         $aField['type'] = Form::FIELD_TEXT;
         return static::render($aField, $sTip);
@@ -530,7 +530,7 @@ class Field
      *
      * @return string
      */
-    public static function date($aField, $sTip = '')
+    public static function date($aField, $sTip = ''): string
     {
         $aField['type']         = Form::FIELD_TEXT;
         $aField['class']        = isset($aField['class']) ? $aField['class'] . ' date' : 'date';
@@ -550,7 +550,7 @@ class Field
      *
      * @return string
      */
-    public static function time($aField, $sTip = '')
+    public static function time($aField, $sTip = ''): string
     {
         $aField['type']         = Form::FIELD_TIME;
         $aField['class']        = isset($aField['class']) ? $aField['class'] . ' time' : 'time';
@@ -570,7 +570,7 @@ class Field
      *
      * @return string
      */
-    public static function datetime($aField, $sTip = '')
+    public static function datetime($aField, $sTip = ''): string
     {
         $aField['type']         = Form::FIELD_TEXT;
         $aField['class']        = isset($aField['class']) ? $aField['class'] . ' datetime' : 'datetime';
@@ -593,7 +593,7 @@ class Field
      *
      * @todo (Pablo - 2020-01-15) - use render() or html()
      */
-    public static function dropdown($field, $options = null, $tip = '')
+    public static function dropdown($field, $options = null, $tip = ''): string
     {
         //  Set var defaults
         $_field                     = [];
@@ -752,7 +752,7 @@ class Field
      *
      * @todo (Pablo - 2020-01-15) - use render() or html()
      */
-    public static function dropdownMultiple($field, $options = null, $tip = '')
+    public static function dropdownMultiple($field, $options = null, $tip = ''): string
     {
         //  Set var defaults
         $_field                     = [];
@@ -889,7 +889,7 @@ class Field
      *
      * @todo (Pablo - 2020-01-15) - use render() or html()
      */
-    public static function boolean($field, $tip = '')
+    public static function boolean($field, $tip = ''): string
     {
         //  Set var defaults
         $_field                = [];
@@ -1003,7 +1003,7 @@ class Field
      *
      * @return string
      */
-    public static function radio($aField, $aOptions = null, $sTip = '')
+    public static function radio($aField, $aOptions = null, $sTip = ''): string
     {
         $aField['type'] = Form::FIELD_RADIO;
         return static::checkbox($aField, $aOptions, $sTip);
@@ -1022,7 +1022,7 @@ class Field
      *
      * @todo (Pablo - 2020-01-15) - use render() or html()
      */
-    public static function checkbox($field, $options = null, $tip = '')
+    public static function checkbox($field, $options = null, $tip = ''): string
     {
         //  Set var defaults
         $_field                = [];
@@ -1232,7 +1232,7 @@ class Field
      *
      * @return string
      */
-    public static function submit(array $aField)
+    public static function submit(array $aField): string
     {
         $sKey     = ArrayHelper::get('key', $aField, []);
         $sDefault = ArrayHelper::get('default', $aField, '');
@@ -1250,7 +1250,7 @@ class Field
      *
      * @return string
      */
-    public static function button(array $aField)
+    public static function button(array $aField): string
     {
         $sKey     = ArrayHelper::get('key', $aField, []);
         $sDefault = ArrayHelper::get('default', $aField, '');
@@ -1268,7 +1268,7 @@ class Field
      *
      * @return string
      */
-    public static function upload(array $aField)
+    public static function upload(array $aField): string
     {
         $aField['html'] = Form::upload(array_filter([
             'name'   => ArrayHelper::get('key', $aField),
