@@ -448,6 +448,26 @@ class Field
     // --------------------------------------------------------------------------
 
     /**
+     * Generates a form field using the "textarea" input type, with the class `json`
+     *
+     * @param array  $aField The config array
+     * @param string $sTip   An optional tip
+     *
+     * @return string
+     */
+    public static function json($aField, $sTip = ''): string
+    {
+        $aField['type'] = Form::FIELD_TEXTAREA;
+        if (empty($aField['class'])) {
+            $aField['class'] = '';
+        }
+        $aField['class'] = trim($aField['class'] . ' json');
+        return static::render($aField, $sTip);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Generates a form field using the "wysiwyg" input type
      *
      * @param array  $aField The config array

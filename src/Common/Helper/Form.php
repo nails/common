@@ -46,6 +46,7 @@ class Form
     const FIELD_TEL               = 'tel';
     const FIELD_TEXT              = 'text';
     const FIELD_TEXTAREA          = 'textarea';
+    const FIELD_JSON              = 'json';
     const FIELD_TIME              = 'time';
     const FIELD_TIMECODE          = 'timecode';
     const FIELD_UPLOAD            = 'upload';

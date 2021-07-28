@@ -65,6 +65,13 @@ if (!function_exists('form_field_textarea')) {
     }
 }
 
+if (!function_exists('form_field_json')) {
+    function form_field_json($aField, $sTip = '')
+    {
+        return Form\Field::json($aField, $sTip);
+    }
+}
+
 if (!function_exists('form_field_wysiwyg')) {
     function form_field_wysiwyg($aField, $sTip = '')
     {

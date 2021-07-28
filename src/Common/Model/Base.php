@@ -2647,6 +2647,11 @@ abstract class Base
                     ->setType(Helper\Form::FIELD_TEXTAREA);
                 break;
 
+            case 'json':
+                $oField
+                    ->setType(Helper\Form::FIELD_JSON);
+                break;
+
             /**
              * Date and time
              */
