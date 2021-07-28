@@ -319,14 +319,16 @@ trait Slug
     /**
      * Fetch an object by it's slug
      *
-     * @param string $sSlug The slug of the object to fetch
-     * @param array  $aData Any data to pass to getCountCommon()
+     * @param string|null $sSlug The slug of the object to fetch
+     * @param array       $aData Any data to pass to getCountCommon()
      *
      * @return Resource|null
      */
-    public function getBySlug(string $sSlug, array $aData = []): ?Resource
+    public function getBySlug(?string $sSlug, array $aData = []): ?Resource
     {
-        return $this->getByColumn($this->getColumnSlug(), $sSlug, $aData);
+        return !empty($sSlug)
+            ? $this->getByColumn($this->getColumnSlug(), $sSlug, $aData)
+            : null;
     }
 
     // --------------------------------------------------------------------------
