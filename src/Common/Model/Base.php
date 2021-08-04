@@ -2233,7 +2233,7 @@ abstract class Base
      * Utility method for defining on-to-one relationships
      *
      * @param string      $sTrigger     The trigger word
-     * @param string      $sModel       The related model
+     * @param string|null $sModel       The related model
      * @param string      $sProvider    The provider of the related model
      * @param string|null $sLocalColumn The local column contianing the foreign ID
      * @param array       $aData        Any data to bind to the expandable field
@@ -2243,7 +2243,7 @@ abstract class Base
      */
     protected function hasOne(
         string $sTrigger,
-        string $sModel,
+        string $sModel = null,
         string $sProvider = 'app',
         string $sLocalColumn = null,
         array $aData = []
@@ -2252,7 +2252,7 @@ abstract class Base
             ->addExpandableField([
                 'type'      => static::EXPANDABLE_TYPE_SINGLE,
                 'trigger'   => $sTrigger,
-                'model'     => $sModel,
+                'model'     => $sModel ?? ucfirst($sTrigger),
                 'provider'  => $sProvider,
                 'id_column' => $sLocalColumn ?? sprintf('%s_id', $sTrigger),
                 'data'      => $aData,
