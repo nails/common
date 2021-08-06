@@ -381,8 +381,8 @@ class Factory
 
         } elseif (!empty($aParamaters)) {
             trigger_error(sprintf(
-                'A call to Factory::%s(%s) passed construction paramaters, but the object has already been constructed',
-                $sType,
+                'A call to Factory::%s(\'%s\') passed construction paramaters, but the object has already been constructed',
+                strtolower($sType),
                 $sName
             ));
         }
@@ -667,7 +667,7 @@ class Factory
      */
     private static function destroyServiceOrModel(
         array &$aTrackerArray,
-        string $sKey,
+        ?string $sKey,
         string $sName = null,
         string $sComponent = null
     ): bool {
