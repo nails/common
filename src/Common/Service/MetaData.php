@@ -107,7 +107,7 @@ class MetaData
                     )
                 )
             ),
-            $this->sTitleSeparator
+            $this->getTitleSeparator()
         );
     }
 
@@ -136,6 +136,31 @@ class MetaData
     public function isTitleAppendAppName(): bool
     {
         return $this->bTitleAppendAppName;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Set the separator for titles
+     *
+     * @param string $sSeparator The separator to use
+     *
+     * @return $this
+     */
+    public function setTitleSeparator(string $sSeparator): self
+    {
+        $this->sTitleSeparator = $sSeparator;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * @return string
+     */
+    public function getTitleSeparator(): string
+    {
+        return $this->sTitleSeparator;
     }
 
     // --------------------------------------------------------------------------
