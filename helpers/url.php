@@ -41,7 +41,7 @@ if (!function_exists('redirect')) {
 }
 
 if (!function_exists('tel')) {
-    function tel(string $sUrl = null, string $sTitle = '', string $sAttributes = ''): string
+    function tel(string $sUrl = null, string $sTitle = null, string $sAttributes = ''): string
     {
         return Url::tel($sUrl, $sTitle, $sAttributes);
     }

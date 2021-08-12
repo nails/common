@@ -104,13 +104,13 @@ class Url
     /**
      * Generates a hyperlink using the tel: scheme
      *
-     * @param string $sUrl        The phone number to link
-     * @param string $sTitle      The title to give the hyperlink
-     * @param string $sAttributes Any attributes to give the hyperlink
+     * @param string      $sUrl        The phone number to link
+     * @param string|null $sTitle      The title to give the hyperlink
+     * @param string      $sAttributes Any attributes to give the hyperlink
      *
      * @return string
      */
-    public static function tel(string $sUrl = null, string $sTitle = '', string $sAttributes = ''): string
+    public static function tel(string $sUrl = null, string $sTitle = null, string $sAttributes = ''): string
     {
         $sTitle = empty($sTitle) ? $sUrl : $sTitle;
         $sUrl   = preg_replace('/[^+0-9]/', '', $sUrl);
