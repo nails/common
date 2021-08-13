@@ -17,7 +17,6 @@ use Nails\Common\Helper\Model\Filter;
 use Nails\Common\Helper\Model\GroupBy;
 use Nails\Common\Helper\Model\Having;
 use Nails\Common\Helper\Model\Like;
-use Nails\Common\Helper\Model\Limit;
 use Nails\Common\Helper\Model\NotLike;
 use Nails\Common\Helper\Model\OrHaving;
 use Nails\Common\Helper\Model\OrLike;
@@ -25,6 +24,7 @@ use Nails\Common\Helper\Model\OrNotLike;
 use Nails\Common\Helper\Model\OrWhere;
 use Nails\Common\Helper\Model\OrWhereIn;
 use Nails\Common\Helper\Model\OrWhereNotIn;
+use Nails\Common\Helper\Model\Paginate;
 use Nails\Common\Helper\Model\Sort;
 use Nails\Common\Helper\Model\Where;
 use Nails\Common\Helper\Model\WhereIn;
@@ -894,7 +894,7 @@ trait GetCountCommon
     protected function getCountCommonCompileLimit(array &$aData): void
     {
         $aMap = [
-            Limit::class => 'limit',
+            Paginate::class => 'limit',
         ];
 
         $this->parseUtilityClasses($aData, $aMap);
