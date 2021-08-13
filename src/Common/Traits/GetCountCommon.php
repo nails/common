@@ -17,6 +17,7 @@ use Nails\Common\Helper\Model\Filter;
 use Nails\Common\Helper\Model\GroupBy;
 use Nails\Common\Helper\Model\Having;
 use Nails\Common\Helper\Model\Like;
+use Nails\Common\Helper\Model\Limit;
 use Nails\Common\Helper\Model\NotLike;
 use Nails\Common\Helper\Model\OrHaving;
 use Nails\Common\Helper\Model\OrLike;
@@ -52,6 +53,7 @@ trait GetCountCommon
         $this->getCountCommonCompileHavings($aData);
         $this->getCountCommonCompileSort($aData);
         $this->getCountCommonCompileGroupBy($aData);
+        $this->getCountCommonCompileLimit($aData);
     }
 
     // --------------------------------------------------------------------------
@@ -887,6 +889,15 @@ trait GetCountCommon
                 }
             }
         }
+    }
+
+    protected function getCountCommonCompileLimit(array &$aData): void
+    {
+        $aMap = [
+            Limit::class => 'limit',
+        ];
+
+        $this->parseUtilityClasses($aData, $aMap);
     }
 
     // --------------------------------------------------------------------------
