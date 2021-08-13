@@ -44,7 +44,7 @@ trait GetCountCommon
      *
      * @param array $aData Data passed from the calling method
      **/
-    protected function getCountCommon(array $aData = []): void
+    protected function getCountCommon(array &$aData = []): void
     {
         $this->getCountCommonCompileSelect($aData);
         $this->getCountCommonCompileFilters($aData);
@@ -891,13 +891,20 @@ trait GetCountCommon
         }
     }
 
+    // --------------------------------------------------------------------------
+
+    /**
+     * Compiles the limit element into the query
+     *
+     * @param array &$aData The data array
+     */
     protected function getCountCommonCompileLimit(array &$aData): void
     {
         $aMap = [
             Paginate::class => 'limit',
         ];
 
-        $this->parseUtilityClasses($aData, $aMap);
+        $this->parseUtilityClasses($aData, $aMap, false);
     }
 
     // --------------------------------------------------------------------------
@@ -905,10 +912,11 @@ trait GetCountCommon
     /**
      * Parse utility clases into their appropriate array element
      *
-     * @param array $aData The data array
-     * @param array $aMap  The map of classes to keys
+     * @param array $aData    The data array
+     * @param array $aMap     The map of classes to keys
+     * @param bool  $bIsArray Whether the target item is an array
      */
-    protected function parseUtilityClasses(array &$aData, array $aMap)
+    protected function parseUtilityClasses(array &$aData, array $aMap, bool $bIsArray = true)
     {
         $aClasses = array_keys($aMap);
 
@@ -920,10 +928,14 @@ trait GetCountCommon
 
                 if (in_array($sDatumClass, $aClasses)) {
                     if (!array_key_exists($aMap[$sDatumClass], $aData)) {
-                        $aData[$aMap[$sDatumClass]] = [];
+                        $aData[$aMap[$sDatumClass]] = $bIsArray ? [] : null;
                     }
 
-                    $aData[$aMap[$sDatumClass]][] = $aDatum->compile();
+                    if ($bIsArray) {
+                        $aData[$aMap[$sDatumClass]][] = $aDatum->compile();
+                    } else {
+                        $aData[$aMap[$sDatumClass]] = $aDatum->compile();
+                    }
                 }
             }
         }
