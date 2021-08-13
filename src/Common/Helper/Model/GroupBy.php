@@ -10,7 +10,6 @@ namespace Nails\Common\Helper\Model;
 class GroupBy
 {
     private string $sColumn;
-    private string $sDirection;
 
     // --------------------------------------------------------------------------
 
