@@ -179,14 +179,14 @@ abstract class Base
      *
      * @var string
      */
-    const SORT_ASC = 'asc';
+    const SORT_ASC = Helper\Model\Sort::ASC;
 
     /**
      * The string for sorting in descending order
      *
      * @var string
      */
-    const SORT_DESC = 'desc';
+    const SORT_DESC = Helper\Model\Sort::DESC;
 
     /**
      * The default column to sort on

@@ -13,6 +13,19 @@
 namespace Nails\Common\Traits;
 
 use Nails\Common\Helper\ArrayHelper;
+use Nails\Common\Helper\Model\GroupBy;
+use Nails\Common\Helper\Model\Having;
+use Nails\Common\Helper\Model\Like;
+use Nails\Common\Helper\Model\NotLike;
+use Nails\Common\Helper\Model\OrHaving;
+use Nails\Common\Helper\Model\OrLike;
+use Nails\Common\Helper\Model\OrNotLike;
+use Nails\Common\Helper\Model\OrWhere;
+use Nails\Common\Helper\Model\OrWhereIn;
+use Nails\Common\Helper\Model\OrWhereNotIn;
+use Nails\Common\Helper\Model\Sort;
+use Nails\Common\Helper\Model\Where;
+use Nails\Common\Helper\Model\WhereIn;
 use Nails\Common\Service\Database;
 use Nails\Factory;
 
@@ -228,6 +241,20 @@ trait GetCountCommon
         $oDb = Factory::service('Database');
 
         /**
+         * Parse utility classes into the main data array
+         */
+        $aMap = [
+            Where::class        => 'where',
+            WhereIn::class      => 'where_in',
+            WhereNotIn::class   => 'where_not_in',
+            OrWhere::class      => 'or_where',
+            OrWhereIn::class    => 'or_where_in',
+            OrWhereNotIn::class => 'or_where_not_in',
+        ];
+
+        $this->parseUtilityClasses($aData, $aMap);
+
+        /**
          * Handle where's
          *
          * This is an array of the various type of where that can be passed in via $aData.
@@ -239,12 +266,12 @@ trait GetCountCommon
          */
 
         $aWheres = [
-            'where'           => 'AND',
-            'or_where'        => 'OR',
-            'where_in'        => 'AND',
-            'or_where_in'     => 'OR',
-            'where_not_in'    => 'AND',
-            'or_where_not_in' => 'OR',
+            $aMap[Where::class]        => 'AND',
+            $aMap[WhereIn::class]      => 'AND',
+            $aMap[WhereNotIn::class]   => 'AND',
+            $aMap[OrWhere::class]      => 'OR',
+            $aMap[OrWhereIn::class]    => 'OR',
+            $aMap[OrWhereNotIn::class] => 'OR',
         ];
 
         $aWhereCompiled = [];
@@ -319,8 +346,8 @@ trait GetCountCommon
 
                                 switch ($sWhereType) {
 
-                                    case 'where' :
-                                    case 'or_where' :
+                                    case $aMap[Where::class]:
+                                    case $aMap[OrWhere::class]:
 
                                         if ($bEscape) {
                                             $mVal = $oDb->escape($mVal);
@@ -329,8 +356,8 @@ trait GetCountCommon
                                         $aWhereCompiled[$sWhereType][] = $mColumn . $sOperator . $mVal;
                                         break;
 
-                                    case 'where_in' :
-                                    case 'or_where_in' :
+                                    case $aMap[WhereIn::class]:
+                                    case $aMap[OrWhereIn::class]:
 
                                         if (!is_array($mVal)) {
                                             $mVal = (array) $mVal;
@@ -347,8 +374,8 @@ trait GetCountCommon
                                         }
                                         break;
 
-                                    case 'where_not_in' :
-                                    case 'or_where_not_in' :
+                                    case $aMap[WhereNotIn::class]:
+                                    case $aMap[OrWhereNotIn::class]:
 
                                         if (!is_array($mVal)) {
                                             $mVal = (array) $mVal;
@@ -417,11 +444,23 @@ trait GetCountCommon
         /** @var Database $oDb */
         $oDb = Factory::service('Database');
 
+        /**
+         * Parse utility classes into the main data array
+         */
+        $aMap = [
+            Like::class      => 'like',
+            NotLike::class   => 'not_like',
+            OrLike::class    => 'or_like',
+            OrNotLike::class => 'or_not_like',
+        ];
+
+        $this->parseUtilityClasses($aData, $aMap);
+
         $aLikes = [
-            'like'        => 'AND',
-            'or_like'     => 'OR',
-            'not_like'    => 'AND',
-            'or_not_like' => 'OR',
+            $aMap[Like::class]      => 'AND',
+            $aMap[NotLike::class]   => 'AND',
+            $aMap[OrLike::class]    => 'OR',
+            $aMap[OrNotLike::class] => 'OR',
         ];
 
         $aLikeCompiled = [];
@@ -492,13 +531,13 @@ trait GetCountCommon
                             if ($mColumn) {
                                 switch ($sLikeType) {
 
-                                    case 'like' :
-                                    case 'or_like' :
+                                    case $aMap[Like::class]:
+                                    case $aMap[NotLike::class]:
                                         $aLikeCompiled[$sLikeType][] = $mColumn . ' LIKE "%' . $mVal . '%"';
                                         break;
 
-                                    case 'not_like' :
-                                    case 'or_not_like' :
+                                    case $aMap[OrLike::class]:
+                                    case $aMap[OrNotLike::class]:
                                         $aLikeCompiled[$sLikeType][] = $mColumn . ' NOT LIKE "%' . $mVal . '%"';
                                         break;
                                 }
@@ -551,6 +590,16 @@ trait GetCountCommon
         $oDb = Factory::service('Database');
 
         /**
+         * Parse utility classes into the main data array
+         */
+        $aMap = [
+            Having::class   => 'having',
+            OrHaving::class => 'or_having',
+        ];
+
+        $this->parseUtilityClasses($aData, $aMap);
+
+        /**
          * Handle having's
          *
          * This is an array of the various type of having that can be passed in via $aData.
@@ -562,8 +611,8 @@ trait GetCountCommon
          */
 
         $aHavings = [
-            'having'    => 'AND',
-            'or_having' => 'OR',
+            $aMap[Having::class]   => 'AND',
+            $aMap[OrHaving::class] => 'OR',
         ];
 
         $aHavingCompiled = [];
@@ -638,8 +687,8 @@ trait GetCountCommon
 
                                 switch ($sHavingType) {
 
-                                    case 'having' :
-                                    case 'or_having' :
+                                    case $aMap[Having::class]:
+                                    case $aMap[OrHaving::class]:
 
                                         if ($bEscape) {
                                             $mVal = $oDb->escape($mVal);
@@ -699,6 +748,15 @@ trait GetCountCommon
     {
         /** @var Database $oDb */
         $oDb = Factory::service('Database');
+
+        /**
+         * Parse utility classes into the main data array
+         */
+        $aMap = [
+            Sort::class => 'sort',
+        ];
+
+        $this->parseUtilityClasses($aData, $aMap);
 
         if (!empty($aData['sort'])) {
 
@@ -812,12 +870,47 @@ trait GetCountCommon
         /** @var Database $oDb */
         $oDb = Factory::service('Database');
 
+        $aMap = [
+            GroupBy::class => 'group',
+        ];
+
+        $this->parseUtilityClasses($aData, $aMap);
+
         if (!empty($aData['group'])) {
             if (is_string($aData['group'])) {
                 $oDb->order_by($aData['group']);
             } elseif (is_array($aData['group'])) {
                 foreach ($aData['group'] as $sColumn) {
                     $oDb->group_by($sColumn);
+                }
+            }
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Parse utility clases into their appropriate array element
+     *
+     * @param array $aData The data array
+     * @param array $aMap  The map of classes to keys
+     */
+    protected function parseUtilityClasses(array &$aData, array $aMap)
+    {
+        $aClasses = array_keys($aMap);
+
+        foreach ($aData as &$aDatum) {
+
+            if (is_object($aDatum)) {
+
+                $sDatumClass = get_class($aDatum);
+
+                if (in_array($sDatumClass, $aClasses)) {
+                    if (!array_key_exists($aMap[$sDatumClass], $aData)) {
+                        $aData[$aMap[$sDatumClass]] = [];
+                    }
+
+                    $aData[$aMap[$sDatumClass]][] = $aDatum->compile();
                 }
             }
         }
