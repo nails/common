@@ -536,11 +536,11 @@ trait GetCountCommon
                                 switch ($sLikeType) {
 
                                     case $aMap[Like::class]:
-                                    case $aMap[NotLike::class]:
+                                    case $aMap[OrLike::class]:
                                         $aLikeCompiled[$sLikeType][] = $mColumn . ' LIKE "%' . $mVal . '%"';
                                         break;
 
-                                    case $aMap[OrLike::class]:
+                                    case $aMap[NotLike::class]:
                                     case $aMap[OrNotLike::class]:
                                         $aLikeCompiled[$sLikeType][] = $mColumn . ' NOT LIKE "%' . $mVal . '%"';
                                         break;
