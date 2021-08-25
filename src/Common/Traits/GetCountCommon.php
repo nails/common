@@ -13,7 +13,7 @@
 namespace Nails\Common\Traits;
 
 use Nails\Common\Helper\ArrayHelper;
-use Nails\Common\Helper\Model\Filter;
+use Nails\Common\Helper\Model\Condition;
 use Nails\Common\Helper\Model\GroupBy;
 use Nails\Common\Helper\Model\Having;
 use Nails\Common\Helper\Model\Like;
@@ -247,7 +247,7 @@ trait GetCountCommon
          * Parse utility classes into the main data array
          */
         $aMap = [
-            Filter::class       => 'where',
+            Condition::class    => 'where',
             Where::class        => 'where',
             WhereIn::class      => 'where_in',
             WhereNotIn::class   => 'where_not_in',
