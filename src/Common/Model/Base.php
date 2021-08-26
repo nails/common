@@ -1208,8 +1208,16 @@ abstract class Base
             $aData['select'] = [];
         }
 
-        $aData['select'][] = $this->getTableAlias(true) . $this->getColumnId();
-        $aData['select'][] = $this->getTableAlias(true) . $this->getColumnLabel();
+        $sColumnId    = $this->getColumnId();
+        $sColumnLabel = $this->getColumnLabel();
+
+        foreach ([$sColumnId, $sColumnLabel] as $sColumn) {
+            if ($sColumn) {
+                $aData['select'][] = strpos($sColumn, '.') === false
+                    ? $this->getTableAlias(true) . $sColumn
+                    : $sColumn;
+            }
+        }
 
         $aItems = $this->getAllRawQuery($iPage, $iPerPage, $aData, $bIncludeDeleted)->result();
         $aOut   = [];
@@ -1225,11 +1233,22 @@ abstract class Base
          * Test columns
          * We need an ID, label is encouraged but if not available we can use the ID
          */
+
+        /**
+         * Its possible that the model might be using an aliased table for these columns
+         * so ensure we use the last segment of a dot separated string as that's what will
+         * be used in the returned object (`alias`.`column` will be `column` in $aItems
+         */
+        $aColumnId    = explode('.', $sColumnId);
+        $sColumnId    = end($aColumnId);
+        $aColumnLabel = explode('.', $sColumnLabel);
+        $sColumnLabel = end($aColumnLabel);
+
         $oTest = reset($aItems);
 
-        if (!property_exists($oTest, $this->getColumnId())) {
+        if (!property_exists($oTest, $sColumnId)) {
             throw new ModelException(
-                static::class . '::getAllFlat() "' . $this->getColumnId() . '" is not a valid column.'
+                static::class . '::getAllFlat() "' . $sColumnId . '" is not a valid column.'
             );
         }
 
@@ -1239,8 +1258,8 @@ abstract class Base
 
         foreach ($aItems as $oItem) {
 
-            $iId    = $oItem->{$this->getColumnId()};
-            $sLabel = $oItem->{$this->getColumnLabel()} ?? 'Item #' . $iId;
+            $iId    = $oItem->{$sColumnId};
+            $sLabel = $oItem->{$sColumnLabel} ?? 'Item #' . $iId;
 
             $aOut[$iId] = $sLabel;
         }
