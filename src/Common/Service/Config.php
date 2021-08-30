@@ -14,6 +14,7 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Common\Exception\FactoryException;
 use Nails\Factory;
 
 /**
@@ -114,8 +115,9 @@ class Config
      * @param bool   $bUseSecure Whether to use BASE_URL or SECURE_BASE_URL
      *
      * @return string
+     * @throws FactoryException
      */
-    public static function siteUrl($sUri, $bUseSecure = false)
+    public static function siteUrl(string $sUri, bool $bUseSecure = false): string
     {
         if (preg_match('/^(https?:\/\/|#)/', $sUri)) {
             //  Absolute URI; return unaltered
