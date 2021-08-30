@@ -122,14 +122,12 @@ class Config
         if (preg_match('/^(https?:\/\/|#)/', $sUri)) {
             //  Absolute URI; return unaltered
             return $sUri;
+
         } else {
 
-            if ($bUseSecure) {
-                $sBaseUrl = rtrim(\Nails\Config::get('SECURE_BASE_URL'), '/') . '/';
-            } else {
-                $sBaseUrl = rtrim(\Nails\Config::get('BASE_URL'), '/') . '/';
-            }
-
+            $sBaseUrl = $bUseSecure
+                ? rtrim(\Nails\Config::get('SECURE_BASE_URL'), '/') . '/'
+                : rtrim(\Nails\Config::get('BASE_URL'), '/') . '/';
 
             /** @var Locale $oLocale */
             $oLocale = Factory::service('Locale');
@@ -137,7 +135,6 @@ class Config
             $sLocale = $sLocale && $sUri ? $sLocale . '/' : $sLocale;
 
             return $sBaseUrl . $sLocale . ltrim($sUri, '/');
-
         }
     }
 
