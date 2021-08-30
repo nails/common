@@ -128,9 +128,6 @@ class Config
                 $sBaseUrl = rtrim(\Nails\Config::get('BASE_URL'), '/') . '/';
             }
 
-            if (is_file($sUri) || is_dir($sUri)) {
-                return $sBaseUrl . ltrim($sUri, '/');
-            }
 
             /** @var Locale $oLocale */
             $oLocale = Factory::service('Locale');
