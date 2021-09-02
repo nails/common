@@ -948,7 +948,11 @@ abstract class Base
         // --------------------------------------------------------------------------
 
         //  Define the default sorting
-        if (empty($aData['sort']) && $this->getDefaultSortColumn()) {
+        if (
+            empty($aData['sort'])
+            && $this->getDefaultSortColumn()
+            && !Helper\ArrayHelper::containsInstanceOf($aData, Helper\Model\Sort::class)
+        ) {
             $aData['sort'] = [
                 $this->getDefaultSortColumn(),
                 $this->getDefaultSortOrder(),

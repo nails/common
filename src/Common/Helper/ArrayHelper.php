@@ -351,4 +351,32 @@ class ArrayHelper
 
         return null;
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Determines wether the array contains an instance of the specified class
+     *
+     * @param array  $aArray The array to check
+     * @param string $sClass The class to look for
+     *
+     * @return bool
+     */
+    public static function containsInstanceOf(array $aArray, string $sClass)
+    {
+        foreach ($aArray as $mItem) {
+            if (is_object($mItem)) {
+                $aClasses = array_merge(
+                    [get_class($mItem)],
+                    class_parents($mItem)
+                );
+
+                if (in_array($sClass, $aClasses)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }
