@@ -35,14 +35,15 @@ class Url
      * Create a local URL based on your base path. Segments can be passed via the
      * first parameter either as a string or an array.
      *
-     * @param mixed $sUrl         URI segments, either as a string or an array
-     * @param bool  $bForceSecure Whether to force the url to be secure or not
+     * @param string|null $sUrl         URI segments, either as a string or an array
+     * @param bool        $bForceSecure Whether to force the url to be secure or not
      *
      * @return string
      * @throws FactoryException
      */
     public static function siteUrl(string $sUrl = null, bool $bForceSecure = false): string
     {
+        /** @var \Nails\Common\Service\Config $oConfig */
         $oConfig = Factory::service('Config');
         return $oConfig::siteUrl($sUrl, $bForceSecure);
     }

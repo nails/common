@@ -111,13 +111,13 @@ class Config
     /**
      * Prepends BASE_URL or SECURE_BASE_URL to a string
      *
-     * @param string $sUri       The URI to append
-     * @param bool   $bUseSecure Whether to use BASE_URL or SECURE_BASE_URL
+     * @param string|null $sUri       The URI to append
+     * @param bool        $bUseSecure Whether to use BASE_URL or SECURE_BASE_URL
      *
      * @return string
      * @throws FactoryException
      */
-    public static function siteUrl(string $sUri, bool $bUseSecure = false): string
+    public static function siteUrl(string $sUri = null, bool $bUseSecure = false): string
     {
         if (preg_match('/^(https?:\/\/|#)/', $sUri)) {
             //  Absolute URI; return unaltered
