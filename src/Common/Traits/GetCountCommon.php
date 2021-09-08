@@ -301,7 +301,6 @@ trait GetCountCommon
                              * The value is a straight up string, assume this is a compiled
                              * where string,
                              */
-
                             $aWhereCompiled[$sWhereType][] = $mWhere;
 
                         } else {
@@ -311,42 +310,12 @@ trait GetCountCommon
                              * of the query. We use strings which are unlikely to be found
                              * as falsey values (such as null) are perfectly likely.
                              */
+                            $sColumn   = $this->extractColumn($mWhere);
+                            $sOperator = $this->extractOperator($mWhere);
+                            $mVal      = $this->extractValue($mWhere);
+                            $bEscape   = $this->extractEscape($mWhere);
 
-                            //  Work out column
-                            $mColumn = isset($mWhere['column']) ? $mWhere['column'] : '[NAILS-COL-NOT-FOUND]';
-
-                            if ($mColumn === '[NAILS-COL-NOT-FOUND]') {
-                                $mColumn = isset($mWhere[0]) && is_string($mWhere[0]) ? $mWhere[0] : null;
-                            }
-
-                            //  Work out value
-                            $mVal = isset($mWhere['value']) ? $mWhere['value'] : '[NAILS-VAL-NOT-FOUND]';
-
-                            if ($mVal === '[NAILS-VAL-NOT-FOUND]') {
-                                $mVal = isset($mWhere[1]) ? $mWhere[1] : null;
-                            }
-
-                            //  Escaped?
-                            $bEscape = isset($mWhere['escape']) ? (bool) $mWhere['escape'] : '[NAILS-ESCAPE-NOT-FOUND]';
-
-                            if ($bEscape === '[NAILS-ESCAPE-NOT-FOUND]') {
-                                $bEscape = isset($mWhere[2]) ? $mWhere[2] : true;
-                            }
-
-                            //  If the $mColumn is an array then we should concat them together
-                            if (is_array($mColumn)) {
-                                $mColumn = 'CONCAT_WS(" ", ' . implode(',', $mColumn) . ')';
-                            }
-
-                            //  Test if there's an SQL operator
-                            if (!(bool) preg_match('/(<|>|!|=|\sIS NULL|\sIS NOT NULL|\sEXISTS|\sBETWEEN|\sLIKE|\sIN\s*\(|\s)/i', trim($mColumn))) {
-                                $sOperator = is_null($mVal) ? ' IS ' : '=';
-                            } else {
-                                $sOperator = '';
-                            }
-
-                            //  Got something?
-                            if ($mColumn) {
+                            if ($sColumn) {
 
                                 switch ($sWhereType) {
 
@@ -357,7 +326,7 @@ trait GetCountCommon
                                             $mVal = $oDb->escape($mVal);
                                         }
 
-                                        $aWhereCompiled[$sWhereType][] = $mColumn . $sOperator . $mVal;
+                                        $aWhereCompiled[$sWhereType][] = $sColumn . $sOperator . $mVal;
                                         break;
 
                                     case $aMap[WhereIn::class]:
@@ -374,7 +343,7 @@ trait GetCountCommon
                                                 }
                                             }
 
-                                            $aWhereCompiled[$sWhereType][] = $mColumn . ' IN (' . implode(',', $mVal) . ')';
+                                            $aWhereCompiled[$sWhereType][] = $sColumn . ' IN (' . implode(',', $mVal) . ')';
                                         }
                                         break;
 
@@ -392,7 +361,7 @@ trait GetCountCommon
                                                 }
                                             }
 
-                                            $aWhereCompiled[$sWhereType][] = $mColumn . ' NOT IN (' . implode(',', $mVal) . ')';
+                                            $aWhereCompiled[$sWhereType][] = $sColumn . ' NOT IN (' . implode(',', $mVal) . ')';
                                         }
                                         break;
                                 }
@@ -500,49 +469,26 @@ trait GetCountCommon
                              * of the query. We use strings which are unlikely to be found
                              * as falsey values (such as null) are perfectly likely.
                              */
-
-                            //  Work out column
-                            $mColumn = isset($mWhere['column']) ? $mWhere['column'] : '[NAILS-COL-NOT-FOUND]';
-
-                            if ($mColumn === '[NAILS-COL-NOT-FOUND]') {
-                                $mColumn = isset($mWhere[0]) && is_string($mWhere[0]) ? $mWhere[0] : null;
-                            }
-
-                            //  Work out value
-                            $mVal = isset($mWhere['value']) ? $mWhere['value'] : '[NAILS-VAL-NOT-FOUND]';
-
-                            if ($mVal === '[NAILS-VAL-NOT-FOUND]') {
-                                $mVal = isset($mWhere[1]) ? $mWhere[1] : null;
-                            }
-
-                            //  Escaped?
-                            $bEscape = isset($mWhere['escape']) ? (bool) $mWhere['escape'] : '[NAILS-ESCAPE-NOT-FOUND]';
-
-                            if ($bEscape === '[NAILS-ESCAPE-NOT-FOUND]') {
-                                $bEscape = isset($mWhere[2]) ? $mWhere[2] : true;
-                            }
+                            $sColumn = $this->extractColumn($mWhere);
+                            $mVal    = $this->extractValue($mWhere);
+                            $bEscape = $this->extractEscape($mWhere);
 
                             if ($bEscape) {
                                 $mVal = $oDb->escape_like_str($mVal);
                             }
 
-                            //  If the $mColumn is an array then we should concat them together
-                            if (is_array($mColumn)) {
-                                $mColumn = 'CONCAT_WS(" ", ' . implode(',', $mColumn) . ')';
-                            }
-
                             //  Got something?
-                            if ($mColumn) {
+                            if ($sColumn) {
                                 switch ($sLikeType) {
 
                                     case $aMap[Like::class]:
                                     case $aMap[OrLike::class]:
-                                        $aLikeCompiled[$sLikeType][] = $mColumn . ' LIKE "%' . $mVal . '%"';
+                                        $aLikeCompiled[$sLikeType][] = $sColumn . ' LIKE "%' . $mVal . '%"';
                                         break;
 
                                     case $aMap[NotLike::class]:
                                     case $aMap[OrNotLike::class]:
-                                        $aLikeCompiled[$sLikeType][] = $mColumn . ' NOT LIKE "%' . $mVal . '%"';
+                                        $aLikeCompiled[$sLikeType][] = $sColumn . ' NOT LIKE "%' . $mVal . '%"';
                                         break;
                                 }
                             }
@@ -653,52 +599,23 @@ trait GetCountCommon
                              * as falsey values (such as null) are perfectly likely.
                              */
 
-                            //  Work out column
-                            $mColumn = isset($mHaving['column']) ? $mHaving['column'] : '[NAILS-COL-NOT-FOUND]';
+                            $sColumn   = $this->extractColumn($mHaving);
+                            $sOperator = $this->extractOperator($mHaving);
+                            $mVal      = $this->extractValue($mHaving);
+                            $bEscape   = $this->extractEscape($mHaving);
 
-                            if ($mColumn === '[NAILS-COL-NOT-FOUND]') {
-                                $mColumn = isset($mHaving[0]) && is_string($mHaving[0]) ? $mHaving[0] : null;
-                            }
-
-                            //  Work out value
-                            $mVal = isset($mHaving['value']) ? $mHaving['value'] : '[NAILS-VAL-NOT-FOUND]';
-
-                            if ($mVal === '[NAILS-VAL-NOT-FOUND]') {
-                                $mVal = isset($mHaving[1]) ? $mHaving[1] : null;
-                            }
-
-                            //  Escaped?
-                            $bEscape = isset($mHaving['escape']) ? (bool) $mHaving['escape'] : '[NAILS-ESCAPE-NOT-FOUND]';
-
-                            if ($bEscape === '[NAILS-ESCAPE-NOT-FOUND]') {
-                                $bEscape = isset($mHaving[2]) ? $mHaving[2] : true;
-                            }
-
-                            //  If the $mColumn is an array then we should concat them together
-                            if (is_array($mColumn)) {
-                                $mColumn = 'CONCAT_WS(" ", ' . implode(',', $mColumn) . ')';
-                            }
-
-                            //  Test if there's an SQL operator
-                            if (!(bool) preg_match('/(<|>|!|=|\sIS NULL|\sIS NOT NULL|\sEXISTS|\sBETWEEN|\sLIKE|\sIN\s*\(|\s)/i', trim($mColumn))) {
-                                $sOperator = is_null($mVal) ? ' IS ' : '=';
-                            } else {
-                                $sOperator = '';
+                            if ($bEscape) {
+                                $mVal = $oDb->escape($mVal);
                             }
 
                             //  Got something?
-                            if ($mColumn) {
+                            if ($sColumn) {
 
                                 switch ($sHavingType) {
 
                                     case $aMap[Having::class]:
                                     case $aMap[OrHaving::class]:
-
-                                        if ($bEscape) {
-                                            $mVal = $oDb->escape($mVal);
-                                        }
-
-                                        $aHavingCompiled[$sHavingType][] = $mColumn . $sOperator . $mVal;
+                                        $aHavingCompiled[$sHavingType][] = $sColumn . $sOperator . $mVal;
                                         break;
                                 }
                             }
@@ -939,5 +856,132 @@ trait GetCountCommon
                 }
             }
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Protects a column if it is a reserved word
+     *
+     * @param string $sColumn The column to protect
+     *
+     * @return string
+     * @throws FactoryException
+     */
+    protected function protectColumn(string $sColumn): string
+    {
+        /** @var Database $oDb */
+        $oDb = Factory::service('Database');
+
+        return in_array(strtoupper($sColumn), $oDb->getReservedWords())
+            ? '`' . $sColumn . '`'
+            : $sColumn;
+    }
+    // --------------------------------------------------------------------------
+
+    /**
+     * Extracts the column value from the query data
+     *
+     * @param array $aData the query data
+     *
+     * @return string
+     */
+    protected function extractColumn($aData): string
+    {
+        $mColumn = isset($aData['column'])
+            ? $aData['column'] :
+            '[NAILS-COL-NOT-FOUND]';
+
+        if ($mColumn === '[NAILS-COL-NOT-FOUND]') {
+            $mColumn = isset($aData[0]) && is_string($aData[0]) ? $aData[0] : null;
+        }
+
+        //  If the $mColumn is an array then we should concat them together
+        $sColumn = is_array($mColumn)
+            ? 'CONCAT_WS(" ", ' . implode(',', $sColumn) . ')'
+            : $mColumn;
+
+        //  Test if there's an SQL operator
+        if (!(bool) preg_match('/(<=|>=|<|>|!|=|\sIS NULL|\sIS NOT NULL|\sEXISTS|\sBETWEEN|\sLIKE|\sIN\s*\(|\s)/i', trim($sColumn))) {
+            $sColumn = trim($sColumn);
+
+        } else {
+            preg_match('/(.*)(<=|>=|<|>)$/i', trim($sColumn), $aMatches);
+            $sColumn = trim($aMatches[1]);
+        }
+
+        return $this->protectColumn($sColumn);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Extracts the operator value from the query data
+     *
+     * @param array $aData The query data
+     *
+     * @return string
+     */
+    protected function extractOperator($aData): string
+    {
+        $mColumn = isset($aData['column']) ? $aData['column'] : '[NAILS-COL-NOT-FOUND]';
+
+        if ($mColumn === '[NAILS-COL-NOT-FOUND]') {
+            $mColumn = isset($aData[0]) && is_string($aData[0]) ? $aData[0] : null;
+        }
+
+        $mVal = $this->extractValue($aData);
+
+        //  Test if there's an SQL operator
+        if (!(bool) preg_match('/(<=|>=|<|>|!|=|\sIS NULL|\sIS NOT NULL|\sEXISTS|\sBETWEEN|\sLIKE|\sIN\s*\(|\s)/i', trim($mColumn))) {
+            $sOperator = is_null($mVal) ? ' IS ' : '=';
+
+        } else {
+            preg_match('/(.*)(<=|>=|<|>)$/i', trim($mColumn), $matches);
+            $sOperator = trim($matches[2] ?? '=');
+        }
+
+        return $sOperator;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Extracts the value from the query data
+     *
+     * @param array $aData The query data
+     *
+     * @return mixed
+     */
+    protected function extractValue($aData)
+    {
+        //  Work out value
+        $mVal = isset($aData['value']) ? $aData['value'] : '[NAILS-VAL-NOT-FOUND]';
+
+        if ($mVal === '[NAILS-VAL-NOT-FOUND]') {
+            $mVal = isset($aData[1]) ? $aData[1] : null;
+        }
+
+        return $mVal;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Extracts the escape value from the query data
+     *
+     * @param array $aData The query data
+     *
+     * @return bool
+     */
+    protected function extractEscape($aData): bool
+    {
+        $bEscape = isset($aData['escape']) ? (bool) $aData['escape'] : '[NAILS-ESCAPE-NOT-FOUND]';
+
+        if ($bEscape === '[NAILS-ESCAPE-NOT-FOUND]') {
+            $bEscape = isset($aData[2]) ? $aData[2] : true;
+        }
+
+        return $bEscape;
     }
 }
