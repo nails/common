@@ -438,14 +438,9 @@ class Database
      */
     public function __call($sMethod, $aArguments)
     {
-        if (method_exists($this, $sMethod)) {
-
-            return call_user_func_array([$this, $sMethod], $aArguments);
-
-        } else {
-
-            return call_user_func_array([$this->oDb, $sMethod], $aArguments);
-        }
+        return method_exists($this, $sMethod)
+            ? call_user_func_array([$this, $sMethod], $aArguments)
+            : call_user_func_array([$this->oDb, $sMethod], $aArguments);
     }
 
     // --------------------------------------------------------------------------
