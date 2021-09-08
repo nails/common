@@ -431,7 +431,7 @@ trait GetCountCommon
             //  And reduce $aWhereStr to an actual string, like the name suggests
             if (!empty($aWhereStr)) {
                 $aWhereStr = implode(' AND ', $aWhereStr);
-                $oDb->where($aWhereStr);
+                $oDb->where($aWhereStr, null, false);
             }
         }
     }
