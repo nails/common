@@ -21,6 +21,7 @@ use Nails\Common\Exception\Database\ConnectionException;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Factory\Database\Transaction;
 use Nails\Common\Factory\Database\ForeignKeyCheck;
+use Nails\Common\Helper\ArrayHelper;
 use Nails\Config;
 use Nails\Environment;
 use Nails\Factory;
@@ -132,6 +133,9 @@ class Database
      * @var CI_DB_mysqli_driver
      */
     private $oDb;
+
+    /** @var string[] */
+    private static $aReservedWords = [];
 
     // --------------------------------------------------------------------------
 
@@ -398,6 +402,28 @@ class Database
     public function foreignKeyCheck(): ForeignKeyCheck
     {
         return Factory::factory('DatabaseForeignKeyCheck', null, $this);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns a list of MySQL reserved words
+     *
+     * @return string[]
+     */
+    public function getReservedWords(): array
+    {
+        if (!empty(self::$aReservedWords)) {
+            return self::$aReservedWords;
+        }
+
+        $aResult = $this
+            ->query('SELECT WORD FROM INFORMATION_SCHEMA.KEYWORDS WHERE RESERVED = 1;')
+            ->result();
+
+        self::$aReservedWords = ArrayHelper::extract($aResult, 'WORD');
+
+        return self::$aReservedWords;
     }
 
     // --------------------------------------------------------------------------
