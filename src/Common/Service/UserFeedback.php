@@ -71,12 +71,9 @@ class UserFeedback
         //  Pre-populate with flashdata
         //  @todo (Pablo - 2021-05-27) - Remove the fallback to the session
         foreach ($this->getTypes() as $sType) {
-            $sValue = $this->oSession->getFlashData($sType);
-            try {
-                if (!empty($sValue)) {
-                    $this->set($sType, $sValue);
-                }
-            } catch (\Exception $e) {
+            $sValue = $this->oSession->getFlashData(strtolower($sType));
+            if (!empty($sValue)) {
+                $this->set($sType, $sValue);
             }
         }
     }
