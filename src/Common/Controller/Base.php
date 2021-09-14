@@ -59,6 +59,11 @@ abstract class Base extends \MX_Controller
     protected $oMetaData;
 
     /**
+     * @var UserFeedback
+     */
+    protected $oUserFeedback;
+
+    /**
      * Items passed to here will be automatically passed to
      * the View when rendered. Deprecated: pass explicitly using the View service's
      * setData method.
@@ -88,8 +93,10 @@ abstract class Base extends \MX_Controller
         // --------------------------------------------------------------------------
 
         //  Populate some standard fields
-        $this->oLocale   = Factory::service('Locale');
-        $this->oMetaData = Factory::service('MetaData');
+        $this->oLocale       = Factory::service('Locale');
+        $this->oMetaData     = Factory::service('MetaData');
+        $this->oUserFeedback = Factory::service('UserFeedback');
+
         $this->oMetaData->setLocale($this->oLocale->get());
 
         //  @todo (Pablo - 2020-02-24) - Remove this/backwards compatibility
@@ -595,17 +602,16 @@ abstract class Base extends \MX_Controller
         /** @var UserFeedback $oUserFeedback */
         $oUserFeedback = Factory::service('UserFeedback');
 
-        //  @todo (Pablo - 2021-05-27) - Remove the fallback to the session
-        $aData['error']   = $oUserFeedback->getError() ?: $oSession->getFlashData('error');
-        $aData['success'] = $oUserFeedback->getSuccess() ?: $oSession->getFlashData('success');
-        $aData['info']    = $oUserFeedback->getInfo() ?: $oSession->getFlashData('info');
-        $aData['warning'] = $oUserFeedback->getWarning() ?: $oSession->getFlashData('warning');
+        $aData['error']   = $oUserFeedback->getError();
+        $aData['success'] = $oUserFeedback->getSuccess();
+        $aData['info']    = $oUserFeedback->getInfo();
+        $aData['warning'] = $oUserFeedback->getWarning();
 
         //  @deprecated (Pablo - 2021-05-27)
-        $aData['negative'] = $oUserFeedback->getNegative() ?: $oSession->getFlashData('negative');
-        $aData['positive'] = $oUserFeedback->getPositive() ?: $oSession->getFlashData('positive');
-        $aData['message']  = $oUserFeedback->getMessage() ?: $oSession->getFlashData('message');
-        $aData['notice']   = $oUserFeedback->getNotice() ?: $oSession->getFlashData('notice');
+        $aData['negative'] = $oUserFeedback->getNegative();
+        $aData['positive'] = $oUserFeedback->getPositive();
+        $aData['message']  = $oUserFeedback->getMessage();
+        $aData['notice']   = $oUserFeedback->getNotice();
     }
 
     // --------------------------------------------------------------------------

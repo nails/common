@@ -16,6 +16,7 @@
 namespace Nails\Common\Service;
 
 use Nails\Common\Exception\FactoryException;
+use Nails\Common\Factory\Service\UserFeedback\Message;
 use Nails\Factory;
 
 /**
@@ -46,7 +47,7 @@ class UserFeedback
     /** @var Session */
     private $oSession;
 
-    /** @var array */
+    /** @var string[]|null[] */
     private $aMessages;
 
     // --------------------------------------------------------------------------
@@ -66,6 +67,18 @@ class UserFeedback
         if (!is_array($this->aMessages)) {
             $this->aMessages = [];
         }
+
+        //  Pre-populate with flashdata
+        //  @todo (Pablo - 2021-05-27) - Remove the fallback to the session
+        foreach ($this>getTypes() as $sType) {
+            $sValue = $this->oSession->getFlashData($sType);
+            try {
+                if (!empty($sType)) {
+                    $this->set($sType, $sValue);
+                }
+            } catch (\Exception $e) {
+            }
+        }
     }
 
     // --------------------------------------------------------------------------
@@ -77,6 +90,7 @@ class UserFeedback
      * @param string $sMessage The message to set
      *
      * @return $this
+     * @throws \InvalidArgumentException
      */
     public function set(string $sType, string $sMessage): self
     {
@@ -98,6 +112,7 @@ class UserFeedback
      * @param string $sType The type to validate
      *
      * @return $this
+     * @throws \InvalidArgumentException
      */
     protected function validateType(string $sType): self
     {
@@ -136,14 +151,36 @@ class UserFeedback
      *
      * @param string $sType The type of feedback to return
      *
-     * @return string
+     * @return Message
+     * @throws \InvalidArgumentException
      */
-    public function get(string $sType): string
+    public function get(string $sType): Message
     {
         $sType = strtoupper(trim($sType));
         $this->validateType($sType);
 
-        return $this->aMessages[$sType] ?? '';
+        /** @var Message $oMessage */
+        $oMessage = Factory::factory('UserFeedbackMessage', null, $this, $sType);
+
+        return $oMessage;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the current value for a type
+     *
+     * @param string $sType
+     *
+     * @return string|null
+     * @throws \InvalidArgumentException
+     */
+    public function getValue(string $sType): ?string
+    {
+        $sType = strtoupper(trim($sType));
+        $this->validateType($sType);
+
+        return $this->aMessages[$sType] ?? null;
     }
 
     // --------------------------------------------------------------------------
@@ -187,6 +224,7 @@ class UserFeedback
      * @param string|null $sType The type of feedback to clear, clears everything if empty
      *
      * @return $this
+     * @throws \InvalidArgumentException
      */
     public function clear(string $sType = null): self
     {
@@ -194,7 +232,7 @@ class UserFeedback
             $this->aMessages = [];
         } else {
             $this->validateType($sType);
-            $this->aMessages[$sType] = '';
+            $this->aMessages[$sType] = null;
         }
 
         return $this;
@@ -208,6 +246,7 @@ class UserFeedback
      * @param string $sMessage The message to set
      *
      * @return $this
+     * @throws \InvalidArgumentException
      */
     public function success(string $sMessage): self
     {
@@ -219,9 +258,10 @@ class UserFeedback
     /**
      * Return the "success" feedback message
      *
-     * @return string
+     * @return Message
+     * @throws \InvalidArgumentException
      */
-    public function getSuccess(): string
+    public function getSuccess(): Message
     {
         return $this->get(static::TYPE_SUCCESS);
     }
@@ -234,6 +274,7 @@ class UserFeedback
      * @param string $sMessage The message to set
      *
      * @return $this
+     * @throws \InvalidArgumentException
      */
     public function error(string $sMessage): self
     {
@@ -245,9 +286,10 @@ class UserFeedback
     /**
      * Return the "error" feedback message
      *
-     * @return string
+     * @return Message
+     * @throws \InvalidArgumentException
      */
-    public function getError(): string
+    public function getError(): Message
     {
         return $this->get(static::TYPE_ERROR);
     }
@@ -260,6 +302,7 @@ class UserFeedback
      * @param string $sMessage The message to set
      *
      * @return $this
+     * @throws \InvalidArgumentException
      */
     public function warning(string $sMessage): self
     {
@@ -271,9 +314,10 @@ class UserFeedback
     /**
      * Return the "warning" feedback message
      *
-     * @return string
+     * @return Message
+     * @throws \InvalidArgumentException
      */
-    public function getWarning(): string
+    public function getWarning(): Message
     {
         return $this->get(static::TYPE_WARNING);
     }
@@ -286,6 +330,7 @@ class UserFeedback
      * @param string $sMessage The message to set
      *
      * @return $this
+     * @throws \InvalidArgumentException
      */
     public function info(string $sMessage): self
     {
@@ -297,9 +342,10 @@ class UserFeedback
     /**
      * Return the "info" feedback message
      *
-     * @return string
+     * @return Message
+     * @throws \InvalidArgumentException
      */
-    public function getInfo(): string
+    public function getInfo(): Message
     {
         return $this->get(static::TYPE_INFO);
     }
@@ -312,6 +358,7 @@ class UserFeedback
      * @param string $sMessage The message to set
      *
      * @return $this
+     * @throws \InvalidArgumentException
      * @deprecated
      */
     public function positive(string $sMessage): self
@@ -324,10 +371,11 @@ class UserFeedback
     /**
      * Return the "positive" feedback message
      *
-     * @return string
+     * @return Message
+     * @throws \InvalidArgumentException
      * @deprecated
      */
-    public function getPositive(): string
+    public function getPositive(): Message
     {
         return $this->get(static::TYPE_POSITIVE);
     }
@@ -340,6 +388,7 @@ class UserFeedback
      * @param string $sMessage The message to set
      *
      * @return $this
+     * @throws \InvalidArgumentException
      * @deprecated
      */
     public function negative(string $sMessage): self
@@ -352,10 +401,11 @@ class UserFeedback
     /**
      * Return the "negative" feedback message
      *
-     * @return string
+     * @return Message
+     * @throws \InvalidArgumentException
      * @deprecated
      */
-    public function getNegative(): string
+    public function getNegative(): Message
     {
         return $this->get(static::TYPE_NEGATIVE);
     }
@@ -368,6 +418,7 @@ class UserFeedback
      * @param string $sMessage The message to set
      *
      * @return $this
+     * @throws \InvalidArgumentException
      * @deprecated
      */
     public function message(string $sMessage): self
@@ -380,10 +431,11 @@ class UserFeedback
     /**
      * Return the "message" feedback message
      *
-     * @return string
+     * @return Message
+     * @throws \InvalidArgumentException
      * @deprecated
      */
-    public function getMessage(): string
+    public function getMessage(): Message
     {
         return $this->get(static::TYPE_MESSAGE);
     }
@@ -396,6 +448,7 @@ class UserFeedback
      * @param string $sMessage The message to set
      *
      * @return $this
+     * @throws \InvalidArgumentException
      * @deprecated
      */
     public function notice(string $sMessage): self
@@ -408,10 +461,11 @@ class UserFeedback
     /**
      * Return the "notice" feedback message
      *
-     * @return string
+     * @return Message
+     * @throws \InvalidArgumentException
      * @deprecated
      */
-    public function getNotice(): string
+    public function getNotice(): Message
     {
         return $this->get(static::TYPE_NOTICE);
     }

@@ -582,6 +582,16 @@ return [
                 return new \Nails\Common\Factory\PDODatabase\Transaction($oDatabase);
             }
         },
+        'UserFeedbackMessage'        => function (
+            Service\UserFeedback $oUserFeedback,
+            string $sType
+        ): \Nails\Common\Factory\Service\UserFeedback\Message {
+            if (class_exists('\App\Common\Factory\UserFeedback\Message')) {
+                return new \App\Common\Factory\Service\UserFeedback\Message($oUserFeedback, $sType);
+            } else {
+                return new \Nails\Common\Factory\Service\UserFeedback\Message($oUserFeedback, $sType);
+            }
+        },
     ],
 
     'resources' => [
