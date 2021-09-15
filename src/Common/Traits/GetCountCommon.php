@@ -903,12 +903,12 @@ trait GetCountCommon
             ? 'CONCAT_WS(" ", ' . implode(',', $sColumn) . ')'
             : trim($mColumn);
 
-        //  Test if there's an SQL operator
-        if ((bool) preg_match('/(<=|>=|<|>|!|=|\sIS NULL|\sIS NOT NULL|\sEXISTS|\sBETWEEN|\sLIKE|\sIN\s*\(|\s)/i', $sColumn)) {
-            preg_match('/(.*)(<=|>=|<|>)$/i', $sColumn, $aMatches);
-            if (!empty($aMatches[1])) {
-                $sColumn = trim($aMatches[1]);
-            }
+        //  Filter out any SQL operators
+        $aOperators = $this->getSqlOperators();
+
+        preg_match('/(.*)(' . implode('|', $aOperators) . ')/i', $sColumn, $aMatches);
+        if (!empty($aMatches[1])) {
+            $sColumn = trim($aMatches[1]);
         }
 
         return $this->protectColumn($sColumn);
@@ -935,15 +935,25 @@ trait GetCountCommon
                 : null;
         }
 
+        //  If the $mColumn is an array then we should concat them together
+        $sColumn = is_array($mColumn)
+            ? 'CONCAT_WS(" ", ' . implode(',', $sColumn) . ')'
+            : trim($mColumn);
+
         $mVal = $this->extractValue($aData);
 
-        //  Test if there's an SQL operator
-        if (!(bool) preg_match('/(<=|>=|<|>|!|=|\sIS NULL|\sIS NOT NULL|\sEXISTS|\sBETWEEN|\sLIKE|\sIN\s*\(|\s)/i', trim($mColumn))) {
-            $sOperator = is_null($mVal) ? ' IS ' : '=';
+        //  Look for SQL operators
+        $aOperators = $this->getSqlOperators();
+
+        preg_match('/(.*)(' . implode('|', $aOperators) . ')/i', $sColumn, $aMatches);
+        if (!empty($aMatches[2])) {
+            $sOperator = trim($aMatches[2]);
+
+        } elseif (is_null($mVal)) {
+            $sOperator = ' IS ';
 
         } else {
-            preg_match('/(.*)(<=|>=|<|>)$/i', trim($mColumn), $matches);
-            $sOperator = trim($matches[2] ?? '=');
+            $sOperator = '=';
         }
 
         return $sOperator;
@@ -994,5 +1004,25 @@ trait GetCountCommon
         }
 
         return $bEscape;
+    }
+
+    // --------------------------------------------------------------------------
+
+    protected function getSqlOperators(): array
+    {
+        return [
+            '<=',
+            '>=',
+            '<',
+            '>',
+            '!',
+            '=',
+            '\sIS NULL',
+            '\sIS NOT NULL',
+            '\sEXISTS',
+            '\sBETWEEN',
+            '\sLIKE',
+            '\sIN\s*\(',
+        ];
     }
 }
