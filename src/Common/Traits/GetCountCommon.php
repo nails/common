@@ -889,11 +889,13 @@ trait GetCountCommon
     protected function extractColumn($aData): string
     {
         $mColumn = isset($aData['column'])
-            ? $aData['column'] :
-            '[NAILS-COL-NOT-FOUND]';
+            ? $aData['column']
+            : '[NAILS-COL-NOT-FOUND]';
 
         if ($mColumn === '[NAILS-COL-NOT-FOUND]') {
-            $mColumn = isset($aData[0]) && is_string($aData[0]) ? $aData[0] : null;
+            $mColumn = isset($aData[0]) && is_string($aData[0])
+                ? $aData[0]
+                : null;
         }
 
         //  If the $mColumn is an array then we should concat them together
@@ -923,10 +925,14 @@ trait GetCountCommon
      */
     protected function extractOperator($aData): string
     {
-        $mColumn = isset($aData['column']) ? $aData['column'] : '[NAILS-COL-NOT-FOUND]';
+        $mColumn = isset($aData['column'])
+            ? $aData['column']
+            : '[NAILS-COL-NOT-FOUND]';
 
         if ($mColumn === '[NAILS-COL-NOT-FOUND]') {
-            $mColumn = isset($aData[0]) && is_string($aData[0]) ? $aData[0] : null;
+            $mColumn = isset($aData[0]) && is_string($aData[0])
+                ? $aData[0]
+                : null;
         }
 
         $mVal = $this->extractValue($aData);
@@ -955,10 +961,14 @@ trait GetCountCommon
     protected function extractValue($aData)
     {
         //  Work out value
-        $mVal = isset($aData['value']) ? $aData['value'] : '[NAILS-VAL-NOT-FOUND]';
+        $mVal = isset($aData['value'])
+            ? $aData['value']
+            : '[NAILS-VAL-NOT-FOUND]';
 
         if ($mVal === '[NAILS-VAL-NOT-FOUND]') {
-            $mVal = isset($aData[1]) ? $aData[1] : null;
+            $mVal = isset($aData[1])
+                ? $aData[1]
+                : null;
         }
 
         return $mVal;
@@ -975,7 +985,9 @@ trait GetCountCommon
      */
     protected function extractEscape($aData): bool
     {
-        $bEscape = isset($aData['escape']) ? (bool) $aData['escape'] : '[NAILS-ESCAPE-NOT-FOUND]';
+        $bEscape = isset($aData['escape'])
+            ? (bool) $aData['escape']
+            : '[NAILS-ESCAPE-NOT-FOUND]';
 
         if ($bEscape === '[NAILS-ESCAPE-NOT-FOUND]') {
             $bEscape = isset($aData[2]) ? $aData[2] : true;
