@@ -1,9 +1,16 @@
 <?php
 
 use Nails\Config;
+use Nails\Common\Service\UserFeedback;
+use Nails\Common\Service\View;
 use Nails\Factory;
 
+/** @var View $oView */
 $oView = Factory::service('View');
+/** @var UserFeedback $oUserFeedback */
+$oUserFeedback = Factory::service('UserFeedback');
+
+
 $oView->load('structure/header/blank');
 
 ?>
@@ -16,21 +23,14 @@ $oView->load('structure/header/blank');
     <hr />
     <?php
 
-    $aMessages = [
-        'error'    => 'error',
-        'negative' => 'error',
-        'success'  => 'success',
-        'positive' => 'success',
-        'info'     => 'info',
-        'warning'  => 'warning',
-    ];
+    foreach ($oUserFeedback->getTypes() as $sType) {
 
+        $sValue = (string) $oUserFeedback->get($sType);
 
-    foreach ($aMessages as $sVariable => $sClass) {
-        if (!empty(${$sVariable})) {
+        if (!empty($sValue)) {
             ?>
-            <p class="alert alert-<?=$sClass?>">
-                <?=${$sVariable}?>
+            <p class="alert alert-<?=strtolower($sType)?>">
+                <?=$sValue?>
             </p>
             <?php
         }
