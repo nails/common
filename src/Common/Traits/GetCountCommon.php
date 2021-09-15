@@ -899,15 +899,14 @@ trait GetCountCommon
         //  If the $mColumn is an array then we should concat them together
         $sColumn = is_array($mColumn)
             ? 'CONCAT_WS(" ", ' . implode(',', $sColumn) . ')'
-            : $mColumn;
+            : trim($mColumn);
 
         //  Test if there's an SQL operator
-        if (!(bool) preg_match('/(<=|>=|<|>|!|=|\sIS NULL|\sIS NOT NULL|\sEXISTS|\sBETWEEN|\sLIKE|\sIN\s*\(|\s)/i', trim($sColumn))) {
-            $sColumn = trim($sColumn);
-
-        } else {
-            preg_match('/(.*)(<=|>=|<|>)$/i', trim($sColumn), $aMatches);
-            $sColumn = trim($aMatches[1]);
+        if ((bool) preg_match('/(<=|>=|<|>|!|=|\sIS NULL|\sIS NOT NULL|\sEXISTS|\sBETWEEN|\sLIKE|\sIN\s*\(|\s)/i', $sColumn)) {
+            preg_match('/(.*)(<=|>=|<|>)$/i', $sColumn, $aMatches);
+            if (!empty($aMatches[1])) {
+                $sColumn = trim($aMatches[1]);
+            }
         }
 
         return $this->protectColumn($sColumn);
