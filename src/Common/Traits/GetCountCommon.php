@@ -906,7 +906,7 @@ trait GetCountCommon
         //  Filter out any SQL operators
         $aOperators = $this->getSqlOperators();
 
-        preg_match('/(.*)(' . implode('|', $aOperators) . ')/i', $sColumn, $aMatches);
+        preg_match('/(.*)(' . implode('|', $aOperators) . ')\s+$/i', $sColumn, $aMatches);
         if (!empty($aMatches[1])) {
             $sColumn = trim($aMatches[1]);
         }
@@ -945,7 +945,7 @@ trait GetCountCommon
         //  Look for SQL operators
         $aOperators = $this->getSqlOperators();
 
-        preg_match('/(.*)(' . implode('|', $aOperators) . ')/i', $sColumn, $aMatches);
+        preg_match('/(.*)(' . implode('|', $aOperators) . ')\s+$/i', $sColumn, $aMatches);
         if (!empty($aMatches[2])) {
             $sOperator = trim($aMatches[2]);
 
