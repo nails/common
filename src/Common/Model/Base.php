@@ -1027,13 +1027,13 @@ abstract class Base
      *
      * @param int|null|array $iPage           The page number of the results, if null then no pagination; also accepts an $aData array
      * @param int|null       $iPerPage        How many items per page of paginated results
-     * @param mixed          $aData           Any data to pass to getCountCommon()
+     * @param array          $aData           Any data to pass to getCountCommon()
      * @param bool           $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
      *
      * @return Resource[]
      * @throws ModelException
      */
-    public function getAll($iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false): array
+    public function getAll($iPage = null, $iPerPage = null, array $aData = [], bool $bIncludeDeleted = false): array
     {
         //  If the first value is an array then treat as if called with getAll(null, null, $aData);
         if (is_array($iPage)) {
