@@ -1057,6 +1057,40 @@ abstract class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Returns the first item for a given query
+     *
+     * @param array $aData           Any data to pass to getCountCommon()
+     * @param bool  $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
+     *
+     * @return Resource|null
+     * @throws ModelException
+     */
+    public function getFirst(array $aData = [], bool $bIncludeDeleted = false): ?Resource
+    {
+        $aResults = $this->getAll($aData, $bIncludeDeleted);
+        return reset($aResults) ?: null;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the last item for a given query
+     *
+     * @param array $aData           Any data to pass to getCountCommon()
+     * @param bool  $bIncludeDeleted If non-destructive delete is enabled then this flag allows you to include deleted items
+     *
+     * @return Resource|null
+     * @throws ModelException
+     */
+    public function getLast(array $aData = [], bool $bIncludeDeleted = false): ?Resource
+    {
+        $aResults = $this->getAll($aData, $bIncludeDeleted);
+        return end($aResults) ?: null;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Handle requests for expanding objects. There are two types of expandable objects:
      *  1. Fields which are an ID, these can be expanded by the appropriate model (1 to 1)
      *  2. Query a model for items which reference this item's ID  (1 to many)
