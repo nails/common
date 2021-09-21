@@ -352,7 +352,7 @@ abstract class Base
      */
     public function create(array $aData = [], $bReturnObject = false)
     {
-        $this->triggerEvent(static::EVENT_CREATING, [$aData, $this]);
+        $this->triggerEvent(static::EVENT_CREATING, [&$aData, $this]);
 
         /** @var Database $oDb */
         $oDb    = Factory::service('Database');
@@ -449,7 +449,7 @@ abstract class Base
      */
     public function update($iId, array $aData = []): bool
     {
-        $this->triggerEvent(static::EVENT_UPDATING, [$aData, $this]);
+        $this->triggerEvent(static::EVENT_UPDATING, [&$aData, $this]);
 
         $sAlias = $this->getTableAlias(true);
         $sTable = $this->getTableName(true);
