@@ -429,6 +429,30 @@ class Database
     // --------------------------------------------------------------------------
 
     /**
+     * Returns whether the  server is version 5.7
+     *
+     * @return bool
+     */
+    public function isMySQL57(): bool
+    {
+        return version_compare($this->version(), '5.7.0', '>=') && version_compare($this->version(), '5.8.0', '<');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns whether the  server is version 8
+     *
+     * @return bool
+     */
+    public function isMySQL80(): bool
+    {
+        return version_compare($this->version(), '8.0.0', '>=') && version_compare($this->version(), '9.0.0', '<');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Route calls to the CodeIgniter Database class
      *
      * @param string $sMethod    The method being called
