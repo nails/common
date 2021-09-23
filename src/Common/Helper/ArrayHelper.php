@@ -94,10 +94,11 @@ class ArrayHelper
     /**
      * Sorts a multi dimensional array
      *
-     * @param array  &$aArray The array to sort
-     * @param string  $sField The key to sort on
+     * @param array  &$aArray     The array to sort
+     * @param string  $sField     The key to sort on
+     * @param bool    $bAscending Sort ascending
      */
-    public static function arraySortMulti(array &$aArray, $sField)
+    public static function arraySortMulti(array &$aArray, string $sField, bool $bAscending = true): void
     {
         uasort($aArray, function ($a, $b) use ($sField) {
 
@@ -147,6 +148,10 @@ class ArrayHelper
 
             return $aSort[0] == $mA ? -1 : 1;
         });
+
+        if (!$bAscending) {
+            $aArray = array_reverse($aArray);
+        }
     }
 
     // --------------------------------------------------------------------------
