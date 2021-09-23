@@ -49,7 +49,7 @@ trait Publishable
      *
      * @return \CI_DB_mysqli_result
      */
-    abstract public function getAllRawQuery($iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false): \CI_DB_mysqli_result;
+    abstract public function getAllRawQuery($iPage = null, $iPerPage = null, array $aData = [], bool $bIncludeDeleted = false): \CI_DB_mysqli_result;
 
     // --------------------------------------------------------------------------
 

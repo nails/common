@@ -55,7 +55,7 @@ trait Searchable
      * @return int
      * @throws ModelException
      */
-    abstract public function countAll(array $aData = [], $bIncludeDeleted = false): int;
+    abstract public function countAll(array $aData = [], bool $bIncludeDeleted = false): int;
 
     // --------------------------------------------------------------------------
 
@@ -94,7 +94,7 @@ trait Searchable
      *
      * @return \stdClass
      */
-    public function search($sKeywords, $iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false)
+    public function search($sKeywords, $iPage = null, $iPerPage = null, array $aData = [], bool $bIncludeDeleted = false)
     {
         //  If the second parameter is an array then treat as if called with search($sKeywords, null, null, $aData);
         if (is_array($iPage)) {

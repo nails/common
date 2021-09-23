@@ -931,7 +931,7 @@ abstract class Base
      * @throws ModelException
      * @throws FactoryException
      */
-    public function getAllRawQuery($iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false): \CI_DB_mysqli_result
+    public function getAllRawQuery($iPage = null, $iPerPage = null, array $aData = [], bool $bIncludeDeleted = false): \CI_DB_mysqli_result
     {
         //  If the first value is an array then treat as if called with getAll(null, null, $aData);
         if (is_array($iPage)) {
@@ -1240,7 +1240,7 @@ abstract class Base
      * @return array
      * @throws ModelException
      */
-    public function getAllFlat($iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false)
+    public function getAllFlat($iPage = null, $iPerPage = null, array $aData = [], bool $bIncludeDeleted = false)
     {
         if (!array_key_exists('select', $aData)) {
             $aData['select'] = [];
@@ -1994,7 +1994,7 @@ abstract class Base
      * @return int
      * @throws ModelException
      */
-    public function countAll(array $aData = [], $bIncludeDeleted = false): int
+    public function countAll(array $aData = [], bool $bIncludeDeleted = false): int
     {
         /** @var Database $oDb */
         $oDb   = Factory::service('Database');
