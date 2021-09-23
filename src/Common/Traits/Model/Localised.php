@@ -105,7 +105,7 @@ trait Localised
      * @return Resource[]
      * @throws FactoryException
      */
-    public function getAll($iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false): array
+    public function getAll($iPage = null, $iPerPage = null, array $aData = [], bool $bIncludeDeleted = false): array
     {
         $aResult = parent::getAll($iPage, $iPerPage, $aData, $bIncludeDeleted);
         $this->addLocaleToResources($aResult);

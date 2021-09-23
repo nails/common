@@ -35,7 +35,7 @@ trait Publishable
      *
      * @return Resource[]
      */
-    abstract public function getAll($iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false): array;
+    abstract public function getAll($iPage = null, $iPerPage = null, array $aData = [], bool $bIncludeDeleted = false): array;
 
     // --------------------------------------------------------------------------
 
