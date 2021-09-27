@@ -7,7 +7,7 @@
     "analyze": true,
     "license": "MIT",
     "devDependencies": {
-        "autoprefixer": "^9.0",
+        "autoprefixer": "^9.8",
         "css-loader": "^6.3",
         "mini-css-extract-plugin": "^2.3",
         "sass": "^1.41",
