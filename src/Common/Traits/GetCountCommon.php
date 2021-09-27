@@ -17,6 +17,7 @@ use Nails\Common\Helper\Model\Condition;
 use Nails\Common\Helper\Model\GroupBy;
 use Nails\Common\Helper\Model\Having;
 use Nails\Common\Helper\Model\Like;
+use Nails\Common\Helper\Model\Limit;
 use Nails\Common\Helper\Model\NotLike;
 use Nails\Common\Helper\Model\OrHaving;
 use Nails\Common\Helper\Model\OrLike;
@@ -819,6 +820,7 @@ trait GetCountCommon
     {
         $aMap = [
             Paginate::class => 'limit',
+            Limit::class => 'limit',
         ];
 
         $this->parseUtilityClasses($aData, $aMap, false);
