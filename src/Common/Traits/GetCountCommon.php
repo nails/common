@@ -26,6 +26,7 @@ use Nails\Common\Helper\Model\OrWhere;
 use Nails\Common\Helper\Model\OrWhereIn;
 use Nails\Common\Helper\Model\OrWhereNotIn;
 use Nails\Common\Helper\Model\Paginate;
+use Nails\Common\Helper\Model\Select;
 use Nails\Common\Helper\Model\Sort;
 use Nails\Common\Helper\Model\Where;
 use Nails\Common\Helper\Model\WhereIn;
@@ -66,6 +67,16 @@ trait GetCountCommon
      */
     protected function getCountCommonCompileSelect(array &$aData): void
     {
+
+        /**
+         * Parse utility classes into the main data array
+         */
+        $aMap = [
+            Select::class => 'select',
+        ];
+
+        $this->parseUtilityClasses($aData, $aMap, false);
+
         if (!empty($aData['select'])) {
             /** @var Database $oDb */
             $oDb = Factory::service('Database');
