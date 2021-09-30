@@ -1514,8 +1514,8 @@ abstract class Base
         return $this->getAll(array_merge(
             $aData,
             [
-                'limit' => $iLimit,
-                'sort'  => ['*', 'RANDOM'],
+                new Helper\Model\Limit($iLimit),
+                new Helper\Model\Sort('*', Helper\Model\Sort::RANDOM),
             ]
         ));
     }
