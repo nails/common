@@ -9,8 +9,9 @@ namespace Nails\Common\Helper\Model;
  */
 class Sort
 {
-    const ASC  = 'asc';
-    const DESC = 'desc';
+    const ASC    = 'asc';
+    const DESC   = 'desc';
+    const RANDOM = 'RANDOM';
 
     // --------------------------------------------------------------------------
 
