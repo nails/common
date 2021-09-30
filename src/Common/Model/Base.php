@@ -953,10 +953,10 @@ abstract class Base
             && $this->getDefaultSortColumn()
             && !Helper\ArrayHelper::containsInstanceOf($aData, Helper\Model\Sort::class)
         ) {
-            $aData['sort'] = [
+            $aData[] = new Helper\Model\Sort(
                 $this->getDefaultSortColumn(),
-                $this->getDefaultSortOrder(),
-            ];
+                $this->getDefaultSortOrder()
+            );
         }
 
         // --------------------------------------------------------------------------
