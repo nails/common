@@ -486,13 +486,13 @@ class Asset
      */
     public function load(
         $mAssets,
-        ?string $sAssetLocation = 'APP',
+        string $sAssetLocation = null,
         string $sForceType = null,
         bool $bAsync = false
     ): self {
 
-        //  Cast as an array
-        $aAssets = (array) $mAssets;
+        $aAssets        = (array) $mAssets;
+        $sAssetLocation = $sAssetLocation ?? 'APP';
 
         // --------------------------------------------------------------------------
 
