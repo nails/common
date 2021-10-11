@@ -923,7 +923,10 @@ class Asset
             return static::TYPE_JS;
         }
 
-        throw new AssetException('Unable to determine type');
+        throw new AssetException(sprintf(
+            'Unable to determine type for `%s`',
+            $sAsset
+        ));
     }
 
     // --------------------------------------------------------------------------
