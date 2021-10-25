@@ -16,6 +16,7 @@ use Nails\Common\Helper\ArrayHelper;
 use Nails\Common\Helper\Model\Condition;
 use Nails\Common\Helper\Model\GroupBy;
 use Nails\Common\Helper\Model\Having;
+use Nails\Common\Helper\Model\Join;
 use Nails\Common\Helper\Model\Like;
 use Nails\Common\Helper\Model\Limit;
 use Nails\Common\Helper\Model\NotLike;
@@ -56,6 +57,7 @@ trait GetCountCommon
         $this->getCountCommonCompileSort($aData);
         $this->getCountCommonCompileGroupBy($aData);
         $this->getCountCommonCompileLimit($aData);
+        $this->getCountCommonCompileJoins($aData);
     }
 
     // --------------------------------------------------------------------------
@@ -831,10 +833,39 @@ trait GetCountCommon
     {
         $aMap = [
             Paginate::class => 'limit',
-            Limit::class => 'limit',
+            Limit::class    => 'limit',
         ];
 
         $this->parseUtilityClasses($aData, $aMap, false);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Compiles any custom joins into the query
+     *
+     * @param array $aData
+     *
+     * @throws \Nails\Common\Exception\FactoryException
+     */
+    protected function getCountCommonCompileJoins(array &$aData): void
+    {
+        /** @var Database $oDb */
+        $oDb = Factory::service('Database');
+
+        $aMap = [
+            Join::class => 'join',
+        ];
+
+        $this->parseUtilityClasses($aData, $aMap);
+
+        foreach ($aData['join'] ?? [] as $aJoin) {
+            $oDb->join(
+                $aJoin['table'] ?? $aJoin[0] ?? null,
+                $aJoin['on'] ?? $aJoin[1] ?? null,
+                $aJoin['tye'] ?? $aJoin[2] ?? null,
+            );
+        }
     }
 
     // --------------------------------------------------------------------------
