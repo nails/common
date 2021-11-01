@@ -191,6 +191,7 @@ class Meta
         $sAppName     = $oMetaData->getTitles()->implode();
         $sDescription = $oMetaData->getDescription();
         $aKeywords    = array_filter(array_unique($oMetaData->getKeywords()));
+        $bNoIndex     = $oMetaData->getNoIndex();
 
         // --------------------------------------------------------------------------
 
@@ -203,6 +204,12 @@ class Meta
                 'name'    => 'viewport',
                 'content' => 'width=device-width, initial-scale=1',
             ]);
+
+        // --------------------------------------------------------------------------
+
+        if ($bNoIndex) {
+            $this->add('robots', 'noindex');
+        }
 
         // --------------------------------------------------------------------------
 
