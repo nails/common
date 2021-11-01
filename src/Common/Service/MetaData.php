@@ -16,7 +16,7 @@ class MetaData
     /** @var string[] */
     protected $aTitles = [];
 
-    /** @var bool bool */
+    /** @var bool */
     protected $bTitleAppendAppName = true;
 
     /** @var Locale */
@@ -52,10 +52,10 @@ class MetaData
     /** @var string[] */
     protected $aBodyClasses = [];
 
-    /** @var string string */
+    /** @var string */
     protected $sTitleSeparator = ' - ';
 
-    /** @var string string */
+    /** @var string */
     protected $sClassSeparator = ' ';
 
     // --------------------------------------------------------------------------
