@@ -58,6 +58,9 @@ class MetaData
     /** @var string */
     protected $sClassSeparator = ' ';
 
+    /** @var bool */
+    protected $bNoIndex = false;
+
     // --------------------------------------------------------------------------
 
     /**
@@ -458,5 +461,32 @@ class MetaData
     public function getBodyClasses(): Service\MetaData\Collection
     {
         return new Service\MetaData\Collection($this->aBodyClasses, $this->sClassSeparator);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets whether the page should be indexed or not
+     *
+     * @param bool $bNoIndex
+     *
+     * @return $this
+     */
+    public function setNoIndex(bool $bNoIndex): self
+    {
+        $this->bNoIndex = $bNoIndex;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Gets whether the page should be indexed or not
+     *
+     * @return bool
+     */
+    public function getNoIndex(): bool
+    {
+        return $this->bNoIndex;
     }
 }
