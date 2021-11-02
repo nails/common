@@ -449,7 +449,7 @@ abstract class Base
      */
     public function update($iId, array $aData = []): bool
     {
-        $this->triggerEvent(static::EVENT_UPDATING, [&$aData, $this]);
+        $this->triggerEvent(static::EVENT_UPDATING, [&$aData, $this, $iId]);
 
         $sAlias = $this->getTableAlias(true);
         $sTable = $this->getTableName(true);
