@@ -205,6 +205,15 @@ abstract class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Whether to skip the delete exists check
+     *
+     * @var bool
+     */
+    protected static $SKIP_DELETE_EXISTS_CHECK = false;
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Keeps a track of the columns which have been used by getByColumn(); allows
      * for us to more easily invalidate caches
      *
@@ -688,16 +697,18 @@ abstract class Base
      * destroy the object. If Non-destructive deletion is enabled then the
      * $this->getColumnIsDeleted() field will be set to true.
      *
-     * @param int  $iId          The ID of the object to mark as deleted
-     * @param bool $bCheckExists Check whether the item exists prior to deletion
+     * @param int $iId The ID of the object to mark as deleted
      *
      * @return bool
      * @throws FactoryException
      * @throws ModelException
      */
-    public function delete($iId, bool $bCheckExists = true): bool
+    public function delete($iId): bool
     {
-        if ($bCheckExists) {
+        if (!static::$SKIP_DELETE_EXISTS_CHECK) {
+
+            static::$SKIP_DELETE_EXISTS_CHECK = false;
+
             $oItem = $this->getById($iId);
             if (empty($oItem)) {
                 $this->setError('Item does not exist.');
@@ -705,7 +716,7 @@ abstract class Base
             }
         }
 
-        $this->triggerEvent(static::EVENT_DELETING, [$oItem, $this]);
+        $this->triggerEvent(static::EVENT_DELETING, [$oItem ?? null ?? null, $this]);
 
         if ($this->isDestructiveDelete()) {
             $bResult = $this->destroy($iId);
@@ -714,7 +725,7 @@ abstract class Base
         }
 
         if ($bResult) {
-            $this->triggerEvent(static::EVENT_DELETED, [$iId, $oItem, $this]);
+            $this->triggerEvent(static::EVENT_DELETED, [$iId, $oItem ?? null, $this]);
         }
 
         return $bResult;
@@ -743,11 +754,19 @@ abstract class Base
         $aIds = array_values($aIds);
 
         /** @var Database $oDb */
-        $oDb = Factory::service('Database');
+        $oDb       = Factory::service('Database');
+        $bSkipTest = static::$SKIP_DELETE_EXISTS_CHECK;
+
         try {
 
             $oDb->transaction()->start();
             foreach ($aIds as $iId) {
+
+                //  Ensure that the skip is not reset in between queries
+                if ($bSkipTest) {
+                    $this->skipDeleteExistsCheck();
+                }
+
                 if (!$this->delete($iId)) {
                     throw new ModelException('Failed to delete item with ID ' . $iId . '. ' . $this->lastError());
                 }
@@ -777,11 +796,19 @@ abstract class Base
         $oResults = $this->getAllRawQuery(['where' => $aData]);
 
         /** @var Database $oDb */
-        $oDb = Factory::service('Database');
+        $oDb       = Factory::service('Database');
+        $bSkipTest = static::$SKIP_DELETE_EXISTS_CHECK;
+
         try {
 
             $oDb->transaction()->start();
             while ($oResult = $oResults->unbuffered_row()) {
+
+                //  Ensure that the skip is not reset in between queries
+                if ($bSkipTest) {
+                    $this->skipDeleteExistsCheck();
+                }
+
                 if (!$this->delete((int) $oResult->id)) {
                     throw new ModelException('Failed to delete item with ID ' . $oResult->id . '. ' . $this->lastError());
                 }
@@ -794,6 +821,21 @@ abstract class Base
             $this->setError($e->getMessage());
             return false;
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * By default when deleting a check is made that the item exists, this
+     * can be skipped by calling this function ahead of time. It'll reset
+     * after each deletion.
+     *
+     * @return $this
+     */
+    public function skipDeleteExistsCheck(): self
+    {
+        static::$SKIP_DELETE_EXISTS_CHECK = true;
+        return $this;
     }
 
     // --------------------------------------------------------------------------
