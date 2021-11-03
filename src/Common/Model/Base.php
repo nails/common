@@ -688,18 +688,21 @@ abstract class Base
      * destroy the object. If Non-destructive deletion is enabled then the
      * $this->getColumnIsDeleted() field will be set to true.
      *
-     * @param int $iId The ID of the object to mark as deleted
+     * @param int  $iId          The ID of the object to mark as deleted
+     * @param bool $bCheckExists Check whether the item exists prior to deletion
      *
      * @return bool
      * @throws FactoryException
      * @throws ModelException
      */
-    public function delete($iId): bool
+    public function delete($iId, bool $bCheckExists = true): bool
     {
-        $oItem = $this->getById($iId);
-        if (empty($oItem)) {
-            $this->setError('Item does not exist.');
-            return false;
+        if ($bCheckExists) {
+            $oItem = $this->getById($iId);
+            if (empty($oItem)) {
+                $this->setError('Item does not exist.');
+                return false;
+            }
         }
 
         $this->triggerEvent(static::EVENT_DELETING, [$oItem, $this]);
