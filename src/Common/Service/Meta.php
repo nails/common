@@ -188,7 +188,7 @@ class Meta
      */
     public function compileFromMetaData(MetaData $oMetaData): self
     {
-        $sAppName     = $oMetaData->getTitles()->implode();
+        $sTitle       = $oMetaData->getTitles()->implode();
         $sDescription = $oMetaData->getDescription();
         $aKeywords    = array_filter(array_unique($oMetaData->getKeywords()));
         $bNoIndex     = $oMetaData->getNoIndex();
@@ -218,7 +218,7 @@ class Meta
             ->addRaw([
                 'tag'      => 'meta',
                 'property' => 'og:title',
-                'content'  => $sAppName,
+                'content'  => $sTitle,
             ])
             ->addRaw([
                 'tag'      => 'meta',
@@ -233,7 +233,7 @@ class Meta
             ->addRaw([
                 'tag'      => 'meta',
                 'property' => 'og:site_name',
-                'content'  => $sAppName,
+                'content'  => $sTitle,
             ])
             ->addRaw([
                 'tag'      => 'meta',
@@ -252,7 +252,7 @@ class Meta
         $this
             ->addRaw([
                 'name'    => 'twitter:title',
-                'content' => $sAppName,
+                'content' => $sTitle,
             ])
             ->addRaw([
                 'name'    => 'twitter:description',
