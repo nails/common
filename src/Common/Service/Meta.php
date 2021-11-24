@@ -269,6 +269,19 @@ class Meta
 
         // --------------------------------------------------------------------------
 
+        // Google Schema.org
+        $this
+            ->addRaw([
+                'itemprop' => 'name',
+                'content'  => $sTitle,
+            ])
+            ->addRaw([
+                'itemprop' => 'description',
+                'content'  => $sDescription,
+            ]);
+
+        // --------------------------------------------------------------------------
+
         // Image tags
         if ($oMetaData->getImageUrl()) {
             $this
@@ -280,6 +293,10 @@ class Meta
                 ->addRaw([
                     'name'    => 'twitter:image',
                     'content' => $oMetaData->getImageUrl(),
+                ])
+                ->addRaw([
+                    'itemprop' => 'image',
+                    'content'  => $oMetaData->getImageUrl(),
                 ]);
 
             if ($oMetaData->getImageWidth()) {
@@ -305,8 +322,8 @@ class Meta
 
         //  Other meta tags
         $this
-            ->add('apple-mobile-web-app-title', $sAppName)
-            ->add('application-name', $sAppName)
+            ->add('apple-mobile-web-app-title', $sTitle)
+            ->add('application-name', $sTitle)
             ->add('description', $sDescription)
             ->add('keywords', implode(', ', $aKeywords));
 
