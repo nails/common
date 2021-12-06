@@ -123,7 +123,7 @@ class Migrate extends Base
                 $oOutput->writeln('Nothing to migrate');
                 $oOutput->writeln('');
 
-                return $this->complete();
+                return $this->runPostCommands();
             }
 
             // --------------------------------------------------------------------------
@@ -202,7 +202,7 @@ class Migrate extends Base
 
             // --------------------------------------------------------------------------
 
-            return $this->complete();
+            return $this->runPostCommands();
 
         } catch (\Exception $e) {
             return $this->abort(
@@ -482,7 +482,7 @@ class Migrate extends Base
      * @return int
      * @throws \Exception
      */
-    private function complete(): int
+    private function runPostCommands(): int
     {
         //  Set default settings... again
         $this->oOutput->write('<comment>Setting defaults</comment>... ');
