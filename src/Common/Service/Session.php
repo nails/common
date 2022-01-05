@@ -38,7 +38,7 @@ class Session
     {
         $this->oSession = new HttpFoundation\Session\Session(
             new HttpFoundation\Session\Storage\NativeSessionStorage(
-                Config::get('NAILS_SESSION_OPTIONS', [])
+                (array) Config::get('NAILS_SESSION_OPTIONS', [])
             ),
             new HttpFoundation\Session\Attribute\AttributeBag(),
             new HttpFoundation\Session\Flash\AutoExpireFlashBag()
