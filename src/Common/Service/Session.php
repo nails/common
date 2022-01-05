@@ -15,6 +15,7 @@
 namespace Nails\Common\Service;
 
 use Nails\Common\Exception\NailsException;
+use Nails\Config;
 use Nails\Factory;
 use Symfony\Component\HttpFoundation;
 
@@ -36,7 +37,9 @@ class Session
     public function __construct()
     {
         $this->oSession = new HttpFoundation\Session\Session(
-            new HttpFoundation\Session\Storage\NativeSessionStorage(),
+            new HttpFoundation\Session\Storage\NativeSessionStorage(
+                Config::get('NAILS_SESSION_OPTIONS', [])
+            ),
             new HttpFoundation\Session\Attribute\AttributeBag(),
             new HttpFoundation\Session\Flash\AutoExpireFlashBag()
         );
