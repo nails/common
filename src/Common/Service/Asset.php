@@ -799,10 +799,15 @@ class Asset
                 throw new AssetException(
                     'Type must be specified when passing a closure.'
                 );
-            }
 
-            $sHash = $mScript instanceof \Closure ? md5(uniqid('inline-closure-')) : md5($mScript);
-            $sType = $this->determineType($mScript, $sForceType);
+            } elseif ($mScript instanceof \Closure) {
+                $sHash = md5(uniqid('inline-closure-'));
+                $sType = $sForceType;
+
+            } else {
+                $sHash = md5($mScript);
+                $sType = $this->determineType($mScript, $sForceType);
+            }
 
             switch ($sType) {
 
