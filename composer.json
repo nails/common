@@ -76,6 +76,7 @@
                     "array",
                     "asset",
                     "cookie",
+                    "config",
                     "date",
                     "debug",
                     "directory",
