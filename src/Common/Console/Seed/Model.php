@@ -220,7 +220,7 @@ abstract class Model implements Interfaces\Database\Seeder
     protected function generateLabel(\Nails\Common\Model\Base $oModel, &$aOut): self
     {
         $sColumn = $oModel->getColumnLabel();
-        if ($sColumn) {
+        if ($sColumn && isset($aOut[$sColumn])) {
             $aOut[$sColumn] = title_case($aOut[$sColumn]);
         }
 
