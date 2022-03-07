@@ -9,7 +9,7 @@
     "devDependencies": {
         "autoprefixer": "^9.8",
         "css-loader": "^6.6",
-        "mini-css-extract-plugin": "^2.5",
+        "mini-css-extract-plugin": "^2.6",
         "sass": "^1.49",
         "postcss-loader": "^6.2",
         "sass-loader": "^12.6",
