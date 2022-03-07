@@ -38,7 +38,7 @@
         "annexare/countries-list": "2.*",
         "axisofstevil/stop-words": "0.*",
         "behat/transliterator": "1.*",
-        "codeigniter/framework": "3.1.11",
+        "codeigniter/framework": "3.1.13",
         "defuse/php-encryption": "2.*",
         "guzzlehttp/guzzle": "7.*",
         "mustache/mustache": "2.*",
