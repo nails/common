@@ -28,12 +28,10 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class Model extends BaseMaker
 {
-    const SERVICE_TOKEN          = 'MODELS';
-    const SERVICE_RESOURCE_TOKEN = 'RESOURCES';
-    const RESOURCE_PATH          = NAILS_COMMON_PATH . 'resources/console/';
-    const MODEL_PATH             = NAILS_APP_PATH . 'src/Model/';
-    const MODEL_RESOURCE_PATH    = NAILS_APP_PATH . 'src/Resource/';
-    const ADMIN_PATH             = NAILS_APP_PATH . 'application/modules/admin/controllers/';
+    const SERVICE_TOKEN     = 'MODELS';
+    const MODEL_PATH        = NAILS_APP_PATH . 'src/Model/';
+    const RESOURCE_PATH     = NAILS_COMMON_PATH . 'resources/console/';
+    const RESOURCE_APP_PATH = Resource::APP_PATH;
 
     // --------------------------------------------------------------------------
 
@@ -74,15 +72,6 @@ class Model extends BaseMaker
                 InputOption::VALUE_NONE,
                 'Create a localised model (or convert an existing model)'
             );
-
-        if (Components::exists('nails/module-admin')) {
-            $this->addOption(
-                'admin',
-                null,
-                InputOption::VALUE_NONE,
-                'Create an admin controller'
-            );
-        }
     }
 
     // --------------------------------------------------------------------------
@@ -102,7 +91,6 @@ class Model extends BaseMaker
         // --------------------------------------------------------------------------
 
         $bSkipDb = $oInput->getOption('skip-db');
-        $bAdmin  = Components::exists('nails/module-admin') && $oInput->getOption('admin');
 
         // --------------------------------------------------------------------------
 
@@ -132,19 +120,12 @@ class Model extends BaseMaker
         // --------------------------------------------------------------------------
 
         try {
+
             $this
-                /**
-                 * Validate the services file for resources first, so that the correct
-                 * values are set on the second call.
-                 */
-                ->validateServiceFile(static::SERVICE_RESOURCE_TOKEN)
                 ->validateServiceFile()
                 ->createPath(self::MODEL_PATH)
-                ->createPath(self::MODEL_RESOURCE_PATH);
-            if ($bAdmin) {
-                $this->createPath(self::ADMIN_PATH);
-            }
-            $this->createModel();
+                ->createModel();
+
         } catch (Exception $e) {
             return $this->abort(
                 self::EXIT_CODE_FAILURE,
@@ -183,7 +164,6 @@ class Model extends BaseMaker
         $bSkipSeeder = $oInput->getOption('skip-seeder');
         $bAutoDetect = $oInput->getOption('auto-detect');
         $bLocalised  = $oInput->getOption('localised');
-        $bAdmin      = Components::exists('nails/module-admin') && $oInput->getOption('admin');
 
         //  If auto-detecting models using the database then skip cresting database tables
         if ($bAutoDetect) {
@@ -281,16 +261,13 @@ class Model extends BaseMaker
             foreach ($aModelData as $oModel) {
                 $oOutput->writeln('Model Class:    <info>\\' . $oModel->class_path . '</info>');
                 $oOutput->writeln('Model Path:     <info>' . $oModel->path . $oModel->filename . '</info>');
+                $oOutput->writeln('Resource Class: <info>\\' . $oModel->resource_class_path . '</info>');
+                $oOutput->writeln('Resource Path:  <info>' . $oModel->resource_path . $oModel->resource_filename . '</info>');
                 if ($bLocalised && $this->modelExists($oModel)) {
                     $oOutput->writeln('Localised:      <info>Model will be converted</info>');
                 } else {
-                    $oOutput->writeln('Resource Class: <info>\\' . $oModel->resource_class_path . '</info>');
-                    $oOutput->writeln('Resource Path:  <info>' . $oModel->resource_path . $oModel->resource_filename . '</info>');
                     if (!$bSkipDb) {
                         $oOutput->writeln('Table:          <info>' . $oModel->table_with_prefix . '</info>');
-                    }
-                    if ($bAdmin) {
-                        $oOutput->writeln('Admin:          <info>Controller will be created</info>');
                     }
                     if (!$bSkipSeeder) {
                         $oOutput->writeln('Seeder:         <info>Seeder will be created</info>');
@@ -301,8 +278,7 @@ class Model extends BaseMaker
 
             if ($this->confirm('Continue?', true)) {
 
-                $aServiceModelDefinitions    = [];
-                $aServiceResourceDefinitions = [];
+                $aServiceModelDefinitions = [];
 
                 foreach ($aModelData as $oModel) {
                     $oOutput->writeln('');
@@ -310,31 +286,24 @@ class Model extends BaseMaker
                         $this->convertExistingModelToLocalised(
                             $oModel,
                             $bSkipDb,
-                            $bAdmin,
                             $bSkipSeeder
                         );
                     } elseif ($bLocalised && !$this->modelExists($oModel)) {
-                        [$sServiceDefinition, $sResourceDefinition] = $this->createLocalisedModel(
+                        $sServiceDefinition = $this->createLocalisedModel(
                             $oModel,
                             $bSkipDb,
-                            $bAdmin,
                             $bSkipSeeder
                         );
                     } else {
-                        [$sServiceDefinition, $sResourceDefinition] = $this->createNormalModel(
+                        $sServiceDefinition = $this->createNormalModel(
                             $oModel,
                             $bSkipDb,
-                            $bAdmin,
                             $bSkipSeeder
                         );
                     }
 
                     if (!empty($sServiceDefinition)) {
                         $aServiceModelDefinitions[] = $sServiceDefinition;
-                    }
-
-                    if (!empty($sResourceDefinition)) {
-                        $aServiceResourceDefinitions[] = $sResourceDefinition;
                     }
                 }
 
@@ -345,15 +314,6 @@ class Model extends BaseMaker
                     $this->oOutput->writeln('');
                     $this->oOutput->write('Adding model(s) to app services...');
                     $this->writeServiceFile($aServiceModelDefinitions);
-                    $this->oOutput->writeln('<info>done</info>');
-                }
-
-                //  Add resources to app's service array
-                if (!empty($aServiceResourceDefinitions)) {
-                    $this->oOutput->write('Adding resource(s) to app services...');
-                    //  Reset the token detials so we write to the correct part of the file
-                    $this->validateServiceFile(static::SERVICE_RESOURCE_TOKEN);
-                    $this->writeServiceFile($aServiceResourceDefinitions);
                     $this->oOutput->writeln('<info>done</info>');
                 }
             }
@@ -405,16 +365,20 @@ class Model extends BaseMaker
         $sPath      = substr($sPath, -1) !== DIRECTORY_SEPARATOR ? $sPath . DIRECTORY_SEPARATOR : $sPath;
         $sNamespace = implode('\\', $aNamespace);
 
+        //  Prepare the resource name, namespace, filename etc
+        $sResourceName      = str_replace('App\Model\\', 'App\Resource\\', $sModelName);
+        $sResourceNameCmd   = str_replace('App\Model\\', '', $sModelName);
+        $aResourceName      = explode('\\', $sResourceName);
+        $aResourceNamespace = array_splice($aResourceName, 0, -1);
+        $sResourceClassName = implode('', $aResourceName);
+        $sResourceFilename  = $sResourceClassName . '.php';
+        $sResourcePath      = static::RESOURCE_APP_PATH . implode(DIRECTORY_SEPARATOR, array_slice($aResourceNamespace, 2));
+        $sResourcePath      = substr($sResourcePath, -1) !== DIRECTORY_SEPARATOR ? $sResourcePath . DIRECTORY_SEPARATOR : $sResourcePath;
+        $sResourceNamespace = implode('\\', $aResourceNamespace);
+
         //  Set the service name
         $sServiceName = str_replace('App\Model\\', '', $sModelName);
         $sServiceName = str_replace('\\', '', $sServiceName);
-
-        //  Set resource details
-        $sResourceNamespace = preg_replace('/^App\\\\Model/', 'App\\Resource', $sNamespace);
-        $sResourceClassName = $sClassName;
-        $sResourcePath      = static::MODEL_RESOURCE_PATH . implode(DIRECTORY_SEPARATOR, array_slice($aNamespace, 2));
-        $sResourcePath      = substr($sResourcePath, -1) !== DIRECTORY_SEPARATOR ? $sResourcePath . DIRECTORY_SEPARATOR : $sResourcePath;
-        $sResourceFilename  = $sFilename;
 
         return (object) [
             'namespace'           => $sNamespace,
@@ -424,12 +388,11 @@ class Model extends BaseMaker
             'filename'            => $sFilename,
             'table'               => $sTableName,
             'table_with_prefix'   => $sTableNameWithPrefix,
-            'service_name'        => $sServiceName,
-            'resource_namespace'  => $sResourceNamespace,
-            'resource_class_name' => $sResourceClassName,
-            'resource_class_path' => $sResourceNamespace . '\\' . $sResourceClassName,
+            'resource_name'       => $sResourceNameCmd,
+            'resource_class_path' => $sResourceNamespace . '\\' . $sClassName,
             'resource_path'       => $sResourcePath,
             'resource_filename'   => $sResourceFilename,
+            'service_name'        => $sServiceName,
         ];
     }
 
@@ -472,7 +435,6 @@ class Model extends BaseMaker
      *
      * @param stdClass $oModel      The model being converted
      * @param bool     $bSkipDb     Whether to skip table creation
-     * @param bool     $bAdmin      Whether to create an admin controller or not
      * @param bool     $bSkipSeeder Whether to skip seeder creation
      *
      * @throws FactoryException
@@ -480,7 +442,6 @@ class Model extends BaseMaker
     private function convertExistingModelToLocalised(
         stdClass $oModel,
         bool $bSkipDb,
-        bool $bAdmin,
         bool $bSkipSeeder
     ): void {
         $this
@@ -495,10 +456,9 @@ class Model extends BaseMaker
      *
      * @param stdClass $oModel      The model being created
      * @param bool     $bSkipDb     Whether to skip table creation
-     * @param bool     $bAdmin      Whether to create an admin controller or not
      * @param bool     $bSkipSeeder Whether to skip seeder creation
      *
-     * @return array
+     * @return string
      * @throws FactoryException
      * @throws NailsException
      * @throws Path\DoesNotExistException
@@ -508,26 +468,21 @@ class Model extends BaseMaker
     private function createLocalisedModel(
         stdClass $oModel,
         bool $bSkipDb,
-        bool $bAdmin,
         bool $bSkipSeeder
-    ): array {
+    ): string {
         $this
             ->createModelFile($oModel, 'model_localised')
-            ->createResource($oModel, 'resource');
+            ->createResource($oModel);
 
         if (!$bSkipDb) {
             $this->createDatabaseTable($oModel, 'model_table_localised');
-        }
-
-        if ($bAdmin) {
-            $this->createAdminController($oModel);
         }
 
         if (!$bSkipSeeder) {
             $this->createSeeder($oModel);
         }
 
-        return $this->generateServiceDefinitions($oModel);
+        return $this->generateServiceDefinition($oModel);
     }
 
     // --------------------------------------------------------------------------
@@ -537,10 +492,9 @@ class Model extends BaseMaker
      *
      * @param stdClass $oModel      The model being created
      * @param bool     $bSkipDb     Whether to skip table creation
-     * @param bool     $bAdmin      Whether to create an admin controller or not
      * @param bool     $bSkipSeeder Whether to skip seeder creation
      *
-     * @return array
+     * @return string
      * @throws FactoryException
      * @throws NailsException
      * @throws Path\DoesNotExistException
@@ -550,27 +504,22 @@ class Model extends BaseMaker
     private function createNormalModel(
         stdClass $oModel,
         bool $bSkipDb,
-        bool $bAdmin,
         bool $bSkipSeeder
-    ): array {
+    ): string {
 
         $this
             ->createModelFile($oModel, 'model')
-            ->createResource($oModel, 'resource');
+            ->createResource($oModel);
 
         if (!$bSkipDb) {
             $this->createDatabaseTable($oModel, 'model_table');
-        }
-
-        if ($bAdmin) {
-            $this->createAdminController($oModel);
         }
 
         if (!$bSkipSeeder) {
             $this->createSeeder($oModel);
         }
 
-        return $this->generateServiceDefinitions($oModel);
+        return $this->generateServiceDefinition($oModel);
     }
 
     // --------------------------------------------------------------------------
@@ -604,23 +553,30 @@ class Model extends BaseMaker
     /**
      * Creates the resource file
      *
-     * @param stdClass $oModel    The model being created
-     * @param string   $sTemplate The template to use
+     * @param stdClass $oModel The model being created
      *
      * @return $this
      * @throws NailsException
      * @throws Path\DoesNotExistException
      * @throws Path\IsNotWritableException
      */
-    private function createResource(stdClass $oModel, string $sTemplate): self
+    private function createResource(stdClass $oModel): self
     {
-        $this->oOutput->write('Creating resource <comment>' . $oModel->resource_class_path . '</comment>... ');
-        $this->createPath($oModel->resource_path);
-        $this->createFile(
-            $oModel->resource_path . $oModel->resource_filename,
-            $this->getResource('template/' . $sTemplate . '.php', (array) $oModel)
+        $this->oOutput->write('Creating resource... ');
+        //  Execute the create command, non-interactively and silently
+        $iExitCode = $this->callCommand(
+            'make:resource',
+            [
+                'resourceName' => $oModel->resource_name,
+            ],
+            false,
+            true
         );
-        $this->oOutput->writeln('<info>done</info>');
+        if ($iExitCode === static::EXIT_CODE_FAILURE) {
+            $this->oOutput->writeln('<error>fail</error>');
+        } else {
+            $this->oOutput->writeln('<info>done</info>');
+        }
 
         return $this;
     }
@@ -646,38 +602,6 @@ class Model extends BaseMaker
         $oModel->nails_db_prefix = Config::get('NAILS_DB_PREFIX');
         $oDb->query($this->getResource('template/' . $sTemplate . '.php', (array) $oModel));
         $this->oOutput->writeln('<info>done</info>');
-
-        return $this;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Creates an admin controller
-     *
-     * @param stdClass $oModel The model being created
-     *
-     * @return $this
-     * @throws Exception
-     */
-    private function createAdminController(stdClass $oModel): self
-    {
-        $this->oOutput->write('Creating admin controller... ');
-        //  Execute the create command, non-interactively and silently
-        $iExitCode = $this->callCommand(
-            'make:controller:admin',
-            [
-                'modelName'    => $oModel->service_name,
-                '--skip-check' => true,
-            ],
-            false,
-            true
-        );
-        if ($iExitCode === static::EXIT_CODE_FAILURE) {
-            $this->oOutput->writeln('<error>fail</error>');
-        } else {
-            $this->oOutput->writeln('<info>done</info>');
-        }
 
         return $this;
     }
@@ -721,25 +645,15 @@ class Model extends BaseMaker
      *
      * @param stdClass $oModel The model being created
      *
-     * @return string[]
+     * @return string
      */
-    private function generateServiceDefinitions(stdClass $oModel): array
+    private function generateServiceDefinition(stdClass $oModel): string
     {
-        return [
-            //  Service definition
-            implode(PHP_EOL, [
-                str_repeat(' ', $this->iServicesIndent) . '\'' . $oModel->service_name . '\' => function () {',
-                str_repeat(' ', $this->iServicesIndent) . '    return new \\' . $oModel->class_path . '();',
-                str_repeat(' ', $this->iServicesIndent) . '},',
-            ]),
-
-            //  Resource definition
-            implode(PHP_EOL, [
-                str_repeat(' ', $this->iServicesIndent) . '\'' . $oModel->service_name . '\' => function ($oObj) {',
-                str_repeat(' ', $this->iServicesIndent) . '    return new \\' . $oModel->resource_class_path . '($oObj);',
-                str_repeat(' ', $this->iServicesIndent) . '},',
-            ]),
-        ];
+        return implode(PHP_EOL, [
+            str_repeat(' ', $this->iServicesIndent) . '\'' . $oModel->service_name . '\' => function () {',
+            str_repeat(' ', $this->iServicesIndent) . '    return new \\' . $oModel->class_path . '();',
+            str_repeat(' ', $this->iServicesIndent) . '},',
+        ]);
     }
 
     // --------------------------------------------------------------------------

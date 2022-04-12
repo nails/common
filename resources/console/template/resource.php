@@ -9,22 +9,22 @@ return <<<'EOD'
 <?php
 
 /**
- * This class represents objects dispensed by the {{SERVICE_NAME}} model
+ * This class represents objects dispensed by the {{CLASS_NAME_NORMALISED}} model
  *
  * @package  App\Resource
  * @category resource
  */
 
-namespace {{RESOURCE_NAMESPACE}};
+namespace {{NAMESPACE}};
 
 use Nails\Common\Resource\Entity;
 
 /**
- * Class {{RESOURCE_CLASS_NAME}}
+ * Class {{CLASS_NAME}}
  *
- * @package {{RESOURCE_NAMESPACE}}
+ * @package {{NAMESPACE}}
  */
-class {{RESOURCE_CLASS_NAME}} extends Entity
+class {{CLASS_NAME}} extends Entity
 {
 }
 
