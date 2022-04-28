@@ -47,6 +47,16 @@ class Asset
     const JS_LOCATION_HEADER = 'HEADER';
     const JS_LOCATION_FOOTER = 'FOOTER';
 
+    /**
+     * Bundled Libraries
+     */
+    const LIBRARY_CKEDITOR = 'CKEDITOR';
+    const LIBRARY_JQUERYUI = 'JQUERYUI';
+    const LIBRARY_SELECT2  = 'SELECT2';
+    const LIBRARY_KNOCKOUT = 'KNOCKOUT';
+    const LIBRARY_MUSTACHE = 'MUSTACHE';
+    const LIBRARY_MOMENT   = 'MOMENT';
+
     // --------------------------------------------------------------------------
 
     /**
@@ -183,27 +193,27 @@ class Asset
         );
 
         $this
-            ->addLibrary('CKEDITOR', [
+            ->addLibrary(static::LIBRARY_CKEDITOR, [
                 'https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.16.0/ckeditor.js',
                 'https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.16.0/adapters/jquery.min.js',
             ])
-            ->addLibrary('JQUERYUI', [
+            ->addLibrary(static::LIBRARY_JQUERYUI, [
                 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js',
                 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.min.css',
                 'https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.js',
                 'https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.css',
             ])
-            ->addLibrary('SELECT2', [
+            ->addLibrary(static::LIBRARY_SELECT2, [
                 'https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.min.js',
                 'https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.min.css',
             ])
-            ->addLibrary('KNOCKOUT', [
+            ->addLibrary(static::LIBRARY_KNOCKOUT, [
                 'https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-latest.min.js',
             ])
-            ->addLibrary('MUSTACHE', [
+            ->addLibrary(static::LIBRARY_MUSTACHE, [
                 'https://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.8.2/mustache.min.js',
             ])
-            ->addLibrary('MOMENT', [
+            ->addLibrary(static::LIBRARY_MOMENT, [
                 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js',
             ]);
     }
@@ -453,6 +463,78 @@ class Asset
         }
 
         return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Shortcut method to load the jqueryui library
+     *
+     * @return $this
+     * @throws \Nails\Common\Exception\AssetException
+     */
+    public function jqueryui(): self
+    {
+        return $this->library(static::LIBRARY_JQUERYUI);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Shortcut method to load the select2 library
+     *
+     * @return $this
+     * @throws \Nails\Common\Exception\AssetException
+     */
+    public function select2(): self
+    {
+        return $this->library(static::LIBRARY_SELECT2);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Shortcut method to load the ckeditor library
+     *
+     * @return $this
+     * @throws \Nails\Common\Exception\AssetException
+     */
+    public function ckeditor(): self
+    {
+        return $this->library(static::LIBRARY_CKEDITOR);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Shortcut method to load the knockout library
+     *
+     * @return $this
+     * @throws \Nails\Common\Exception\AssetException
+     */
+    public function knockout(): self
+    {
+        return $this->library(static::LIBRARY_KNOCKOUT);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Shortcut method to load the moment library
+     *
+     * @return $this
+     * @throws \Nails\Common\Exception\AssetException
+     */
+    public function moment(): self
+    {
+        return $this->library(static::LIBRARY_MOMENT);
+    }
+
+    // --------------------------------------------------------------------------
+
+    public function mustache(): self
+    {
+        return $this->library(static::LIBRARY_MUSTACHE);
     }
 
     // --------------------------------------------------------------------------
