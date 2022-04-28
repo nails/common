@@ -30,6 +30,13 @@ if (!function_exists('camelcase_to_underscore')) {
     }
 }
 
+if (!function_exists('camelcase_to_dash')) {
+    function camelcase_to_dash($sString)
+    {
+        return Strings::camelcase_to_dash($sString);
+    }
+}
+
 if (!function_exists('addTrailingSlash')) {
     function addTrailingSlash($sString)
     {

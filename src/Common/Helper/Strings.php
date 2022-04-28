@@ -73,6 +73,20 @@ class Strings
     // --------------------------------------------------------------------------
 
     /**
+     * Transforms a camelcased string to dashes
+     *
+     * @param string $sString The string to transform
+     *
+     * @return string
+     */
+    public static function camelcase_to_dash($sString)
+    {
+        return strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $sString));
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Adds a trailing slash to the input string if there isn't already one there
      *
      * @param string The string to add a trailing slash to.
