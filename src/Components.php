@@ -225,6 +225,28 @@ final class Components
     // --------------------------------------------------------------------------
 
     /**
+     * Returns a component by its URL slug
+     *
+     * @param string $sSlug The component's URL slug
+     *
+     * @return Component
+     */
+    public static function getByUrlSlug($sSlug): ?Component
+    {
+        $aComponents = static::available();
+
+        foreach ($aComponents as $oComponent) {
+            if ($oComponent->slugUrl === $sSlug) {
+                return $oComponent;
+            }
+        }
+
+        return null;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Returns an instance of the app as a component
      *
      * @param bool $bUseCache Whether to use the cache or not

@@ -22,6 +22,7 @@ use Nails\Common\Helper\Directory;
  * @package Nails\Common\Factory
  *
  * @property string    $slug
+ * @property string    $slugUrl
  * @property string    $namespace
  * @property string    $name
  * @property string    $description
@@ -41,6 +42,7 @@ use Nails\Common\Helper\Directory;
 final class Component
 {
     private $slug;
+    private $slugUrl;
     private $namespace;
     private $name;
     private $description;
@@ -73,6 +75,7 @@ final class Component
         $aNailsData = !empty($aPackage['extra']->nails) ? (array) $aPackage['extra']->nails : [];
 
         $this->slug         = ArrayHelper::get(['slug', 'name'], $aPackage);
+        $this->slugUrl      = str_replace('/', '-', $this->slug);
         $this->namespace    = ArrayHelper::get('namespace', $aNailsData);
         $this->name         = ArrayHelper::get('name', $aNailsData, $this->slug);
         $this->description  = ArrayHelper::get('description', $aNailsData, ArrayHelper::get('description', $aPackage));
