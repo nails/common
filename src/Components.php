@@ -45,6 +45,13 @@ final class Components
      */
     private static $aCache = [];
 
+    /**
+     * Stores the paths used for components
+     *
+     * @var string[]
+     */
+    private static $aComponentPaths = [];
+
     // --------------------------------------------------------------------------
 
     /**
@@ -92,14 +99,26 @@ final class Components
         $aOut = [];
         foreach ($aPackages as $oPackage) {
             if (isset($oPackage->extra->nails)) {
+
+                $sAbsolutePath = realpath(NAILS_APP_PATH . 'vendor' . DIRECTORY_SEPARATOR . $oPackage->name);
+                $sRelativePath = preg_replace('/^' . preg_quote(getcwd(), '/') . '/', '.', $sAbsolutePath);
+
                 $aOut[] = new Component(
                     $oPackage,
-                    NAILS_APP_PATH . 'vendor' . DIRECTORY_SEPARATOR . $oPackage->name,
-                    'vendor' . DIRECTORY_SEPARATOR . $oPackage->name,
+                    $sAbsolutePath,
+                    $sRelativePath,
                     false
                 );
+
+                self::$aComponentPaths[] = $sAbsolutePath;
             }
         }
+
+        static::$aComponentPaths = array_values(
+            array_unique(
+                array_map(fn($sPath) => dirname($sPath), static::$aComponentPaths)
+            )
+        );
 
         // --------------------------------------------------------------------------
 
@@ -486,7 +505,13 @@ final class Components
     {
         $oReflect  = new \ReflectionClass($mClass);
         $sPath     = $oReflect->getFileName();
-        $bIsVendor = (bool) preg_match('/^' . preg_quote(NAILS_APP_PATH . 'vendor', '/') . '/', $sPath);
+        $bIsVendor = (bool) preg_match(
+            sprintf(
+                '/^(%s)/',
+                implode('|', array_map(fn($sPath) => preg_quote($sPath, '/'), static::$aComponentPaths))
+            ),
+            $sPath
+        );
 
         if (!$bIsVendor) {
             return static::getApp();
@@ -495,6 +520,7 @@ final class Components
         foreach (static::available() as $oComponent) {
             if ($oComponent->slug === static::$sAppSlug) {
                 continue;
+
             } elseif (preg_match('/^' . preg_quote($oComponent->path, '/') . '/', $sPath)) {
                 return $oComponent;
             }
