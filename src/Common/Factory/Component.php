@@ -15,6 +15,7 @@ namespace Nails\Common\Factory;
 use Nails\Common\Factory\Component\ClassCollection;
 use Nails\Common\Helper\ArrayHelper;
 use Nails\Common\Helper\Directory;
+use Nails\Components;
 
 /**
  * Class Component
@@ -127,6 +128,18 @@ final class Component
     public function __isset($sProperty)
     {
         return property_exists($this, $sProperty);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Whether the component is the app or not
+     *
+     * @return bool
+     */
+    public function isApp(): bool
+    {
+        return $this->slug === Components::$sAppSlug;
     }
 
     // --------------------------------------------------------------------------
