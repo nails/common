@@ -12,6 +12,13 @@ use Nails\Common\Model\Base;
 trait User
 {
     /**
+     * Whether to skip the updating of the user IDs during an update
+     */
+    protected $bSkipUpdateUsers = false;
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Returns the column name for specific columns of interest
      *
      * @param string      $sColumn  The column to query
@@ -47,7 +54,7 @@ trait User
      */
     protected function setDataUsers(array &$aData, bool $bSetCreated = true): self
     {
-        if ($this->isAutoSetUsers()) {
+        if ($this->isAutoSetUsers() && !$this->bSkipUpdateUsers) {
             if (isLoggedIn()) {
                 if ($bSetCreated && empty($aData[$this->getColumnCreatedBy()])) {
                     $aData[$this->getColumnCreatedBy()] = activeUser('id');
@@ -64,6 +71,8 @@ trait User
                 }
             }
         }
+
+        $this->bSkipUpdateUsers = false;
 
         return $this;
     }
@@ -90,5 +99,18 @@ trait User
     public function getColumnModifiedBy(): string
     {
         return $this->getColumn('modified_by', 'modified_by');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Skips the next user update
+     *
+     * @return $this
+     */
+    public function skipUpdateUsers(): Base
+    {
+        $this->bSkipUpdateUsers = true;
+        return $this;
     }
 }
