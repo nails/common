@@ -187,7 +187,7 @@ trait Nestable
      */
     public function update($mIds, array $aData = []): bool
     {
-        $mResult = parent::skipUpdateTimestamp()->update(($mIds, $aData);
+        $mResult = parent::skipUpdateTimestamp()->update($mIds, $aData);
         if ($mResult) {
             $aIds = (array) $mIds;
             foreach ($aIds as $iId) {
