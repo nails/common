@@ -160,4 +160,16 @@ abstract class Collection implements \Iterator, \Countable
     {
         return count($this->aCollection);
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the raw collection array
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return $this->aCollection;
+    }
 }
