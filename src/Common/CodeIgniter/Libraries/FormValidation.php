@@ -65,20 +65,6 @@ class FormValidation extends CI_Form_validation
     // --------------------------------------------------------------------------
 
     /**
-     * This rule has been deprecated from the FormValidation class in CI 3.*;
-     * left here for backwards comparability
-     *
-     * @return bool
-     */
-    public function xss_clean()
-    {
-        trigger_error('Use of xss_clean as a Form Validation filter is deprecated and no longer affects the field');
-        return true;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Checks if a certain value is unique in a specified table if different
      * from current value.
      *
