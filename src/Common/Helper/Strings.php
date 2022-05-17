@@ -87,6 +87,22 @@ class Strings
     // --------------------------------------------------------------------------
 
     /**
+     * Transforms a dash string to camelCase
+     *
+     * @param string $sString The string to transform
+     *
+     * @return string
+     */
+    public static function dashToCamelCase(string $sString): string
+    {
+        return preg_replace_callback('/\-(.)?/', function ($aMatches) {
+            return strtoupper($aMatches[1]);
+        }, $sString);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Adds a trailing slash to the input string if there isn't already one there
      *
      * @param string The string to add a trailing slash to.
