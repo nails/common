@@ -25,7 +25,7 @@ class Strings
      *
      * @return string
      */
-    public static function replaceLastOccurrence($sString, $sReplace, $sSubject)
+    public static function replaceLastOccurrence(string $sString, string $sReplace, string $sSubject): string
     {
         $iPos = strrpos($sSubject, $sString);
 
@@ -46,7 +46,7 @@ class Strings
      *
      * @return string
      */
-    public static function underscoreToCamelcase($sString, $bLowerFirst = true)
+    public static function underscoreToCamelcase(string $sString, bool $bLowerFirst = true): string
     {
         $sString = explode('_', $sString);
         $sString = array_map('strtolower', $sString);
@@ -65,7 +65,7 @@ class Strings
      *
      * @return string
      */
-    public static function camelcase_to_underscore($sString)
+    public static function camelcase_to_underscore(string $sString): string
     {
         return strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $sString));
     }
@@ -79,7 +79,7 @@ class Strings
      *
      * @return string
      */
-    public static function camelcase_to_dash($sString)
+    public static function camelcase_to_dash(string $sString): string
     {
         return strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $sString));
     }
@@ -109,7 +109,7 @@ class Strings
      *
      * @return  string
      **/
-    public static function addTrailingSlash($sString)
+    public static function addTrailingSlash(string $sString): string
     {
         return rtrim($sString, '/') . '/';
     }
@@ -123,7 +123,7 @@ class Strings
      *
      * @return  string
      **/
-    public static function removeStopWords($sString)
+    public static function removeStopWords(string $sString): string
     {
         $oFilter = new Filter();
         return $oFilter->cleanText($sString);
@@ -134,13 +134,13 @@ class Strings
     /**
      * Generates a token string using a specific mask
      *
-     * @param string $sMask   The mask to use; A = Any, C = Character, D = digit, S = Symbol
-     * @param array  $aChars  The array of characters to use
-     * @param array  $aDigits The array of digits to use
+     * @param string   $sMask   The mask to use; A = Any, C = Character, D = digit, S = Symbol
+     * @param string[] $aChars  The array of characters to use
+     * @param int[]    $aDigits The array of digits to use
      *
      * @return string
      */
-    public static function generateToken($sMask = null, $aChars = [], $aDigits = [])
+    public static function generateToken(string $sMask = null, array $aChars = [], array $aDigits = []): string
     {
         $sMask   = empty($sMask) ? 'AAAA-AAAA-AAAA-AAAA-AAAA-AAAA' : $sMask;
         $aChars  = empty($aChars) ? str_split('abcdefghijklmnopqrstuvwxyz') : $aChars;
@@ -194,13 +194,15 @@ class Strings
      *
      * @return string
      */
-    public static function prosaicList(array $aArray, $sSeparator = ', ', $sConjunctive = ' and ', $bOxfordComma = true)
+    public static function prosaicList(array $aArray, string $sSeparator = ', ', string $sConjunctive = ' and ', bool $bOxfordComma = true): string
     {
         $iCount = count($aArray);
         if ($iCount <= 1) {
             return implode('', $aArray);
+
         } elseif ($iCount == 2) {
             return implode($sConjunctive, $aArray);
+
         } else {
             $aOut = [];
             for ($i = 0; $i < $iCount; $i++) {
@@ -208,8 +210,10 @@ class Strings
                 if ($i == ($iCount - 2) && $bOxfordComma) {
                     //  Second last item, and using Oxford comma
                     $sTemp .= $sSeparator . $sConjunctive;
+
                 } elseif ($i == ($iCount - 2) && !$bOxfordComma) {
                     $sTemp .= $sConjunctive;
+
                 } elseif ($i != ($iCount - 1)) {
                     $sTemp .= $sSeparator;
                 }
