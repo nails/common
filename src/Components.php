@@ -96,7 +96,9 @@ final class Components
             ErrorHandler::halt('composer/installed.json is not in a valid format');
         }
 
-        $aOut = [];
+        $aOut                  = [];
+        self::$aComponentPaths = [];
+
         foreach ($aPackages as $oPackage) {
             if (isset($oPackage->extra->nails)) {
 
