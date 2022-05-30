@@ -187,7 +187,8 @@ trait Nestable
      */
     public function update($mIds, array $aData = []): bool
     {
-        $mResult = parent::skipUpdateTimestamp()->update($mIds, $aData);
+        $this->skipUpdateTimestamp();
+        $mResult = parent::update($mIds, $aData);
         if ($mResult) {
             $aIds = (array) $mIds;
             foreach ($aIds as $iId) {
@@ -241,7 +242,8 @@ trait Nestable
             }
 
             //  Save breadcrumbs to the current item
-            parent::skipUpdateTimestamp()->update(
+            $this->skipUpdateTimestamp();
+            parent::update(
                 $iItemId,
                 [
                     $this->getColumnBreadcrumbs() => json_encode($aBreadcrumbs),
