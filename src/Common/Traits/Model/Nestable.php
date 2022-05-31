@@ -244,7 +244,7 @@ trait Nestable
             //  Save breadcrumbs to the current item
             $this->skipUpdateTimestamp();
             parent::update(
-                $iItemId,
+                $oItem->id,
                 [
                     $this->getColumnBreadcrumbs() => json_encode($aBreadcrumbs),
                 ]
