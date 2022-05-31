@@ -253,7 +253,7 @@ trait Nestable
             //  Save breadcrumbs of all children
             /** @var Database $oDb */
             $oDb = Factory::service('Database');
-            $oDb->where('parent_id', $iItemId);
+            $oDb->where('parent_id', $oItem->id);
             $aChildren = $oDb->get($this->getTableName())->result();
             foreach ($aChildren as $oItem) {
                 $this->saveBreadcrumbs($oItem->id);
