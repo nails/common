@@ -2522,6 +2522,18 @@ abstract class Base
     // --------------------------------------------------------------------------
 
     /**
+     * Returns whether a model is using soft deletes or not
+     *
+     * @return bool
+     */
+    public function isSoftDelete(): bool
+    {
+        return !$this->isDestructiveDelete();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Returns the column name for specific columns of interest
      *
      * @param string      $sColumn  The column to query
