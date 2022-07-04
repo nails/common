@@ -211,6 +211,13 @@ abstract class Base
      */
     protected static $SKIP_DELETE_EXISTS_CHECK = false;
 
+    /**
+     * Whether to include deleted items
+     *
+     * @var bool
+     */
+    protected static $INCLUDE_DELETED = false;
+
     // --------------------------------------------------------------------------
 
     /**
@@ -841,6 +848,48 @@ abstract class Base
     // --------------------------------------------------------------------------
 
     /**
+     * When model uses soft deletes deleted items are excluded by default,
+     * calling this method will include them in the next call to getAll after
+     * which it will reset.
+     *
+     * @return $this
+     */
+    public function includeDeleted(): self
+    {
+        if (static::DESTRUCTIVE_DELETE) {
+            throw new ModelException(sprintf(
+                '`%s` uses destructive deletes.',
+                static::class
+            ));
+        }
+
+        static::$INCLUDE_DELETED = true;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Utility method to announe the deprecation of the $bIncludeDeleted argument.
+     *
+     * @param bool $bIncludeDeleted
+     *
+     * @return void
+     */
+    private function deprecatedIncludeDeleted(bool $bIncludeDeleted): void
+    {
+        if ($bIncludeDeleted) {
+            trigger_error(
+                'Use of the `$bIncludeDeleted` argument is deprecated, use `->includeDeleted()` method instead',
+                E_USER_DEPRECATED
+            );
+            $this->includeDeleted();
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Unmarks an object as deleted
      *
      * If destructive deletion is enabled then this method will return null.
@@ -978,6 +1027,8 @@ abstract class Base
      */
     public function getAllRawQuery($iPage = null, $iPerPage = null, array $aData = [], bool $bIncludeDeleted = false): \CI_DB_mysqli_result
     {
+        $this->deprecatedIncludeDeleted($bIncludeDeleted);
+
         //  If the first value is an array then treat as if called with getAll(null, null, $aData);
         if (is_array($iPage)) {
             $aData = $iPage;
@@ -1050,9 +1101,13 @@ abstract class Base
         // --------------------------------------------------------------------------
 
         //  If non-destructive delete is enabled then apply the delete query
-        if (!$this->isDestructiveDelete() && !$bIncludeDeleted) {
+        if ($this->isSoftDelete() && !static::$INCLUDE_DELETED) {
             $oDb->where($this->getTableAlias(true) . $this->getColumnIsDeleted(), false);
         }
+
+        //  Reset the $INCLUDE_DELETED variable so future queries arent affected by
+        //  previous calls to includeDeleted()
+        static::$INCLUDE_DELETED = false;
 
         // --------------------------------------------------------------------------
 
@@ -1080,13 +1135,15 @@ abstract class Base
      */
     public function getAll($iPage = null, $iPerPage = null, array $aData = [], bool $bIncludeDeleted = false): array
     {
+        $this->deprecatedIncludeDeleted($bIncludeDeleted);
+
         //  If the first value is an array then treat as if called with getAll(null, null, $aData);
         if (is_array($iPage)) {
             $aData = $iPage;
             $iPage = null;
         }
 
-        $oResults    = $this->getAllRawQuery($iPage, $iPerPage, $aData, $bIncludeDeleted);
+        $oResults    = $this->getAllRawQuery($iPage, $iPerPage, $aData);
         $aResults    = $oResults->result();
         $iNumResults = count($aResults);
 
@@ -1112,7 +1169,8 @@ abstract class Base
      */
     public function getFirst(array $aData = [], bool $bIncludeDeleted = false): ?Resource
     {
-        $aResults = $this->getAll($aData, $bIncludeDeleted);
+        $this->deprecatedIncludeDeleted($bIncludeDeleted);
+        $aResults = $this->getAll($aData);
         return reset($aResults) ?: null;
     }
 
@@ -1129,7 +1187,8 @@ abstract class Base
      */
     public function getLast(array $aData = [], bool $bIncludeDeleted = false): ?Resource
     {
-        $aResults = $this->getAll($aData, $bIncludeDeleted);
+        $this->deprecatedIncludeDeleted($bIncludeDeleted);
+        $aResults = $this->getAll($aData);
         return end($aResults) ?: null;
     }
 
@@ -1287,6 +1346,8 @@ abstract class Base
      */
     public function getAllFlat($iPage = null, $iPerPage = null, array $aData = [], bool $bIncludeDeleted = false)
     {
+        $this->deprecatedIncludeDeleted($bIncludeDeleted);
+
         if (!array_key_exists('select', $aData)) {
             $aData['select'] = [];
         }
@@ -1302,7 +1363,7 @@ abstract class Base
             }
         }
 
-        $aItems = $this->getAllRawQuery($iPage, $iPerPage, $aData, $bIncludeDeleted)->result();
+        $aItems = $this->getAllRawQuery($iPage, $iPerPage, $aData)->result();
         $aOut   = [];
 
         //  Nothing returned? Skip the rest of this method, it's pointless.
@@ -1580,7 +1641,8 @@ abstract class Base
      */
     public function getAllColumn(string $sColumn, array $aData, bool $bIncludeDeleted = false): array
     {
-        $oResults = $this->getAllRawQuery($aData, $bIncludeDeleted);
+        $this->deprecatedIncludeDeleted($bIncludeDeleted);
+        $oResults = $this->getAllRawQuery($aData);
 
         return arrayExtractProperty(
             $oResults->result(),
@@ -1602,7 +1664,8 @@ abstract class Base
      */
     public function getIds(array $aData = [], bool $bIncludeDeleted = false): array
     {
-        return array_map('intval', $this->getAllColumn('id', $aData, $bIncludeDeleted));
+        $this->deprecatedIncludeDeleted($bIncludeDeleted);
+        return array_map('intval', $this->getAllColumn('id', $aData));
     }
 
     // --------------------------------------------------------------------------
@@ -2041,6 +2104,8 @@ abstract class Base
      */
     public function countAll(array $aData = [], bool $bIncludeDeleted = false): int
     {
+        $this->deprecatedIncludeDeleted($bIncludeDeleted);
+
         /** @var Database $oDb */
         $oDb   = Factory::service('Database');
         $table = $this->getTableName(true);
@@ -2059,9 +2124,13 @@ abstract class Base
         // --------------------------------------------------------------------------
 
         //  If non-destructive delete is enabled then apply the delete query
-        if (!$this->isDestructiveDelete() && !$bIncludeDeleted) {
+        if ($this->isSoftDelete() && !static::$INCLUDE_DELETED) {
             $oDb->where($this->getTableAlias(true) . $this->getColumnIsDeleted(), false);
         }
+
+        //  Reset the $INCLUDE_DELETED variable so future queries arent affected by
+        //  previous calls to includeDeleted()
+        static::$INCLUDE_DELETED = false;
 
         // --------------------------------------------------------------------------
 
