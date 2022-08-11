@@ -39,4 +39,22 @@ if (!function_exists('isDirCS')) {
 
 // --------------------------------------------------------------------------
 
+if (!function_exists('formatBytes')) {
+    function formatBytes(int $iBytes, int $iPrecision = 2): string
+    {
+        return File::formatBytes($iBytes, $iPrecision);
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('returnBytes')) {
+    function returnBytes(string $sSize): int
+    {
+        return File::returnBytes($sSize);
+    }
+}
+
+// --------------------------------------------------------------------------
+
 include NAILS_CI_SYSTEM_PATH . 'helpers/file_helper.php';

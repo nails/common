@@ -12,6 +12,8 @@
 
 namespace Nails\Common\Helper;
 
+use Nails\Common\Exception\NailsException;
+
 /**
  * Class File
  *
@@ -19,6 +21,17 @@ namespace Nails\Common\Helper;
  */
 class File
 {
+    /**
+     * Byte Multipliers
+     *
+     * @var int
+     */
+    const BYTE_MULTIPLIER_KB = 1024;
+    const BYTE_MULTIPLIER_MB = self::BYTE_MULTIPLIER_KB * 1024;
+    const BYTE_MULTIPLIER_GB = self::BYTE_MULTIPLIER_MB * 1024;
+
+    // --------------------------------------------------------------------------
+
     /**
      * Caches the results of static::fileExistsCS()
      *
@@ -152,5 +165,63 @@ class File
                 scandir($sPath)
             )
             : [];
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Formats a file size given in bytes into a human-friendly string
+     *
+     * @param int $iBytes     The file size, in bytes
+     * @param int $iPrecision The precision to use
+     *
+     * @return string
+     */
+    public static function formatBytes(int $iBytes, int $iPrecision = 2): string
+    {
+        $aUnits = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $iBytes = max($iBytes, 0);
+        $fPow   = floor(($iBytes ? log($iBytes) : 0) / log(1024));
+        $fPow   = min($fPow, count($aUnits) - 1);
+
+        $iBytes   /= (1 << (10 * $fPow));
+        $fRounded = round($iBytes, $iPrecision) . ' ' . $aUnits[$fPow];
+
+        return preg_replace_callback(
+            '/(.+?)\.(.*?)/',
+            function ($matches) {
+                return number_format($matches[1]) . '.' . $matches[2];
+            },
+            $fRounded
+        );
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Formats a file size as bytes (e.g max_upload_size)
+     * hat-tip: http://php.net/manual/en/function.ini-get.php#96996
+     *
+     * @param string $sSize The string to convert to bytes
+     *
+     * @return int
+     */
+    public static function returnBytes(string $sSize): int
+    {
+        switch (strtoupper(substr($sSize, -1))) {
+            case 'M':
+                return (int) $sSize * static::BYTE_MULTIPLIER_MB;
+
+            case 'K':
+                return (int) $sSize * static::BYTE_MULTIPLIER_KB;
+
+            case 'G':
+                return (int) $sSize * static::BYTE_MULTIPLIER_GB;
+        }
+
+        throw new NailsException(sprintf(
+            'Invalid format `%s`',
+            $sSize
+        ));
     }
 }
