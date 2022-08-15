@@ -12,9 +12,10 @@
 
 namespace Nails\Common\Helper;
 
-use Nails\Bootstrap;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
+use Nails\Common\Exception\Redirect\RedirectException;
+use Nails\Common\Factory\Redirect;
 use Nails\Common\Service\FileCache;
 use Nails\Config;
 use Nails\Factory;
@@ -56,57 +57,30 @@ class Url
     /**
      * Header Redirect
      *
-     * Header redirect in two flavors
-     * For very fine grained control over headers, you could use the Output
-     * Library's setHeader() function.
-     *
-     * Overriding so as to call the post_system hook before exit()'ing
-     *
-     * @param string $sUrl    The uri to redirect to
-     * @param string $sMethod The redirect method
-     * @param int    $iHttpResponseCode
+     * @param string $sUrl                      The uri to redirect to
+     * @param string $sMethod                   The redirect method
+     * @param int    $iLocationHttpResponseCode The status code to give refresh redirects
+     * @param bool   $bAllowExternal            Whether to allow external redirects
      *
      * @return void
      * @throws FactoryException
      * @throws NailsException
+     * @throws RedirectException
      */
-    public static function redirect(?string $sUrl = null, string $sMethod = 'location', ?int $iHttpResponseCode = null): void
-    {
-        /**
-         * Call the Bootstrap::shutdown method, the system will be killed in approximately 13
-         * lines so this is the last chance to cleanup.
-         */
-        Bootstrap::shutdown();
-
-        // --------------------------------------------------------------------------
-
-        /** @var \Nails\Common\Service\UserFeedback $oUserFeedback */
-        $oUserFeedback = Factory::service('UserFeedback');
-        $oUserFeedback->persist();
-
-        // --------------------------------------------------------------------------
-
-        if (!preg_match('#^https?://#i', (string) $sUrl)) {
-            $sUrl = siteUrl($sUrl);
-        }
-
-        // --------------------------------------------------------------------------
-
-        $iHttpResponseCode = $iHttpResponseCode ?? Config::get('NAILS_REDIRECT_HEADER_CODE_DEFAULT', static::REDIRECT_HEADER_CODE_DEFAULT);
-
-        // --------------------------------------------------------------------------
-
-        switch ($sMethod) {
-            case 'refresh':
-                header('Refresh:0;url=' . $sUrl);
-                break;
-
-            default:
-                header('Location: ' . $sUrl, true, $iHttpResponseCode);
-                break;
-        }
-
-        exit;
+    public static function redirect(
+        string $sUrl = '',
+        string $sMethod = Redirect::METHOD_LOCATION,
+        int $iLocationHttpResponseCode = Redirect::HTTP_CODE_TEMPORARY,
+        bool $bAllowExternal = false
+    ): void {
+        /** @var Redirect $oRedirect */
+        $oRedirect = Factory::factory('Redirect');
+        $oRedirect
+            ->setUrl($sUrl)
+            ->setMethod($sMethod)
+            ->setLocationHttpResponseCode($iLocationHttpResponseCode)
+            ->allowExternal($bAllowExternal)
+            ->execute();
     }
 
     // --------------------------------------------------------------------------
