@@ -14,6 +14,9 @@ namespace Nails\Common\Helper;
 
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
+use Nails\Common\Exception\Redirect\InvalidDestinationException;
+use Nails\Common\Exception\Redirect\InvalidLocationHttpResponseCodeException;
+use Nails\Common\Exception\Redirect\InvalidMethodException;
 use Nails\Common\Exception\Redirect\RedirectException;
 use Nails\Common\Factory\Redirect;
 use Nails\Common\Service\FileCache;
@@ -54,30 +57,40 @@ class Url
     /**
      * Header Redirect
      *
-     * @param string $sUrl                      The uri to redirect to
-     * @param string $sMethod                   The redirect method
-     * @param int    $iLocationHttpResponseCode The status code to give refresh redirects
-     * @param bool   $bAllowExternal            Whether to allow external redirects
+     * @param string      $sUrl                      The uri to redirect to
+     * @param string|null $sMethod                   The redirect method
+     * @param int|null    $iLocationHttpResponseCode The status code to give refresh redirects
+     * @param bool        $bAllowExternal            Whether to allow external redirects
      *
      * @return void
      * @throws FactoryException
-     * @throws NailsException
-     * @throws RedirectException
+     * @throws InvalidDestinationException
+     * @throws InvalidLocationHttpResponseCodeException
+     * @throws InvalidMethodException
      */
     public static function redirect(
-        string $sUrl = '',
-        string $sMethod = Redirect::METHOD_LOCATION,
-        int $iLocationHttpResponseCode = Redirect::HTTP_CODE_TEMPORARY,
-        bool $bAllowExternal = false
+        string $sUrl,
+        string $sMethod = null,
+        int $iLocationHttpResponseCode = null,
+        bool $bAllowExternal = null
     ): void {
+
         /** @var Redirect $oRedirect */
         $oRedirect = Factory::factory('Redirect');
-        $oRedirect
-            ->setUrl($sUrl)
-            ->setMethod($sMethod)
-            ->setLocationHttpResponseCode($iLocationHttpResponseCode)
-            ->allowExternal($bAllowExternal)
-            ->execute();
+        $oRedirect->setUrl($sUrl);
+
+        if ($sMethod !== null) {
+            $oRedirect->setMethod($sMethod);
+        }
+        if ($iLocationHttpResponseCode !== null) {
+            $oRedirect->setLocationHttpResponseCode($iLocationHttpResponseCode);
+        }
+
+        if ($bAllowExternal !== null) {
+            $oRedirect->allowExternal($bAllowExternal);
+        }
+
+        $oRedirect->execute();
     }
 
     // --------------------------------------------------------------------------
