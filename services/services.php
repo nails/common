@@ -4,8 +4,8 @@ use MimeTyper\Repository\MimeDbRepository;
 use Nails\Common\Interfaces;
 use Nails\Common\Resource;
 use Nails\Common\Service;
+use Nails\Common\Factory;
 use Nails\Config;
-use Nails\Factory;
 use Symfony\Component\Mime\MimeTypes;
 
 return [
@@ -50,7 +50,7 @@ return [
                 );
             }
         },
-        'CodeIgniter'                    => function () {
+        'CodeIgniter'                    => function (): \CI_Controller {
             return get_instance();
         },
         'Config'                         => function (): Service\Config {
@@ -117,14 +117,14 @@ return [
             if (class_exists('\App\Common\Service\FileCache')) {
                 /** @var Service\FileCache $oFileCache */
                 $oFileCache = new \App\Common\Service\FileCache(
-                    $oPrivate ?? Factory::service('FileCacheDriver'),
-                    $oPublic ?? Factory::service('FileCacheDriverAccessibleByUrl')
+                    $oPrivate ?? \Nails\Factory::service('FileCacheDriver'),
+                    $oPublic ?? \Nails\Factory::service('FileCacheDriverAccessibleByUrl')
                 );
             } else {
                 /** @var Service\FileCache $oFileCache */
                 $oFileCache = new Service\FileCache(
-                    $oPrivate ?? Factory::service('FileCacheDriver'),
-                    $oPublic ?? Factory::service('FileCacheDriverAccessibleByUrl')
+                    $oPrivate ?? \Nails\Factory::service('FileCacheDriver'),
+                    $oPublic ?? \Nails\Factory::service('FileCacheDriverAccessibleByUrl')
                 );
             }
 
@@ -216,7 +216,7 @@ return [
             Service\Input $oInput = null
         ): Service\Locale {
 
-            $oInput = $oInput ?? Factory::service('Input');
+            $oInput = $oInput ?? \Nails\Factory::service('Input');
 
             if (class_exists('\App\Common\Service\Locale')) {
                 return new \App\Common\Service\Locale(
@@ -363,28 +363,28 @@ return [
     ],
 
     'factories' => [
-        'AssetCriticalCss'           => function (Service\Asset $oAsset): \Nails\Common\Factory\Asset\CriticalCss {
+        'AssetCriticalCss'           => function (Service\Asset $oAsset): Factory\Asset\CriticalCss {
             if (class_exists('\App\Common\Factory\Asset\CriticalCss')) {
                 return new \App\Common\Factory\Asset\CriticalCss($oAsset);
             } else {
-                return new \Nails\Common\Factory\Asset\CriticalCss($oAsset);
+                return new Factory\Asset\CriticalCss($oAsset);
             }
         },
         'ComponentSetting'           => function (): \Nails\Components\Setting {
             return new \Nails\Components\Setting();
         },
-        'DatabaseForeignKeyCheck'    => function (Service\Database $oDatabase): \Nails\Common\Factory\Database\ForeignKeyCheck {
+        'DatabaseForeignKeyCheck'    => function (Service\Database $oDatabase): Factory\Database\ForeignKeyCheck {
             if (class_exists('\App\Common\Factory\Database\ForeignKeyCheck')) {
                 return new \App\Common\Factory\Database\ForeignKeyCheck($oDatabase);
             } else {
-                return new \Nails\Common\Factory\Database\ForeignKeyCheck($oDatabase);
+                return new Factory\Database\ForeignKeyCheck($oDatabase);
             }
         },
-        'DatabaseTransaction'        => function (Service\Database $oDatabase): \Nails\Common\Factory\Database\Transaction {
+        'DatabaseTransaction'        => function (Service\Database $oDatabase): Factory\Database\Transaction {
             if (class_exists('\App\Common\Factory\Database\Transaction')) {
                 return new \App\Common\Factory\Database\Transaction($oDatabase);
             } else {
-                return new \Nails\Common\Factory\Database\Transaction($oDatabase);
+                return new Factory\Database\Transaction($oDatabase);
             }
         },
         'DateTime'                   => function ($sTime = null, DateTimeZone $oTimeZone = null): \DateTime {
@@ -393,22 +393,15 @@ return [
                 $oTimeZone
             );
         },
-        'EventSubscription'          => function (): \Nails\Common\Events\Subscription {
-            if (class_exists('\App\Common\Events\Subscription')) {
-                return new \App\Common\Events\Subscription();
-            } else {
-                return new \Nails\Common\Events\Subscription();
-            }
-        },
         'FormValidationValidator'    => function (
             array $aRules = [],
             array $aMessages = [],
             array $aData = []
-        ): \Nails\Common\Factory\Service\FormValidation\Validator {
+        ): Factory\Service\FormValidation\Validator {
             if (class_exists('\App\Common\Factory\Service\FormValidation\Validator')) {
                 return new \App\Common\Factory\Service\FormValidation\Validator($aRules, $aMessages, $aData);
             } else {
-                return new \Nails\Common\Factory\Service\FormValidation\Validator($aRules, $aMessages, $aData);
+                return new Factory\Service\FormValidation\Validator($aRules, $aMessages, $aData);
             }
         },
         'HttpClient'                 => function (array $aConfig = []): \GuzzleHttp\Client {
@@ -422,174 +415,174 @@ return [
             string $sBaseUri = '',
             string $sPath = '',
             array $aHeaders = []
-        ): \Nails\Common\Factory\HttpRequest\Delete {
+        ): Factory\HttpRequest\Delete {
             if (class_exists('\App\Common\Factory\HttpRequest\Delete')) {
                 return new \App\Common\Factory\HttpRequest\Delete($sBaseUri, $sPath, $aHeaders);
             } else {
-                return new \Nails\Common\Factory\HttpRequest\Delete($sBaseUri, $sPath, $aHeaders);
+                return new Factory\HttpRequest\Delete($sBaseUri, $sPath, $aHeaders);
             }
         },
         'HttpRequestGet'             => function (
             string $sBaseUri = '',
             string $sPath = '',
             array $aHeaders = []
-        ): \Nails\Common\Factory\HttpRequest\Get {
+        ): Factory\HttpRequest\Get {
             if (class_exists('\App\Common\Factory\HttpRequest\Get')) {
                 return new \App\Common\Factory\HttpRequest\Get($sBaseUri, $sPath, $aHeaders);
             } else {
-                return new \Nails\Common\Factory\HttpRequest\Get($sBaseUri, $sPath, $aHeaders);
+                return new Factory\HttpRequest\Get($sBaseUri, $sPath, $aHeaders);
             }
         },
         'HttpRequestPatch'           => function (
             string $sBaseUri = '',
             string $sPath = '',
             array $aHeaders = []
-        ): \Nails\Common\Factory\HttpRequest\Patch {
+        ): Factory\HttpRequest\Patch {
             if (class_exists('\App\Common\Factory\HttpRequest\Patch')) {
                 return new \App\Common\Factory\HttpRequest\Patch($sBaseUri, $sPath, $aHeaders);
             } else {
-                return new \Nails\Common\Factory\HttpRequest\Patch($sBaseUri, $sPath, $aHeaders);
+                return new Factory\HttpRequest\Patch($sBaseUri, $sPath, $aHeaders);
             }
         },
         'HttpRequestPost'            => function (
             string $sBaseUri = '',
             string $sPath = '',
             array $aHeaders = []
-        ): \Nails\Common\Factory\HttpRequest\Post {
+        ): Factory\HttpRequest\Post {
             if (class_exists('\App\Common\Factory\HttpRequest\Post')) {
                 return new \App\Common\Factory\HttpRequest\Post($sBaseUri, $sPath, $aHeaders);
             } else {
-                return new \Nails\Common\Factory\HttpRequest\Post($sBaseUri, $sPath, $aHeaders);
+                return new Factory\HttpRequest\Post($sBaseUri, $sPath, $aHeaders);
             }
         },
         'HttpRequestPut'             => function (
             string $sBaseUri = '',
             string $sPath = '',
             array $aHeaders = []
-        ): \Nails\Common\Factory\HttpRequest\Put {
+        ): Factory\HttpRequest\Put {
             if (class_exists('\App\Common\Factory\HttpRequest\Put')) {
                 return new \App\Common\Factory\HttpRequest\Put($sBaseUri, $sPath, $aHeaders);
             } else {
-                return new \Nails\Common\Factory\HttpRequest\Put($sBaseUri, $sPath, $aHeaders);
+                return new Factory\HttpRequest\Put($sBaseUri, $sPath, $aHeaders);
             }
         },
         'HttpRequestOptions'         => function (
             string $sBaseUri = '',
             string $sPath = '',
             array $aHeaders = []
-        ): \Nails\Common\Factory\HttpRequest\Options {
+        ): Factory\HttpRequest\Options {
             if (class_exists('\App\Common\Factory\HttpRequest\Options')) {
                 return new \App\Common\Factory\HttpRequest\Options($sBaseUri, $sPath, $aHeaders);
             } else {
-                return new \Nails\Common\Factory\HttpRequest\Options($sBaseUri, $sPath, $aHeaders);
+                return new Factory\HttpRequest\Options($sBaseUri, $sPath, $aHeaders);
             }
         },
         'HttpRequestHead'            => function (
             string $sBaseUri = '',
             string $sPath = '',
             array $aHeaders = []
-        ): \Nails\Common\Factory\HttpRequest\Head {
+        ): Factory\HttpRequest\Head {
             if (class_exists('\App\Common\Factory\HttpRequest\Head')) {
                 return new \App\Common\Factory\HttpRequest\Head($sBaseUri, $sPath, $aHeaders);
             } else {
-                return new \Nails\Common\Factory\HttpRequest\Head($sBaseUri, $sPath, $aHeaders);
+                return new Factory\HttpRequest\Head($sBaseUri, $sPath, $aHeaders);
             }
         },
         'HttpResponse'               => function (
             GuzzleHttp\Psr7\Response $oClient,
             \Nails\Common\Factory\HttpRequest $oRequest
-        ): \Nails\Common\Factory\HttpResponse {
+        ): Factory\HttpResponse {
             if (class_exists('\App\Common\Factory\HttpResponse')) {
                 return new \App\Common\Factory\HttpResponse($oClient, $oRequest);
             } else {
-                return new \Nails\Common\Factory\HttpResponse($oClient, $oRequest);
+                return new Factory\HttpResponse($oClient, $oRequest);
             }
         },
         'Locale'                     => function (
-            \Nails\Common\Factory\Locale\Language $oLanguage = null,
-            \Nails\Common\Factory\Locale\Region $oRegion = null,
-            \Nails\Common\Factory\Locale\Script $oScript = null
-        ): \Nails\Common\Factory\Locale {
+            Factory\Locale\Language $oLanguage = null,
+            Factory\Locale\Region $oRegion = null,
+            Factory\Locale\Script $oScript = null
+        ): Factory\Locale {
             if (class_exists('\App\Common\Factory\Locale')) {
                 return new \App\Common\Factory\Locale($oLanguage, $oRegion, $oScript);
             } else {
-                return new \Nails\Common\Factory\Locale($oLanguage, $oRegion, $oScript);
+                return new Factory\Locale($oLanguage, $oRegion, $oScript);
             }
         },
         'LocaleLanguage'             => function (
             string $sLabel = ''
-        ): \Nails\Common\Factory\Locale\Language {
+        ): Factory\Locale\Language {
             if (class_exists('\App\Common\Factory\Locale\Language')) {
                 return new \App\Common\Factory\Locale\Language($sLabel);
             } else {
-                return new \Nails\Common\Factory\Locale\Language($sLabel);
+                return new Factory\Locale\Language($sLabel);
             }
         },
         'LocaleRegion'               => function (
             string $sLabel = ''
-        ): \Nails\Common\Factory\Locale\Region {
+        ): Factory\Locale\Region {
             if (class_exists('\App\Common\Factory\Locale\Region')) {
                 return new \App\Common\Factory\Locale\Region($sLabel);
             } else {
-                return new \Nails\Common\Factory\Locale\Region($sLabel);
+                return new Factory\Locale\Region($sLabel);
             }
         },
         'LocaleScript'               => function (
             string $sLabel = ''
-        ): \Nails\Common\Factory\Locale\Script {
+        ): Factory\Locale\Script {
             if (class_exists('\App\Common\Factory\Locale\Script')) {
                 return new \App\Common\Factory\Locale\Script($sLabel);
             } else {
-                return new \Nails\Common\Factory\Locale\Script($sLabel);
+                return new Factory\Locale\Script($sLabel);
             }
         },
-        'Logger'                     => function (): \Nails\Common\Factory\Logger {
+        'Logger'                     => function (): Factory\Logger {
             if (class_exists('\App\Common\Factory\Logger')) {
                 return new \App\Common\Factory\Logger();
             } else {
-                return new \Nails\Common\Factory\Logger();
+                return new Factory\Logger();
             }
         },
-        'ModelField'                 => function (): \Nails\Common\Factory\Model\Field {
+        'ModelField'                 => function (): Factory\Model\Field {
             if (class_exists('\App\Common\Factory\Model\Field')) {
                 return new \App\Common\Factory\Model\Field();
             } else {
-                return new \Nails\Common\Factory\Model\Field();
+                return new Factory\Model\Field();
             }
         },
-        'Pagination'                 => function (): \Nails\Common\Factory\Pagination {
+        'Pagination'                 => function (): Factory\Pagination {
             if (class_exists('\App\Common\Factory\Pagination')) {
                 return new \App\Common\Factory\Pagination();
             } else {
-                return new \Nails\Common\Factory\Pagination();
+                return new Factory\Pagination();
             }
         },
         'PDODatabaseForeignKeyCheck' => function (
             Service\PDODatabase $oDatabase
-        ): \Nails\Common\Factory\PDODatabase\ForeignKeyCheck {
+        ): Factory\PDODatabase\ForeignKeyCheck {
             if (class_exists('\App\Common\Factory\PDODatabase\ForeignKeyCheck')) {
                 return new \App\Common\Factory\PDODatabase\ForeignKeyCheck($oDatabase);
             } else {
-                return new \Nails\Common\Factory\PDODatabase\ForeignKeyCheck($oDatabase);
+                return new Factory\PDODatabase\ForeignKeyCheck($oDatabase);
             }
         },
         'PDODatabaseTransaction'     => function (
             Service\PDODatabase $oDatabase
-        ): \Nails\Common\Factory\PDODatabase\Transaction {
+        ): Factory\PDODatabase\Transaction {
             if (class_exists('\App\Common\Factory\PDODatabase\Transaction')) {
                 return new \App\Common\Factory\PDODatabase\Transaction($oDatabase);
             } else {
-                return new \Nails\Common\Factory\PDODatabase\Transaction($oDatabase);
+                return new Factory\PDODatabase\Transaction($oDatabase);
             }
         },
         'UserFeedbackMessage'        => function (
             Service\UserFeedback $oUserFeedback,
             string $sType
-        ): \Nails\Common\Factory\Service\UserFeedback\Message {
+        ): Factory\Service\UserFeedback\Message {
             if (class_exists('\App\Common\Factory\UserFeedback\Message')) {
                 return new \App\Common\Factory\Service\UserFeedback\Message($oUserFeedback, $sType);
             } else {
-                return new \Nails\Common\Factory\Service\UserFeedback\Message($oUserFeedback, $sType);
+                return new Factory\Service\UserFeedback\Message($oUserFeedback, $sType);
             }
         },
     ],
