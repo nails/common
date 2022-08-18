@@ -28,7 +28,7 @@ class Condition
     /**
      * Compile the statement
      *
-     * @return array|string
+     * @return string
      */
     public function compile()
     {
