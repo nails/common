@@ -9,19 +9,18 @@ namespace Nails\Common\Helper\Model;
  */
 class Condition
 {
-    private string $sColumn;
-    private string $sDirection;
+    private string $sCondition;
 
     // --------------------------------------------------------------------------
 
     /**
      * Condition constructor.
      *
-     * @param string $sColumn
+     * @param string $sCondition
      */
-    public function __construct(string $sColumn)
+    public function __construct(string $sCondition)
     {
-        $this->sColumn = $sColumn;
+        $this->sCondition = $sCondition;
     }
 
     // --------------------------------------------------------------------------
@@ -33,6 +32,6 @@ class Condition
      */
     public function compile()
     {
-        return $this->sColumn;
+        return sprintf('(%s)', $this->sCondition);
     }
 }
