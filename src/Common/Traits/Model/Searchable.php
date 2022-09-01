@@ -2,6 +2,7 @@
 
 namespace Nails\Common\Traits\Model;
 
+use Nails\Common\Helper\Model\OrLike;
 use Nails\Common\Resource;
 
 /**
@@ -130,10 +131,6 @@ trait Searchable
 
         $sKeywords = $aData[$sKey];
 
-        if (empty($aData['or_like'])) {
-            $aData['or_like'] = [];
-        }
-
         $sAlias             = $this->getTableAlias(true);
         $aSearchableColumns = array_filter($this->getSearchableColumns());
 
@@ -150,16 +147,16 @@ trait Searchable
                     }
                 }, $mField);
 
-                $aData['or_like'][] = ['CONCAT_WS(" ", ' . implode(',', $sMappedFields) . ')', $sKeywords];
+                $aData[] = new OrLike('CONCAT_WS(" ", ' . implode(',', $sMappedFields) . ')', $sKeywords);
 
             } elseif (preg_match('/^\(.*\)$/', $mField)) {
-                $aData['or_like'][] = [$mField, $sKeywords];
+                $aData[] = new OrLike($mField, $sKeywords);
 
             } elseif (strpos($mField, '.') !== false) {
-                $aData['or_like'][] = [$mField, $sKeywords];
+                $aData[] = new OrLike($mField, $sKeywords);
 
             } else {
-                $aData['or_like'][] = [$sAlias . $mField, $sKeywords];
+                $aData[] = new OrLike($sAlias . $mField, $sKeywords);
             }
         }
 
