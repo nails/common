@@ -204,7 +204,7 @@ class Migrate extends Base
 
             return $this->runPostCommands();
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return $this->abort(
                 $e->getCode(),
                 array_filter([$e->getMessage()])
@@ -459,7 +459,7 @@ class Migrate extends Base
                         $oModule->slug
                     ));
 
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     $this->oOutput->writeln('');
                     $this->oOutput->writeln('');
                     $this->oOutput->writeln('<error>ERROR</error>: Migration "' . get_class($oMigration) . '" failed:');
