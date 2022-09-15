@@ -18,7 +18,7 @@ $mimes['json'] = array_merge($mimes['json'], ['text/plain']);
 $mimes['ico'] = 'image/x-icon';
 
 //  SVG
-$mimes['svg'] = ['image/svg+xml', 'text/html'];
+$mimes['svg'] = ['image/svg+xml', 'image/svg', 'text/html'];
 
 //  Video
 $mimes['mp4']  = 'video/mp4';
