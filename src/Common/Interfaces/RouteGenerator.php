@@ -17,7 +17,7 @@ interface RouteGenerator
     /**
      * Returns an array of routes in the form of key value pairs
      *
-     * @return array
+     * @return string[]
      */
-    public static function generate();
+    public static function generate(): array;
 }
