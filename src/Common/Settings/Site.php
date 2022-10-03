@@ -7,7 +7,6 @@ use Nails\Common\Exception\FactoryException;
 use Nails\Common\Helper\Form;
 use Nails\Common\Interfaces;
 use Nails\Common\Service\Input;
-use Nails\Components;
 use Nails\Components\Setting;
 use Nails\Factory;
 
@@ -18,10 +17,6 @@ use Nails\Factory;
  */
 class Site implements Interfaces\Component\Settings
 {
-    use Traits\Settings\Permission;
-
-    // --------------------------------------------------------------------------
-
     const KEY_CUSTOM_JS             = 'site_custom_js';
     const KEY_CUSTOM_CSS            = 'site_custom_css';
     const KEY_CUSTOM_MARKUP         = 'site_custom_markup';
@@ -75,10 +70,6 @@ class Site implements Interfaces\Component\Settings
      */
     protected function getSettingsCustomJsCss(): array
     {
-        if (!$this->userHasPermission()) {
-            return [];
-        }
-
         /** @var Setting $oCustomJs */
         $oCustomJs = Factory::factory('ComponentSetting');
         $oCustomJs
@@ -125,10 +116,6 @@ class Site implements Interfaces\Component\Settings
      */
     protected function getSettingsMaintenance(): array
     {
-        if (!$this->userHasPermission('maintenance')) {
-            return [];
-        }
-
         /** @var Input $oInput */
         $oInput = \Nails\Factory::service('Input');
 
