@@ -1704,7 +1704,7 @@ abstract class Base
      * @param string   $sAssociatedModel          The name of the model which handles the associated content
      * @param string   $sAssociatedModelProvider  Which module provides the associated model
      * @param array    $aAssociatedModelData      Data to pass to the associated model's getByIds method()
-     * @param bool     $bUnsetOriginalProperty    Whether to remove the original property (i.e the property defined by
+     * @param bool     $bNullOriginalProperty     Whether to null the original property (i.e the property defined by
      *                                            $sAssociatedItemIdColumn)
      *
      * @return void
@@ -1716,7 +1716,7 @@ abstract class Base
         $sAssociatedModel,
         $sAssociatedModelProvider,
         array $aAssociatedModelData = [],
-        $bUnsetOriginalProperty = true
+        $bNullOriginalProperty = true
     ) {
         if (!empty($aItems)) {
 
@@ -1750,8 +1750,8 @@ abstract class Base
                  * Unset the original property, but only if it's not the same as the new property,
                  * otherwise we'll remove the property which was just set!
                  */
-                if ($bUnsetOriginalProperty && $sAssociatedItemIdColumn !== $sItemProperty) {
-                    unset($oItem->{$sAssociatedItemIdColumn});
+                if ($bNullOriginalProperty && $sAssociatedItemIdColumn !== $sItemProperty) {
+                    $oItem->{$sAssociatedItemIdColumn} = null;
                 }
             }
         }
