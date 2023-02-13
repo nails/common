@@ -61,6 +61,9 @@ class MetaData
     /** @var bool */
     protected $bNoIndex = false;
 
+    /** @var bool */
+    protected $bFollow = true;
+
     // --------------------------------------------------------------------------
 
     /**
@@ -488,5 +491,45 @@ class MetaData
     public function getNoIndex(): bool
     {
         return $this->bNoIndex;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets whether the page should be followed or not
+     *
+     * @param bool $bFollow
+     *
+     * @return $this
+     */
+    public function setFollow(bool $bFollow): self
+    {
+        $this->bFollow = $bFollow;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Gets whether the page should be indexed or not
+     *
+     * @return bool
+     */
+    public function getFollow(): bool
+    {
+        return $this->bFollow;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the robots meta tag
+     */
+    public function getRobots(): string
+    {
+        return implode(',', array_filter([
+            $this->bNoIndex ? 'noindex' : 'index',
+            $this->bFollow ? 'follow' : 'nofollow',
+        ]));
     }
 }
