@@ -124,8 +124,8 @@ class ArrayHelper
                 );
 
                 $sKey = implode('->', $aKey);
-                $mA   = strtolower(eval('return $oA->' . $sKey . ' ?? null;'));
-                $mB   = strtolower(eval('return $oB->' . $sKey . ' ?? null;'));
+                $mA   = strtolower(eval('return $oA->' . $sKey . ' ?? "";'));
+                $mB   = strtolower(eval('return $oB->' . $sKey . ' ?? "";'));
 
             } else {
                 $mA = property_exists($oA, $sField) ? strtolower($oA->$sField) : null;
