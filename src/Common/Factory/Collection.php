@@ -55,7 +55,7 @@ abstract class Collection implements \Iterator, \Countable
      *
      * @return mixed
      */
-    public function current()
+    public function current(): mixed
     {
         return $this->aCollection[$this->iIndex];
     }
@@ -77,7 +77,7 @@ abstract class Collection implements \Iterator, \Countable
      *
      * @return bool|float|int|string|null
      */
-    public function key()
+    public function key(): mixed
     {
         return $this->iIndex;
     }
@@ -156,7 +156,7 @@ abstract class Collection implements \Iterator, \Countable
     /**
      * @inheritDoc
      */
-    public function count()
+    public function count(): int
     {
         return count($this->aCollection);
     }

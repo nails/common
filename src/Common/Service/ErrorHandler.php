@@ -629,8 +629,8 @@ class ErrorHandler
     {
         if (php_sapi_name() === 'cli' || defined('STDIN')) {
 
-            $sSubject = trim(strip_tags($sSubject));
-            $sError   = trim(strip_tags($sError));
+            $sSubject = trim(strip_tags($sSubject ?? ''));
+            $sError   = trim(strip_tags($sError ?? ''));
 
             echo "\n";
             echo $sSubject ? 'ERROR: ' . $sSubject . ":\n" : '';

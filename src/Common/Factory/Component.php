@@ -152,7 +152,7 @@ final class Component
     public function getNamespaceRootPaths(): array
     {
         $aPsr4NameSpaces = require(NAILS_APP_PATH . 'vendor/composer/autoload_psr4.php');
-        return getFromArray(ltrim($this->namespace, '\\'), $aPsr4NameSpaces, []);
+        return getFromArray(ltrim($this->namespace ?? '', '\\'), $aPsr4NameSpaces, []);
     }
 
     // --------------------------------------------------------------------------

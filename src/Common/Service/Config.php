@@ -4,7 +4,6 @@
  * The class abstracts CI's Config class.
  *
  * @todo        - remove dependency on CI
- *
  * @package     Nails
  * @subpackage  common
  * @category    Library
@@ -26,10 +25,8 @@ class Config
 {
     /**
      * --------------------------------------------------------------------------
-     *
      * The following properties and methods are legacy to support the CodeIgniter
      * Config class. New functionality should use the Nails\Config class
-     *
      * --------------------------------------------------------------------------
      */
 
@@ -119,23 +116,22 @@ class Config
      */
     public static function siteUrl(string $sUri = null, bool $bUseSecure = false): string
     {
-        if (preg_match('/^(https?:\/\/|#)/', $sUri)) {
+        if (preg_match('/^(https?:\/\/|#)/', $sUri ?? '')) {
             //  Absolute URI; return unaltered
             return $sUri;
 
-        } else {
-
-            $sBaseUrl = $bUseSecure
-                ? rtrim(\Nails\Config::get('SECURE_BASE_URL'), '/') . '/'
-                : rtrim(\Nails\Config::get('BASE_URL'), '/') . '/';
-
-            /** @var Locale $oLocale */
-            $oLocale = Factory::service('Locale');
-            $sLocale = $oLocale->getUrlSegment($oLocale->get());
-            $sLocale = $sLocale && $sUri ? $sLocale . '/' : $sLocale;
-
-            return $sBaseUrl . $sLocale . ltrim($sUri, '/');
         }
+
+        $sBaseUrl = $bUseSecure
+            ? rtrim(\Nails\Config::get('SECURE_BASE_URL'), '/') . '/'
+            : rtrim(\Nails\Config::get('BASE_URL'), '/') . '/';
+
+        /** @var Locale $oLocale */
+        $oLocale = Factory::service('Locale');
+        $sLocale = $oLocale->getUrlSegment($oLocale->get());
+        $sLocale = $sLocale && $sUri ? $sLocale . '/' : $sLocale;
+
+        return $sBaseUrl . $sLocale . ltrim($sUri ?? '', '/');
     }
 
     // --------------------------------------------------------------------------
