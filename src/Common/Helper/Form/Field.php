@@ -119,7 +119,7 @@ class Field
         //  Generate the field's HTML
         $sFieldAttr = $_attr;
         $sFieldAttr .= ' class="field-input ' . $_field_class . '" ';
-        $sFieldAttr .= 'placeholder="' . htmlentities($_field_placeholder, ENT_QUOTES) . '" ';
+        $sFieldAttr .= 'placeholder="' . htmlentities($_field_placeholder ?? '', ENT_QUOTES) . '" ';
         $sFieldAttr .= $_readonly;
 
         $_field_html = call_user_func(
@@ -680,7 +680,7 @@ class Field
         $_selected = set_value($_field['key'], $_field['default']);
 
         //  Build the select
-        $_placeholder = null !== $_field['placeholder'] ? 'data-placeholder="' . htmlentities($_field['placeholder'], ENT_QUOTES) . '"' : '';
+        $_placeholder = null !== $_field['placeholder'] ? 'data-placeholder="' . htmlentities($_field['placeholder'] ?? '', ENT_QUOTES) . '"' : '';
         $_out         .= '<select name="' . $_field['key'] . '" class="' . $_field['class'] . '" style="' . $_field['style'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . $_data . '>';
 
         foreach ($_field['options'] as $value => $label) {
@@ -829,7 +829,7 @@ class Field
         $_selected = set_value(preg_replace('/\[\]$/', '', $_field['key']), $_field['default']);
 
         //  Build the select
-        $_placeholder = null !== $_field['placeholder'] ? 'data-placeholder="' . htmlentities($_field['placeholder'], ENT_QUOTES) . '"' : '';
+        $_placeholder = null !== $_field['placeholder'] ? 'data-placeholder="' . htmlentities($_field['placeholder'] ?? '', ENT_QUOTES) . '"' : '';
         $_out         .= '<select name="' . $_field['key'] . '" multiple="multiple" class="' . $_field['class'] . '" style="' . $_field['style'] . '" ' . $_field['id'] . ' ' . $_readonly . $_placeholder . $_data . '>';
 
         foreach ($options as $value => $label) {
