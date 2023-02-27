@@ -157,7 +157,7 @@ class MX_Loader extends CI_Loader
 		if (isset($this->_ci_classes[$class]) && $_alias = $this->_ci_classes[$class])
 			return $this;
 
-		($_alias = strtolower($object_name)) OR $_alias = $class;
+		($_alias = strtolower($object_name ?? '')) OR $_alias = $class;
 
 		list($path, $_library) = Modules::find($library, $this->_module, 'libraries/');
 
@@ -187,7 +187,7 @@ class MX_Loader extends CI_Loader
 	/** Load an array of libraries **/
 	public function libraries($libraries)
 	{
-		foreach ($libraries as $library => $alias) 
+		foreach ($libraries as $library => $alias)
 		{
 			(is_int($library)) ? $this->library($alias) : $this->library($library, NULL, $alias);
 		}
@@ -235,7 +235,7 @@ class MX_Loader extends CI_Loader
 	/** Load an array of models **/
 	public function models($models)
 	{
-		foreach ($models as $model => $alias) 
+		foreach ($models as $model => $alias)
 		{
 			(is_int($model)) ? $this->model($alias) : $this->model($model, $alias);
 		}
@@ -427,7 +427,7 @@ class MX_Loader extends CI_Loader
 				}
 			}
 		}
-		
+
 		// Autoload drivers
 		if (isset($autoload['drivers']))
 		{

@@ -1090,8 +1090,8 @@ class Asset
      */
     public function getCacheBuster(): ?string
     {
-        return trim($this->sCacheBuster)
-            ? 'revision=' . trim($this->sCacheBuster)
+        return trim($this->sCacheBuster ?? '')
+            ? 'revision=' . trim($this->sCacheBuster ?? '')
             : null;
     }
 

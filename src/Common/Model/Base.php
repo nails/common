@@ -2782,7 +2782,7 @@ abstract class Base
         preg_match('/^(.*?)(\((.+?)\)(.*))?$/', $oDbField->Type, $aMatches);
 
         $sType       = Helper\ArrayHelper::get(1, $aMatches, 'text');
-        $sTypeConfig = trim(Helper\ArrayHelper::get(3, $aMatches));
+        $sTypeConfig = trim(Helper\ArrayHelper::get(3, $aMatches) ?? '');
         $iLength     = is_numeric($sTypeConfig) ? (int) $sTypeConfig : null;
 
         switch ($sType) {
@@ -2904,7 +2904,7 @@ abstract class Base
 
         $sType   = Helper\ArrayHelper::get(1, $aMatches, 'text');
         $iLength = Helper\ArrayHelper::get(3, $aMatches);
-        $sExtra  = trim(strtolower(Helper\ArrayHelper::get(4, $aMatches)));
+        $sExtra  = trim(strtolower(Helper\ArrayHelper::get(4, $aMatches) ?? ''));
 
         switch ($sType) {
 
