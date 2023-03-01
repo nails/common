@@ -36,7 +36,7 @@
         "ext-pdo": "*",
         "adrienrn/php-mimetyper": "0.*",
         "annexare/countries-list": "2.*",
-        "axisofstevil/stop-words": "0.*",
+        "axisofstevil/stop-words": "1.*",
         "behat/transliterator": "1.*",
         "codeigniter/framework": "3.1.13",
         "defuse/php-encryption": "2.*",
