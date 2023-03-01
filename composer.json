@@ -28,7 +28,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": "^7.3",
+        "php": ">=8",
         "ext-fileinfo": "*",
         "ext-intl": "*",
         "ext-json": "*",
