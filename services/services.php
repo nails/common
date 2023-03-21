@@ -267,11 +267,11 @@ return [
                 return new Service\Mime($oDatabase, $oDetector);
             }
         },
-        'Mustache'                       => function (): Mustache_Engine {
+        'Mustache'                       => function (): Service\Mustache {
             if (class_exists('\App\Common\Service\Mustache')) {
                 return new \App\Common\Service\Mustache();
             } else {
-                return new Mustache_Engine();
+                return new Service\Mustache();
             }
         },
         'Output'                         => function (): Service\Output {
