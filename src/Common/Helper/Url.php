@@ -83,7 +83,7 @@ class Url
 
         // --------------------------------------------------------------------------
 
-        if (!preg_match('#^https?://#i', $sUrl)) {
+        if (!preg_match('#^https?://#i', (string) $sUrl)) {
             $sUrl = siteUrl($sUrl);
         }
 

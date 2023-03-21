@@ -933,13 +933,13 @@ trait GetCountCommon
     protected function extractColumn($aData): string
     {
         $mColumn = isset($aData['column'])
-            ? $aData['column']
+            ? (string) $aData['column']
             : '[NAILS-COL-NOT-FOUND]';
 
         if ($mColumn === '[NAILS-COL-NOT-FOUND]') {
             $mColumn = isset($aData[0]) && is_string($aData[0])
                 ? $aData[0]
-                : null;
+                : '';
         }
 
         //  If the $mColumn is an array then we should concat them together
@@ -970,13 +970,13 @@ trait GetCountCommon
     protected function extractOperator($aData): string
     {
         $mColumn = isset($aData['column'])
-            ? $aData['column']
+            ? (string) $aData['column']
             : '[NAILS-COL-NOT-FOUND]';
 
         if ($mColumn === '[NAILS-COL-NOT-FOUND]') {
             $mColumn = isset($aData[0]) && is_string($aData[0])
                 ? $aData[0]
-                : null;
+                : '';
         }
 
         //  If the $mColumn is an array then we should concat them together
