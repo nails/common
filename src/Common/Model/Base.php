@@ -322,7 +322,7 @@ abstract class Base
      */
     public function getSearchableColumns(): array
     {
-        return $this->searchableFields;
+        return array_filter($this->searchableFields);
     }
 
     // --------------------------------------------------------------------------
