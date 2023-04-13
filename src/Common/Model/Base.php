@@ -295,11 +295,11 @@ abstract class Base
     {
         $this->clearErrors();
 
-        $this->aCacheColumns = [
+        $this->aCacheColumns = array_filter([
             $this->getColumnId(),
             $this->getColumnSlug(),
             $this->getColumnToken(),
-        ];
+        ]);
 
         //  @todo (Pablo 2021-04-28) - Backwards compatability; remove this in favour of getSearchableColumns()
         if (empty($this->searchableFields)) {
@@ -322,7 +322,7 @@ abstract class Base
      */
     public function getSearchableColumns(): array
     {
-        return $this->searchableFields;
+        return array_filter($this->searchableFields);
     }
 
     // --------------------------------------------------------------------------
@@ -505,7 +505,7 @@ abstract class Base
                 ->afterWrite($iId);
 
             //  Clear the cache
-            foreach ($this->aCacheColumns as $sColumn) {
+            foreach ($this->getCacheColumns() as $sColumn) {
                 $sKey = strtoupper($sColumn) . ':' . json_encode($iId);
                 $this->unsetCachePrefix($sKey);
             }
@@ -1468,7 +1468,7 @@ abstract class Base
         // --------------------------------------------------------------------------
 
         foreach ($aResult as $oResult) {
-            foreach ($this->aCacheColumns as $sColumn) {
+            foreach ($this->getCacheColumns() as $sColumn) {
                 if (!property_exists($oResult, $sColumn)) {
                     continue;
                 }
@@ -1534,6 +1534,13 @@ abstract class Base
         ]);
 
         return implode(':', $aKey);
+    }
+
+    // --------------------------------------------------------------------------
+
+    protected function getCacheColumns(): array
+    {
+        return array_filter($this->aCacheColumns);
     }
 
     // --------------------------------------------------------------------------
