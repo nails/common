@@ -134,25 +134,18 @@ class Url
     {
         /** @var FileCache $oFileCache */
         $oFileCache = Factory::service('FileCache');
-        $sCacheDir  = $oFileCache->getDir() . 'php-domain-parser' . DIRECTORY_SEPARATOR;
+        $sCacheFile = 'php-domain-parser-public-suffix.dat';
 
-        $oManager = new Pdp\Manager(
-            new Pdp\Cache($sCacheDir),
-            new Pdp\CurlHttpClient()
-        );
+        $sUrl = preg_replace('/^(?:https?|ftp):\/\//', '', $sUrl ?? '');
 
-        try {
-
-            $oRules = $oManager->getRules();
-
-        } catch (Pdp\Exception\CouldNotLoadRules $e) {
-            $oManager->refreshRules(static::PUBLIC_SUFFIX_LIST);
-            $oRules = $oManager->getRules();
+        if (!$oFileCache->exists($sCacheFile)) {
+            $oFileCache->write(file_get_contents(static::PUBLIC_SUFFIX_LIST), $sCacheFile);
         }
 
-        $sUrl    = preg_replace('/^(?:https?|ftp):\/\//', '', $sUrl);
-        $oDomain = $oRules->resolve($sUrl);
+        $oRules  = Pdp\Rules::fromPath($oFileCache->getDir() . $sCacheFile);
+        $oDomain = Pdp\Domain::fromIDNA2008($sUrl);
+        $oResult = $oRules->resolve($oDomain);
 
-        return $oDomain->getRegistrableDomain();
+        return $oResult->registrableDomain()->toString();
     }
 }
