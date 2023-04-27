@@ -30,7 +30,7 @@ class Join
     {
         $this->sTable = $sTable;
         $this->sOn    = $sOn;
-        $this->sType  = $sType;
+        $this->sType  = $sType ?? self::TYPE_INNER;
     }
 
     // --------------------------------------------------------------------------
