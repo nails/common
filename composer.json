@@ -45,7 +45,7 @@
         "pimple/pimple": "3.*",
         "ralouphie/getallheaders": "3.*",
         "symfony/mime": "5.*",
-        "symfony/http-foundation": "^5.0",
+        "symfony/http-foundation": "^6.2",
         "jeremykendall/php-domain-parser": "^6.3"
     },
     "require-dev": {
