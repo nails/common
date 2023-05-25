@@ -62,7 +62,7 @@ class Inflector
      *
      * @return string
      */
-    public static function pluralise(int $iValue, stirng $sSingular, string $sSpecified = ''): string
+    public static function pluralise(int $iValue, string $sSingular, string $sSpecified = ''): string
     {
         $sSingular = trim($sSingular);
 
