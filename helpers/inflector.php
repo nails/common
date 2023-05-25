@@ -11,7 +11,7 @@
  */
 
 if (!function_exists('possessive')) {
-    function possessive($sString)
+    function possessive(string $sString)
     {
         return \Nails\Common\Helper\Inflector::possessive($sString);
     }
@@ -20,7 +20,7 @@ if (!function_exists('possessive')) {
 // --------------------------------------------------------------------------
 
 if (!function_exists('possessionise')) {
-    function possessionise($sString)
+    function possessionise(string $sString)
     {
         return \Nails\Common\Helper\Inflector::possessionise($sString);
     }
@@ -29,7 +29,7 @@ if (!function_exists('possessionise')) {
 // --------------------------------------------------------------------------
 
 if (!function_exists('pluralise')) {
-    function pluralise($iValue, $sSingular, $sPlural = null)
+    function pluralise(int $iValue, string $sSingular, $sPlural = '')
     {
         return \Nails\Common\Helper\Inflector::pluralise($iValue, $sSingular, $sPlural);
     }
