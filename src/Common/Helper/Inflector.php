@@ -23,10 +23,10 @@ class Inflector
      *
      * @return string
      */
-    public static function possessive($sString)
+    public static function possessive(string $sString): string
     {
         //  Attempt to match the case
-        $sLastChar       = substr($sString, -1);
+        $sLastChar       = (string) substr($sString, -1);
         $bIsLowerCase    = strtolower($sLastChar) === $sLastChar;
         $sPossessionChar = $bIsLowerCase ? 's' : 'S';
 
@@ -45,7 +45,7 @@ class Inflector
      *
      * @return string
      */
-    public static function possessionise($sString)
+    public static function possessionise(string $sString): string
     {
         trigger_error('Function ' . __METHOD__ . ' is deprecated', E_USER_DEPRECATED);
         return static::possessive($sString);
@@ -62,7 +62,7 @@ class Inflector
      *
      * @return string
      */
-    public static function pluralise($iValue, $sSingular, $sSpecified = null)
+    public static function pluralise(int $iValue, stirng $sSingular, string $sSpecified = ''): string
     {
         $sSingular = trim($sSingular);
 
