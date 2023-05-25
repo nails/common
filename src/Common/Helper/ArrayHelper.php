@@ -128,8 +128,8 @@ class ArrayHelper
                 $mB   = strtolower(eval('return $oB->' . $sKey . ' ?? "";'));
 
             } else {
-                $mA = property_exists($oA, $sField) ? strtolower($oA->$sField) : null;
-                $mB = property_exists($oB, $sField) ? strtolower($oB->$sField) : null;
+                $mA = property_exists($oA, $sField) ? strtolower($oA->$sField) : '';
+                $mB = property_exists($oB, $sField) ? strtolower($oB->$sField) : '';
             }
 
             //  Equal?
