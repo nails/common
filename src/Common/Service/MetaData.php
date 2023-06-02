@@ -13,55 +13,23 @@ use Nails\Config;
  */
 class MetaData
 {
-    protected ?string $sAppName = null;
-
-    /** @var string[] */
-    protected array $aTitles = [];
-
-    /** @var bool */
-    protected bool $bTitleAppendAppName = true;
-
-    /** @var Locale */
-    protected ?Locale $oLocale = null;
-
-    /** @var string|null */
-    protected ?string $sDescription = null;
-
-    /** @var string|null */
-    protected ?string $sCanonicalUrl = null;
-
-    /** @var string[] */
-    protected array $aKeywords = [];
-
-    /** @var string|null */
-    protected ?string $sImageUrl = null;
-
-    /** @var int|null */
-    protected ?int $iImageWidth = null;
-
-    /** @var int|null */
-    protected ?int $iImageHeight = null;
-
-    /** @var string|null */
-    protected ?string $sThemeColour = null;
-
-    /** @var string|null */
-    protected ?string $sTwitterHandle = null;
-
-    /** @var string[] */
-    protected array $aHtmlClasses = [];
-
-    /** @var string[] */
-    protected array $aBodyClasses = [];
-
-    /** @var string */
-    protected string $sTitleSeparator = ' - ';
-
-    /** @var string */
-    protected string $sClassSeparator = ' ';
-
-    /** @var bool */
-    protected bool $bNoIndex = false;
+    protected ?string $sAppName            = null;
+    protected array   $aTitles             = [];
+    protected bool    $bTitleAppendAppName = true;
+    protected ?Locale $oLocale             = null;
+    protected ?string $sDescription        = null;
+    protected ?string $sCanonicalUrl       = null;
+    protected array   $aKeywords           = [];
+    protected ?string $sImageUrl           = null;
+    protected ?int    $iImageWidth         = null;
+    protected ?int    $iImageHeight        = null;
+    protected ?string $sThemeColour        = null;
+    protected ?string $sTwitterHandle      = null;
+    protected array   $aHtmlClasses        = [];
+    protected array   $aBodyClasses        = [];
+    protected string  $sTitleSeparator     = ' - ';
+    protected string  $sClassSeparator     = ' ';
+    protected bool    $bNoIndex            = false;
 
     /** @var bool */
     protected $bFollow = true;
