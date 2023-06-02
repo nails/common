@@ -14,52 +14,52 @@ use Nails\Config;
 class MetaData
 {
     /** @var string[] */
-    protected $aTitles = [];
+    protected array $aTitles = [];
 
     /** @var bool */
-    protected $bTitleAppendAppName = true;
+    protected bool $bTitleAppendAppName = true;
 
     /** @var Locale */
-    protected $oLocale;
+    protected ?Locale $oLocale = null;
 
     /** @var string|null */
-    protected $sDescription;
+    protected ?string $sDescription = null;
 
     /** @var string|null */
-    protected $sCanonicalUrl;
+    protected ?string $sCanonicalUrl = null;
 
     /** @var string[] */
-    protected $aKeywords = [];
+    protected array $aKeywords = [];
 
     /** @var string|null */
-    protected $sImageUrl;
+    protected ?string $sImageUrl = null;
 
     /** @var int|null */
-    protected $iImageWidth;
+    protected ?int $iImageWidth = null;
 
     /** @var int|null */
-    protected $iImageHeight;
+    protected ?int $iImageHeight = null;
 
     /** @var string|null */
-    protected $sThemeColour;
+    protected ?string $sThemeColour = null;
 
     /** @var string|null */
-    protected $sTwitterHandle;
+    protected ?string $sTwitterHandle = null;
 
     /** @var string[] */
-    protected $aHtmlClasses = [];
+    protected array $aHtmlClasses = [];
 
     /** @var string[] */
-    protected $aBodyClasses = [];
+    protected array $aBodyClasses = [];
 
     /** @var string */
-    protected $sTitleSeparator = ' - ';
+    protected string $sTitleSeparator = ' - ';
 
     /** @var string */
-    protected $sClassSeparator = ' ';
+    protected string $sClassSeparator = ' ';
 
     /** @var bool */
-    protected $bNoIndex = false;
+    protected bool $bNoIndex = false;
 
     /** @var bool */
     protected $bFollow = true;
@@ -72,7 +72,7 @@ class MetaData
      * @var string
      * @deprecated
      */
-    public $title = '';
+    public string $title = '';
 
     // --------------------------------------------------------------------------
 
@@ -189,9 +189,9 @@ class MetaData
     /**
      * Gets the SEO locale
      *
-     * @return Locale
+     * @return Locale|null
      */
-    public function getLocale(): Locale
+    public function getLocale(): ?Locale
     {
         return $this->oLocale;
     }
