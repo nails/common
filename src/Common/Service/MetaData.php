@@ -13,6 +13,8 @@ use Nails\Config;
  */
 class MetaData
 {
+    protected ?string $sAppName = null;
+
     /** @var string[] */
     protected array $aTitles = [];
 
@@ -73,6 +75,21 @@ class MetaData
      * @deprecated
      */
     public string $title = '';
+
+    // --------------------------------------------------------------------------
+
+    public function setAppName(string $sAppName): self
+    {
+        $this->sAppName = $sAppName;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    public function getAppName(): string
+    {
+        return $this->sAppName ?? Config::get('APP_NAME');
+    }
 
     // --------------------------------------------------------------------------
 
