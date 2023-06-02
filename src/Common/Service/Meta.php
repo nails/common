@@ -233,7 +233,7 @@ class Meta
             ->addRaw([
                 'tag'      => 'meta',
                 'property' => 'og:site_name',
-                'content'  => $sTitle,
+                'content'  => $oMetaData->getAppName(),
             ])
             ->addRaw([
                 'tag'      => 'meta',
@@ -323,7 +323,7 @@ class Meta
         //  Other meta tags
         $this
             ->add('apple-mobile-web-app-title', $sTitle)
-            ->add('application-name', $sTitle)
+            ->add('application-name', $oMetaData->getAppName())
             ->add('description', $sDescription)
             ->add('keywords', implode(', ', $aKeywords));
 
