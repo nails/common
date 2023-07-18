@@ -115,7 +115,7 @@ class Rebuild extends Base
 
         //  Which tables are we going to drop; all those which match our prefixes
         $oResult  = $oDb->query('SHOW TABLES');
-        $aResults = $oResult->fetchAll(\PDO::FETCH_OBJ);
+        $aResults = $oResult->fetchAll(\PDO::FETCH_ASSOC);
         $aTables  = [];
         foreach ($aResults as $aResult) {
             $sTable = reset($aResult);
