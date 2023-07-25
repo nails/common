@@ -187,7 +187,6 @@ trait Nestable
      */
     public function update($mIds, array $aData = []): bool
     {
-        $this->skipUpdateTimestamp();
         $mResult = parent::update($mIds, $aData);
         if ($mResult) {
             $aIds = (array) $mIds;
@@ -304,9 +303,13 @@ trait Nestable
         );
 
         foreach ($aItems as $oItem) {
-            $oDb->set($this->getColumnOrder(), ++$iIndex);
-            $oDb->where($this->getColumnId(), $oItem->id);
-            $oDb->update($this->getTableName());
+            $this->skipUpdateTimestamp();
+            parent::update(
+                $oItem->id,
+                [
+                    $this->getColumnOrder() => ++$iIndex,
+                ]
+            );
         }
     }
 
