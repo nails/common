@@ -1385,7 +1385,7 @@ abstract class Base
          */
         $aColumnId    = explode('.', $sColumnId);
         $sColumnId    = end($aColumnId);
-        $aColumnLabel = explode('.', $sColumnLabel);
+        $aColumnLabel = explode('.', (string) $sColumnLabel);
         $sColumnLabel = end($aColumnLabel);
 
         $oTest = reset($aItems);
