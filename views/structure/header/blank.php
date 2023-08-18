@@ -5,9 +5,9 @@ use Nails\Common\Service;
 use Nails\Common\Resource;
 
 /**
- * @var Service\Asset     $oAsset
- * @var Service\Meta      $oMetaService
- * @var Resource\MetaData $oMetaData
+ * @var Service\Asset    $oAsset
+ * @var Service\Meta     $oMetaService
+ * @var Service\MetaData $oMetaData
  */
 
 $oMetaService = Factory::service('Meta');
