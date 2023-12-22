@@ -562,6 +562,7 @@ class Asset
      * @param string|null     $sAssetLocation The asset's location
      * @param string|null     $sForceType     The asset's file type (e.g., JS or CSS)
      * @param bool            $bAsync         Whether to load the asset asynchronously
+     * @param bool            $bDefer         Whether to defer loading the asset
      *
      * @return $this
      * @throws AssetException
@@ -570,7 +571,8 @@ class Asset
         $mAssets,
         string $sAssetLocation = null,
         string $sForceType = null,
-        bool $bAsync = false
+        bool $bAsync = false,
+        bool $bDefer = false
     ): self {
 
         $aAssets        = (array) $mAssets;
@@ -598,13 +600,13 @@ class Asset
 
         foreach ($aAssets as $sAsset) {
             if (preg_match('#^https?://#', $sAsset)) {
-                $this->loadUrl($sAsset, $sForceType, $bAsync);
+                $this->loadUrl($sAsset, $sForceType, $bAsync, $bDefer);
 
             } elseif (substr($sAsset, 0, 0) === '/') {
-                $this->loadAbsolute(substr($sAsset, 1), $sForceType, $bAsync);
+                $this->loadAbsolute(substr($sAsset, 1), $sForceType, $bAsync, $bDefer);
 
             } else {
-                $this->{$sAssetLocationMethod}($sAsset, $sForceType, $bAsync, $sAssetLocation);
+                $this->{$sAssetLocationMethod}($sAsset, $sForceType, $bAsync, $bDefer, $sAssetLocation);
             }
         }
 
@@ -621,11 +623,12 @@ class Asset
      * @param string      $sAsset     The asset to load
      * @param string|null $sForceType Force a particular type of asset (i.e. JS or CSS)
      * @param bool        $bAsync     Whether to load the asset asynchronously
+     * @param bool        $bDefer     Whether to defer loading the asset
      *
      * @return $this
      * @throws AssetException
      */
-    protected function loadUrl(string $sAsset, ?string $sForceType, bool $bAsync): self
+    protected function loadUrl(string $sAsset, ?string $sForceType, bool $bAsync, bool $bDefer): self
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -637,11 +640,11 @@ class Asset
 
             case static::TYPE_JS:
             case static::TYPE_JS_FOOTER:
-                $this->aJs['URL-' . $sAsset] = [$sAsset, $bAsync];
+                $this->aJs['URL-' . $sAsset] = [$sAsset, $bAsync, $bDefer];
                 break;
 
             case static::TYPE_JS_HEADER:
-                $this->aJsHeader['URL-' . $sAsset] = [$sAsset, $bAsync];
+                $this->aJsHeader['URL-' . $sAsset] = [$sAsset, $bAsync, $bDefer];
                 break;
         }
 
@@ -656,11 +659,12 @@ class Asset
      * @param string      $sAsset     The asset to load
      * @param string|null $sForceType Force a particular type of asset (i.e. JS or CSS)
      * @param bool        $bAsync     Whether to load the asset asynchronously
+     * @param bool        $bDefer     Whether to defer loading the asset
      *
      * @return $this
      * @throws AssetException
      */
-    protected function loadAbsolute(string $sAsset, ?string $sForceType, bool $bAsync): self
+    protected function loadAbsolute(string $sAsset, ?string $sForceType, bool $bAsync, bool $bDefer): self
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -672,11 +676,11 @@ class Asset
 
             case static::TYPE_JS:
             case static::TYPE_JS_FOOTER:
-                $this->aJs['ABSOLUTE-' . $sAsset] = [$this->buildUrl($sAsset), $bAsync];
+                $this->aJs['ABSOLUTE-' . $sAsset] = [$this->buildUrl($sAsset), $bAsync, $bDefer];
                 break;
 
             case static::TYPE_JS_HEADER:
-                $this->aJsHeader['ABSOLUTE-' . $sAsset] = [$this->buildUrl($sAsset), $bAsync];
+                $this->aJsHeader['ABSOLUTE-' . $sAsset] = [$this->buildUrl($sAsset), $bAsync, $bDefer];
                 break;
         }
 
@@ -753,15 +757,15 @@ class Asset
         //  Linked JS
         if (!empty($this->aJs) && ($sType === static::TYPE_JS || $sType === static::TYPE_ALL)) {
             foreach ($this->aJs as $aAsset) {
-                [$sAsset, $bAsync] = $aAsset;
-                $aOut[] = '<script ' . ($bAsync ? 'async ' : '') . 'src="' . $sAsset . '"></script>';
+                [$sAsset, $bAsync, $bDefer] = $aAsset;
+                $aOut[] = '<script ' . ($bAsync ? 'async ' : '') . ($bDefer ? 'defer ' : '') . 'src="' . $sAsset . '"></script>';
             }
         }
 
         if (!empty($this->aJsHeader) && ($sType === static::TYPE_JS_HEADER || $sType === static::TYPE_ALL)) {
             foreach ($this->aJsHeader as $aAsset) {
-                [$sAsset, $bAsync] = $aAsset;
-                $aOut[] = '<script ' . ($bAsync ? 'async ' : '') . 'src="' . $sAsset . '"></script>';
+                [$sAsset, $bAsync, $bDefer] = $aAsset;
+                $aOut[] = '<script ' . ($bAsync ? 'async ' : '') . ($bDefer ? 'defer ' : '') . 'src="' . $sAsset . '"></script>';
             }
         }
 
@@ -929,12 +933,13 @@ class Asset
      * @param string       $sAsset     The asset to load
      * @param string|null  $sForceType Force a particular type of asset (i.e. JS or CSS)
      * @param bool         $bAsync     Whether to load the asset asynchronously
+     * @param bool         $bDefer     Whether to defer loading the asset
      * @param array|string $mModule    The module to load from
      *
      * @return $this
      * @throws AssetException
      */
-    protected function loadModule(string $sAsset, ?string $sForceType, bool $bAsync, $mModule): self
+    protected function loadModule(string $sAsset, ?string $sForceType, bool $bAsync, bool $bDefer, $mModule): self
     {
         if (is_array($mModule)) {
             $sModule   = !empty($mModule[0]) ? $mModule[0] : null;
@@ -958,6 +963,7 @@ class Asset
                 $this->aJs[$sKey] = [
                     $this->addCacheBuster($this->sBaseModuleUrl . $sModule . '/assets/js/' . $sAsset),
                     $bAsync,
+                    $bDefer,
                 ];
                 break;
 
@@ -965,6 +971,7 @@ class Asset
                 $this->aJsHeader[$sKey] = [
                     $this->addCacheBuster($this->sBaseModuleUrl . $sModule . '/assets/js/' . $sAsset),
                     $bAsync,
+                    $bDefer,
                 ];
                 break;
         }
@@ -1103,11 +1110,12 @@ class Asset
      * @param string      $sAsset     The asset to load
      * @param string|null $sForceType Force a particular type of asset (i.e. JS or CSS)
      * @param bool        $bAsync     Whether to load the asset asynchronously
+     * @param bool        $bDefer     Whether to defer loading the asset
      *
      * @return $this
      * @throws AssetException
      */
-    protected function loadApp(string $sAsset, ?string $sForceType, bool $bAsync): self
+    protected function loadApp(string $sAsset, ?string $sForceType, bool $bAsync, bool $bDefer): self
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -1119,11 +1127,11 @@ class Asset
 
             case static::TYPE_JS:
             case static::TYPE_JS_FOOTER:
-                $this->aJs['APP-' . $sAsset] = [$this->buildUrl($this->sJsDir . $sAsset), $bAsync];
+                $this->aJs['APP-' . $sAsset] = [$this->buildUrl($this->sJsDir . $sAsset), $bAsync, $bDefer];
                 break;
 
             case static::TYPE_JS_HEADER:
-                $this->aJsHeader['APP-' . $sAsset] = [$this->buildUrl($this->sJsDir . $sAsset), $bAsync];
+                $this->aJsHeader['APP-' . $sAsset] = [$this->buildUrl($this->sJsDir . $sAsset), $bAsync, $bDefer];
                 break;
         }
 
