@@ -86,9 +86,11 @@ class Profiler
         if (static::isEnabled()) {
 
             $aBacktrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+            $aImmediate = $aBacktrace[0];
             $aCaller    = $aBacktrace[1];
             $sCaller    = (!empty($aCaller['class']) ? $aCaller['class'] . '->' : '') .
-                (!empty($aCaller['function']) ? $aCaller['function'] : 'Unknown');
+                (!empty($aCaller['function']) ? $aCaller['function'] . '()' : '<unknown>()') .
+                (!empty($aImmediate['line']) ? '@L' . $aImmediate['line'] : '');
 
             if (!$sLabel) {
                 $sLabel = $sCaller;
