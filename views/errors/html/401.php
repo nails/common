@@ -5,7 +5,7 @@ MESSAGE: <?=$sMessage?>
 -->
 <html lang="en">
     <head>
-        <title>401 Unauthorised - <?=\Nails\Config::get('APP_NAME')?></title>
+        <title>401 Unauthorised - <?=\Nails\Factory::service('MetaData')->getAppName()?></title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <?php
 

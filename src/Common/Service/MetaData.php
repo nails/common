@@ -92,7 +92,7 @@ class MetaData
                         array_filter([
                             $this->title,
                             $this->isTitleAppendAppName()
-                                ? Config::get('APP_NAME')
+                                ? $this->getAppName()
                                 : null,
                         ])
                     )

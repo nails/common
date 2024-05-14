@@ -260,7 +260,7 @@ if (Environment::not(Environment::ENV_PROD)) {
     <!DOCTYPE html>
     <html lang="en">
         <head>
-            <title>An Error Occurred - <?=\Nails\Config::get('APP_NAME')?></title>
+            <title>An Error Occurred - <?=Factory::service('MetaData')->getAppName()?></title>
             <meta name="viewport" content="width=device-width, initial-scale=1">
             <?php
 
