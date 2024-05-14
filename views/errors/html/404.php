@@ -4,7 +4,7 @@ ERROR:   404
 -->
 <html lang="en">
     <head>
-        <title>404 Page Not Found - <?=\Nails\Config::get('APP_NAME')?></title>
+        <title>404 Page Not Found - <?=\Nails\Factory::service('MetaData')->getAppName()?></title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <?php
 

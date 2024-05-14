@@ -17,7 +17,7 @@ $oView->load('structure/header/blank');
 <div class="container">
     <div class="row text-center" style="margin-top:1em;">
         <h1>
-            <?=anchor('', Config::get('APP_NAME'), 'style="text-decoration:none;color:inherit;"')?>
+            <?=anchor('', Factory::service('MetaData')->getAppName(), 'style="text-decoration:none;color:inherit;"')?>
         </h1>
     </div>
     <hr />

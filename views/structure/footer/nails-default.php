@@ -7,7 +7,7 @@ use Nails\Factory;
     <div class="row">
         <p class="text-center">
             <small>
-                &copy; <?=\Nails\Config::get('APP_NAME') . ' ' . date('Y')?>
+                &copy; <?=Factory::service('MetaData')->getAppName() . ' ' . date('Y')?>
                 <br />
                 <?=lang('nails_footer_powered_by', [\Nails\Config::get('NAILS_PACKAGE_URL'), \Nails\Config::get('NAILS_PACKAGE_NAME')])?>
             </small>

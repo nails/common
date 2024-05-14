@@ -4,7 +4,7 @@ ERROR:   Maintenance
 -->
 <html lang="en">
     <head>
-        <title>Down For Maintenance - <?=\Nails\Config::get('APP_NAME')?></title>
+        <title>Down For Maintenance - <?=\Nails\Factory::service('MetaData')->getAppName()?></title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta http-equiv="refresh" content="10">
         <?php
