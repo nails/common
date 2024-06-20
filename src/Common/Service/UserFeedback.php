@@ -8,7 +8,6 @@
  * @category    Library
  * @author      Nails Dev Team
  * @link
- *
  * @todo        Add "actions" to messages (i.e. buttons)
  * @todo        Match the naming convention of Bootstrap Alerts
  */
@@ -99,6 +98,20 @@ class UserFeedback
         $this->aMessages[$sType] = $sMessage;
 
         return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Detect whether a specific feedback message has been set
+     *
+     * @param string $sType
+     *
+     * @return bool
+     */
+    public function isset(string $sType): bool
+    {
+        return isset($this->aMessages[$sType]);
     }
 
     // --------------------------------------------------------------------------
@@ -266,6 +279,18 @@ class UserFeedback
     // --------------------------------------------------------------------------
 
     /**
+     * Whether the "success" feedback message is set
+     *
+     * @return bool
+     */
+    public function issetSuccess(): bool
+    {
+        return $this->isset(static::TYPE_SUCCESS);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Set a "error" feedback message
      *
      * @param string $sMessage The message to set
@@ -289,6 +314,18 @@ class UserFeedback
     public function getError(): Message
     {
         return $this->get(static::TYPE_ERROR);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Whether the "error" feedback message is set
+     *
+     * @return bool
+     */
+    public function issetError(): bool
+    {
+        return $this->isset(static::TYPE_ERROR);
     }
 
     // --------------------------------------------------------------------------
@@ -322,6 +359,18 @@ class UserFeedback
     // --------------------------------------------------------------------------
 
     /**
+     * Whether the "warning" feedback message is set
+     *
+     * @return bool
+     */
+    public function issetWarning(): bool
+    {
+        return $this->isset(static::TYPE_WARNING);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Set a "info" feedback message
      *
      * @param string $sMessage The message to set
@@ -345,6 +394,18 @@ class UserFeedback
     public function getInfo(): Message
     {
         return $this->get(static::TYPE_INFO);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Whether the "info" feedback message is set
+     *
+     * @return bool
+     */
+    public function issetInfo(): bool
+    {
+        return $this->isset(static::TYPE_INFO);
     }
 
     // --------------------------------------------------------------------------
@@ -380,6 +441,19 @@ class UserFeedback
     // --------------------------------------------------------------------------
 
     /**
+     * Whether the "positive" feedback message is set
+     *
+     * @return bool
+     * @deprecated
+     */
+    public function issetPositive(): bool
+    {
+        return $this->isset(static::TYPE_POSITIVE);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Set a "negative" feedback message
      *
      * @param string $sMessage The message to set
@@ -405,6 +479,19 @@ class UserFeedback
     public function getNegative(): Message
     {
         return $this->get(static::TYPE_NEGATIVE);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Whether the "negative" feedback message is set
+     *
+     * @return bool
+     * @deprecated
+     */
+    public function issetNegative(): bool
+    {
+        return $this->isset(static::TYPE_NEGATIVE);
     }
 
     // --------------------------------------------------------------------------
@@ -440,6 +527,19 @@ class UserFeedback
     // --------------------------------------------------------------------------
 
     /**
+     * Whether the "message" feedback message is set
+     *
+     * @return bool
+     * @deprecated
+     */
+    public function issetMessage(): bool
+    {
+        return $this->isset(static::TYPE_MESSAGE);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Set a "notice" feedback message
      *
      * @param string $sMessage The message to set
@@ -465,5 +565,18 @@ class UserFeedback
     public function getNotice(): Message
     {
         return $this->get(static::TYPE_NOTICE);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Whether the "notice" feedback message is set
+     *
+     * @return bool
+     * @deprecated
+     */
+    public function issetNotice(): bool
+    {
+        return $this->isset(static::TYPE_NOTICE);
     }
 }
