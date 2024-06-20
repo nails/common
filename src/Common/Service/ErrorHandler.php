@@ -328,6 +328,13 @@ class ErrorHandler
         bool $bForceView = false
     ): void {
 
+        /** @var UserFeedback $oSession */
+        $oUserFeedback = Factory::service('UserFeedback');
+        /** @var Input $oInput */
+        $oInput = Factory::service('Input');
+
+        // --------------------------------------------------------------------------
+
         if ($bForceView || (function_exists('isLoggedIn') && isLoggedIn())) {
 
             if ($bLogError) {
@@ -335,8 +342,15 @@ class ErrorHandler
                 log_message('error', '401 Unauthorised --> ' . $sPage);
             }
 
-            $sMessage = 'The page you are trying to view is restricted. Sadly you do not have enough ';
-            $sMessage .= 'permissions to see its content.';
+            if (!is_null($sFlashMessage)) {
+                $sMessage = $sFlashMessage;
+
+            } elseif ($oUserFeedback->issetError()) {
+                $sMessage = $oUserFeedback->getError();
+
+            } else {
+                $sMessage = 'The page you are trying to view is restricted. Sadly you do not have enough permissions to see its content.';
+            }
 
             // --------------------------------------------------------------------------
 
@@ -358,11 +372,6 @@ class ErrorHandler
             exit(401);
 
         } else {
-
-            /** @var UserFeedback $oSession */
-            $oUserFeedback = Factory::service('UserFeedback');
-            /** @var Input $oInput */
-            $oInput = Factory::service('Input');
 
             if (!is_null($sFlashMessage)) {
                 $oUserFeedback->error($sFlashMessage);
