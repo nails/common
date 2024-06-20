@@ -274,12 +274,10 @@ class ErrorHandler
         /**
          * By default we log this, but allow a dev to skip it. Additionally, skip
          * if it's a HEAD request.
-         *
          * Reasoning: I often use HEAD requests to check the existence of a file
          * in JS before fetching it. I feel that these shouldn't be logged. A
          * direct GET/POST/etc request to a non-existent file is more likely a
          * user following a dead link so these _should_ be logged.
-         *
          * If you disagree, open up an issue and we'll work something out.
          */
 
@@ -366,25 +364,18 @@ class ErrorHandler
             /** @var Input $oInput */
             $oInput = Factory::service('Input');
 
-            if (is_null($sFlashMessage)) {
-                $sFlashMessage = 'Sorry, you need to be logged in to see that page.';
+            if (!is_null($sFlashMessage)) {
+                $oUserFeedback->error($sFlashMessage);
+            } elseif (!$oUserFeedback->issetError()) {
+                $oUserFeedback->error('Sorry, you need to be logged in to see that page.');
             }
-
-            $oUserFeedback->error($sFlashMessage);
 
             if (is_null($sReturnUrl)) {
-                if ($oInput->server('REQUEST_URI')) {
-                    $sReturnUrl = $oInput->server('REQUEST_URI');
-                } elseif (uri_string()) {
-                    $sReturnUrl = uri_string();
-                } else {
-                    $sReturnUrl = '';
-                }
+                //  Allow helper to determine what he returnTo should be
+                $sReturnUrl = '';
             }
 
-            $sReturnUrl = $sReturnUrl ? '?return_to=' . urlencode($sReturnUrl) : '';
-
-            redirect('auth/login' . $sReturnUrl);
+            redirect(loginUrl($sReturnUrl));
         }
     }
 
