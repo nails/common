@@ -113,7 +113,7 @@ class Migrate extends Base
             //  Backwards compatability - ensure that the vendor prefix is correct
             //  @todo (Pablo 2021-03-25) - Remove this
             $this->oDb->query(
-                'UPDATE `' . Config::get('NAILS_DB_PREFIX') . 'migration` SET `module` = REPLACE(`module`, "nailsapp/", "nails/");'
+                'UPDATE `' . Config::get('NAILS_DB_PREFIX') . 'migration` SET `module` = REPLACE(`module`, \'nailsapp/\', \'nails/\');'
             );
 
             // --------------------------------------------------------------------------
@@ -204,9 +204,9 @@ class Migrate extends Base
 
             return $this->runPostCommands();
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return $this->abort(
-                $e->getCode(),
+                is_int($e->getCode()) ? $e->getCode() : self::EXIT_CODE_FAILURE,
                 array_filter([$e->getMessage()])
             );
         }
@@ -396,7 +396,7 @@ class Migrate extends Base
     private function getCurrentMigrationIndex(Component $oComponent): ?int
     {
         $oResult = $this->oDb->query(sprintf(
-            'SELECT `version` FROM `%s` WHERE `module` = "%s";',
+            'SELECT `version` FROM `%s` WHERE `module` = \'%s\';',
             Config::get('NAILS_DB_PREFIX') . 'migration',
             $oComponent->slug
         ));
@@ -404,7 +404,7 @@ class Migrate extends Base
         if ($oResult->rowCount() === 0) {
 
             $oResult = $this->oDb->query(sprintf(
-                'INSERT INTO `%s` (`module`, `version`) VALUES ("%s", NULL);',
+                'INSERT INTO `%s` (`module`, `version`) VALUES (\'%s\', NULL);',
                 Config::get('NAILS_DB_PREFIX') . 'migration',
                 $oComponent->slug
             ));
@@ -453,13 +453,13 @@ class Migrate extends Base
 
                     //  Mark this migration as complete
                     $oResult = $this->oDb->query(sprintf(
-                        'UPDATE `%s` SET `version` = %s WHERE `module` = "%s"',
+                        'UPDATE `%s` SET `version` = %s WHERE `module` = \'%s\'',
                         Config::get('NAILS_DB_PREFIX') . 'migration',
                         $iPriority,
                         $oModule->slug
                     ));
 
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     $this->oOutput->writeln('');
                     $this->oOutput->writeln('');
                     $this->oOutput->writeln('<error>ERROR</error>: Migration "' . get_class($oMigration) . '" failed:');
