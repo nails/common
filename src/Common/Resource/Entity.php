@@ -2,16 +2,21 @@
 
 namespace Nails\Common\Resource;
 
+use Nails\Common\Model\Base;
 use Nails\Common\Resource;
 
 /**
  * Class Entity
  *
  * @package Nails\Common\Resource
- *
  */
 class Entity extends Resource
 {
+    public function __construct($mObj = [], protected ?Base $model = null)
+    {
+        parent::__construct($mObj);
+    }
+
     /**
      * The entity's ID
      *

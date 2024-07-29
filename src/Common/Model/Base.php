@@ -2231,7 +2231,7 @@ abstract class Base
         // --------------------------------------------------------------------------
 
         //  Convert to a resource
-        $oObj = Factory::resource(static::RESOURCE_NAME, static::RESOURCE_PROVIDER, $oObj);
+        $oObj = Factory::resource(static::RESOURCE_NAME, static::RESOURCE_PROVIDER, $oObj, $this);
     }
 
     // --------------------------------------------------------------------------
