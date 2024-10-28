@@ -16,6 +16,7 @@ use Nails\Bootstrap;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Service\FileCache;
+use Nails\Config;
 use Nails\Factory;
 use Pdp;
 use Psr\SimpleCache\InvalidArgumentException;
@@ -28,6 +29,8 @@ use Psr\SimpleCache\InvalidArgumentException;
 class Url
 {
     const PUBLIC_SUFFIX_LIST = 'https://publicsuffix.org/list/public_suffix_list.dat';
+
+    const REDIRECT_HEADER_CODE_DEFAULT = 302;
 
     // --------------------------------------------------------------------------
 
@@ -67,7 +70,7 @@ class Url
      * @throws FactoryException
      * @throws NailsException
      */
-    public static function redirect(string $sUrl = null, string $sMethod = 'location', int $iHttpResponseCode = 302): void
+    public static function redirect(string $sUrl = null, string $sMethod = 'location', ?int $iHttpResponseCode = null): void
     {
         /**
          * Call the Bootstrap::shutdown method, the system will be killed in approximately 13
@@ -86,6 +89,12 @@ class Url
         if (!preg_match('#^https?://#i', (string) $sUrl)) {
             $sUrl = siteUrl($sUrl);
         }
+
+        // --------------------------------------------------------------------------
+
+        $iHttpResponseCode = $iHttpResponseCode ?? Config::get('NAILS_REDIRECT_HEADER_CODE_DEFAULT', static::REDIRECT_HEADER_CODE_DEFAULT);
+
+        // --------------------------------------------------------------------------
 
         switch ($sMethod) {
             case 'refresh':

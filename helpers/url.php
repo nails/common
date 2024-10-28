@@ -34,7 +34,7 @@ if (!function_exists('secure_site_url')) {
 }
 
 if (!function_exists('redirect')) {
-    function redirect(string $sUrl = null, string $sMethod = 'location', int $iHttpResponseCode = 302): void
+    function redirect(string $sUrl = null, string $sMethod = 'location', ?int $iHttpResponseCode = null): void
     {
         Url::redirect($sUrl, $sMethod, $iHttpResponseCode);
     }
