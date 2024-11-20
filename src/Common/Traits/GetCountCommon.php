@@ -31,6 +31,7 @@ use Nails\Common\Helper\Model\Select;
 use Nails\Common\Helper\Model\Sort;
 use Nails\Common\Helper\Model\Where;
 use Nails\Common\Helper\Model\WhereIn;
+use Nails\Common\Helper\Model\WhereNotIn;
 use Nails\Common\Service\Database;
 use Nails\Factory;
 
