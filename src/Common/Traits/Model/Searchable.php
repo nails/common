@@ -82,6 +82,13 @@ trait Searchable
 
     // --------------------------------------------------------------------------
 
+    public function getSearchTerm(array $aData): string
+    {
+        return (string) ($aData[$this->getSearchKey()] ?? '');
+    }
+
+    // --------------------------------------------------------------------------
+
     /**
      * Searches for objects, optionally paginated.
      *
@@ -123,12 +130,14 @@ trait Searchable
      */
     protected function applySearchConditionals(array &$aData): self
     {
-        $sKey = $this->getSearchKey();
-        if (empty($aData[$sKey])) {
+        $sKeywords = $this->getSearchTerm($aData);
+        if (empty($sKeywords)) {
             return $this;
         }
 
-        $sKeywords = $aData[$sKey];
+        if (empty($aData['or_like'])) {
+            $aData['or_like'] = [];
+        }
 
         if (empty($aData['or_like'])) {
             $aData['or_like'] = [];
