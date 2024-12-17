@@ -211,8 +211,8 @@ class Profiler
      */
     protected function renderStyles()
     {
+        echo styleOpen();
         ?>
-        <style>
             .<?=static::HTML_CLASS_PROFILER?> {
                 padding: 1rem;
                 margin-top: 5rem;
@@ -262,9 +262,8 @@ class Profiler
             .<?=static::HTML_CLASS_PROFILER_TABLE_PROPERTY_ROW?>:hover td {
                 background: #CCCCCC;
             }
-
-        </style>
         <?php
+        echo styleClose();
     }
 
     // --------------------------------------------------------------------------

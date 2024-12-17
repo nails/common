@@ -1,4 +1,4 @@
-<style type="text/css">
+<?=styleOpen()?>
 
     html,
     body {
@@ -101,4 +101,4 @@
         height: auto;
     }
 
-</style>
+<?=styleClose()?>
