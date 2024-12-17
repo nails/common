@@ -229,5 +229,114 @@ if (!function_exists('list_first_last')) {
 
 // --------------------------------------------------------------------------
 
+if (!function_exists('scriptOpen')) {
+    function scriptOpen(array $attributes = []): string
+    {
+        /** @var \Nails\Common\Service\Asset $oAsset */
+        $oAsset = \Nails\Factory::service('Asset');
+        if ($oAsset->getNonce()) {
+            $attributes['nonce'] = $oAsset->getNonce();
+        }
+
+        $attr = [];
+        foreach ($attributes as $key => $value) {
+            $attr[] = $value === '' || $value === null
+                ? $key
+                : $key . '="' . $value . '"';
+        }
+
+        return sprintf(
+            '<script%s>',
+            !empty($attributes)
+                ? ' ' . implode(' ', $attr)
+                : ''
+        );
+    }
+}
+
+if (!function_exists('scriptClose')) {
+    function scriptClose(): string
+    {
+        return '</script>';
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('styleOpen')) {
+    function styleOpen(array $attributes = []): string
+    {
+        if (!array_key_exists('type', $attributes)) {
+            $attributes['type'] = 'text/css';
+        }
+
+        /** @var \Nails\Common\Service\Asset $oAsset */
+        $oAsset = \Nails\Factory::service('Asset');
+        if ($oAsset->getNonce()) {
+            $attributes['nonce'] = $oAsset->getNonce();
+        }
+
+        $attr = [];
+        foreach ($attributes as $key => $value) {
+            $attr[] = $value === '' || $value === null
+                ? $key
+                : $key . '="' . $value . '"';
+        }
+
+        return sprintf(
+            '<style%s>',
+            !empty($attributes)
+                ? ' ' . implode(' ', $attr)
+                : ''
+        );
+    }
+}
+
+if (!function_exists('styleClose')) {
+    function styleClose(): string
+    {
+        return '</style>';
+    }
+}
+
+// --------------------------------------------------------------------------
+
+if (!function_exists('linkTag')) {
+    function linkTag(string $href, array $attributes = []): string
+    {
+        if (!array_key_exists('rel', $attributes)) {
+            $attributes['rel'] = 'stylesheet';
+        }
+
+        if (!array_key_exists('type', $attributes)) {
+            $attributes['type'] = 'text/css';
+        }
+
+        /** @var \Nails\Common\Service\Asset $oAsset */
+        $oAsset = \Nails\Factory::service('Asset');
+        if ($oAsset->getNonce()) {
+            $attributes['nonce'] = $oAsset->getNonce();
+        }
+
+        $attr = [];
+        foreach ($attributes as $key => $value) {
+            $attr[] = $value === '' || $value === null
+                ? $key
+                : $key . '="' . $value . '"';
+        }
+
+        return sprintf(
+            '<link href="%s" %s/>',
+            siteUrl($href),
+            !empty($attributes)
+                ? implode(' ', $attr) . ' '
+                : ''
+        );
+    }
+}
+
+
+// --------------------------------------------------------------------------
+
 //  Include the CodeIgniter original
 include NAILS_CI_SYSTEM_PATH . 'helpers/html_helper.php';
