@@ -89,7 +89,7 @@ if (Environment::not(Environment::ENV_PROD)) {
     <html>
         <head>
             <title>[Dev] An Error Occurred: <?=$sSubject?></title>
-            <style type="text/css">
+            <?=styleOpen()?>
 
                 html,
                 body {
@@ -170,7 +170,7 @@ if (Environment::not(Environment::ENV_PROD)) {
                     color: green;
                 }
 
-            </style>
+            <?=styleClose()?>
         </head>
         <body>
             <div class="dev-only">

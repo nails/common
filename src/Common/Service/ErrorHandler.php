@@ -639,8 +639,8 @@ class ErrorHandler
 
         } else {
             set_status_header($iCode);
+            echo styleOpen();
             ?>
-            <style type="text/css">
                 p {
                     font-family: monospace;
                     margin: 20px 10px;
@@ -655,7 +655,7 @@ class ErrorHandler
                     border: 1px solid #CCC;
                     background: #EEE
                 }
-            </style>
+            <?=styleClose()?>
             <p>
                 <strong>ERROR:</strong>
                 <?=$sSubject ? '<em>' . $sSubject . '</em> - ' : ''?>
