@@ -14,14 +14,14 @@ jobs:
                     php-version: 8.1
 
             -   name: Cache Composer dependencies
-                uses: actions/cache@v1
+                uses: actions/cache@v4
                 with:
                     path: vendor
                     key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
                     restore-keys: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
 
             -   name: Cache Yarn dependencies
-                uses: actions/cache@v1
+                uses: actions/cache@v4
                 with:
                     path: node_modules
                     key: ${{ runner.os }}-yarn-${{ hashFiles('**/package.json') }}
