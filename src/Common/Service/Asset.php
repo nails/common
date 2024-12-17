@@ -67,6 +67,13 @@ class Asset
     protected $sCacheBuster;
 
     /**
+     * A nonce to apply to script and style tags
+     *
+     * @var string|null
+     */
+    protected ?string $sNonce = null;
+
+    /**
      * The base URL where assets are stored
      *
      * @var string
@@ -264,6 +271,19 @@ class Asset
         return Functions::isPageSecure()
             ? $this->sBaseModuleUrlSecure
             : $this->sBaseModuleUrl;
+    }
+
+    // --------------------------------------------------------------------------
+
+    public function setNonce(?string $sNonce): self
+    {
+        $this->sNonce = $sNonce;
+        return $this;
+    }
+
+    public function getNonce(): ?string
+    {
+        return $this->sNonce;
     }
 
     // --------------------------------------------------------------------------
@@ -752,7 +772,13 @@ class Asset
         //  Linked Stylesheets
         if (!empty($this->aCss) && ($sType === static::TYPE_CSS || $sType === static::TYPE_ALL)) {
             foreach ($this->aCss as $sAsset) {
-                $aOut[] = link_tag($sAsset);
+                $aOut[] = sprintf(
+                    '<link rel="stylesheet" href="%s" type="text/css"%s/>',
+                    $sAsset,
+                    $this->getNonce()
+                        ? ' nonce="' . $this->getNonce() . '"'
+                        : ''
+                );
             }
         }
 
@@ -763,12 +789,15 @@ class Asset
             foreach ($this->aJs as $aAsset) {
                 [$sAsset, $bAsync, $bDefer, $bModule] = $aAsset;
                 $aOut[] = sprintf(
-                    '<script src="%s"%s%s%s></script>',
+                    '<script src="%s"%s%s%s%s></script>',
                     $sAsset,
                     $bAsync ? 'async ' : '',
                     $bDefer ? 'defer ' : '',
                     isset($bModule)
                         ? ($bModule ? 'type="module"' : 'nomodule') . ' '
+                        : '',
+                    $this->getNonce()
+                        ? ' nonce="' . $this->getNonce() . '"'
                         : ''
                 );
             }
@@ -778,12 +807,15 @@ class Asset
             foreach ($this->aJsHeader as $aAsset) {
                 [$sAsset, $bAsync, $bDefer, $bModule] = $aAsset;
                 $aOut[] = sprintf(
-                    '<script src="%s"%s%s%s></script>',
+                    '<script src="%s"%s%s%s%s></script>',
                     $sAsset,
                     $bAsync ? ' async' : '',
                     $bDefer ? ' defer' : '',
                     isset($bModule)
                         ? ' ' . ($bModule ? 'type="module"' : 'nomodule')
+                        : '',
+                    $this->getNonce()
+                        ? ' nonce="' . $this->getNonce() . '"'
                         : ''
                 );
             }
@@ -794,7 +826,12 @@ class Asset
         //  Inline CSS
         if (!empty($this->aCssInline) && ($sType === static::TYPE_CSS_INLINE || $sType === static::TYPE_ALL)) {
 
-            $aOut[] = '<style type="text/css">';
+            $aOut[] = sprintf(
+                '<style type="text/css"%s>',
+                $this->getNonce()
+                    ? 'nonce="' . $this->getNonce() . '"'
+                    : ''
+            );
             foreach ($this->aCssInline as $sAsset) {
                 if ($sAsset instanceof \Closure) {
                     $aOut[] = $sAsset();
@@ -809,7 +846,12 @@ class Asset
 
         //  Inline JS (Header)
         if (!empty($this->aJsInlineHeader) && ($sType === static::TYPE_JS_INLINE_HEADER || $sType === static::TYPE_ALL)) {
-            $aOut[] = '<script>';
+            $aOut[] = sprintf(
+                '<script%s>',
+                $this->getNonce()
+                    ? ' nonce="' . $this->getNonce() . '"'
+                    : ''
+            );
             foreach ($this->aJsInlineHeader as $sAsset) {
                 if ($sAsset instanceof \Closure) {
                     $aOut[] = $sAsset();
@@ -824,7 +866,12 @@ class Asset
 
         //  Inline JS (Footer)
         if (!empty($this->aJsInlineFooter) && ($sType === static::TYPE_JS_INLINE_FOOTER || $sType === static::TYPE_ALL)) {
-            $aOut[] = '<script>';
+            $aOut[] = sprintf(
+                '<script%s>',
+                $this->getNonce()
+                    ? ' nonce="' . $this->getNonce() . '"'
+                    : ''
+            );
             foreach ($this->aJsInlineFooter as $sAsset) {
                 if ($sAsset instanceof \Closure) {
                     $aOut[] = $sAsset();

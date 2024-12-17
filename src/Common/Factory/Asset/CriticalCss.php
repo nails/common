@@ -125,7 +125,10 @@ class CriticalCss
 
         return !empty($aOut)
             ? sprintf(
-                '<style type="text/css">%s</style>',
+                '<style type="text/css"%s>%s</style>',
+                $this->oAsset->getNonce()
+                    ? ' nonce="' . $this->oAsset->getNonce() . '"'
+                    : '',
                 implode('', $aOut)
             ) : '';
     }
@@ -163,8 +166,11 @@ class CriticalCss
         $sUrl = $this->getDeferredStylesheetUrl();
         return $sUrl
             ? sprintf(
-                '<link rel="stylesheet" as="style" href="%s" media="print" onload="this.media=\'all\'">',
-                $sUrl
+                '<link rel="stylesheet" as="style" href="%s" media="print" onload="this.media=\'all\'"%s />',
+                $sUrl,
+                $this->oAsset->getNonce()
+                    ? ' nonce="' . $this->oAsset->getNonce() . '"'
+                    : '',
             ) : '';
     }
 
@@ -180,8 +186,11 @@ class CriticalCss
         $sUrl = $this->getDeferredStylesheetUrl();
         return $sUrl
             ? sprintf(
-                '<link href="%s" rel="stylesheet" type="text/css"/>',
-                $sUrl
+                '<link href="%s" rel="stylesheet" type="text/css"%s/>',
+                $sUrl,
+                $this->oAsset->getNonce()
+                    ? ' nonce="' . $this->oAsset->getNonce() . '"'
+                    : '',
             ) : '';
     }
 }
