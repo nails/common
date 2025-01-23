@@ -163,15 +163,22 @@ class CriticalCss
      */
     protected function renderDeferredStylesheet(): string
     {
-        $sUrl = $this->getDeferredStylesheetUrl();
+        $sUrl   = $this->getDeferredStylesheetUrl();
+        $sNonce = $this->oAsset->getNonce()
+            ? ' nonce="' . $this->oAsset->getNonce() . '"'
+            : '';
+
         return $sUrl
-            ? sprintf(
-                '<link rel="stylesheet" as="style" href="%s" media="print" onload="this.media=\'all\'"%s />',
-                $sUrl,
-                $this->oAsset->getNonce()
-                    ? ' nonce="' . $this->oAsset->getNonce() . '"'
-                    : '',
-            ) : '';
+            ? <<<EOT
+            <link rel="stylesheet" as="style" href="$sUrl" media="print" id="critical-css-deferred-stylesheet"$sNonce>/>
+            <script$sNonce>
+            document
+                .addEventListener('DOMContentLoaded', function() {
+                    document.getElementById('critical-css-deferred-stylesheet').media = 'all';
+                });
+            </script>
+            EOT
+            : '';
     }
 
     // --------------------------------------------------------------------------
