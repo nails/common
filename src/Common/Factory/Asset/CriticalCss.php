@@ -170,7 +170,7 @@ class CriticalCss
 
         return $sUrl
             ? <<<EOT
-            <link rel="stylesheet" as="style" href="$sUrl" media="print" id="critical-css-deferred-stylesheet"$sNonce>/>
+            <link rel="stylesheet" as="style" href="$sUrl" media="print" id="critical-css-deferred-stylesheet"$sNonce />
             <script$sNonce>
             document
                 .addEventListener('DOMContentLoaded', function() {
