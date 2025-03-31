@@ -56,6 +56,8 @@ class Asset
     const LIBRARY_KNOCKOUT = 'KNOCKOUT';
     const LIBRARY_MUSTACHE = 'MUSTACHE';
     const LIBRARY_MOMENT   = 'MOMENT';
+    const LIBRARY_VUE2     = 'VUE2';
+    const LIBRARY_VUE3     = 'VUE3';
 
     // --------------------------------------------------------------------------
 
@@ -227,7 +229,45 @@ class Asset
             ])
             ->addLibrary(static::LIBRARY_MOMENT, [
                 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js',
-            ]);
+            ])
+            ->addLibrary(static::LIBRARY_VUE2, [
+                'https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js',
+            ], function () {
+                $this->checkIfOtherVueLoaded(static::LIBRARY_VUE2);
+            })
+            ->addLibrary(static::LIBRARY_VUE3, [
+                'https://cdn.jsdelivr.net/npm/vue@3.2.47/dist/vue.js',
+            ], function () {
+                $this->checkIfOtherVueLoaded(static::LIBRARY_VUE3);
+            });
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Utility function to handle loading both versions of Vue at once
+     *
+     * @throws AssetException
+     */
+    protected function checkIfOtherVueLoaded(string $sDesired)
+    {
+        $aVue2Js = $this->aLibraries[self::LIBRARY_VUE2];
+        $aVue3Js = $this->aLibraries[self::LIBRARY_VUE3];
+
+        if ($sDesired === self::LIBRARY_VUE2) {
+            $aFailIfLoaded  = $aVue3Js;
+            $sAlreadyLoaded = self::LIBRARY_VUE3;
+        } elseif ($sDesired === self::LIBRARY_VUE3) {
+            $aFailIfLoaded  = $aVue2Js;
+            $sAlreadyLoaded = self::LIBRARY_VUE2;
+        }
+
+        $aLoaded = array_keys($this->aJs);
+        foreach ($aFailIfLoaded as $sAsset) {
+            if (in_array('URL-' . $sAsset, $aLoaded)) {
+                throw new AssetException('Cannot load ' . $sDesired . ' as ' . $sAlreadyLoaded . ' is already loaded.');
+            }
+        }
     }
 
     // --------------------------------------------------------------------------
@@ -564,6 +604,32 @@ class Asset
     public function mustache(): self
     {
         return $this->library(static::LIBRARY_MUSTACHE);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Shortcut method to load the mustache library
+     *
+     * @return $this
+     * @throws \Nails\Common\Exception\AssetException
+     */
+    public function vue2(): self
+    {
+        return $this->library(static::LIBRARY_VUE2);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Shortcut method to load the mustache library
+     *
+     * @return $this
+     * @throws \Nails\Common\Exception\AssetException
+     */
+    public function vue3(): self
+    {
+        return $this->library(static::LIBRARY_VUE3);
     }
 
     // --------------------------------------------------------------------------
