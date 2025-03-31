@@ -179,12 +179,32 @@ class Mime
         return array_filter($aGroups);
     }
 
+    // --------------------------------------------------------------------------
+
     public function getGroupForMime(string $sMime): string
     {
         $aMimeGroup = $this->getMimeGroups([$sMime]);
         $aGroups    = array_keys($aMimeGroup);
         $sGroup     = reset($aGroups);
         return $sGroup ?: 'Other';
+    }
+
+    // --------------------------------------------------------------------------
+
+    public function getMimesForGroup(string $sGroup): array
+    {
+        return $this->getMimeGroups()[$sGroup] ?? [];
+    }
+
+    // --------------------------------------------------------------------------
+
+    public function getMimesForGroups(array $aGroups): array
+    {
+        $aMimes = [];
+        foreach ($aGroups as $sGroup) {
+            $aMimes = array_merge($aMimes, $this->getMimesForGroup($sGroup));
+        }
+        return array_keys($aMimes);
     }
 
     // --------------------------------------------------------------------------
