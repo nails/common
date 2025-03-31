@@ -165,6 +165,11 @@ class Asset
      */
     protected $aLibraries = [];
 
+    /**
+     * @var \Closure[]
+     */
+    protected $aLibrariesCallback = [];
+
     // --------------------------------------------------------------------------
 
     /**
@@ -482,6 +487,10 @@ class Asset
             $this->load($sUrls);
         }
 
+        if ($this->aLibrariesCallback[$sKey]) {
+            $this->aLibrariesCallback[$sKey]();
+        }
+
         return $this;
     }
 
@@ -567,9 +576,10 @@ class Asset
      *
      * @return $this
      */
-    public function addLibrary(string $sKey, array $aUrls): self
+    public function addLibrary(string $sKey, array $aUrls, ?\Closure $cOnLoad = null): self
     {
-        $this->aLibraries[strtoupper($sKey)] = $aUrls;
+        $this->aLibraries[strtoupper($sKey)]         = $aUrls;
+        $this->aLibrariesCallback[strtoupper($sKey)] = $cOnLoad;
         return $this;
     }
 
