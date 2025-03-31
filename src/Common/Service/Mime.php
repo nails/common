@@ -4,7 +4,6 @@ namespace Nails\Common\Service;
 
 use MimeTyper\Repository\MimeDbRepository;
 use Nails\Common\Helper\ArrayHelper;
-use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Mime\MimeTypesInterface;
 
 /**
@@ -127,6 +126,65 @@ class Mime
     public function getMimeMap(): array
     {
         return static::$aMapMimeToExtensions;
+    }
+
+    // --------------------------------------------------------------------------
+
+    public function getMimeGroups(array $aRestrictToMimes = null): array
+    {
+        $aMimeMap = $this->getMimeMap();
+        $aGroups  = [
+            'Documents' => [],
+            'Images'    => [],
+            'Videos'    => [],
+            'Archives'  => [],
+            'Other'     => [],
+        ];
+
+        foreach ($aMimeMap as $sMimeType => $aExtensions) {
+            if ($aRestrictToMimes && !in_array($sMimeType, $aRestrictToMimes)) {
+                continue;
+            } // Images
+            elseif (str_starts_with($sMimeType, 'image/')) {
+                $aGroups['Images'][$sMimeType] = $aExtensions;
+            } // Videos
+            elseif (str_starts_with($sMimeType, 'video/')) {
+                $aGroups['Videos'][$sMimeType] = $aExtensions;
+            } // Documents
+            elseif (
+                str_starts_with($sMimeType, 'application/pdf') ||
+                str_starts_with($sMimeType, 'application/msword') ||
+                str_starts_with($sMimeType, 'application/vnd.openxmlformats-officedocument.') ||
+                str_starts_with($sMimeType, 'application/vnd.ms-') ||
+                str_starts_with($sMimeType, 'text/')
+            ) {
+                $aGroups['Documents'][$sMimeType] = $aExtensions;
+            } // Archives
+            elseif (
+                str_starts_with($sMimeType, 'application/zip') ||
+                str_starts_with($sMimeType, 'application/x-rar') ||
+                str_starts_with($sMimeType, 'application/x-tar') ||
+                str_starts_with($sMimeType, 'application/x-7z') ||
+                str_starts_with($sMimeType, 'application/x-gzip') ||
+                str_starts_with($sMimeType, 'application/x-bzip2')
+            ) {
+                $aGroups['Archives'][$sMimeType] = $aExtensions;
+            } // Everything else
+            else {
+                $aGroups['Other'][$sMimeType] = $aExtensions;
+            }
+        }
+
+        // Remove empty groups
+        return array_filter($aGroups);
+    }
+
+    public function getGroupForMime(string $sMime): string
+    {
+        $aMimeGroup = $this->getMimeGroups([$sMime]);
+        $aGroups    = array_keys($aMimeGroup);
+        $sGroup     = reset($aGroups);
+        return $sGroup ?: 'Other';
     }
 
     // --------------------------------------------------------------------------
