@@ -601,6 +601,12 @@ class Asset
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Shortcut method to load the mustache library
+     *
+     * @return $this
+     * @throws \Nails\Common\Exception\AssetException
+     */
     public function mustache(): self
     {
         return $this->library(static::LIBRARY_MUSTACHE);
