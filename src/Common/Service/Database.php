@@ -184,6 +184,7 @@ class Database
 
         $sDbPath = BASEPATH . 'database/';
         require_once $sDbPath . 'DB_driver.php';
+        require_once $sDbPath . 'DB_result.php';
         require_once $sDbPath . 'DB_query_builder.php';
 
         if (!class_exists('CI_DB')) {
@@ -191,6 +192,7 @@ class Database
         }
 
         require_once $sDbPath . 'drivers/' . $aParams['dbdriver'] . '/' . $aParams['dbdriver'] . '_driver.php';
+        require_once $sDbPath . 'drivers/' . $aParams['dbdriver'] . '/' . $aParams['dbdriver'] . '_result.php';
 
         $sDriver   = 'CI_DB_' . $aParams['dbdriver'] . '_driver';
         $this->oDb = new $sDriver($aParams);

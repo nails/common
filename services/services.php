@@ -92,7 +92,6 @@ return [
             if (class_exists('\App\Common\Service\Encrypt')) {
                 return new \App\Common\Service\Encrypt();
             } else {
-                require_once BASEPATH . 'libraries/Encrypt.php';
                 return new Service\Encrypt();
             }
         },

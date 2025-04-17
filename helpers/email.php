@@ -30,8 +30,3 @@ if (!function_exists('valid_email')) {
         }
     }
 }
-
-// --------------------------------------------------------------------------
-
-//  Include the CodeIgniter original
-include NAILS_CI_SYSTEM_PATH . 'helpers/email_helper.php';
