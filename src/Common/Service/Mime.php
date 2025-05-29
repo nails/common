@@ -98,21 +98,19 @@ class Mime
     public static function updateDb(): void
     {
         $url         = 'https://raw.githubusercontent.com/jshttp/mime-db/master/db.json';
-        $destination = realpath(__DIR__ . '/../../../resources/mime-db/db.json');
+        $file        = 'db.json';
+        $destination = __DIR__ . '/../../../resources/mime-db/';
 
-        if (!is_dir(dirname($destination))) {
-            mkdir(dirname($destination), 0777, true);
+        if (!is_dir($destination)) {
+            mkdir($destination, 0777, true);
         }
 
-        echo "Downloading mime-db...\n";
         $contents = @file_get_contents($url);
         if ($contents === false) {
-            echo "Failed to download mime-db.\n";
-            return;
+            throw new NailsException('Failed to download mime database.');
         }
 
-        file_put_contents($destination, $contents);
-        echo "mime-db saved to: $destination\n";
+        file_put_contents($destination . $file, $contents);
     }
 
     // --------------------------------------------------------------------------
