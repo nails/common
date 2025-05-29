@@ -150,7 +150,7 @@ abstract class Base extends \MX_Controller
     protected function setErrorReporting(): self
     {
         /**
-         * Configure how verbose PHP is; Everything except E_STRICT and E_ERROR;
+         * Configure how verbose PHP is; Everything except E_ERROR;
          * we'll let the errorHandler pick up fatal errors
          */
 
