@@ -45,7 +45,6 @@ class ErrorHandler
         E_USER_ERROR      => 'User Error',
         E_USER_WARNING    => 'User Warning',
         E_USER_NOTICE     => 'User Notice',
-        E_STRICT          => 'Runtime Notice',
     ];
 
     /*
@@ -322,8 +321,8 @@ class ErrorHandler
      * @throws ViewNotFoundException
      */
     public function show401(
-        string $sFlashMessage = null,
-        string $sReturnUrl = null,
+        ?string $sFlashMessage = null,
+        ?string $sReturnUrl = null,
         bool $bLogError = true,
         bool $bForceView = false
     ): void {
