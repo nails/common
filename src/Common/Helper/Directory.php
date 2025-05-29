@@ -40,11 +40,11 @@ class Directory
      */
     public static function map(
         string $sPath,
-        int $iMaxDepth = null,
+        ?int $iMaxDepth = null,
         bool $bAbsolutePath = true,
         bool $bIncludeHidden = false,
         int $iCurrentDepth = 0,
-        string $sInitialPath = null,
+        ?string $sInitialPath = null,
         array &$aResults = []
     ): array {
 
@@ -135,7 +135,7 @@ class Directory
      * @throws DirectoryIsNotWritableException
      * @throws DirectoryNameException
      */
-    public static function tempdir(string $sDir = null, string $sPrefix = 'tmp_', int $iMode = 0700, int $iMaxAttempts = 1000)
+    public static function tempdir(?string $sDir = null, string $sPrefix = 'tmp_', int $iMode = 0700, int $iMaxAttempts = 1000)
     {
         //  Use the system temp dir by default
         if (is_null($sDir)) {

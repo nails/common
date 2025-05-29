@@ -196,7 +196,7 @@ class ArrayHelper
      * @return array
      * @throws NailsException
      */
-    public static function arrayFilterMulti($mKey, array $aArray, callable $cFilter = null): array
+    public static function arrayFilterMulti($mKey, array $aArray, ?callable $cFilter = null): array
     {
         if ($cFilter === null) {
             // Filter out empty values by default

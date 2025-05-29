@@ -536,7 +536,7 @@ class Form
      *
      * @return string
      */
-    public static function timecode(string $sKey, string $sDefault = null): string
+    public static function timecode(string $sKey, ?string $sDefault = null): string
     {
         return
             '<div class="admin-js-timecode">' .

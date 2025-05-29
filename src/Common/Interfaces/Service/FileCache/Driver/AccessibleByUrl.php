@@ -18,5 +18,5 @@ interface AccessibleByUrl extends Driver
      *
      * @return string
      */
-    public function getUrl(string $sKey = null): string;
+    public function getUrl(?string $sKey = null): string;
 }

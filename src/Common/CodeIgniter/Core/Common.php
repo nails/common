@@ -57,8 +57,8 @@ if (!function_exists('show_401')) {
 
 if (!function_exists('show401')) {
     function show401(
-        string $sFlashMessage = null,
-        string $sReturnUrl = null,
+        ?string $sFlashMessage = null,
+        ?string $sReturnUrl = null,
         bool $bLogError = true
     ) {
         Functions::show401($sFlashMessage, $sReturnUrl, $bLogError);
@@ -67,8 +67,8 @@ if (!function_exists('show401')) {
 
 if (!function_exists('unauthorised')) {
     function unauthorised(
-        string $sFlashMessage = null,
-        string $sReturnUrl = null,
+        ?string $sFlashMessage = null,
+        ?string $sReturnUrl = null,
         bool $bLogError = true
     ) {
         Functions::show401($sFlashMessage, $sReturnUrl, $bLogError);

@@ -86,7 +86,7 @@ class Logger
      * @return $this
      * @throws FactoryException
      */
-    public function line($sLine = '', string $sType = null): self
+    public function line($sLine = '', ?string $sType = null): self
     {
         //  Is dummy mode enabled? If it is then don't do anything.
         if ($this->bDummy) {

@@ -110,8 +110,8 @@ return [
             }
         },
         'FileCache'                      => function (
-            Interfaces\Service\FileCache\Driver $oPrivate = null,
-            Interfaces\Service\FileCache\Driver\AccessibleByUrl $oPublic = null
+            ?Interfaces\Service\FileCache\Driver $oPrivate = null,
+            ?Interfaces\Service\FileCache\Driver\AccessibleByUrl $oPublic = null
         ): Service\FileCache {
             if (class_exists('\App\Common\Service\FileCache')) {
                 /** @var Service\FileCache $oFileCache */
@@ -130,7 +130,7 @@ return [
             return $oFileCache;
         },
         'FileCacheDriver'                => function (
-            string $sDir = null
+            ?string $sDir = null
         ): Service\FileCache\Driver {
 
             $sDir = $sDir
@@ -150,8 +150,8 @@ return [
             return $oDriver;
         },
         'FileCacheDriverAccessibleByUrl' => function (
-            string $sDir = null,
-            string $sUrl = null
+            ?string $sDir = null,
+            ?string $sUrl = null
         ): Service\FileCache\Driver\AccessibleByUrl {
 
             $sDir = $sDir
@@ -211,8 +211,8 @@ return [
             }
         },
         'Locale'                         => function (
-            \Nails\Common\Factory\Locale $oLocale = null,
-            Service\Input $oInput = null
+            ?\Nails\Common\Factory\Locale $oLocale = null,
+            ?Service\Input $oInput = null
         ): Service\Locale {
 
             $oInput = $oInput ?? \Nails\Factory::service('Input');
@@ -386,7 +386,7 @@ return [
                 return new Factory\Database\Transaction($oDatabase);
             }
         },
-        'DateTime'                   => function ($sTime = null, DateTimeZone $oTimeZone = null): \DateTime {
+        'DateTime'                   => function ($sTime = null, ?DateTimeZone $oTimeZone = null): \DateTime {
             return new \DateTime(
                 $sTime ?? Config::get('NAILS_TIME_NOW', 'now'),
                 $oTimeZone
@@ -498,9 +498,9 @@ return [
             }
         },
         'Locale'                     => function (
-            Factory\Locale\Language $oLanguage = null,
-            Factory\Locale\Region $oRegion = null,
-            Factory\Locale\Script $oScript = null
+            ?Factory\Locale\Language $oLanguage = null,
+            ?Factory\Locale\Region $oRegion = null,
+            ?Factory\Locale\Script $oScript = null
         ): Factory\Locale {
             if (class_exists('\App\Common\Factory\Locale')) {
                 return new \App\Common\Factory\Locale($oLanguage, $oRegion, $oScript);

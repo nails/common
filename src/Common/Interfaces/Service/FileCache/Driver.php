@@ -28,7 +28,7 @@ interface Driver
      *
      * @return Item
      */
-    public function write($mData, string $sKey = null): Item;
+    public function write($mData, ?string $sKey = null): Item;
 
     // --------------------------------------------------------------------------
 

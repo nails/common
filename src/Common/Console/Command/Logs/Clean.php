@@ -40,7 +40,7 @@ class Clean extends Base
      *
      * @param string|null $name
      */
-    public function __construct(string $name = null)
+    public function __construct(?string $name = null)
     {
         $this->iLogRetention = (int) Config::get('LOG_RETENTION', 180);
         parent::__construct($name);

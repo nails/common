@@ -30,7 +30,7 @@ final class Collection extends \Nails\Common\Factory\Collection
      * @param array  $aCollection
      * @param string $sImplodeString
      */
-    public function __construct(array $aCollection = [], string $sImplodeString = null)
+    public function __construct(array $aCollection = [], ?string $sImplodeString = null)
     {
         parent::__construct($aCollection);
         $this->sImplodeString = $sImplodeString;
@@ -45,7 +45,7 @@ final class Collection extends \Nails\Common\Factory\Collection
      *
      * @return string
      */
-    public function implode(string $sImplodeString = null): string
+    public function implode(?string $sImplodeString = null): string
     {
         return implode($sImplodeString ?? $this->sImplodeString, $this->aCollection);
     }

@@ -239,7 +239,7 @@ class Seed extends Base
      *
      * @return \stdClass[]
      */
-    protected function filterSeeders(array $aSeeders, string $sComponent = null, string $sClass = null): array
+    protected function filterSeeders(array $aSeeders, ?string $sComponent = null, ?string $sClass = null): array
     {
         if ($sComponent) {
             $aSeeders = array_filter(

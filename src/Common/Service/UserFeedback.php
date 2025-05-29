@@ -58,7 +58,7 @@ class UserFeedback
      *
      * @throws FactoryException
      */
-    public function __construct(Session $oSession = null)
+    public function __construct(?Session $oSession = null)
     {
         $this->oSession  = $oSession ?? Factory::service('Session');
         $this->aMessages = json_decode($this->oSession->getFlashData(static::SESSION_KEY) ?? '[]', JSON_OBJECT_AS_ARRAY);
@@ -236,7 +236,7 @@ class UserFeedback
      * @return $this
      * @throws \InvalidArgumentException
      */
-    public function clear(string $sType = null): self
+    public function clear(?string $sType = null): self
     {
         if (empty($sType)) {
             $this->aMessages = [];

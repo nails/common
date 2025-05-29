@@ -153,7 +153,7 @@ class Mime
 
     // --------------------------------------------------------------------------
 
-    public function getMimeGroups(array $aRestrictToMimes = null): array
+    public function getMimeGroups(?array $aRestrictToMimes = null): array
     {
         $aMimeMap = $this->getMimeMap();
         $aGroups  = [

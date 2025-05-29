@@ -176,7 +176,7 @@ class Validator
      *
      * @return $this
      */
-    public function run(array $aData = null): Validator
+    public function run(?array $aData = null): Validator
     {
         if (empty($this->getRules())) {
             return $this;

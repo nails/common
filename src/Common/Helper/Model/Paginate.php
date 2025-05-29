@@ -20,7 +20,7 @@ class Paginate
      * @param int $iPerPage
      * @param int $iPage
      */
-    public function __construct(int $iPerPage, int $iPage = null)
+    public function __construct(int $iPerPage, ?int $iPage = null)
     {
         $this->iPerPage = $iPerPage;
         $this->iPage    = $iPage ?? 0;

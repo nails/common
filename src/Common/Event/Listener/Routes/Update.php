@@ -38,7 +38,7 @@ class Update extends Subscription
      * @throws NailsException
      * @throws FactoryException
      */
-    public function execute(string $sModule = null, OutputInterface $oOutput = null): void
+    public function execute(?string $sModule = null, ?OutputInterface $oOutput = null): void
     {
         /** @var Routes $oRoutesService */
         $oRoutesService = Factory::service('Routes');

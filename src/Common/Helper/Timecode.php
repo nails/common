@@ -57,7 +57,7 @@ class Timecode
      * @return string
      * @throws ValidationException
      */
-    public static function toTimecode(int $iSeconds, string $sSeparator = null): string
+    public static function toTimecode(int $iSeconds, ?string $sSeparator = null): string
     {
         $sSeparator = $sSeparator ?? ':';
 

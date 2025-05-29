@@ -46,7 +46,7 @@ class Functions
      * @return string
      * @throws \Exception
      */
-    public static function generateKey(string $sSalt = null): string
+    public static function generateKey(?string $sSalt = null): string
     {
         return base64_encode($sSalt . random_bytes(32));
     }
@@ -168,8 +168,8 @@ class Functions
      * @param bool   $bLogError     Whether to log the error or not
      */
     public static function show401(
-        string $sFlashMessage = null,
-        string $sReturnUrl = null,
+        ?string $sFlashMessage = null,
+        ?string $sReturnUrl = null,
         bool $bLogError = true
     ): void {
 

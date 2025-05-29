@@ -34,7 +34,7 @@ class Driver implements Interfaces\Service\FileCache\Driver
      * @throws DirectoryDoesNotExistException
      * @throws DirectoryIsNotWritableException
      */
-    public function __construct(string $sDir = null)
+    public function __construct(?string $sDir = null)
     {
         $this->sDir = Strings::addTrailingSlash($sDir);
 
@@ -72,7 +72,7 @@ class Driver implements Interfaces\Service\FileCache\Driver
      * @return Item
      * @throws FactoryException
      */
-    public function write($mData, string $sKey = null): Item
+    public function write($mData, ?string $sKey = null): Item
     {
         //  Generate a key if one isn't explicitly specified
         if (is_null($sKey)) {
