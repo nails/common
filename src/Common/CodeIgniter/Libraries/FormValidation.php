@@ -64,6 +64,17 @@ class FormValidation extends CI_Form_validation
 
     // --------------------------------------------------------------------------
 
+    public function set_rules($field, $label = null, $rules = null, $errors = [])
+    {
+        if (empty($field) || empty($rules)) {
+            //  Nothing to do and parent method will throw an exception
+            return $this;
+        }
+        parent::set_rules($field, $label, $rules, $errors);
+    }
+
+    // --------------------------------------------------------------------------
+
     /**
      * Checks if a certain value is unique in a specified table if different
      * from current value.

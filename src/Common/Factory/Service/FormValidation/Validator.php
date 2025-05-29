@@ -15,6 +15,9 @@ use Nails\Factory;
  *
  * @package Nails\Common\Factory\FormValidation
  */
+
+//  Form Validation sets some dynamic props due to MX
+#[\AllowDynamicProperties]
 class Validator
 {
     /**
