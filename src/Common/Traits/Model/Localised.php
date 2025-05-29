@@ -323,7 +323,7 @@ trait Localised
      * @return string
      * @throws ModelException
      */
-    protected function generateSlug(array $aData = [], int $iIgnoreId = null, \Nails\Common\Factory\Locale $oLocale = null)
+    protected function generateSlug(array $aData = [], ?int $iIgnoreId = null, ?\Nails\Common\Factory\Locale $oLocale = null)
     {
         if (empty($oLocale)) {
             throw new ModelException(sprintf(
@@ -360,7 +360,7 @@ trait Localised
      * @throws FactoryException
      * @throws ModelException
      */
-    public function create(array $aData = [], $bReturnObject = false, \Nails\Common\Factory\Locale $oLocale = null)
+    public function create(array $aData = [], $bReturnObject = false, ?\Nails\Common\Factory\Locale $oLocale = null)
     {
         /** @var Database $oDb */
         $oDb = Factory::service('Database');
@@ -430,7 +430,7 @@ trait Localised
      * @throws FactoryException
      * @throws ModelException
      */
-    public function update($iId, array $aData = [], \Nails\Common\Factory\Locale $oLocale = null): bool
+    public function update($iId, array $aData = [], ?\Nails\Common\Factory\Locale $oLocale = null): bool
     {
         if (empty($oLocale)) {
             throw new ModelException(
@@ -467,7 +467,7 @@ trait Localised
      * @throws FactoryException
      * @throws ModelException
      */
-    public function delete($iId, \Nails\Common\Factory\Locale $oLocale = null): bool
+    public function delete($iId, ?\Nails\Common\Factory\Locale $oLocale = null): bool
     {
         if (empty($oLocale)) {
             throw new ModelException(
@@ -527,7 +527,7 @@ trait Localised
      * @throws FactoryException
      * @throws ModelException
      */
-    public function destroy($iId, \Nails\Common\Factory\Locale $oLocale = null): bool
+    public function destroy($iId, ?\Nails\Common\Factory\Locale $oLocale = null): bool
     {
         if (empty($oLocale)) {
             throw new ModelException(
@@ -555,7 +555,7 @@ trait Localised
      * @throws FactoryException
      * @throws ModelException
      */
-    public function restore($iId, \Nails\Common\Factory\Locale $oLocale = null): bool
+    public function restore($iId, ?\Nails\Common\Factory\Locale $oLocale = null): bool
     {
         if (empty($oLocale)) {
             throw new ModelException(
