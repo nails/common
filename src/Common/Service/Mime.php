@@ -93,29 +93,6 @@ class Mime
     // --------------------------------------------------------------------------
 
     /**
-     * Updates the local mime database file
-     */
-    public static function updateDb(): void
-    {
-        $url         = 'https://raw.githubusercontent.com/jshttp/mime-db/master/db.json';
-        $file        = 'db.json';
-        $destination = __DIR__ . '/../../../resources/mime-db/';
-
-        if (!is_dir($destination)) {
-            mkdir($destination, 0777, true);
-        }
-
-        $contents = @file_get_contents($url);
-        if ($contents === false) {
-            throw new NailsException('Failed to download mime database.');
-        }
-
-        file_put_contents($destination . $file, $contents);
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Detect a file's mimetype, first using the system, followed by the detector
      *
      * @param string $sFile The path to the file to detect

@@ -60,15 +60,7 @@
     "scripts":
     {
         "test": "mkdir -p cache/private cache/public && ./vendor/bin/phpunit",
-        "analyse": "./vendor/bin/phpstan analyse -c .phpstan/config.neon",
-        "post-install-cmd":
-        [
-            "Nails\\Common\\Service\\Mime::updateDb"
-        ],
-        "post-update-cmd":
-        [
-            "Nails\\Common\\Service\\Mime::updateDb"
-        ]
+        "analyse": "./vendor/bin/phpstan analyse -c .phpstan/config.neon"
     },
     "autoload":
     {
@@ -126,6 +118,10 @@
                         "35x35"
                     ]
                 }
+            },
+            "scripts":
+            {
+                "install": "./scripts/install-mime-db.sh"
             }
         }
     }
