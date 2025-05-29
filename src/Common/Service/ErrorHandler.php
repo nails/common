@@ -283,7 +283,7 @@ class ErrorHandler
         $sRequestMethod = isset($_SERVER) ? strtoupper(ArrayHelper::get('REQUEST_METHOD', $_SERVER)) : '';
 
         if ($bLogError && $sRequestMethod != 'HEAD') {
-            log_message('error', '404 Page Not Found --> ' . $sPage);
+            log_message('info', '404 Page Not Found --> ' . $sPage);
         }
 
         // --------------------------------------------------------------------------
