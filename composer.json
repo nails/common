@@ -60,7 +60,15 @@
     "scripts":
     {
         "test": "mkdir -p cache/private cache/public && ./vendor/bin/phpunit",
-        "analyse": "./vendor/bin/phpstan analyse -c .phpstan/config.neon"
+        "analyse": "./vendor/bin/phpstan analyse -c .phpstan/config.neon",
+        "post-install-cmd":
+        [
+            "Nails\\Common\\Service\\Mime::updateDb"
+        ],
+        "post-update-cmd":
+        [
+            "Nails\\Common\\Service\\Mime::updateDb"
+        ]
     },
     "autoload":
     {
