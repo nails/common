@@ -4,6 +4,7 @@ namespace Nails\Common\Factory\PDODatabase;
 
 use Nails\Common\Service\PDODatabase;
 use Nails\Common\Exception\PDODatabase\TransactionException;
+use Throwable;
 
 /**
  * Class Transaction
@@ -48,7 +49,7 @@ class Transaction
             $this->oDatabase->db()->beginTransaction();
             $this->bIsTransactionRunning = true;
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             throw new TransactionException($e->getMessage(), $e->getCode(), $e);
         }
 
@@ -81,7 +82,7 @@ class Transaction
             $this->oDatabase->db()->commit();
             $this->bIsTransactionRunning = false;
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             throw new TransactionException($e->getMessage(), $e->getCode(), $e);
         }
 
@@ -102,7 +103,7 @@ class Transaction
             $this->oDatabase->db()->rollBack();
             $this->bIsTransactionRunning = false;
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             throw new TransactionException($e->getMessage(), $e->getCode(), $e);
         }
 

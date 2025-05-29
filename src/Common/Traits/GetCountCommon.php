@@ -945,7 +945,7 @@ trait GetCountCommon
 
         //  If the $mColumn is an array then we should concat them together
         $sColumn = is_array($mColumn)
-            ? 'CONCAT_WS(" ", ' . implode(',', $sColumn) . ')'
+            ? 'CONCAT_WS(" ", ' . implode(',', $mColumn) . ')'
             : trim($mColumn);
 
         //  Filter out any SQL operators
@@ -982,7 +982,7 @@ trait GetCountCommon
 
         //  If the $mColumn is an array then we should concat them together
         $sColumn = is_array($mColumn)
-            ? 'CONCAT_WS(" ", ' . implode(',', $sColumn) . ')'
+            ? 'CONCAT_WS(" ", ' . implode(',', $mColumn) . ')'
             : trim($mColumn);
 
         $mVal = $this->extractValue($aData);
