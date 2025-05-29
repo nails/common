@@ -1021,7 +1021,6 @@ class FormValidation extends CI_Form_validation
      *
      * @return boolean
      * @todo  provide this from within the CDN module
-     *
      */
     public function cdnObjectPickerMultiObjectRequired($aValues)
     {
@@ -1047,7 +1046,6 @@ class FormValidation extends CI_Form_validation
      *
      * @return boolean
      * @todo  provide this from within the CDN module
-     *
      */
     public function cdnObjectPickerMultiLabelRequired($aValues)
     {
@@ -1073,7 +1071,6 @@ class FormValidation extends CI_Form_validation
      *
      * @return boolean
      * @todo  provide this from within the CDN module
-     *
      */
     public function cdnObjectPickerMultiAllRequired($aValues)
     {
