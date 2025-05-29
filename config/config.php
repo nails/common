@@ -30,6 +30,9 @@ $config['permitted_uri_chars'] = 'a-z 0-9~%.:_\-+@';
 //  Increase logging threshold
 $config['log_threshold'] = 1;
 
+//  Define log path
+$config['log_path'] = Config::get('LOG_DIR');
+
 //  Cache directory
 /** @var FileCache $oFileCache */
 $oFileCache           = Factory::service('FileCache');
