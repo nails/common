@@ -1089,7 +1089,7 @@ class Asset
      * @return $this
      * @throws AssetException
      */
-    protected function loadModule(string $sAsset, ?string $sForceType, bool $bAsync, bool $bDefer, ?bool $bModule = null, $mModule): self
+    protected function loadModule(string $sAsset, ?string $sForceType, bool $bAsync, bool $bDefer, ?bool $bModule, $mModule): self
     {
         if (is_array($mModule)) {
             $sModule   = !empty($mModule[0]) ? $mModule[0] : null;

@@ -38,7 +38,6 @@
         "ext-json": "*",
         "ext-mbstring": "*",
         "ext-pdo": "*",
-        "adrienrn/php-mimetyper": "0.*",
         "annexare/countries-list": "2.*",
         "axisofstevil/stop-words": "0.*",
         "behat/transliterator": "1.*",

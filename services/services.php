@@ -1,6 +1,5 @@
 <?php
 
-use MimeTyper\Repository\MimeDbRepository;
 use Nails\Common\Interfaces;
 use Nails\Common\Resource;
 use Nails\Common\Service;
@@ -250,10 +249,10 @@ return [
                 return new Service\MetaData($oObj);
             }
         },
-        'Mime'                           => function ($oDatabase = null, $oDetector = null): Service\Mime {
+        'Mime'                           => function ($sDatabase = null, $oDetector = null): Service\Mime {
 
-            if (!$oDatabase) {
-                $oDatabase = new MimeDbRepository();
+            if (!$sDatabase) {
+                $sDatabase = NAILS_COMMON_PATH . 'resources/mime-db/db.json';
             }
 
             if (!$oDetector) {
@@ -261,9 +260,9 @@ return [
             }
 
             if (class_exists('\App\Common\Service\Mime')) {
-                return new \App\Common\Service\Mime($oDatabase, $oDetector);
+                return new \App\Common\Service\Mime($sDatabase, $oDetector);
             } else {
-                return new Service\Mime($oDatabase, $oDetector);
+                return new Service\Mime($sDatabase, $oDetector);
             }
         },
         'Mustache'                       => function (): Service\Mustache {
