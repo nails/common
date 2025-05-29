@@ -237,7 +237,7 @@ class Validator
         }
 
         //  Execute the validation
-        if (!$oFormValidation->run($this)) {
+        if (!$oFormValidation->run(module: $this)) {
             $oException = new ValidationException(lang('fv_there_were_errors'));
             $oException->setData($this->getErrors());
             throw $oException;
