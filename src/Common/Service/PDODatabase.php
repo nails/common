@@ -56,33 +56,35 @@ class PDODatabase
      * @return void
      * @throws ConnectionException
      */
-    public function connect($sDbHost = '', $sDbUser = '', $sDbPass = '', $sDbName = '', $sDbPort = '')
+    public function connect($sDbHost = '', $sDbUser = '', $sDbPass = '', $sDbName = '', $sDbPort = '', $sDbCharset = '')
     {
         //  Close the connection if one is open
         if (!is_null($this->oDb)) {
             $this->oDb = null;
         }
 
-        $sDbHost = !empty($sDbHost) ? $sDbHost : \Nails\Config::get('DB_HOST');
+        $sDbHost = !empty($sDbHost) ? $sDbHost : \Nails\Config::get('DB_HOST', '127.0.0.1');
         $sDbUser = !empty($sDbUser) ? $sDbUser : \Nails\Config::get('DB_USERNAME');
         $sDbPass = !empty($sDbPass) ? $sDbPass : \Nails\Config::get('DB_PASSWORD');
         $sDbName = !empty($sDbName) ? $sDbName : \Nails\Config::get('DB_DATABASE');
-        $sDbPort = !empty($sDbPort) ? $sDbPort : \Nails\Config::get('DB_PORT');
+        $sDbPort = !empty($sDbPort) ? $sDbPort : \Nails\Config::get('DB_PORT', 3306);
+        $sDbChar = !empty($sDbChar) ? $sDbChar : \Nails\Config::get('DB_CHARSET', 'utf8mb4');
 
         try {
 
             $this->oDb = new PDO(
                 sprintf(
-                    'mysql:host=%s;port=%s;dbname=%s;charset=utf8',
+                    'mysql:host=%s;port=%s;dbname=%s;charset=%s',
                     $sDbHost,
                     $sDbPort,
-                    $sDbName
+                    $sDbName,
+                    $sDbChar
                 ),
                 $sDbUser,
                 $sDbPass
             );
 
-            $this->oDb->exec('set names utf8');
+            $this->oDb->exec('set names ' . $sDbChar);
             $this->oDb->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         } catch (Exception $e) {
