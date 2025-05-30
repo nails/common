@@ -19,8 +19,8 @@ namespace Nails\Common\Service;
 use CI_DB_mysqli_driver;
 use Nails\Common\Exception\Database\ConnectionException;
 use Nails\Common\Exception\FactoryException;
-use Nails\Common\Factory\Database\Transaction;
 use Nails\Common\Factory\Database\ForeignKeyCheck;
+use Nails\Common\Factory\Database\Transaction;
 use Nails\Common\Helper\ArrayHelper;
 use Nails\Config;
 use Nails\Environment;
@@ -151,18 +151,15 @@ class Database
         $oFileCache = Factory::service('FileCache');
 
         $aParams = [
-
-            //  Consistent between deployments
-            'dbdriver' => APP_DB_DRIVER,
-            'dbprefix' => APP_DB_GLOBAL_PREFIX,
-            'pconnect' => APP_DB_PCONNECT,
-            'cache_on' => APP_DB_CACHE,
-            'char_set' => APP_DB_CHARSET,
-            'dbcollat' => APP_DB_DBCOLLAT,
-            'stricton' => APP_DB_STRICT,
+            'dbdriver' => Config::get('DB_DRIVER', 'mysqli'),
+            'dbprefix' => Config::get('DB_GLOBAL_PREFIX'),
+            'pconnect' => Config::get('DB_PCONNECT', true),
+            'cache_on' => Config::get('DB_CACHE', false),
+            'char_set' => Config::get('DB_CHARSET', 'utf8mb4'),
+            'dbcollat' => Config::get('DB_DBCOLLAT', 'utf8mb4_unicode_ci'),
+            'stricton' => Config::get('DB_STRICT', true),
             'swap_pre' => false,
             'autoinit' => true,
-
             /**
              * We always have the database in debug mode; errors will throw exceptions,
              * which are handled by the ErrorHandler. If this is set to false, errors
@@ -170,12 +167,10 @@ class Database
              * things which expect an object.
              */
             'db_debug' => true,
-
-            //  Potentially vary between deployments
-            'hostname' => Config::get('DB_HOST'),
+            'hostname' => Config::get('DB_HOST', '127.0.0.1'),
             'username' => Config::get('DB_USERNAME'),
             'password' => Config::get('DB_PASSWORD'),
-            'port'     => Config::get('DB_PORT'),
+            'port'     => Config::get('DB_PORT', 3306),
             'database' => Environment::is([Environment::ENV_TEST, Environment::ENV_HTTP_TEST])
                 ? Testing::DB_NAME
                 : Config::get('DB_DATABASE'),

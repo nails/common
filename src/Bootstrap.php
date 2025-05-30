@@ -14,7 +14,6 @@ namespace Nails;
 use Nails\Common\Events;
 use Nails\Common\Exception\EnvironmentException;
 use Nails\Common\Service\ErrorHandler;
-use Nails\Common\Service\FileCache;
 use Nails\Common\Service\Profiler;
 use Nails\Common\Service\Routes;
 
@@ -230,25 +229,8 @@ final class Bootstrap
         Environment::isValid(Config::get('ENVIRONMENT'));
 
         //  Database
-        //  @todo (Pablo - 2018-11-16) - Move these to the database service
-
-        //  Consistent between deployments
-        Config::default('APP_DB_DRIVER', 'mysqli');
-        Config::default('APP_DB_GLOBAL_PREFIX', '');
-        Config::default('APP_DB_PCONNECT', true);
-        Config::default('APP_DB_CACHE', false);
-        Config::default('APP_DB_CHARSET', 'utf8mb4');
-        Config::default('APP_DB_DBCOLLAT', 'utf8mb4_unicode_ci');
-        Config::default('APP_DB_STRICT', true);
         Config::default('NAILS_DB_PREFIX', 'nails_');
         Config::default('APP_DB_PREFIX', 'app_');
-
-        //  Potentially vary between deployments
-        Config::default('DB_HOST', '127.0.0.1');
-        Config::default('DB_USERNAME');
-        Config::default('DB_PASSWORD');
-        Config::default('DB_DATABASE');
-        Config::default('DB_PORT', 3306);
 
         //  App
         Config::default('APP_NAME', 'Nails');
