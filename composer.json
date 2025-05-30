@@ -41,15 +41,16 @@
         "annexare/countries-list": "2.*",
         "axisofstevil/stop-words": "0.*",
         "behat/transliterator": "1.*",
-        "pocketarc/codeigniter": "3.*",
         "defuse/php-encryption": "2.*",
         "guzzlehttp/guzzle": "7.*",
+        "jeremykendall/php-domain-parser": "6.*",
         "mustache/mustache": "2.*",
         "pimple/pimple": "3.*",
+        "pocketarc/codeigniter": "3.*",
         "ralouphie/getallheaders": "3.*",
+        "symfony/http-foundation": "5.*",
         "symfony/mime": "5.*",
-        "symfony/http-foundation": "^5.0",
-        "jeremykendall/php-domain-parser": "^6.3"
+        "vlucas/phpdotenv": "5.*"
     },
     "require-dev":
     {
