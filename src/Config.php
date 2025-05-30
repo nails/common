@@ -2,6 +2,8 @@
 
 namespace Nails;
 
+use Dotenv\Dotenv;
+
 /**
  * Class Config
  *
@@ -15,6 +17,17 @@ final class Config
      * @var array
      */
     private static $aConfig = [];
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Load .env configurations
+     */
+    public static function dotenv()
+    {
+        $dotenv = Dotenv::createImmutable(NAILS_APP_PATH);
+        $dotenv->safeLoad();
+    }
 
     // --------------------------------------------------------------------------
 
