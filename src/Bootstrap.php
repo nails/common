@@ -90,6 +90,7 @@ final class Bootstrap
             \App\Events::preSystem();
         }
 
+        Config::dotenv();
         //  @todo (Pablo - 2020-03-02) - Remove; app and deploy config files are deprecated
         self::loadConfig('app');
         self::loadConfig('deploy');

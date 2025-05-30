@@ -25,7 +25,7 @@ final class Config
      */
     public static function dotenv()
     {
-        $dotenv = Dotenv::createImmutable(NAILS_APP_PATH);
+        $dotenv = Dotenv::createImmutable(__DIR__ . '/../../../../');
         $dotenv->safeLoad();
     }
 
