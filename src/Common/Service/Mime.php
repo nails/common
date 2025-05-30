@@ -2,6 +2,7 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Common\Exception\MimeException;
 use Nails\Common\Helper\ArrayHelper;
 use Symfony\Component\Mime\MimeTypesInterface;
 
@@ -95,7 +96,15 @@ class Mime
 
     protected function loadDatabase(string $sPath): self
     {
+        if (!file_exists($sPath)) {
+            throw new MimeException('Mime DB not found at ' . $sPath);
+        }
+
         $aMimeDb = json_decode(file_get_contents($sPath), true);
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new MimeException('Error parsing Mime DB: ' . json_last_error_msg());
+        }
 
         $aMimeDbExtensions = array_map(
             function ($type) {
