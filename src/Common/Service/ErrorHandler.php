@@ -411,7 +411,7 @@ class ErrorHandler
             : HttpCodes::STATUS_INTERNAL_SERVER_ERROR;
 
         //  Stops cascading errors if CI isn't available
-        if (!class_exists('MX_LANG')) {
+        if (!class_exists('CI_Lang') || !class_exists('MX_Lang')) {
 
             $sSubject = getFromArray('sSubject', $aData);
             $sMessage = getFromArray('sMessage', $aData);
