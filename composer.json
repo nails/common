@@ -30,13 +30,6 @@
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "repositories":
-    [
-        {
-            "type": "vcs",
-            "url": "https://github.com/nails/mustache.php"
-        }
-    ],
     "require":
     {
         "php": ">=8",
@@ -51,7 +44,7 @@
         "defuse/php-encryption": "2.*",
         "guzzlehttp/guzzle": "7.*",
         "jeremykendall/php-domain-parser": "6.*",
-        "mustache/mustache": "dev-main as 2.14.2",
+        "mustache/mustache": "2.*",
         "pimple/pimple": "3.*",
         "pocketarc/codeigniter": "3.*",
         "ralouphie/getallheaders": "3.*",
