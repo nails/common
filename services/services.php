@@ -550,6 +550,20 @@ return [
                 return new Factory\Model\Field();
             }
         },
+        'ModelFieldWysiwyg'          => function (): Factory\Model\Field {
+            if (class_exists('\App\Common\Factory\Model\Field\Wysiwyg')) {
+                return new \App\Common\Factory\Model\Field\Wysiwyg();
+            } else {
+                return new Factory\Model\Field\Wysiwyg();
+            }
+        },
+        'ModelFieldWysiwygBasic'     => function (): Factory\Model\Field {
+            if (class_exists('\App\Common\Factory\Model\Field\WysiwygBasic')) {
+                return new \App\Common\Factory\Model\Field\WysiwygBasic();
+            } else {
+                return new Factory\Model\Field\WysiwygBasic();
+            }
+        },
         'Pagination'                 => function (): Factory\Pagination {
             if (class_exists('\App\Common\Factory\Pagination')) {
                 return new \App\Common\Factory\Pagination();
