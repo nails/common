@@ -2730,7 +2730,9 @@ abstract class Base
 
             /** @var Field $oTemp */
             $oTemp = array_key_exists($oField->Field, static::FIELD_CLASSES)
-                ? Factory::factory(... static::FIELD_CLASSES[$oField->Field])
+                ? is_array(static::FIELD_CLASSES[$oField->Field])
+                    ? Factory::factory(... static::FIELD_CLASSES[$oField->Field])
+                    : Factory::factory(static::FIELD_CLASSES[$oField->Field])
                 : Factory::factory('ModelField');
 
             if (!$oTemp instanceof Field) {
