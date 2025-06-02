@@ -59,7 +59,7 @@ use Nails\Factory;
  * @method regex_match($str, $regex)
  * @method required($str)
  * @method reset_validation()
- * @method run($group = '')
+ * @method run($config = null, &$data = null, $module = '')
  * @method set_checkbox($field = '', $value = '', $default = false)
  * @method set_data(array $data)
  * @method set_error_delimiters($prefix = '<p>', $suffix = '</p>')
