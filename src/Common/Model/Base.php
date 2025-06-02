@@ -2805,6 +2805,11 @@ abstract class Base
      */
     protected function describeFieldsGuessType(Field &$oField, \stdClass $oDbField): self
     {
+        //  If a custom class has been defined then do not guess.
+        if ($oField::class !== Field::class) {
+            return $this;
+        }
+
         preg_match('/^(.*?)(\((.+?)\)(.*))?$/', $oDbField->Type, $aMatches);
 
         $sType       = Helper\ArrayHelper::get(1, $aMatches, 'text');
