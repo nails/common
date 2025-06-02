@@ -12,10 +12,8 @@
 
 namespace Nails\Common\Model;
 
-use Behat\Transliterator\Transliterator;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\ModelException;
-use Nails\Common\Exception\NailsException;
 use Nails\Common\Factory\Model\Field;
 use Nails\Common\Helper;
 use Nails\Common\Resource;
@@ -166,6 +164,12 @@ abstract class Base
      * @var string
      */
     const RESOURCE_PROVIDER = null;
+
+    /**
+     * The mapping of what type of object describeFields should use to identify a particular field
+     * Takes the format: 'field' => ['factoryKey', 'providerSlug]
+     */
+    const FIELD_CLASSES = [];
 
     /**
      * Any fields which should be considered sensitive
@@ -2725,7 +2729,22 @@ abstract class Base
         foreach ($aResult as $oField) {
 
             /** @var Field $oTemp */
-            $oTemp = Factory::factory('ModelField');
+            $oTemp = array_key_exists($oField->Field, static::FIELD_CLASSES)
+                ? Factory::factory(... static::FIELD_CLASSES[$oField->Field])
+                : Factory::factory('ModelField');
+
+            if (!$oTemp instanceof Field) {
+                throw new ModelException(
+                    sprintf(
+                        'Class %s is not a child of %s; defined for field %s::$%s;',
+                        $oTemp::class,
+                        Field::class,
+                        static::class,
+                        $oField->Field
+                    )
+                );
+            }
+
             $oTemp
                 ->setKey($oField->Field)
                 ->setLabel($this->describeFieldsPrepareLabel($oField->Field))
