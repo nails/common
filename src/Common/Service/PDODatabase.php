@@ -56,7 +56,7 @@ class PDODatabase
      * @return void
      * @throws ConnectionException
      */
-    public function connect($sDbHost = '', $sDbUser = '', $sDbPass = '', $sDbName = '', $sDbPort = '', $sDbCharset = '')
+    public function connect($sDbHost = '', $sDbUser = '', $sDbPass = '', $sDbName = '', $sDbPort = '', $sDbChar = '')
     {
         //  Close the connection if one is open
         if (!is_null($this->oDb)) {
