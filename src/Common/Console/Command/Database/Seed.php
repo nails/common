@@ -2,7 +2,6 @@
 
 namespace Nails\Common\Console\Command\Database;
 
-use Nails\Common\Helper\Directory;
 use Nails\Common\Interfaces;
 use Nails\Common\Service\PDODatabase;
 use Nails\Components;
@@ -239,7 +238,7 @@ class Seed extends Base
      *
      * @return \stdClass[]
      */
-    protected function filterSeeders(array $aSeeders, string $sComponent = null, string $sClass = null): array
+    protected function filterSeeders(array $aSeeders, ?string $sComponent = null, ?string $sClass = null): array
     {
         if ($sComponent) {
             $aSeeders = array_filter(

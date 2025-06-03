@@ -285,8 +285,8 @@ class Asset
     public function setBaseUrls(
         string $sBaseUrl,
         string $sBaseModuleUrl,
-        string $sBaseUrlSecure = null,
-        string $sBaseModuleUrlSecure = null
+        ?string $sBaseUrlSecure = null,
+        ?string $sBaseModuleUrlSecure = null
     ): self {
 
         $this->sBaseUrl = siteUrl($sBaseUrl);
@@ -343,7 +343,7 @@ class Asset
      * @return $this
      * @throws AssetException
      */
-    public function unload($mAssets, ?string $sAssetLocation = 'APP', string $sForceType = null): self
+    public function unload($mAssets, ?string $sAssetLocation = 'APP', ?string $sForceType = null): self
     {
         //  Cast as an array
         $aAssets = (array) $mAssets;
@@ -464,8 +464,8 @@ class Asset
      * @throws AssetException
      */
     public function unloadInline(
-        string $sScript = null,
-        string $sForceType = null,
+        ?string $sScript = null,
+        ?string $sForceType = null,
         string $sJsLocation = self::JS_LOCATION_FOOTER
     ): self {
 
@@ -672,11 +672,11 @@ class Asset
      */
     public function load(
         $mAssets,
-        string $sAssetLocation = null,
-        string $sForceType = null,
+        ?string $sAssetLocation = null,
+        ?string $sForceType = null,
         bool $bAsync = false,
         bool $bDefer = false,
-        bool $bModule = null
+        ?bool $bModule = null
     ): self {
 
         $aAssets        = (array) $mAssets;
@@ -733,7 +733,7 @@ class Asset
      * @return $this
      * @throws AssetException
      */
-    protected function loadUrl(string $sAsset, ?string $sForceType, bool $bAsync, bool $bDefer, bool $bModule = null): self
+    protected function loadUrl(string $sAsset, ?string $sForceType, bool $bAsync, bool $bDefer, ?bool $bModule = null): self
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -770,7 +770,7 @@ class Asset
      * @return $this
      * @throws AssetException
      */
-    protected function loadAbsolute(string $sAsset, ?string $sForceType, bool $bAsync, bool $bDefer, bool $bModule = null): self
+    protected function loadAbsolute(string $sAsset, ?string $sForceType, bool $bAsync, bool $bDefer, ?bool $bModule = null): self
     {
         $sType = $this->determineType($sAsset, $sForceType);
 
@@ -1018,7 +1018,7 @@ class Asset
      * @return $this
      * @throws AssetException
      */
-    public function inline($mScript = null, string $sForceType = null, $sJsLocation = self::JS_LOCATION_FOOTER): self
+    public function inline($mScript = null, ?string $sForceType = null, $sJsLocation = self::JS_LOCATION_FOOTER): self
     {
         if (!empty($mScript)) {
 
@@ -1089,7 +1089,7 @@ class Asset
      * @return $this
      * @throws AssetException
      */
-    protected function loadModule(string $sAsset, ?string $sForceType, bool $bAsync, bool $bDefer, bool $bModule = null, $mModule): self
+    protected function loadModule(string $sAsset, ?string $sForceType, bool $bAsync, bool $bDefer, ?bool $bModule, $mModule): self
     {
         if (is_array($mModule)) {
             $sModule   = !empty($mModule[0]) ? $mModule[0] : null;
@@ -1142,7 +1142,7 @@ class Asset
      * @return string
      * @throws AssetException
      */
-    protected function determineType(string $sAsset, string $sForceType = null): string
+    protected function determineType(string $sAsset, ?string $sForceType = null): string
     {
         //  Override if nessecary
         if (!empty($sForceType)) {
@@ -1268,7 +1268,7 @@ class Asset
      * @return $this
      * @throws AssetException
      */
-    protected function loadApp(string $sAsset, ?string $sForceType, bool $bAsync, bool $bDefer, bool $bModule = null): self
+    protected function loadApp(string $sAsset, ?string $sForceType, bool $bAsync, bool $bDefer, ?bool $bModule = null): self
     {
         $sType = $this->determineType($sAsset, $sForceType);
 

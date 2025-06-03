@@ -43,7 +43,7 @@ class Locale
      *
      * @param string $oLanguage The language to set
      */
-    public function __construct(Language $oLanguage = null, Region $oRegion = null, Script $oScript = null)
+    public function __construct(?Language $oLanguage = null, ?Region $oRegion = null, ?Script $oScript = null)
     {
         $this
             ->setLanguage($oLanguage)
@@ -60,7 +60,7 @@ class Locale
      *
      * @return $this
      */
-    public function setLanguage(Language $oLanguage = null): self
+    public function setLanguage(?Language $oLanguage = null): self
     {
         $this->oLanguage = $oLanguage;
         return $this;
@@ -87,7 +87,7 @@ class Locale
      *
      * @return $this
      */
-    public function setRegion(Region $oRegion = null): self
+    public function setRegion(?Region $oRegion = null): self
     {
         $this->oRegion = $oRegion;
         return $this;
@@ -114,7 +114,7 @@ class Locale
      *
      * @return $this
      */
-    public function setScript(Script $oScript = null): self
+    public function setScript(?Script $oScript = null): self
     {
         $this->oScript = $oScript;
         return $this;

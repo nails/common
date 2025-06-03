@@ -3,7 +3,6 @@
 namespace Nails\Common\Factory\Model\Field;
 
 use Nails\Common\Helper\Form;
-use Nails\Common\Factory\Model\Field;
 
 class WysiwygBasic extends Wysiwyg
 {

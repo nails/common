@@ -36,9 +36,9 @@ class Hooks extends CI_Hooks
     /**
      * Construct Hooks
      */
-    public function __construct()
+    public function __construct(\CI_Config $config)
     {
-        parent::__construct();
+        parent::__construct($config);
 
         /**
          * Add a pre-system hook which reverts the erorr handlers back to the Nails ones.

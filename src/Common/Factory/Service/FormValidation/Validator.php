@@ -15,6 +15,9 @@ use Nails\Factory;
  *
  * @package Nails\Common\Factory\FormValidation
  */
+
+//  Form Validation sets some dynamic props due to MX
+#[\AllowDynamicProperties]
 class Validator
 {
     /**
@@ -176,7 +179,7 @@ class Validator
      *
      * @return $this
      */
-    public function run(array $aData = null): Validator
+    public function run(?array $aData = null): Validator
     {
         if (empty($this->getRules())) {
             return $this;
@@ -237,7 +240,7 @@ class Validator
         }
 
         //  Execute the validation
-        if (!$oFormValidation->run($this)) {
+        if (!$oFormValidation->run(module: $this)) {
             $oException = new ValidationException(lang('fv_there_were_errors'));
             $oException->setData($this->getErrors());
             throw $oException;

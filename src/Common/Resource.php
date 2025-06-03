@@ -7,6 +7,7 @@ namespace Nails\Common;
  *
  * @package Nails\Common
  */
+#[\AllowDynamicProperties]
 class Resource
 {
     /**

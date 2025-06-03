@@ -24,14 +24,8 @@ if (!function_exists('valid_email')) {
             return (bool) filter_var($sAddress, FILTER_VALIDATE_EMAIL);
 
         } else {
-
-            $sPattern = "/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix";
+            $sPattern = "/^([a-z0-9+_\-]+)(\.[a-z0-9+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix";
             return (!preg_match($sPattern, $sAddress)) ? false : true;
         }
     }
 }
-
-// --------------------------------------------------------------------------
-
-//  Include the CodeIgniter original
-include NAILS_CI_SYSTEM_PATH . 'helpers/email_helper.php';

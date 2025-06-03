@@ -22,7 +22,7 @@ class Where
      * @param null      $mValue
      * @param bool|null $bEscape
      */
-    public function __construct(string $sColumn, $mValue = null, bool $bEscape = null)
+    public function __construct(string $sColumn, $mValue = null, ?bool $bEscape = null)
     {
         $this->sColumn = $sColumn;
         $this->mValue  = $mValue;

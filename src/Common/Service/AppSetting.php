@@ -92,7 +92,7 @@ class AppSetting
      * @return Resource\AppSetting[]|Resource\AppSetting|null
      * @throws FactoryException
      */
-    public function get(string $sKey = null, string $sGrouping = 'app', bool $bForceRefresh = false)
+    public function get(?string $sKey = null, string $sGrouping = 'app', bool $bForceRefresh = false)
     {
         if ($bForceRefresh) {
             $this->load();

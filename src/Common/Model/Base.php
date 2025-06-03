@@ -667,7 +667,7 @@ abstract class Base
      * @throws FactoryException
      * @throws ModelException
      */
-    protected function saveToDb(array $aData, int $iId = null): bool
+    protected function saveToDb(array $aData, ?int $iId = null): bool
     {
         /** @var Database $oDb */
         $oDb = Factory::service('Database');
@@ -2425,9 +2425,9 @@ abstract class Base
      */
     protected function hasOne(
         string $sTrigger,
-        string $sModel = null,
+        ?string $sModel = null,
         string $sProvider = 'app',
-        string $sLocalColumn = null,
+        ?string $sLocalColumn = null,
         array $aData = []
     ): self {
         return $this
@@ -2621,7 +2621,7 @@ abstract class Base
      *
      * @return string|null
      */
-    public function getColumn(string $sColumn, string $sDefault = null): ?string
+    public function getColumn(string $sColumn, ?string $sDefault = null): ?string
     {
         $sProperty = sprintf(
             'table%sColumn',
@@ -2677,6 +2677,8 @@ abstract class Base
      * @param string|null $sTable The database table to query
      *
      * @return Field[]
+     * @throws FactoryException
+     * @throws ModelException
      */
     public function describeFields($sTable = null)
     {

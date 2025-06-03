@@ -59,7 +59,7 @@ use Nails\Factory;
  * @method regex_match($str, $regex)
  * @method required($str)
  * @method reset_validation()
- * @method run($group = '')
+ * @method run($config = null, &$data = null, $module = '')
  * @method set_checkbox($field = '', $value = '', $default = false)
  * @method set_data(array $data)
  * @method set_error_delimiters($prefix = '<p>', $suffix = '</p>')
@@ -244,7 +244,7 @@ class FormValidation
      *
      * @return $this;
      */
-    public function setRule($mKey, string $sRule, string $sLabel = null): self
+    public function setRule($mKey, string $sRule, ?string $sLabel = null): self
     {
         if (is_array($mKey)) {
             foreach ($mKey as $sKey => $sRule) {
@@ -320,7 +320,7 @@ class FormValidation
      * @return Validator
      * @throws FactoryException
      */
-    public function buildValidator(array $aRules = [], array $aMessages = [], array $aData = null): Validator
+    public function buildValidator(array $aRules = [], array $aMessages = [], ?array $aData = null): Validator
     {
         $oInput = Factory::service('Input');
         return Factory::factory(
@@ -345,7 +345,7 @@ class FormValidation
      * @throws FactoryException
      * @throws ValidationException
      */
-    public function buildValidatorFromModel(Base $oModel, array $aMessages = [], array $aData = null): Validator
+    public function buildValidatorFromModel(Base $oModel, array $aMessages = [], ?array $aData = null): Validator
     {
         $oValidator = $this->buildValidator([], $aMessages, $aData);
         return $oValidator->setRulesFromModel($oModel);

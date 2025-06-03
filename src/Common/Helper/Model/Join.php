@@ -26,7 +26,7 @@ class Join
      *
      * @param string $sTable
      */
-    public function __construct(string $sTable, string $sOn, string $sType = null)
+    public function __construct(string $sTable, string $sOn, ?string $sType = null)
     {
         $this->sTable = $sTable;
         $this->sOn    = $sOn;

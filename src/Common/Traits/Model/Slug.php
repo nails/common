@@ -34,7 +34,7 @@ trait Slug
      *
      * @return string|null
      */
-    abstract public function getColumn(string $sColumn, string $sDefault = null): ?string;
+    abstract public function getColumn(string $sColumn, string $sDefault = null): ?string;?
 
     // --------------------------------------------------------------------------
 
@@ -146,7 +146,7 @@ trait Slug
      * @return $this
      * @throws ModelException
      */
-    protected function setDataSlug(array &$aData, bool $bIsCreate = true, int $iIgnoreId = null): self
+    protected function setDataSlug(array &$aData, bool $bIsCreate = true, ?int $iIgnoreId = null): self
     {
         if ($this->isAutoSetSlugs() &&
             empty($aData[$this->getColumnSlug()]) &&
@@ -228,7 +228,7 @@ trait Slug
      * @return string
      * @throws ModelException
      */
-    protected function generateSlug(array $aData = [], int $iIgnoreId = null)
+    protected function generateSlug(array $aData = [], ?int $iIgnoreId = null)
     {
         $sSlug    = $this->generateSlugBase($aData);
         $iCounter = 0;
@@ -257,7 +257,7 @@ trait Slug
      * @return string
      * @throws ModelException
      */
-    protected function generateSlugBase(array $aData, string $sKey = null): string
+    protected function generateSlugBase(array $aData, ?string $sKey = null): string
     {
         $sKey = $sKey ?? $this->getColumnSlugSource();
 
@@ -288,7 +288,7 @@ trait Slug
      * @throws FactoryException
      * @throws ModelException
      */
-    public function isValidSlug(string $sSlug, int $iIgnoreId = null, array $aData = []): bool
+    public function isValidSlug(string $sSlug, ?int $iIgnoreId = null, array $aData = []): bool
     {
         /** @var Database $oDb */
         $oDb = Factory::service('Database');

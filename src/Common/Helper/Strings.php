@@ -140,7 +140,7 @@ class Strings
      *
      * @return string
      */
-    public static function generateToken(string $sMask = null, array $aChars = [], array $aDigits = []): string
+    public static function generateToken(?string $sMask = null, array $aChars = [], array $aDigits = []): string
     {
         $sMask   = empty($sMask) ? 'AAAA-AAAA-AAAA-AAAA-AAAA-AAAA' : $sMask;
         $aChars  = empty($aChars) ? str_split('abcdefghijklmnopqrstuvwxyz') : $aChars;
@@ -235,7 +235,7 @@ class Strings
      *
      * @return string
      */
-    public static function mask(string $sInput, $iMaskLength = null, string $sMask = null): string
+    public static function mask(string $sInput, $iMaskLength = null, ?string $sMask = null): string
     {
         $iMaskLength = $iMaskLength ?? 0.75;
         $sMask       = $sMask ?? '*';
@@ -258,7 +258,7 @@ class Strings
      *
      * @return string[]
      */
-    public static function toArray(string $sInput, array $aDeliminators = null, array $aFormatters = null): array
+    public static function toArray(string $sInput, ?array $aDeliminators = null, ?array $aFormatters = null): array
     {
         foreach ($aDeliminators ?? ["\r", "\n", ';'] as $sDeliminator) {
             $sInput = str_replace($sDeliminator, ',', $sInput);

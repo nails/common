@@ -143,8 +143,8 @@ class Testing
         Bootstrap::setBaseDirectory(dirname($sFile));
         Bootstrap::setNailsConstants();
         Bootstrap::setCodeIgniterConstants(
-            realpath(dirname($sFile) . '/../vendor/codeigniter/framework/system'),
-            realpath(dirname($sFile) . '/../vendor/codeigniter/framework/application')
+            realpath(dirname($sFile) . '/../vendor/pocketarc/codeigniter/system'),
+            realpath(dirname($sFile) . '/../vendor/pocketarc/codeigniter/application')
         );
         Factory::setup();
         Factory::autoload();

@@ -253,3 +253,4 @@ $RECYCLE.BIN/
 !src/Common/Console/Command/Logs
 !src/Common/Cron/Task/Logs
 cache
+resources/mime-db/db.json

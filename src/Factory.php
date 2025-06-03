@@ -668,8 +668,8 @@ class Factory
     private static function destroyServiceOrModel(
         array &$aTrackerArray,
         ?string $sKey,
-        string $sName = null,
-        string $sComponent = null
+        ?string $sName = null,
+        ?string $sComponent = null
     ): bool {
         if (!$sKey) {
             $sKey = md5($sComponent . $sName);
@@ -693,7 +693,7 @@ class Factory
      *
      * @return array
      */
-    public static function listKeys(string $sType = null, string $sComponent = null): array
+    public static function listKeys(?string $sType = null, ?string $sComponent = null): array
     {
         $aOut = [];
 

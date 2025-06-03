@@ -81,7 +81,7 @@ class Profiler
      *
      * @param string|null $sLabel
      */
-    public static function mark(string $sLabel = null): void
+    public static function mark(?string $sLabel = null): void
     {
         if (static::isEnabled()) {
 

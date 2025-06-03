@@ -44,7 +44,7 @@ class Url
      * @return string
      * @throws FactoryException
      */
-    public static function siteUrl(string $sUrl = null, bool $bForceSecure = false): string
+    public static function siteUrl(?string $sUrl = null, bool $bForceSecure = false): string
     {
         /** @var \Nails\Common\Service\Config $oConfig */
         $oConfig = Factory::service('Config');
@@ -70,7 +70,7 @@ class Url
      * @throws FactoryException
      * @throws NailsException
      */
-    public static function redirect(string $sUrl = null, string $sMethod = 'location', ?int $iHttpResponseCode = null): void
+    public static function redirect(?string $sUrl = null, string $sMethod = 'location', ?int $iHttpResponseCode = null): void
     {
         /**
          * Call the Bootstrap::shutdown method, the system will be killed in approximately 13
@@ -120,7 +120,7 @@ class Url
      *
      * @return string
      */
-    public static function tel(string $sUrl = null, string $sTitle = null, string $sAttributes = ''): string
+    public static function tel(?string $sUrl = null, string $sTitle = null, string $sAttributes = ''): string
     {
         $sTitle = empty($sTitle) ? $sUrl : $sTitle;
         $sUrl   = preg_replace('/[^+0-9]/', '', $sUrl);

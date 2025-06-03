@@ -114,7 +114,7 @@ class Config
      * @return string
      * @throws FactoryException
      */
-    public static function siteUrl(string $sUri = null, bool $bUseSecure = false): string
+    public static function siteUrl(?string $sUri = null, bool $bUseSecure = false): string
     {
         if (preg_match('/^(https?:\/\/|#)/', $sUri ?? '')) {
             //  Absolute URI; return unaltered

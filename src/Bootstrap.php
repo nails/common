@@ -14,7 +14,6 @@ namespace Nails;
 use Nails\Common\Events;
 use Nails\Common\Exception\EnvironmentException;
 use Nails\Common\Service\ErrorHandler;
-use Nails\Common\Service\FileCache;
 use Nails\Common\Service\Profiler;
 use Nails\Common\Service\Routes;
 
@@ -90,6 +89,7 @@ final class Bootstrap
             \App\Events::preSystem();
         }
 
+        Config::dotenv();
         //  @todo (Pablo - 2020-03-02) - Remove; app and deploy config files are deprecated
         self::loadConfig('app');
         self::loadConfig('deploy');
@@ -191,8 +191,8 @@ final class Bootstrap
         Config::default('NAILS_PATH', self::$sBaseDirectory . 'vendor/nails/');
         Config::default('NAILS_APP_PATH', self::$sBaseDirectory);
         Config::default('NAILS_COMMON_PATH', Config::get('NAILS_PATH') . 'common/');
-        Config::default('NAILS_CI_APP_PATH', self::$sBaseDirectory . 'vendor/codeigniter/framework/application/');
-        Config::default('NAILS_CI_SYSTEM_PATH', self::$sBaseDirectory . 'vendor/codeigniter/framework/system/');
+        Config::default('NAILS_CI_APP_PATH', self::$sBaseDirectory . 'vendor/pocketarc/codeigniter/framework/application/');
+        Config::default('NAILS_CI_SYSTEM_PATH', self::$sBaseDirectory . 'vendor/pocketarc/codeigniter/framework/system/');
 
         //  So CodeIgniter configures itself correctly
         Config::default('BASEPATH', Config::get('NAILS_CI_SYSTEM_PATH'));
@@ -229,25 +229,8 @@ final class Bootstrap
         Environment::isValid(Config::get('ENVIRONMENT'));
 
         //  Database
-        //  @todo (Pablo - 2018-11-16) - Move these to the database service
-
-        //  Consistent between deployments
-        Config::default('APP_DB_DRIVER', 'mysqli');
-        Config::default('APP_DB_GLOBAL_PREFIX', '');
-        Config::default('APP_DB_PCONNECT', true);
-        Config::default('APP_DB_CACHE', false);
-        Config::default('APP_DB_CHARSET', 'utf8mb4');
-        Config::default('APP_DB_DBCOLLAT', 'utf8mb4_unicode_ci');
-        Config::default('APP_DB_STRICT', true);
         Config::default('NAILS_DB_PREFIX', 'nails_');
         Config::default('APP_DB_PREFIX', 'app_');
-
-        //  Potentially vary between deployments
-        Config::default('DB_HOST', '127.0.0.1');
-        Config::default('DB_USERNAME');
-        Config::default('DB_PASSWORD');
-        Config::default('DB_DATABASE');
-        Config::default('DB_PORT', 3306);
 
         //  App
         Config::default('APP_NAME', 'Nails');
@@ -303,7 +286,7 @@ final class Bootstrap
          * Set the path if it is not in the same directory as this file.
          */
         if (empty($sSystemPath)) {
-            $system_path = self::$sBaseDirectory . 'vendor/codeigniter/framework/system';
+            $system_path = self::$sBaseDirectory . 'vendor/pocketarc/codeigniter/framework/system';
         } else {
             $system_path = $sSystemPath;
         }

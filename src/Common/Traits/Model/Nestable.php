@@ -23,7 +23,7 @@ trait Nestable
      *
      * @return string|null
      */
-    abstract public function getColumn(string $sColumn, string $sDefault = null): ?string;
+    abstract public function getColumn(string $sColumn, ?string $sDefault = null): ?string;
 
     // --------------------------------------------------------------------------
 
@@ -338,7 +338,7 @@ trait Nestable
      * @return array
      * @todo (Pablo - 2019-05-10) - Support building partial trees
      */
-    public function buildTree(array $aItems, int $iParentId = null): array
+    public function buildTree(array $aItems, ?int $iParentId = null): array
     {
         $aTemp         = [];
         $sIdColumn     = $this->getColumnId();

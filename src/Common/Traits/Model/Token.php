@@ -42,7 +42,7 @@ trait Token
      *
      * @return string|null
      */
-    abstract public function getColumn(string $sColumn, string $sDefault = null): ?string;
+    abstract public function getColumn(string $sColumn, ?string $sDefault = null): ?string;
 
     // --------------------------------------------------------------------------
 
@@ -178,7 +178,7 @@ trait Token
      * @throws FactoryException
      * @throws ModelException
      */
-    protected function generateToken(string $sMask = null, string $sTable = null, string $sColumn = null): string
+    protected function generateToken(?string $sMask = null, ?string $sTable = null, ?string $sColumn = null): string
     {
         $sMask   = $sMask ?? $this->getTokenMask();
         $sTable  = $sTable ?? $this->getTableName();
