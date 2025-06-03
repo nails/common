@@ -27,7 +27,7 @@ if (!function_exists('appSetting')) {
      * @return mixed
      * @throws FactoryException
      */
-    function appSetting(string $sKey = null, string $sGrouping = 'app', $mDefault = null, $bForceRefresh = false)
+    function appSetting(?string $sKey = null, string $sGrouping = 'app', $mDefault = null, $bForceRefresh = false)
     {
         /** @var AppSetting $oAppSettingService */
         $oAppSettingService = Factory::service('AppSetting');

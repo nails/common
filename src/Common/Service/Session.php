@@ -163,7 +163,7 @@ class Session
      *
      * @return mixed
      */
-    public function getUserData(string $sKey = null)
+    public function getUserData(?string $sKey = null)
     {
         if (empty($sKey)) {
             return $this->oSession->all();

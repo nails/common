@@ -2,7 +2,7 @@
 
 namespace Nails\Common\Service;
 
-use MimeTyper\Repository\MimeDbRepository;
+use Nails\Common\Exception\MimeException;
 use Nails\Common\Helper\ArrayHelper;
 use Symfony\Component\Mime\MimeTypesInterface;
 
@@ -32,9 +32,9 @@ class Mime
     /**
      * The mime databse
      *
-     * @var MimeDbRepository
+     * @var array
      */
-    protected $oDatabase;
+    protected $aDatabase;
 
     /**
      * The mime detector
@@ -48,32 +48,34 @@ class Mime
      *
      * @var string[]
      */
-    protected static $aMapExtensionToMimes;
+    protected static $aMapExtensionToMimes = [];
 
     /**
      * A map of mime types and their valid extensions
      *
      * @var string[]
      */
-    protected static $aMapMimeToExtensions;
+    protected static $aMapMimeToExtensions = [];
 
     // --------------------------------------------------------------------------
 
     /**
      * Mime constructor.
      *
-     * @param MimeDbRepository   $oDatabase The mime database to use
+     * @param string             $sDatabase The mime database to use
      * @param MimeTypesInterface $oDetector The mime detector to use
      */
     public function __construct(
-        MimeDbRepository $oDatabase,
+        string $sDatabase,
         MimeTypesInterface $oDetector
     ) {
-        $this->oDatabase = $oDatabase;
+
         $this->oDetector = $oDetector;
 
-        static::$aMapExtensionToMimes = $oDatabase->dumpExtensionToType();
-        static::$aMapMimeToExtensions = $oDatabase->dumpTypeToExtensions();
+        $this
+            ->loadDatabase($sDatabase)
+            ->mapExtensionToType()
+            ->mapTypeToExtensions();
 
         if (file_exists(static::APP_MIME_FILE)) {
             include static::APP_MIME_FILE;
@@ -88,6 +90,60 @@ class Mime
         foreach ($mimes as $sExtension => $mMimes) {
             $this->addExtension($sExtension, (array) $mMimes);
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    protected function loadDatabase(string $sPath): self
+    {
+        if (!file_exists($sPath)) {
+            throw new MimeException('Mime DB not found at ' . $sPath);
+        }
+
+        $aMimeDb = json_decode(file_get_contents($sPath), true);
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new MimeException('Error parsing Mime DB: ' . json_last_error_msg());
+        }
+
+        $aMimeDbExtensions = array_map(
+            function ($type) {
+                return $type['extensions'] ?? [];
+            },
+            array_values($aMimeDb)
+        );
+
+        $this->aDatabase = array_combine(array_keys($aMimeDb), $aMimeDbExtensions);
+
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    protected function mapExtensionToType(): self
+    {
+        foreach ($this->aDatabase as $mime => $extensions) {
+            foreach ($extensions as $extension) {
+                if (!array_key_exists($extension, static::$aMapExtensionToMimes)) {
+                    static::$aMapExtensionToMimes[$extension] = [];
+                }
+                static::$aMapExtensionToMimes[$extension][] = $mime;
+            }
+        }
+
+        foreach (static::$aMapExtensionToMimes as &$extensions) {
+            $extensions = array_unique($extensions);
+        }
+
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    protected function mapTypeToExtensions(): self
+    {
+        static::$aMapMimeToExtensions = $this->aDatabase;
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -130,7 +186,7 @@ class Mime
 
     // --------------------------------------------------------------------------
 
-    public function getMimeGroups(array $aRestrictToMimes = null): array
+    public function getMimeGroups(?array $aRestrictToMimes = null): array
     {
         $aMimeMap = $this->getMimeMap();
         $aGroups  = [

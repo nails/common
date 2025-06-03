@@ -12,10 +12,8 @@
 
 namespace Nails\Common\Model;
 
-use Behat\Transliterator\Transliterator;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\ModelException;
-use Nails\Common\Exception\NailsException;
 use Nails\Common\Factory\Model\Field;
 use Nails\Common\Helper;
 use Nails\Common\Resource;
@@ -166,6 +164,12 @@ abstract class Base
      * @var string
      */
     const RESOURCE_PROVIDER = null;
+
+    /**
+     * The mapping of what type of object describeFields should use to identify a particular field
+     * Takes the format: 'field' => ['factoryKey', 'providerSlug]
+     */
+    const FIELD_CLASSES = [];
 
     /**
      * Any fields which should be considered sensitive
@@ -663,7 +667,7 @@ abstract class Base
      * @throws FactoryException
      * @throws ModelException
      */
-    protected function saveToDb(array $aData, int $iId = null): bool
+    protected function saveToDb(array $aData, ?int $iId = null): bool
     {
         /** @var Database $oDb */
         $oDb = Factory::service('Database');
@@ -2421,9 +2425,9 @@ abstract class Base
      */
     protected function hasOne(
         string $sTrigger,
-        string $sModel = null,
+        ?string $sModel = null,
         string $sProvider = 'app',
-        string $sLocalColumn = null,
+        ?string $sLocalColumn = null,
         array $aData = []
     ): self {
         return $this
@@ -2617,7 +2621,7 @@ abstract class Base
      *
      * @return string|null
      */
-    public function getColumn(string $sColumn, string $sDefault = null): ?string
+    public function getColumn(string $sColumn, ?string $sDefault = null): ?string
     {
         $sProperty = sprintf(
             'table%sColumn',
@@ -2725,7 +2729,24 @@ abstract class Base
         foreach ($aResult as $oField) {
 
             /** @var Field $oTemp */
-            $oTemp = Factory::factory('ModelField');
+            $oTemp = array_key_exists($oField->Field, static::FIELD_CLASSES)
+                ? is_array(static::FIELD_CLASSES[$oField->Field])
+                    ? Factory::factory(... static::FIELD_CLASSES[$oField->Field])
+                    : Factory::factory(static::FIELD_CLASSES[$oField->Field])
+                : Factory::factory('ModelField');
+
+            if (!$oTemp instanceof Field) {
+                throw new ModelException(
+                    sprintf(
+                        'Class %s is not a child of %s; defined for field %s::$%s;',
+                        $oTemp::class,
+                        Field::class,
+                        static::class,
+                        $oField->Field
+                    )
+                );
+            }
+
             $oTemp
                 ->setKey($oField->Field)
                 ->setLabel($this->describeFieldsPrepareLabel($oField->Field))
@@ -2786,6 +2807,11 @@ abstract class Base
      */
     protected function describeFieldsGuessType(Field &$oField, \stdClass $oDbField): self
     {
+        //  If a custom class has been defined then do not guess.
+        if ($oField::class !== Field::class) {
+            return $this;
+        }
+
         preg_match('/^(.*?)(\((.+?)\)(.*))?$/', $oDbField->Type, $aMatches);
 
         $sType       = Helper\ArrayHelper::get(1, $aMatches, 'text');

@@ -139,7 +139,7 @@ class Output
      *
      * @return $this
      */
-    public function setContentType(string $sMimeType, string $sCharset = null): self
+    public function setContentType(string $sMimeType, ?string $sCharset = null): self
     {
         $this->oOutput->set_content_type($sMimeType, $sCharset);
         return $this;

@@ -22,7 +22,7 @@ class AccessibleByUrl extends Driver implements Interfaces\Service\FileCache\Dri
 
     // --------------------------------------------------------------------------
 
-    public function __construct(string $sDir = null, string $sUrl = null)
+    public function __construct(?string $sDir = null, ?string $sUrl = null)
     {
         parent::__construct($sDir);
         $this->sUrl = Strings::addTrailingSlash($sUrl);
@@ -37,7 +37,7 @@ class AccessibleByUrl extends Driver implements Interfaces\Service\FileCache\Dri
      *
      * @return string
      */
-    public function getUrl(string $sKey = null): string
+    public function getUrl(?string $sKey = null): string
     {
         $sUrl = rtrim($this->sUrl, '/');
         $sUrl .= $sKey ? '/' . $sKey : '';

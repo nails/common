@@ -66,14 +66,14 @@ if (!function_exists('prosaicList')) {
 }
 
 if (!function_exists('mask')) {
-    function mask(string $sInput, $iMaskLength = null, string $sMask = null): string
+    function mask(string $sInput, $iMaskLength = null, ?string $sMask = null): string
     {
         return Strings::mask($sInput, $iMaskLength, $sMask);
     }
 }
 
 if (!function_exists('toArray')) {
-    function toArray(string $sInput, array $aDeliminators = null, array $aFormatters = null): array
+    function toArray(string $sInput, ?array $aDeliminators = null, ?array $aFormatters = null): array
     {
         return Strings::toArray($sInput, $aDeliminators, $aFormatters);
     }

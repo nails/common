@@ -10,7 +10,7 @@ if (!function_exists('timecodeToSeconds')) {
 }
 
 if (!function_exists('secondsToTimecode')) {
-    function secondsToTimecode(int $iSeconds, string $sSeparator = null): string
+    function secondsToTimecode(int $iSeconds, ?string $sSeparator = null): string
     {
         return Timecode::toTimecode($iSeconds, $sSeparator);
     }

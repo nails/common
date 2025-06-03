@@ -22,11 +22,11 @@ if (!function_exists('deleteDir')) {
 if (!function_exists('directoryMap')) {
     function directoryMap(
         string $sPath,
-        int $iMaxDepth = null,
+        ?int $iMaxDepth = null,
         bool $bAbsolutePath = true,
         bool $bIncludeHidden = false,
         int $iCurrentDepth = 0,
-        string $sInitialPath = null,
+        ?string $sInitialPath = null,
         array &$aResults = []
     ): array {
         return Directory::map(

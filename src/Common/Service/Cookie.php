@@ -94,7 +94,7 @@ class Cookie
     public function write(
         string $sKey,
         string $sValue,
-        int $iTTL = null,
+        ?int $iTTL = null,
         string $sPath = '',
         string $sDomain = '',
         bool $bSecure = false,

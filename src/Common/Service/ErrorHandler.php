@@ -45,7 +45,6 @@ class ErrorHandler
         E_USER_ERROR      => 'User Error',
         E_USER_WARNING    => 'User Warning',
         E_USER_NOTICE     => 'User Notice',
-        E_STRICT          => 'Runtime Notice',
     ];
 
     /*
@@ -322,8 +321,8 @@ class ErrorHandler
      * @throws ViewNotFoundException
      */
     public function show401(
-        string $sFlashMessage = null,
-        string $sReturnUrl = null,
+        ?string $sFlashMessage = null,
+        ?string $sReturnUrl = null,
         bool $bLogError = true,
         bool $bForceView = false
     ): void {
@@ -412,7 +411,7 @@ class ErrorHandler
             : HttpCodes::STATUS_INTERNAL_SERVER_ERROR;
 
         //  Stops cascading errors if CI isn't available
-        if (!class_exists('MX_LANG')) {
+        if (!class_exists('CI_Lang') || !class_exists('MX_Lang')) {
 
             $sSubject = getFromArray('sSubject', $aData);
             $sMessage = getFromArray('sMessage', $aData);

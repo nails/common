@@ -144,7 +144,7 @@ class Locale
      */
     public function __construct(
         Input $oInput,
-        \Nails\Common\Factory\Locale $oLocale = null
+        ?\Nails\Common\Factory\Locale $oLocale = null
     ) {
         $this->oInput = $oInput;
 
@@ -221,7 +221,7 @@ class Locale
      *
      * @return \Nails\Common\Factory\Locale
      */
-    public function sniffLocale(\Nails\Common\Factory\Locale $oLocale = null): \Nails\Common\Factory\Locale
+    public function sniffLocale(?\Nails\Common\Factory\Locale $oLocale = null): \Nails\Common\Factory\Locale
     {
         if (!$oLocale) {
             $oLocale = $this->getDefautLocale();
@@ -407,7 +407,7 @@ class Locale
      *
      * @param \Nails\Common\Factory\Locale $oLocale
      */
-    public function set(\Nails\Common\Factory\Locale $oLocale = null): self
+    public function set(?\Nails\Common\Factory\Locale $oLocale = null): self
     {
         $this->oLocale = $oLocale;
         return $this;

@@ -125,7 +125,7 @@ class Routes
      * @return bool
      * @throws \Exception
      */
-    public function update(string $sModule = null, OutputInterface $oOutput = null)
+    public function update(?string $sModule = null, ?OutputInterface $oOutput = null)
     {
         if ($this->bIgnoreRewriteRequests) {
             return true;

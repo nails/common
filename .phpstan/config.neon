@@ -7,7 +7,7 @@ parameters:
     bootstrapFiles:
         - constants.php
     scanDirectories:
-        - ../vendor/codeigniter/framework/system/core
-        - ../vendor/codeigniter/framework/system/libraries
-        - ../vendor/codeigniter/framework/system/database
-        - ../vendor/codeigniter/framework/system/helpers
+        - ../vendor/pocketarc/codeigniter/system/core
+        - ../vendor/pocketarc/codeigniter/system/libraries
+        - ../vendor/pocketarc/codeigniter/system/database
+        - ../vendor/pocketarc/codeigniter/system/helpers

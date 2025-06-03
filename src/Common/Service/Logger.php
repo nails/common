@@ -50,7 +50,7 @@ class Logger
      * @return $this
      * @throws FactoryException
      */
-    public function line($sLine = '', string $sType = null): self
+    public function line($sLine = '', ?string $sType = null): self
     {
         $this->oLogger->line($sLine);
         return $this;

@@ -37,14 +37,14 @@ class FormValidation extends CI_Form_validation
      *
      * @return bool
      */
-    public function run($module = '', $group = '')
+    public function run($config = null, &$data = null, $module = '')
     {
         if (is_object($module)) {
             $this->CI        = &$module;
             $this->CI->input = get_instance()->input;
             $this->CI->lang  = get_instance()->lang;
         }
-        return parent::run($group);
+        return parent::run($config, $data);
     }
 
     // --------------------------------------------------------------------------
@@ -60,6 +60,17 @@ class FormValidation extends CI_Form_validation
             array_keys($this->_field_data),
             arrayExtractProperty($this->_field_data, 'rules')
         );
+    }
+
+    // --------------------------------------------------------------------------
+
+    public function set_rules($field, $label = null, $rules = null, $errors = [])
+    {
+        if (empty($field) || empty($rules)) {
+            //  Nothing to do and parent method will throw an exception
+            return $this;
+        }
+        parent::set_rules($field, $label, $rules, $errors);
     }
 
     // --------------------------------------------------------------------------
@@ -1021,7 +1032,6 @@ class FormValidation extends CI_Form_validation
      *
      * @return boolean
      * @todo  provide this from within the CDN module
-     *
      */
     public function cdnObjectPickerMultiObjectRequired($aValues)
     {
@@ -1047,7 +1057,6 @@ class FormValidation extends CI_Form_validation
      *
      * @return boolean
      * @todo  provide this from within the CDN module
-     *
      */
     public function cdnObjectPickerMultiLabelRequired($aValues)
     {
@@ -1073,7 +1082,6 @@ class FormValidation extends CI_Form_validation
      *
      * @return boolean
      * @todo  provide this from within the CDN module
-     *
      */
     public function cdnObjectPickerMultiAllRequired($aValues)
     {

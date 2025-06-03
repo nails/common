@@ -20,7 +20,7 @@ class WhereIn
      * @param string     $sColumn
      * @param array|null $aValues
      */
-    public function __construct(string $sColumn, array $aValues = null)
+    public function __construct(string $sColumn, ?array $aValues = null)
     {
         $this->sColumn = $sColumn;
         $this->aValues = $aValues;

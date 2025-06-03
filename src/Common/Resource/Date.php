@@ -157,16 +157,6 @@ class Date extends Resource
     // --------------------------------------------------------------------------
 
     /**
-     * The __wakeup handler
-     */
-    public function __wakeup()
-    {
-        $this->oDateObj->__wakeup();
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
      * Returns whether the date is before the supplied date
      *
      * @param \DateTime|self $oCompareWith The date to compare with

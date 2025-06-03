@@ -19,7 +19,7 @@ trait Sortable
      *
      * @return string|null
      */
-    abstract public function getColumn(string $sColumn, string $sDefault = null): ?string;
+    abstract public function getColumn(string $sColumn, ?string $sDefault = null): ?string;
 
     // --------------------------------------------------------------------------
 
