@@ -118,6 +118,10 @@
                         "35x35"
                     ]
                 }
+            },
+            "scripts":
+            {
+                "install": "./scripts/install-mime-db.sh"
             }
         }
     }
