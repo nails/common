@@ -143,9 +143,58 @@ class ErrorHandler
      */
     public static function setHandlers(): void
     {
-        set_error_handler(static::getDriverClass() . '::error');
-        set_exception_handler(static::getDriverClass() . '::exception');
-        register_shutdown_function(static::getDriverClass() . '::fatal');
+        set_error_handler(static::class . '::handleError');
+        set_exception_handler(static::class . '::handleException');
+        register_shutdown_function(static::class . '::handleFatal');
+    }
+
+    // --------------------------------------------------------------------------
+
+    public static function handleError($iErrorNumber, $sErrorString, $sErrorFile, $iErrorLine): void
+    {
+        if (!Factory::isReady()) {
+            static::halt(sprintf(
+                '%s: %s in file: %s on line: %d',
+                $iErrorNumber,
+                $sErrorString,
+                $sErrorFile,
+                $iErrorLine
+            ), 'Error');
+        } else {
+            static::getDriverClass()::error($iErrorNumber, $sErrorString, $sErrorFile, $iErrorLine);
+        }
+    }
+
+    public static function handleException($oException, $bHaltExecution = true): void
+    {
+        if (!Factory::isReady()) {
+            static::halt(sprintf(
+                'Uncaught %s Exception: code %s in file: %s on line: %s',
+                get_class($oException),
+                $oException->getCode(),
+                $oException->getFile(),
+                $oException->getLine()
+            ), 'Uncaught Exception');
+        } else {
+            static::getDriverClass()::exception($oException, $bHaltExecution);
+        }
+    }
+
+    public static function handleFatal(): void
+    {
+        if (!Factory::isReady()) {
+            $aError = error_get_last();
+            if (!is_null($aError) && $aError['type'] === E_ERROR) {
+                static::halt(sprintf(
+                    '%s in file: %s on line: %d',
+                    $aError['message'],
+                    $aError['file'],
+                    $aError['line']
+                ), 'Fatal Error');
+            }
+        } else {
+            static::getDriverClass()::fatal();
+        }
     }
 
     // --------------------------------------------------------------------------

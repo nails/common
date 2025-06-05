@@ -31,6 +31,13 @@ class Factory
     // --------------------------------------------------------------------------
 
     /**
+     * Whether the Factory is ready to begin accepting requests/has been set up
+     *
+     * @var bool
+     */
+    private static bool $bIsReady = false;
+
+    /**
      * Contains an array of containers; each component gets its own element so as
      * to avoid naming collisions.
      *
@@ -170,6 +177,20 @@ class Factory
                 }
             }
         }
+
+        static::$bIsReady = true;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Whether the Factory is ready to begin accepting requests/has been set up
+     *
+     * @return bool
+     */
+    public static function isReady(): bool
+    {
+        return static::$bIsReady;
     }
 
     // --------------------------------------------------------------------------
