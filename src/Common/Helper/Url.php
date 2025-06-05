@@ -120,7 +120,7 @@ class Url
      *
      * @return string
      */
-    public static function tel(?string $sUrl = null, string $sTitle = null, string $sAttributes = ''): string
+    public static function tel(?string $sUrl = null, ?string $sTitle = null, string $sAttributes = ''): string
     {
         $sTitle = empty($sTitle) ? $sUrl : $sTitle;
         $sUrl   = preg_replace('/[^+0-9]/', '', $sUrl);
