@@ -191,8 +191,8 @@ final class Bootstrap
         Config::default('NAILS_PATH', self::$sBaseDirectory . 'vendor/nails/');
         Config::default('NAILS_APP_PATH', self::$sBaseDirectory);
         Config::default('NAILS_COMMON_PATH', Config::get('NAILS_PATH') . 'common/');
-        Config::default('NAILS_CI_APP_PATH', self::$sBaseDirectory . 'vendor/pocketarc/codeigniter/framework/application/');
-        Config::default('NAILS_CI_SYSTEM_PATH', self::$sBaseDirectory . 'vendor/pocketarc/codeigniter/framework/system/');
+        Config::default('NAILS_CI_APP_PATH', self::$sBaseDirectory . 'vendor/pocketarc/codeigniter/application/');
+        Config::default('NAILS_CI_SYSTEM_PATH', self::$sBaseDirectory . 'vendor/pocketarc/codeigniter/system/');
 
         //  So CodeIgniter configures itself correctly
         Config::default('BASEPATH', Config::get('NAILS_CI_SYSTEM_PATH'));
@@ -286,7 +286,7 @@ final class Bootstrap
          * Set the path if it is not in the same directory as this file.
          */
         if (empty($sSystemPath)) {
-            $system_path = self::$sBaseDirectory . 'vendor/pocketarc/codeigniter/framework/system';
+            $system_path = self::$sBaseDirectory . 'vendor/pocketarc/codeigniter/system';
         } else {
             $system_path = $sSystemPath;
         }
