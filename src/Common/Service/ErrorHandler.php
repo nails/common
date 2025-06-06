@@ -268,7 +268,7 @@ class ErrorHandler
      * @throws ReflectionException
      * @throws ViewNotFoundException
      */
-    public function showFatalErrorScreen($sSubject = '', $sMessage = '', $oDetails = null)
+    public function showFatalErrorScreen($sSubject = '', $sMessage = '', $oDetails = null, ?array $aTrace = null)
     {
         if (is_array($sMessage)) {
             $sMessage = implode("\n", $sMessage);
@@ -285,12 +285,7 @@ class ErrorHandler
             ];
         }
 
-        //  Get the backtrace
-        if (function_exists('debug_backtrace')) {
-            $oDetails->backtrace = debug_backtrace();
-        } else {
-            $oDetails->backtrace = [];
-        }
+        $oDetails->backtrace = $aTrace ?? (function_exists('debug_backtrace') ? debug_backtrace() : null);
 
         set_status_header(HttpCodes::STATUS_INTERNAL_SERVER_ERROR);
         $this->renderErrorView(
