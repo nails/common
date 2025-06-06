@@ -126,12 +126,16 @@ class Rebuild extends Base
 
         // --------------------------------------------------------------------------
 
-        $oOutput->writeln('The following database tables will be dropped, and migrations run.');
-        $oOutput->writeln('');
-        foreach ($aTables as $sTable) {
-            $oOutput->writeln(' - <comment>' . $sTable . '</comment>');
+        if (!empty($aTables)) {
+            $oOutput->writeln('The following database tables will be dropped, and migrations run.');
+            $oOutput->writeln('');
+            foreach ($aTables as $sTable) {
+                $oOutput->writeln(' - <comment>' . $sTable . '</comment>');
+            }
+            $oOutput->writeln('');
+        } else {
+            $oOutput->writeln('No existing database tables were found, no tables will be dropped.');
         }
-        $oOutput->writeln('');
 
         if ($this->confirm('Continue?', true)) {
             $oOutput->writeln('');
