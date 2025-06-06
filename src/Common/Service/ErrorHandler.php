@@ -285,7 +285,8 @@ class ErrorHandler
             ];
         }
 
-        $oDetails->backtrace = $aTrace ?? (function_exists('debug_backtrace') ? debug_backtrace() : null);
+        $aTrace              = $aTrace ?? (function_exists('debug_backtrace') ? debug_backtrace() : null);
+        $oDetails->backtrace = $aTrace;
 
         set_status_header(HttpCodes::STATUS_INTERNAL_SERVER_ERROR);
         $this->renderErrorView(
@@ -294,7 +295,9 @@ class ErrorHandler
                 'sSubject' => $sSubject,
                 'sMessage' => $sMessage,
                 'oDetails' => $oDetails,
-            ]
+            ],
+            true,
+            $aTrace
         );
         exit(HttpCodes::STATUS_INTERNAL_SERVER_ERROR);
     }
@@ -447,7 +450,8 @@ class ErrorHandler
     public static function renderErrorView(
         $sView,
         $aData = [],
-        $bFlushBuffer = true
+        $bFlushBuffer = true,
+        ?array $aTrace = null
     ) {
 
         $iCode = is_numeric($sView)
@@ -473,7 +477,8 @@ class ErrorHandler
             static::halt(
                 $sMessage,
                 $sSubject,
-                $iCode
+                $iCode,
+                $aTrace
             );
         }
 
@@ -668,7 +673,7 @@ class ErrorHandler
      * @param string $sSubject An optional subject line
      * @param int    $iCode    The status code to send
      */
-    public static function halt($sError, $sSubject = '', int $iCode = HttpCodes::STATUS_INTERNAL_SERVER_ERROR)
+    public static function halt($sError, $sSubject = '', int $iCode = HttpCodes::STATUS_INTERNAL_SERVER_ERROR, ?array $aTrace = null)
     {
         if (php_sapi_name() === 'cli' || defined('STDIN')) {
 
@@ -679,6 +684,15 @@ class ErrorHandler
             echo $sSubject ? 'ERROR: ' . $sSubject . ":\n" : '';
             echo $sSubject ? $sError : 'ERROR: ' . $sError;
             echo "\n\n";
+
+            if (is_array($aTrace)) {
+                echo "Backtrace:\n\n";
+                foreach ($aTrace as $index => $trace) {
+                    echo "  " . ($trace['class'] ?? '<unknown class>') . ($trace['type'] ?? '::') . $trace['function'] . "()\n";
+                    echo "  " . ($trace['file'] ?? '<unknown file>') . '::' . ($trace['line'] ?? '<unknown line>') . "\n";
+                    echo "\n";
+                }
+            }
 
         } else {
             set_status_header($iCode);
