@@ -501,7 +501,7 @@ class Locale
         $sRegion    = $oLocale->getRegion();
         $aCountries = json_decode(
             file_get_contents(
-                NAILS_APP_PATH . 'vendor/annexare/countries-list/dist/countries.emoji.json'
+                NAILS_APP_PATH . 'vendor/annexare/countries-list/dist/minimal/countries.emoji.min.json'
             )
         );
 
