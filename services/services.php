@@ -6,6 +6,7 @@ use Nails\Common\Service;
 use Nails\Common\Factory;
 use Nails\Config;
 use Symfony\Component\Mime\MimeTypes;
+use Symfony\Component\Mime\MimeTypesInterface;
 
 return [
     'services' => [
@@ -249,7 +250,7 @@ return [
                 return new Service\MetaData($oObj);
             }
         },
-        'Mime'                           => function ($sDatabase = null, $oDetector = null): Service\Mime {
+        'Mime'                           => function ($sDatabase = null, ?MimeTypesInterface $oDetector = null): Service\Mime {
 
             if (!$sDatabase) {
                 $sDatabase = NAILS_COMMON_PATH . 'resources/mime-db/db.json';
