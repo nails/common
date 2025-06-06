@@ -1,4 +1,4 @@
-name: code_quality
+name: static_analysis
 on:
     pull_request:
     # Run on push, but only if PHP files have changed
