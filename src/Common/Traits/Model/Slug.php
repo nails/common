@@ -2,12 +2,12 @@
 
 namespace Nails\Common\Traits\Model;
 
-use Behat\Transliterator\Transliterator;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\ModelException;
 use Nails\Common\Resource;
 use Nails\Common\Service\Database;
 use Nails\Factory;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 
 /**
  * Trait Slug
@@ -270,9 +270,10 @@ trait Slug
             );
         }
 
-        return Transliterator::transliterate(
-            getFromArray($sKey, $aData)
-        );
+        return (new AsciiSlugger())
+            ->slug(
+                getFromArray($sKey, $aData)
+            );
     }
 
     // --------------------------------------------------------------------------
