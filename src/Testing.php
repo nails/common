@@ -11,6 +11,7 @@
 
 namespace Nails;
 
+use Nails\Common\Service\Input;
 use Nails\Console\App;
 use Symfony\Component\Console\Input\ArrayInput;
 
@@ -43,6 +44,22 @@ class Testing
      * @var string
      */
     const TEST_HEADER_USER_NAME = 'X-Testing-As-User';
+
+    // --------------------------------------------------------------------------
+
+    public static function enabled(): bool
+    {
+        /** @var Input $oInput */
+        $oInput = Factory::service('Input');
+
+        if (Environment::is(Environment::ENV_PROD)) {
+            return false;
+        }
+
+        return Environment::is(Environment::ENV_TEST)
+            || Environment::is(Environment::ENV_HTTP_TEST)
+            || $oInput->header(self::TEST_HEADER_NAME) === self::TEST_HEADER_VALUE;
+    }
 
     // --------------------------------------------------------------------------
 
