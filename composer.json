@@ -40,7 +40,6 @@
         "ext-pdo": "*",
         "annexare/countries-list": "3.*",
         "axisofstevil/stop-words": "1.*",
-        "behat/transliterator": "1.*",
         "defuse/php-encryption": "2.*",
         "guzzlehttp/guzzle": "7.*",
         "jeremykendall/php-domain-parser": "6.*",
@@ -50,6 +49,7 @@
         "ralouphie/getallheaders": "3.*",
         "symfony/http-foundation": "5.*",
         "symfony/mime": "5.*",
+        "symfony/string": "7.*",
         "vlucas/phpdotenv": "5.*"
     },
     "require-dev":
