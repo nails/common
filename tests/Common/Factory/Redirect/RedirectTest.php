@@ -13,10 +13,10 @@ use PHPUnit\Framework\TestCase;
 class RedirectTest extends TestCase
 {
     private function getInstance(
-        string $sUrl = null,
-        string $sMethod = null,
-        int $iLocationHttpResponseCode = null,
-        bool $bAllowExternal = null,
+        ?string $sUrl = null,
+        ?string $sMethod = null,
+        ?int $iLocationHttpResponseCode = null,
+        ?bool $bAllowExternal = null,
         $oUserFeedbackMock = null,
         $sBootstrapMock = null
     ): Redirect {
