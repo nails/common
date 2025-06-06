@@ -487,6 +487,16 @@ final class Components
             throw new NailsException('Driver class does not exist "' . $sDriverClass . '"', 4);
         }
 
+        //  Check if there's an app override
+        //  App overrides are defined as having the same namespace, but `App` as the vendor
+        //  and extending the vendor class
+        if (!$oDriver->isApp()) {
+            $sAppDriverClass = preg_replace('/^.+?\\\/', 'App\\', $sNamespace) . $sClassName;
+            if (class_exists($sAppDriverClass) && classExtends($sAppDriverClass, $sDriverClass)) {
+                $sDriverClass = $sAppDriverClass;
+            }
+        }
+
         //  Save for later
         static::$aCache['DRIVER_INSTANCE'][$oDriver->slug] = new $sDriverClass();
 
