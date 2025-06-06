@@ -3,7 +3,7 @@ on:
     pull_request:
     # Run on push, but only if PHP files have changed
     push:
-        branches: [ main, develop ]
+        branches: [ main, develop, pre-new-admin ]
         paths:
             - '**.php'
             - 'composer.json'

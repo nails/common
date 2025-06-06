@@ -1,9 +1,9 @@
 name: build_and_test
 on:
     push:
-        branches: [ main, develop ]
+        branches: [ main, develop, pre-new-admin ]
     pull_request:
-        branches: [ main, develop ]
+        branches: [ main, develop, pre-new-admin ]
 
 jobs:
     test:
