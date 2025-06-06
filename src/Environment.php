@@ -12,7 +12,6 @@
 namespace Nails;
 
 use Nails\Common\Exception\EnvironmentException;
-use Nails\Config;
 
 /**
  * Class Environment
@@ -49,24 +48,9 @@ final class Environment
     public static function get(): string
     {
         if (empty(self::$sEnvironment)) {
-
-            self::set(Config::get('ENVIRONMENT', self::ENV_DEV));
-
-            try {
-
-                $oInput = Factory::service('Input');
-                if (self::not(self::ENV_PROD) && $oInput->header(Testing::TEST_HEADER_NAME) === Testing::TEST_HEADER_VALUE) {
-                    self::set(self::ENV_HTTP_TEST);
-                }
-
-            } catch (\Exception $e) {
-                /**
-                 * In the circumstance the environment is checked before the factory
-                 * is loaded then this block will fail. Rather than consider this an
-                 * error, simply swallow it quietly as it's probably intentional and
-                 * can be considered a non-testing situation.
-                 */
-            }
+            self::set(
+                Config::get('ENVIRONMENT', self::ENV_DEV)
+            );
         }
 
         return self::$sEnvironment;
