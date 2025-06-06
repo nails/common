@@ -47,7 +47,7 @@
         "pimple/pimple": "3.*",
         "pocketarc/codeigniter": "3.*",
         "ralouphie/getallheaders": "3.*",
-        "symfony/http-foundation": "5.*",
+        "symfony/http-foundation": "7.*",
         "symfony/mime": "7.*",
         "symfony/string": "7.*",
         "vlucas/phpdotenv": "5.*"
