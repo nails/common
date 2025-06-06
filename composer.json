@@ -47,9 +47,9 @@
         "pimple/pimple": "3.*",
         "pocketarc/codeigniter": "3.*",
         "ralouphie/getallheaders": "3.*",
-        "symfony/http-foundation": "7.*",
-        "symfony/mime": "7.*",
-        "symfony/string": "7.*",
+        "symfony/http-foundation": "6.*",
+        "symfony/mime": "6.*",
+        "symfony/string": "6.*",
         "vlucas/phpdotenv": "5.*"
     },
     "require-dev":
