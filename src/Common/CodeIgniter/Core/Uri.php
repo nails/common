@@ -10,13 +10,13 @@
 
 namespace Nails\Common\CodeIgniter\Core;
 
-use CI_Uri;
+use CI_URI;
 use Exception;
 use Nails\Common\Service\ErrorHandler;
 use Nails\Common\Service\HttpCodes;
 use Nails\Environment;
 
-class Uri extends CI_Uri
+class Uri extends CI_URI
 {
     /**
      * Filters the URI and prevents illegal characters
