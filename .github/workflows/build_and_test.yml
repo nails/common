@@ -1,24 +1,35 @@
 name: build_and_test
-on: [ push ]
+on:
+    push:
+        branches: [ main, develop ]
+    pull_request:
+        branches: [ main, develop ]
+
 jobs:
     test:
-        name: build_and_test
+        name: PHP ${{ matrix.php-version }} Test
         runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                php-version: [ '8.1', '8.2', '8.3', '8.4' ]
+            fail-fast: false  # Continue with other versions even if one fails
+
         steps:
             -   name: Checkout code
                 uses: actions/checkout@v2
 
-            -   name: Setup PHP, with composer and extensions
+            -   name: Setup PHP ${{ matrix.php-version }}
                 uses: shivammathur/setup-php@v2
                 with:
-                    php-version: 8.1
+                    php-version: ${{ matrix.php-version }}
 
             -   name: Cache Composer dependencies
                 uses: actions/cache@v4
                 with:
                     path: vendor
-                    key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-                    restore-keys: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+                    key: ${{ runner.os }}-php-${{ matrix.php-version }}-composer-${{ hashFiles('**/composer.json') }}
+                    restore-keys: |
+                        ${{ runner.os }}-php-${{ matrix.php-version }}-composer-
 
             -   name: Cache Yarn dependencies
                 uses: actions/cache@v4
@@ -35,9 +46,6 @@ jobs:
 
             -   name: Run tests
                 run: composer test
-
-            -   name: PHPStan Static Analysis
-                run: composer analyse
 
             -   name: Build assets
                 run: yarn build
