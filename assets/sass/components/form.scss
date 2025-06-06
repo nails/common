@@ -1,3 +1,7 @@
+@use "sass:color";
+@use "../base/palette";
+@use "alert";
+
 .form {
     &__row {
         display: flex;
@@ -31,7 +35,7 @@
             box-sizing: border-box;
             margin-top: 0.5rem;
             font-size: 1rem;
-            border: 1px solid $color-grey;
+            border: 1px solid palette.$color-grey;
         }
 
         input[type=radio],
@@ -50,8 +54,8 @@
         &.has-error {
             .input,
             input {
-                border: 1px solid $color-danger-border;
-                background: lighten($color-danger-border, 42.5%);
+                border: 1px solid palette.$color-danger-border;
+                background: color.adjust(palette.$color-danger-border, $lightness: 42.5%);
             }
         }
 

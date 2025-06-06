@@ -1,3 +1,5 @@
+@use "../base/palette";
+
 .list {
     padding: 0 0 0 2rem;
     margin: 0 0 1.5rem 0;
@@ -18,7 +20,7 @@
 
     &--bordered {
         > li {
-            border: 1px solid $color-grey-lightest;
+            border: 1px solid palette.$color-grey-lightest;
             margin-bottom: 1rem;
         }
     }

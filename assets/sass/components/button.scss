@@ -1,11 +1,13 @@
+@use "../base/palette";
+
 .btn {
     display: inline-block;
-    border: 1px solid $color-grey-lighter;
-    background: $color-white;
+    border: 1px solid palette.$color-grey-lighter;
+    background: palette.$color-white;
     padding: 1rem;
     cursor: pointer;
     border-radius: 3px;
-    box-shadow: 0 1px 2px $color-grey-lightest;
+    box-shadow: 0 1px 2px palette.$color-grey-lightest;
     text-transform: uppercase;
     font-size: 0.8rem;
     color: inherit;
@@ -42,40 +44,40 @@
 
     &--disabled,
     &[disabled] {
-        border: 1px solid $color-white-darker;
-        color: $color-grey-lighter;
+        border: 1px solid palette.$color-white-darker;
+        color: palette.$color-grey-lighter;
         cursor: not-allowed;
         opacity: 0.5;
     }
 
     &--primary {
-        color: $color-brand-text;
-        border-color: $color-brand-border;
-        background: $color-brand;
+        color: palette.$color-brand-text;
+        border-color: palette.$color-brand-border;
+        background: palette.$color-brand;
     }
 
     &--success {
-        color: $color-success-text;
-        border-color: $color-success-border;
-        background: $color-success-background;
+        color: palette.$color-success-text;
+        border-color: palette.$color-success-border;
+        background: palette.$color-success-background;
     }
 
     &--warning {
-        color: $color-warning-text;
-        border-color: $color-warning-border;
-        background: $color-warning-background;
+        color: palette.$color-warning-text;
+        border-color: palette.$color-warning-border;
+        background: palette.$color-warning-background;
     }
 
     &--danger {
-        color: $color-danger-text;
-        border-color: $color-danger-border;
-        background: $color-danger-background;
+        color: palette.$color-danger-text;
+        border-color: palette.$color-danger-border;
+        background: palette.$color-danger-background;
     }
 
     &--info {
-        color: $color-info-text;
-        border-color: $color-info-border;
-        background: $color-info-background;
+        color: palette.$color-info-text;
+        border-color: palette.$color-info-border;
+        background: palette.$color-info-background;
     }
 
     &--working {

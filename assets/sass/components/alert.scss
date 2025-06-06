@@ -1,31 +1,33 @@
+@use "../base/palette";
+
 .alert {
-    border: 1px solid $color-grey-lighter;
-    border-left: 10px solid $color-grey-lighter;
-    background: $color-white-darker;
+    border: 1px solid palette.$color-grey-lighter;
+    border-left: 10px solid palette.$color-grey-lighter;
+    background: palette.$color-white-darker;
     padding: 0.7rem 1rem;
 
     &--success {
-        color: $color-success-text;
-        border-color: $color-success-border;
-        background: $color-success-background;
+        color: palette.$color-success-text;
+        border-color: palette.$color-success-border;
+        background: palette.$color-success-background;
     }
 
     &--warning {
-        color: $color-warning-text;
-        border-color: $color-warning-border;
-        background: $color-warning-background;
+        color: palette.$color-warning-text;
+        border-color: palette.$color-warning-border;
+        background: palette.$color-warning-background;
     }
 
     &--danger {
-        color: $color-danger-text;
-        border-color: $color-danger-border;
-        background: $color-danger-background;
+        color: palette.$color-danger-text;
+        border-color: palette.$color-danger-border;
+        background: palette.$color-danger-background;
     }
 
     &--info {
-        color: $color-info-text;
-        border-color: $color-info-border;
-        background: $color-info-background;
+        color: palette.$color-info-text;
+        border-color: palette.$color-info-border;
+        background: palette.$color-info-background;
     }
 
     a {

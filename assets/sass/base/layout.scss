@@ -1,14 +1,18 @@
+@use "sass:color";
+@use "palette";
+@use "variables";
+
 html,
 body {
     min-height: 100vh;
     width: 100vw;
-    color: $color-black-darkest;
-    background: $color-white;
-    background: linear-gradient(-45deg, lighten($color-grey-lightest, 5%), $color-white);
+    color: palette.$color-black-darkest;
+    background: palette.$color-white;
+    background: linear-gradient(-45deg, color.adjust(palette.$color-grey-lightest, $lightness: 5%), palette.$color-white);
 }
 
 .container {
-    max-width: $max-width;
+    max-width: variables.$max-width;
     margin: auto;
     padding: 0 0.25rem;
 }
