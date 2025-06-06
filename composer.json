@@ -39,7 +39,7 @@
         "ext-mbstring": "*",
         "ext-pdo": "*",
         "annexare/countries-list": "2.*",
-        "axisofstevil/stop-words": "0.*",
+        "axisofstevil/stop-words": "1.*",
         "behat/transliterator": "1.*",
         "defuse/php-encryption": "2.*",
         "guzzlehttp/guzzle": "7.*",
