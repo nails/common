@@ -28,21 +28,21 @@ class Country
      *
      * @var string
      */
-    const DATABASE_COUNTRY = NAILS_APP_PATH . 'vendor/annexare/countries-list/data/countries.json';
+    const DATABASE_COUNTRY = NAILS_APP_PATH . 'vendor/annexare/countries-list/dist/countries.min.json';
 
     /**
      * The location of the continent database
      *
      * @var string
      */
-    const DATABASE_CONTINENT = NAILS_APP_PATH . 'vendor/annexare/countries-list/data/continents.json';
+    const DATABASE_CONTINENT = NAILS_APP_PATH . 'vendor/annexare/countries-list/dist/continents.min.json';
 
     /**
      * The location of the language database
      *
      * @var string
      */
-    const DATABASE_LANGUAGE = NAILS_APP_PATH . 'vendor/annexare/countries-list/data/languages.json';
+    const DATABASE_LANGUAGE = NAILS_APP_PATH . 'vendor/annexare/countries-list/dist/languages.min.json';
 
     // --------------------------------------------------------------------------
 
