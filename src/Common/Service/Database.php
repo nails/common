@@ -171,7 +171,7 @@ class Database
             'username' => Config::get('DB_USERNAME'),
             'password' => Config::get('DB_PASSWORD'),
             'port'     => Config::get('DB_PORT', 3306),
-            'database' => Environment::is([Environment::ENV_TEST, Environment::ENV_HTTP_TEST])
+            'database' => Testing::enabled()
                 ? Testing::DB_NAME
                 : Config::get('DB_DATABASE'),
             'cachedir' => $oFileCache->getDir(),
