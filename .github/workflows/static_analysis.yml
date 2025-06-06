@@ -11,6 +11,9 @@ on:
             - 'phpstan.neon'
             - '.github/workflows/static_analysis.yml'
 
+env:
+    GITHUB_ACTIONS_NOTIFY_ON_FAILURE: false
+
 jobs:
     phpstan:
         name: Static Analysis
