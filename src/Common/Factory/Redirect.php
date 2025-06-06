@@ -64,8 +64,8 @@ class Redirect
          * The following properties and associated constructor arguments make it
          * easier to test this class and are not intended for use by the app
          */
-        Service\UserFeedback $oUserFeedback = null,
-        string $sBootstrapClass = null
+        ?Service\UserFeedback $oUserFeedback = null,
+        ?string $sBootstrapClass = null
     ) {
         $this
             ->setUrl($sUrl)
@@ -245,7 +245,7 @@ class Redirect
      * @return void
      * @throws InvalidDestinationException
      */
-    public function execute(\Closure $cInspect = null): void
+    public function execute(?\Closure $cInspect = null): void
     {
         $sUrl = $this->getUrl();
         if (!preg_match('/^https?:\/\//', $sUrl)) {

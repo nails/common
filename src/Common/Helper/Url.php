@@ -73,9 +73,9 @@ class Url
      */
     public static function redirect(
         string $sUrl,
-        string $sMethod = null,
-        int $iLocationHttpResponseCode = null,
-        bool $bAllowExternal = null
+        ?string $sMethod = null,
+        ?int $iLocationHttpResponseCode = null,
+        ?bool $bAllowExternal = null
     ): void {
 
         /** @var Redirect $oRedirect */
