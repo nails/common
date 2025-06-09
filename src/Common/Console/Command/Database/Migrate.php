@@ -26,7 +26,6 @@ class Migrate extends Base
     /**
      * Exit codes
      */
-    const EXIT_CODE_NO_DB            = 2;
     const EXIT_CODE_DB_NOT_READY     = 3;
     const EXIT_CODE_MIGRATION_FAILED = 4;
 
@@ -244,16 +243,11 @@ class Migrate extends Base
     private function connectToDb(): self
     {
         //  Work out the DB credentials to use
-        $sDbHost = $this->oInput->getOption('dbHost') ?: Config::get('DB_HOST');
-        $sDbUser = $this->oInput->getOption('dbUser') ?: Config::get('DB_USERNAME');
-        $sDbPass = $this->oInput->getOption('dbPass') ?: Config::get('DB_PASSWORD');
-        $sDbName = $this->oInput->getOption('dbName') ?: Config::get('DB_DATABASE');
-        $iDbPort = $this->oInput->getOption('dbPort') ?: Config::get('DB_PORT');
-
-        //  Check we have a database to connect to
-        if (empty($sDbName)) {
-            throw new ConsoleException('No database defined', static::EXIT_CODE_NO_DB);
-        }
+        $sDbHost = $this->oInput->getOption('dbHost') ?: null;
+        $sDbUser = $this->oInput->getOption('dbUser') ?: null;
+        $sDbPass = $this->oInput->getOption('dbPass') ?: null;
+        $sDbName = $this->oInput->getOption('dbName') ?: null;
+        $iDbPort = $this->oInput->getOption('dbPort') ?: null;
 
         //  Get the DB object
         $this->oDb = Factory::service('PDODatabase');
