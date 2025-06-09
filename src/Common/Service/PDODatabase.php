@@ -16,6 +16,8 @@ use Nails\Common\Exception\Database\TransactionException;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Factory\PDODatabase\ForeignKeyCheck;
 use Nails\Common\Factory\PDODatabase\Transaction;
+use Nails\Common\Traits\Database\HasDatabaseCredentials;
+use Nails\Config;
 use Nails\Factory;
 use PDO;
 use PDOStatement;
@@ -27,6 +29,10 @@ use PDOStatement;
  */
 class PDODatabase
 {
+    use HasDatabaseCredentials;
+
+    // --------------------------------------------------------------------------
+
     /**
      * The PDO handler
      *
@@ -63,12 +69,12 @@ class PDODatabase
             $this->oDb = null;
         }
 
-        $sDbHost = !empty($sDbHost) ? $sDbHost : \Nails\Config::get('DB_HOST', '127.0.0.1');
-        $sDbUser = !empty($sDbUser) ? $sDbUser : \Nails\Config::get('DB_USERNAME');
-        $sDbPass = !empty($sDbPass) ? $sDbPass : \Nails\Config::get('DB_PASSWORD');
-        $sDbName = !empty($sDbName) ? $sDbName : \Nails\Config::get('DB_DATABASE');
-        $sDbPort = !empty($sDbPort) ? $sDbPort : \Nails\Config::get('DB_PORT', 3306);
-        $sDbChar = !empty($sDbChar) ? $sDbChar : \Nails\Config::get('DB_CHARSET', 'utf8mb4');
+        $sDbHost = !empty($sDbHost) ? $sDbHost : $this->getHost();
+        $sDbUser = !empty($sDbUser) ? $sDbUser : $this->getUsername();
+        $sDbPass = !empty($sDbPass) ? $sDbPass : $this->getPassword();
+        $sDbName = !empty($sDbName) ? $sDbName : $this->getDatabase();
+        $sDbPort = !empty($sDbPort) ? $sDbPort : $this->getPort();
+        $sDbChar = !empty($sDbChar) ? $sDbChar : Config::get('DB_CHARSET', 'utf8mb4');
 
         try {
 
