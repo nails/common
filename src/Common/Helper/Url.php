@@ -129,6 +129,11 @@ class Url
         $oFileCache = Factory::service('FileCache');
         $sCacheFile = 'php-domain-parser-public-suffix.dat';
 
+
+        if (!preg_match('/https?\:\\/\\//', $sUrl)) {
+            $sUrl = 'http://' . $sUrl;
+        }
+
         $sUrl = parse_url($sUrl ?? '', PHP_URL_HOST);
 
         if (!$oFileCache->exists($sCacheFile)) {
