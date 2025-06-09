@@ -3,6 +3,7 @@
 namespace Nails\Common\Traits\Database;
 
 use Nails\Config;
+use Nails\Testing;
 
 trait HasDatabaseCredentials
 {
