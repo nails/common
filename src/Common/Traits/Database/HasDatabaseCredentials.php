@@ -2,6 +2,8 @@
 
 namespace Nails\Common\Traits\Database;
 
+use Nails\Config;
+
 trait HasDatabaseCredentials
 {
     /**
