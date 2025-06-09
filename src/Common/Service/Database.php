@@ -22,6 +22,7 @@ use Nails\Common\Exception\FactoryException;
 use Nails\Common\Factory\Database\ForeignKeyCheck;
 use Nails\Common\Factory\Database\Transaction;
 use Nails\Common\Helper\ArrayHelper;
+use Nails\Common\Traits\Database\HasDatabaseCredentials;
 use Nails\Config;
 use Nails\Environment;
 use Nails\Factory;
@@ -127,6 +128,10 @@ use Nails\Testing;
  */
 class Database
 {
+    use HasDatabaseCredentials;
+
+    // --------------------------------------------------------------------------
+
     /**
      * The database object
      *
@@ -167,13 +172,11 @@ class Database
              * things which expect an object.
              */
             'db_debug' => true,
-            'hostname' => Config::get('DB_HOST', '127.0.0.1'),
-            'username' => Config::get('DB_USERNAME'),
-            'password' => Config::get('DB_PASSWORD'),
-            'port'     => Config::get('DB_PORT', 3306),
-            'database' => Testing::enabled()
-                ? Testing::DB_NAME
-                : Config::get('DB_DATABASE'),
+            'hostname' => $this->getHost(),
+            'username' => $this->getUsername(),
+            'password' => $this->getPassword(),
+            'port'     => $this->getPort(),
+            'database' => $this->getDatabase(),
             'cachedir' => $oFileCache->getDir(),
         ];
 
@@ -240,68 +243,6 @@ class Database
         if (Environment::is(Environment::ENV_HTTP_TEST)) {
             $this->transaction()->rollback();
         }
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Returns the connection's host
-     *
-     * @return string
-     */
-    public function getDbHost(): string
-    {
-        return (string) Config::get('DB_HOST');
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Returns the connection's username
-     *
-     * @return string
-     */
-    public function getDbUsername(): string
-    {
-        return (string) Config::get('DB_USERNAME');
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Returns the connection's password
-     *
-     * @return string
-     */
-    public function getDbPassword(): string
-    {
-        return (string) Config::get('DB_HOST');
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Returns the connection's port
-     *
-     * @return string
-     */
-    public function getDbPort(): string
-    {
-        return (string) Config::get('DB_PORT');
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Returns the connection's database
-     *
-     * @return string
-     */
-    public function getDbDatabase(): string
-    {
-        return Environment::is([Environment::ENV_TEST, Environment::ENV_HTTP_TEST])
-            ? Testing::DB_NAME
-            : (string) Config::get('DB_DATABASE');
     }
 
     // --------------------------------------------------------------------------
