@@ -95,16 +95,11 @@ class Rebuild extends Base
         // --------------------------------------------------------------------------
 
         //  Work out the DB credentials to use
-        $sDbHost = $oInput->getOption('dbHost') ?: Config::get('DB_HOST');
-        $sDbUser = $oInput->getOption('dbUser') ?: Config::get('DB_USERNAME');
-        $sDbPass = $oInput->getOption('dbPass') ?: Config::get('DB_PASSWORD');
-        $sDbName = $oInput->getOption('dbName') ?: Config::get('DB_DATABASE');
-        $iDbPort = $oInput->getOption('dbPort') ?: Config::get('DB_Port');
-
-        //  Check we have a database to connect to
-        if (empty($sDbName)) {
-            return $this->abort(static::EXIT_CODE_NO_DB);
-        }
+        $sDbHost = $oInput->getOption('dbHost') ?: null;
+        $sDbUser = $oInput->getOption('dbUser') ?: null;
+        $sDbPass = $oInput->getOption('dbPass') ?: null;
+        $sDbName = $oInput->getOption('dbName') ?: null;
+        $iDbPort = $oInput->getOption('dbPort') ?: null;
 
         //  Get the DB object
         /** @var \Nails\Common\Service\PDODatabase $oDb */
