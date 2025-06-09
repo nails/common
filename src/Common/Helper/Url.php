@@ -13,14 +13,11 @@
 namespace Nails\Common\Helper;
 
 use Nails\Common\Exception\FactoryException;
-use Nails\Common\Exception\NailsException;
 use Nails\Common\Exception\Redirect\InvalidDestinationException;
 use Nails\Common\Exception\Redirect\InvalidLocationHttpResponseCodeException;
 use Nails\Common\Exception\Redirect\InvalidMethodException;
-use Nails\Common\Exception\Redirect\RedirectException;
 use Nails\Common\Factory\Redirect;
 use Nails\Common\Service\FileCache;
-use Nails\Config;
 use Nails\Factory;
 use Pdp;
 use Psr\SimpleCache\InvalidArgumentException;
