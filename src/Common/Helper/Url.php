@@ -132,8 +132,7 @@ class Url
         $oFileCache = Factory::service('FileCache');
         $sCacheFile = 'php-domain-parser-public-suffix.dat';
 
-        $sUrl = preg_replace('/^(?:https?|ftp):\/\//', '', $sUrl ?? '');
-        $sUrl = trim($sUrl, '/');
+        $sUrl = parse_url($sUrl ?? '', PHP_URL_HOST);
 
         if (!$oFileCache->exists($sCacheFile)) {
             $oFileCache->write(file_get_contents(static::PUBLIC_SUFFIX_LIST), $sCacheFile);
