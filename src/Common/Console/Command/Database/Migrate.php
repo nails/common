@@ -2,12 +2,15 @@
 
 namespace Nails\Common\Console\Command\Database;
 
+use Nails\Common\Events;
+use Nails\Common\Exception\FactoryException;
 use Nails\Common\Factory\Component;
 use Nails\Common\Interfaces;
+use Nails\Common\Service\Event;
 use Nails\Common\Service\PDODatabase;
 use Nails\Common\Service\Routes;
-use Nails\Config;
 use Nails\Components;
+use Nails\Config;
 use Nails\Console\Command\Base;
 use Nails\Console\Exception\ConsoleException;
 use Nails\Environment;
@@ -161,13 +164,17 @@ class Migrate extends Base
 
             /**
              * Ignore route rewriting until the whole migration is complete. Some actions
-             * might internally trigger a rewrite which could cause things to fall over as
+             * might internally trigger a rewrite which could, Events::self::getEventNamespace() cause things to fall over as
              * the code will have expected the migration to finish. We rewrite the routes
              * afterwards anyway so any internal request will [eventually] be honoured.
              */
             /** @var Routes $oRoutes */
             $oRoutes = Factory::service('Routes');
             $oRoutes->ignoreRewriteRequests(true);
+
+            // --------------------------------------------------------------------------
+
+            $this->trigger(Events::DB_MIGRATE_PRE, [$aEnabledModules]);
 
             // --------------------------------------------------------------------------
 
@@ -201,14 +208,32 @@ class Migrate extends Base
 
             // --------------------------------------------------------------------------
 
+            $this->trigger(Events::DB_MIGRATE_POST, [$aEnabledModules]);
+
+            // --------------------------------------------------------------------------
+
             return $this->runPostCommands();
 
         } catch (\Throwable $e) {
+            $this->trigger(Events::DB_MIGRATE_FAIL, [$aEnabledModules ?? [], $e]);
             return $this->abort(
                 is_int($e->getCode()) ? $e->getCode() : self::EXIT_CODE_FAILURE,
                 array_filter([$e->getMessage()])
             );
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * @throws FactoryException
+     */
+    private function trigger(string $sEvent, array $aData = []): self
+    {
+        /** @var Event $oEvent */
+        $oEvent = Factory::service('Event');
+        $oEvent->trigger($sEvent, Events::getEventNamespace(), $aData);
+        return $this;
     }
 
     // --------------------------------------------------------------------------
@@ -421,6 +446,11 @@ class Migrate extends Base
      */
     private function doMigration($oModule): bool
     {
+        /** @var Event $oEvent */
+        $oEvent = Factory::service('Event');
+
+        // --------------------------------------------------------------------------
+
         if ($oModule->slug == Components::$sAppSlug) {
             /**
              * Set all component settings ahead of migrating the app.
@@ -443,7 +473,9 @@ class Migrate extends Base
             ) {
                 try {
 
+                    $this->trigger(Events::DB_MIGRATE_BEFORE, [$oModule, $oMigration]);
                     $oMigration->execute();
+                    $this->trigger(Events::DB_MIGRATE_AFTER, [$oModule, $oMigration]);
 
                     //  Mark this migration as complete
                     $oResult = $this->oDb->query(sprintf(

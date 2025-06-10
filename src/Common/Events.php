@@ -13,8 +13,9 @@ namespace Nails\Common;
 
 use Nails\Common\Event\Listener;
 use Nails\Common\Events\Base;
-use Nails\Common\Events\Subscription;
-use Nails\Factory;
+use Nails\Common\Factory\Component;
+use Nails\Common\Interfaces\Database\Migration;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class Events
@@ -92,4 +93,59 @@ class Events extends Base
      * @param array  $aData Data being passed to the view (as a reference)
      */
     const VIEW_ERROR_POST = 'VIEW:ERROR:POST';
+
+    /**
+     * Fired before migrations are run
+     *
+     * @param array $aEnabledModules The available modules to be migrated
+     */
+    const DB_MIGRATE_PRE = 'DB:MIGRATE:PRE';
+
+    /**
+     * Fired before each migration
+     *
+     * @param Component $oModule    The module being migrated
+     * @param Migration $oMigration The migration being executed
+     */
+    const DB_MIGRATE_BEFORE = 'DB:MIGRATE:BEFORE';
+
+    /**
+     * Fired after each migration
+     *
+     * @param Component $oModule    The module being migrated
+     * @param Migration $oMigration The migration being executed
+     */
+    const DB_MIGRATE_AFTER = 'DB:MIGRATE:AFTER';
+
+    /**
+     * Fired after all migrations have executed successfully
+     *
+     * @param array $aEnabledModules The available modules to be migrated
+     */
+    const DB_MIGRATE_POST = 'DB:MIGRATE:POST';
+
+    /**
+     * Fired when migrations fail
+     *
+     * @param array      $aEnabledModules The available modules to be migrated
+     * @param \Throwable $e               The exception which was caught
+     */
+    const DB_MIGRATE_FAIL = 'DB:MIGRATE:FAIL';
+
+    /**
+     * Fired before routes are generated
+     *
+     * @param string|null          $sModue  The module to rewrite routes for
+     * @param OutputInterface|null $oOutput The console output interface
+     */
+    const ROUTES_REWRITE_PRE = 'ROUTES:REWRITE:PRE';
+
+    /**
+     * Fired after routes are generated
+     *
+     * @param bool                 $bResult Whether routes were successfully written, or not
+     * @param string|null          $sModue  The module to rewrite routes for
+     * @param OutputInterface|null $oOutput The console output interface
+     */
+    const ROUTES_REWRITE_POST = 'ROUTES:REWRITE:POST';
 }
