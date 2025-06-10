@@ -12,6 +12,8 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Common\Events;
+use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Traits\ErrorHandling;
 use Nails\Components;
@@ -125,7 +127,7 @@ class Routes
      * @return bool
      * @throws \Exception
      */
-    public function update(?string $sModule = null, ?OutputInterface $oOutput = null)
+    public function update(?string $sModule = null, ?OutputInterface $oOutput = null): bool
     {
         if ($this->bIgnoreRewriteRequests) {
             return true;
@@ -134,6 +136,10 @@ class Routes
             $this->setError($this->sCantWriteReason);
             return false;
         }
+
+        // --------------------------------------------------------------------------
+
+        $this->trigger(Events::ROUTES_REWRITE_PRE, [$sModule, $oOutput]);
 
         // --------------------------------------------------------------------------
 
@@ -153,9 +159,7 @@ class Routes
             $sClass = $oModule->namespace . 'Routes';
             if (class_exists($sClass)) {
 
-                if (!is_null($oOutput)) {
-                    $oOutput->write('Generating routes for <info>' . $oModule->slug . '</info>... ');
-                }
+                $oOutput?->write('Generating routes for <info>' . $oModule->slug . '</info>... ');
 
                 $sInterface = 'Nails\\Common\\Interfaces\\RouteGenerator';
                 if (!classImplements($sClass, $sInterface)) {
@@ -171,31 +175,25 @@ class Routes
                     ['// END ' . $oModule->name => '']
                 );
 
-                if (!is_null($oOutput)) {
-                    $oOutput->writeln('<info>done</info>');
-                }
+                $oOutput?->writeln('<info>done</info>');
             }
         }
 
         // --------------------------------------------------------------------------
 
         //  Write the file
-        if (!is_null($oOutput)) {
-            $oOutput->write('Writing routes to file... ');
-        }
+        $oOutput?->write('Writing routes to file... ');
 
-        if ($this->writeFile()) {
+        $bResult = $this->writeFile();
 
-            if (!is_null($oOutput)) {
-                $oOutput->writeln('<info>done</info>');
-            }
+        $this->trigger(Events::ROUTES_REWRITE_POST, [$bResult, $sModule, $oOutput]);
+
+        if ($bResult) {
+            $oOutput?->writeln('<info>done</info>');
             return true;
 
         } else {
-
-            if (!is_null($oOutput)) {
-                $oOutput->writeln('<error>fail</error>');
-            }
+            $oOutput?->writeln('<error>fail</error>');
             return false;
         }
     }
@@ -207,7 +205,7 @@ class Routes
      *
      * @return bool
      */
-    protected function writeFile()
+    protected function writeFile(): bool
     {
         //  Routes are writable, apparently, give it a bash
         $sData = '<?php' . "\n\n";
@@ -271,7 +269,7 @@ class Routes
      *
      * @return bool
      */
-    public function canWriteRoutes()
+    public function canWriteRoutes(): bool
     {
         if (!is_null($this->bCanWriteRoutes)) {
             return $this->bCanWriteRoutes;
@@ -323,5 +321,18 @@ class Routes
                 return false;
             }
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * @throws FactoryException
+     */
+    private function trigger(string $sEvent, array $aData = []): self
+    {
+        /** @var Event $oEvent */
+        $oEvent = Factory::service('Event');
+        $oEvent->trigger($sEvent, Events::getEventNamespace(), $aData);
+        return $this;
     }
 }
