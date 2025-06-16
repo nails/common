@@ -3,7 +3,7 @@
 namespace Tests\Common\Factory\Redirect;
 
 use Nails\Common\Exception\Redirect\InvalidDestinationException;
-use Nails\Common\Exception\Redirect\InvalidLocationHttpResponseCodeException;
+use Nails\Common\Exception\Redirect\InvalidHttpResponseCodeException;
 use Nails\Common\Exception\Redirect\InvalidMethodException;
 use Nails\Common\Factory\Redirect;
 use Nails\Common\Service\UserFeedback;
@@ -15,7 +15,7 @@ class RedirectTest extends TestCase
     private function getInstance(
         ?string $sUrl = null,
         ?string $sMethod = null,
-        ?int $iLocationHttpResponseCode = null,
+        ?int $iHttpResponseCode = null,
         ?bool $bAllowExternal = null,
         $oUserFeedbackMock = null,
         $sBootstrapMock = null
@@ -23,7 +23,7 @@ class RedirectTest extends TestCase
         return new Redirect(
             $sUrl ?? '',
             $sMethod ?? Redirect::METHOD_LOCATION,
-            $iLocationHttpResponseCode ?? Redirect::HTTP_CODE_TEMPORARY,
+            $iHttpResponseCode ?? Redirect::HTTP_CODE_TEMPORARY,
             $bAllowExternal ?? false,
             $oUserFeedbackMock ?? $this->createUserFeedbackMock(),
             $sBootstrapMock ?? get_class($this->createBootstrapMock())
@@ -90,7 +90,7 @@ class RedirectTest extends TestCase
     {
         $iCode     = Redirect::HTTP_CODE_PERMANENT;
         $oRedirect = $this->getInstance(null, null, $iCode);
-        $this->assertEquals($iCode, $oRedirect->getLocationHttpResponseCode());
+        $this->assertEquals($iCode, $oRedirect->getHttpResponseCode());
     }
 
     // --------------------------------------------------------------------------
@@ -171,8 +171,8 @@ class RedirectTest extends TestCase
     {
         $iCode     = Redirect::HTTP_CODE_PERMANENT;
         $oRedirect = $this->getInstance();
-        $oRedirect->setLocationHttpResponseCode($iCode);
-        $this->assertEquals($iCode, $oRedirect->getLocationHttpResponseCode());
+        $oRedirect->setHttpResponseCode($iCode);
+        $this->assertEquals($iCode, $oRedirect->getHttpResponseCode());
     }
 
     // --------------------------------------------------------------------------
@@ -185,8 +185,8 @@ class RedirectTest extends TestCase
         $iCode     = 999;
         $oRedirect = $this->getInstance();
 
-        $this->expectException(InvalidLocationHttpResponseCodeException::class);
-        $oRedirect->setLocationHttpResponseCode($iCode);
+        $this->expectException(InvalidHttpResponseCodeException::class);
+        $oRedirect->setHttpResponseCode($iCode);
     }
 
     // --------------------------------------------------------------------------

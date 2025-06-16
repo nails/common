@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Invalid Location Http Response Code Exception
+ * Invalid Http Response Code Exception
  *
  * @package     Nails
  * @subpackage  common
@@ -12,6 +12,6 @@
 
 namespace Nails\Common\Exception\Redirect;
 
-class InvalidLocationHttpResponseCodeException extends RedirectException
+class InvalidHttpResponseCodeException extends RedirectException
 {
 }

@@ -5,7 +5,7 @@ namespace Nails\Common\Factory;
 use Nails\Bootstrap;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\Redirect\InvalidDestinationException;
-use Nails\Common\Exception\Redirect\InvalidLocationHttpResponseCodeException;
+use Nails\Common\Exception\Redirect\InvalidHttpResponseCodeException;
 use Nails\Common\Exception\Redirect\InvalidMethodException;
 use Nails\Common\Exception\Redirect\RedirectException;
 use Nails\Common\Service;
@@ -31,7 +31,7 @@ class Redirect
     protected string $sUrl;
     protected string $sMethod;
     protected bool $bAllowExternal;
-    protected int $iLocationHttpResponseCode;
+    protected int $iHttpResponseCode;
 
     /**
      * The following properties and associated constructor arguments make it
@@ -45,7 +45,7 @@ class Redirect
     /**
      * @param string                    $sUrl
      * @param string                    $sMethod
-     * @param int                       $iLocationHttpResponseCode
+     * @param int                       $iHttpResponseCode
      * @param bool                      $bAllowExternal
      * @param Service\UserFeedback|null $oUserFeedback
      * @param string|null               $sBootstrapClass
@@ -57,7 +57,7 @@ class Redirect
     public function __construct(
         string $sUrl = '',
         string $sMethod = self::METHOD_LOCATION,
-        int $iLocationHttpResponseCode = self::HTTP_CODE_TEMPORARY,
+        int $iHttpResponseCode = self::HTTP_CODE_TEMPORARY,
         bool $bAllowExternal = false,
 
         /**
@@ -70,7 +70,7 @@ class Redirect
         $this
             ->setUrl($sUrl)
             ->setMethod($sMethod)
-            ->setLocationHttpResponseCode($iLocationHttpResponseCode)
+            ->setHttpResponseCode($iHttpResponseCode)
             ->allowExternal($bAllowExternal);
 
         $this->oUserFeedback   = $oUserFeedback ?? Factory::service('UserFeedback');
@@ -159,22 +159,22 @@ class Redirect
     // --------------------------------------------------------------------------
 
     /**
-     * @param int $iLocationHttpResponseCode
+     * @param int $iHttpResponseCode
      *
      * @return $this
-     * @throws InvalidLocationHttpResponseCodeException
+     * @throws InvalidHttpResponseCodeException
      */
-    public function setLocationHttpResponseCode(int $iLocationHttpResponseCode): self
+    public function setHttpResponseCode(int $iHttpResponseCode): self
     {
-        if (!in_array($iLocationHttpResponseCode, static::getHttpCodes())) {
-            throw new InvalidLocationHttpResponseCodeException(sprintf(
+        if (!in_array($iHttpResponseCode, static::getHttpCodes())) {
+            throw new InvalidHttpResponseCodeException(sprintf(
                 '`%s` is not a valid HTTP code, must be one of: %s',
-                $iLocationHttpResponseCode,
+                $iHttpResponseCode,
                 implode(', ', static::getHttpCodes())
             ));
         }
 
-        $this->iLocationHttpResponseCode = $iLocationHttpResponseCode;
+        $this->iHttpResponseCode = $iHttpResponseCode;
         return $this;
     }
 
@@ -183,9 +183,9 @@ class Redirect
     /**
      * @return int
      */
-    public function getLocationHttpResponseCode(): int
+    public function getHttpResponseCode(): int
     {
-        return $this->iLocationHttpResponseCode;
+        return $this->iHttpResponseCode;
     }
 
     // --------------------------------------------------------------------------
@@ -279,8 +279,8 @@ class Redirect
             default:
                 $sHeader = 'Location: ' . $sUrl;
                 $cInspect
-                    ? $cInspect($sHeader, $this->getLocationHttpResponseCode())
-                    : header($sHeader, true, $this->getLocationHttpResponseCode());
+                    ? $cInspect($sHeader, $this->getHttpResponseCode())
+                    : header($sHeader, true, $this->getHttpResponseCode());
                 break;
         }
 
