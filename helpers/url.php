@@ -34,9 +34,14 @@ if (!function_exists('secure_site_url')) {
 }
 
 if (!function_exists('redirect')) {
-    function redirect(?string $sUrl = null, string $sMethod = 'location', ?int $iHttpResponseCode = null): void
+    function redirect(
+        string $sUrl,
+        ?string $sMethod = null,
+        ?int $iHttpResponseCode = null,
+        ?bool $bAllowExternal = null
+    ): void
     {
-        Url::redirect($sUrl, $sMethod, $iHttpResponseCode);
+        Url::redirect($sUrl, $sMethod, $iHttpResponseCode, $bAllowExternal);
     }
 }
 
