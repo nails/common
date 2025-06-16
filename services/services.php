@@ -591,21 +591,21 @@ return [
         'Redirect'                   => function (
             string $sUrl = '',
             string $sMethod = Factory\Redirect::METHOD_LOCATION,
-            int $iLocationHttpResponseCode = Factory\Redirect::HTTP_CODE_TEMPORARY,
+            int $iHttpResponseCode = Factory\Redirect::HTTP_CODE_TEMPORARY,
             bool $bAllowExternal = false
         ): Factory\Redirect {
             if (class_exists('\App\Common\Factory\Redirect')) {
                 return new \App\Common\Factory\Redirect(
                     $sUrl,
                     $sMethod,
-                    $iLocationHttpResponseCode,
+                    $iHttpResponseCode,
                     $bAllowExternal
                 );
             } else {
                 return new Factory\Redirect(
                     $sUrl,
                     $sMethod,
-                    $iLocationHttpResponseCode,
+                    $iHttpResponseCode,
                     $bAllowExternal
                 );
             }
