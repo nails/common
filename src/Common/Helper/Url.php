@@ -69,7 +69,7 @@ class Url
      * @throws InvalidMethodException
      */
     public static function redirect(
-        string $sUrl,
+        string $sUrl = '',
         ?string $sMethod = null,
         ?int $iHttpResponseCode = null,
         ?bool $bAllowExternal = null
