@@ -35,7 +35,7 @@ if (!function_exists('secure_site_url')) {
 
 if (!function_exists('redirect')) {
     function redirect(
-        string $sUrl,
+        string $sUrl = '',
         ?string $sMethod = null,
         ?int $iHttpResponseCode = null,
         ?bool $bAllowExternal = null
