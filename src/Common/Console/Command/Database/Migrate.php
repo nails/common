@@ -329,7 +329,8 @@ class Migrate extends Base
 
         foreach ($aModules as $oModule) {
             $oState = $this->determineModuleState($oModule);
-            if ($oState->start < $oState->end) {
+
+            if (($oState->start === null && $oState->end !== null) || ($oState->start < $oState->end)) {
                 $aOut[] = $oState;
             }
         }
