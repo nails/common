@@ -5,6 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/Common" isTestSource="false" packagePrefix="Nails\Common\" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" packagePrefix="Nails\" />
+      <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/adrienrn/php-mimetyper" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/annexare/countries-list" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/axisofstevil/stop-words" />
