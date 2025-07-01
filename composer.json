@@ -43,7 +43,7 @@
         "defuse/php-encryption": "2.*",
         "guzzlehttp/guzzle": "7.*",
         "jeremykendall/php-domain-parser": "6.*",
-        "nails/mustache": "dev-main",
+        "mustache/mustache": "3.*",
         "pimple/pimple": "3.*",
         "pocketarc/codeigniter": "3.*",
         "ralouphie/getallheaders": "3.*",

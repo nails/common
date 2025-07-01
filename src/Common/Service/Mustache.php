@@ -2,12 +2,14 @@
 
 namespace Nails\Common\Service;
 
+use Mustache\Engine;
+
 /**
  * Class Mustache
  *
  * @package Nails\Common\Service
  */
-class Mustache extends \Mustache_Engine
+class Mustache extends Engine
 {
     public function render($template, $context = [])
     {
