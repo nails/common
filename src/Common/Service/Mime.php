@@ -192,6 +192,7 @@ class Mime
             'Documents' => [],
             'Images'    => [],
             'Videos'    => [],
+            'Audio'     => [],
             'Archives'  => [],
             'Other'     => [],
         ];
@@ -205,6 +206,9 @@ class Mime
             } // Videos
             elseif (str_starts_with($sMimeType, 'video/')) {
                 $aGroups['Videos'][$sMimeType] = $aExtensions;
+            } // Audio
+            elseif (str_starts_with($sMimeType, 'audio/')) {
+                $aGroups['Audio'][$sMimeType] = $aExtensions;
             } // Documents
             elseif (
                 str_starts_with($sMimeType, 'application/pdf') ||
