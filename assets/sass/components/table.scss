@@ -1,17 +1,250 @@
+/* 
+ * Nails CSS Framework - Table Component
+ * Tables with different variants and responsive behavior
+ */
+
 .table {
     width: 100%;
+    margin-bottom: var(--spacing-lg);
+    color: var(--color-text);
+    border-collapse: collapse;
 
-    thead,
-    tbody,
-    tfoot {
-        td {
-            padding: 1rem;
+    /* Table header, body, and footer */
+    thead {
+        th {
+            vertical-align: bottom;
+            border-bottom: 2px solid var(--color-border);
+            font-weight: var(--font-weight-bold);
         }
     }
 
     tbody {
+        tr {
+            &:hover {
+                background-color: rgba(0, 0, 0, 0.03);
+            }
+        }
+    }
+
+    tfoot {
+        th {
+            vertical-align: top;
+            border-top: 2px solid var(--color-border);
+            font-weight: var(--font-weight-bold);
+        }
+    }
+
+    /* Table cells */
+    th,
+    td {
+        padding: var(--spacing-md);
+        vertical-align: top;
+        border-top: 1px solid var(--color-border);
+        text-align: left;
+    }
+
+    /* Table variants */
+    &--striped {
+        tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+    }
+
+    &--bordered {
+        border: 1px solid var(--color-border);
+
+        th,
         td {
-            border-bottom: 1px solid $color-grey-lightest;
+            border: 1px solid var(--color-border);
+        }
+    }
+
+    &--borderless {
+        th,
+        td,
+        thead th,
+        tbody + tbody {
+            border: 0;
+        }
+    }
+
+    &--hover {
+        tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.075);
+        }
+    }
+
+    &--sm {
+        th,
+        td {
+            padding: var(--spacing-xs) var(--spacing-sm);
+        }
+    }
+
+    &--lg {
+        th,
+        td {
+            padding: var(--spacing-lg);
+        }
+    }
+
+    /* Table contextual classes */
+    &__row--primary,
+    &__cell--primary {
+        background-color: rgba(var(--color-brand), 0.1);
+        color: var(--color-brand-dark);
+    }
+
+    &__row--success,
+    &__cell--success {
+        background-color: var(--color-success-light);
+        color: var(--color-success-text);
+    }
+
+    &__row--warning,
+    &__cell--warning {
+        background-color: var(--color-warning-light);
+        color: var(--color-warning-text);
+    }
+
+    &__row--danger,
+    &__cell--danger {
+        background-color: var(--color-danger-light);
+        color: var(--color-danger-text);
+    }
+
+    &__row--info,
+    &__cell--info {
+        background-color: var(--color-info-light);
+        color: var(--color-info-text);
+    }
+
+    /* Table caption */
+    &__caption {
+        padding-top: var(--spacing-sm);
+        padding-bottom: var(--spacing-sm);
+        color: var(--color-text-muted);
+        text-align: left;
+        caption-side: bottom;
+    }
+
+    /* Table responsive */
+    &-responsive {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+
+        .table {
+            margin-bottom: 0;
+        }
+    }
+}
+
+/* Responsive tables at different breakpoints */
+/* Small devices */
+@media (max-width: 576px) {
+    .table-responsive-sm {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+
+        .table {
+            margin-bottom: 0;
+        }
+    }
+}
+
+/* Medium devices */
+@media (max-width: 768px) {
+    .table-responsive-md {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+
+        .table {
+            margin-bottom: 0;
+        }
+    }
+}
+
+/* Large devices */
+@media (max-width: 992px) {
+    .table-responsive-lg {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+
+        .table {
+            margin-bottom: 0;
+        }
+    }
+}
+
+/* Extra large devices */
+@media (max-width: 1200px) {
+    .table-responsive-xl {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+
+        .table {
+            margin-bottom: 0;
+        }
+    }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .table {
+        color: var(--color-text);
+
+        thead th {
+            border-bottom-color: var(--color-border);
+        }
+
+        tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        tfoot th {
+            border-top-color: var(--color-border);
+        }
+
+        th,
+        td {
+            border-top-color: var(--color-border);
+        }
+
+        &--striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        &--bordered {
+            border-color: var(--color-border);
+
+            th,
+            td {
+                border-color: var(--color-border);
+            }
+        }
+
+        &--hover tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.075);
+        }
+
+        &__row--primary,
+        &__cell--primary {
+            background-color: rgba(var(--color-brand), 0.2);
+            color: var(--color-brand-light);
+        }
+
+        &__caption {
+            color: var(--color-text-muted);
         }
     }
 }

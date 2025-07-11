@@ -1,51 +1,88 @@
-//  Brand colours
-$color-brand: #d53354;
-$color-brand-text: #ffffff;
-$color-brand-border: darken($color-brand, 10%);
+// Nails CSS Framework - Color Palette
+// These colors can be overridden by the root application for customization
 
-// --------------------------------------------------------------------------
+:root {
+    // Brand colors
+    --color-brand: #d53354;
+    --color-brand-light: #e05e79;
+    --color-brand-dark: #b02a46;
+    --color-brand-text: #ffffff;
 
-//  Whites
-$color-white: #ffffff;
-$color-white-lightest: lighten($color-white, 10%);
-$color-white-lighter: lighten($color-white, 30%);
-$color-white-darker: darken($color-white, 5%);
-$color-white-darkest: darken($color-white, 10%);
+    // Neutral colors - Light mode (default)
+    --color-background: #ffffff;
+    --color-surface: #f8f9fa;
+    --color-border: #dee2e6;
+    --color-text: #212529;
+    --color-text-muted: #6c757d;
 
-//  Greys
-$color-grey: #cccccc;
-$color-grey-lightest: lighten($color-grey, 10%);
-$color-grey-lighter: lighten($color-grey, 5%);
-$color-grey-darker: darken($color-grey, 5%);
-$color-grey-darkest: darken($color-grey, 10%);
+    // Gray scale
+    --color-gray-100: #f8f9fa;
+    --color-gray-200: #e9ecef;
+    --color-gray-300: #dee2e6;
+    --color-gray-400: #ced4da;
+    --color-gray-500: #adb5bd;
+    --color-gray-600: #6c757d;
+    --color-gray-700: #495057;
+    --color-gray-800: #343a40;
+    --color-gray-900: #212529;
 
-//  Blacks
-$color-black: #333333;
-$color-black-lightest: lighten($color-black, 10%);
-$color-black-lighter: lighten($color-black, 5%);
-$color-black-darker: darken($color-black, 5%);
-$color-black-darkest: darken($color-black, 10%);
+    // Status colors
+    --color-success: #28a745;
+    --color-success-light: #d4edda;
+    --color-success-dark: #155724;
+    --color-success-border: #c3e6cb;
+    --color-success-text: #155724;
 
-// --------------------------------------------------------------------------
+    --color-warning: #ffc107;
+    --color-warning-light: #fff3cd;
+    --color-warning-dark: #856404;
+    --color-warning-border: #ffeeba;
+    --color-warning-text: #856404;
 
-//  Status
+    --color-danger: #dc3545;
+    --color-danger-light: #f8d7da;
+    --color-danger-dark: #721c24;
+    --color-danger-border: #f5c6cb;
+    --color-danger-text: #721c24;
 
-//  Success
-$color-success-background: #5cb85c;
-$color-success-text: darken($color-success-background, 30%);
-$color-success-border: darken($color-success-background, 10%);
+    --color-info: #17a2b8;
+    --color-info-light: #d1ecf1;
+    --color-info-dark: #0c5460;
+    --color-info-border: #bee5eb;
+    --color-info-text: #0c5460;
 
-//  Warning
-$color-warning-background: #f0ad4e;
-$color-warning-text: darken($color-warning-background, 35%);
-$color-warning-border: darken($color-warning-background, 10%);
+    //  Btn status colours
+    --color-btn-success-text: #fff;
+    --color-btn-success-text-hover: #fff;
+    --color-btn-warning-text: --color-gray-800;
+    --color-btn-warning-text-hover: #fff;
+    --color-btn-danger-text: #fff;
+    --color-btn-danger-text-hover: #fff;
+    --color-btn-info-text: #fff;
+    --color-btn-info-text-hover: #fff;
+}
 
-//  Danger
-$color-danger-background: #e2817e;
-$color-danger-text: darken($color-danger-background, 35%);
-$color-danger-border: darken($color-danger-background, 15%);
+// Dark mode
+@media (prefers-color-scheme: dark) {
+    :root {
+        // Neutral colors - Dark mode
+        --color-background: #121212;
+        --color-surface: #1e1e1e;
+        --color-border: #333333;
+        --color-text: #f8f9fa;
+        --color-text-muted: #adb5bd;
 
-//  Info
-$color-info-background: #5bc0de;
-$color-info-text: darken($color-info-background, 35%);
-$color-info-border: darken($color-info-background, 10%);
+        // Status colors - Dark mode adjustments
+        --color-success-light: #0d3a1f;
+        --color-success-text: #8fd19e;
+
+        --color-warning-light: #332701;
+        --color-warning-text: #ffe083;
+
+        --color-danger-light: #2c0b0e;
+        --color-danger-text: #ea868f;
+
+        --color-info-light: #062a30;
+        --color-info-text: #6edff6;
+    }
+}

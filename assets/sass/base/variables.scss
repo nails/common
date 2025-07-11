@@ -1,6 +1,74 @@
-//  Breakpoints
-$max-width: 1028px;
+// Nails CSS Framework - Variables
+// These variables can be overridden by the root application for customization
 
-//  Typography
-$font-family: 'Roboto', sans-serif;
-$font-size: 16px;
+:root {
+    // Breakpoints
+    --max-width: 1200px;
+    --breakpoint-sm: 576px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 992px;
+    --breakpoint-xl: 1200px;
+
+    // Typography
+    --font-family-base: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    --font-size-base: 16px;
+    --line-height-base: 1.5;
+
+    // Font sizes
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-md: 1rem;
+    --font-size-lg: 1.25rem;
+    --font-size-xl: 1.5rem;
+    --font-size-2xl: 1.75rem;
+    --font-size-3xl: 2rem;
+
+    // Font weights
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-bold: 700;
+
+    // Spacing
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+
+    // Border radius
+    --border-radius-sm: 0.125rem;
+    --border-radius-md: 0.25rem;
+    --border-radius-lg: 0.5rem;
+    --border-radius-pill: 9999px;
+
+    // Transitions
+    --transition-duration: 0.2s;
+    --transition-timing: ease-in-out;
+}
+
+// Mixins for responsive design
+@mixin sm {
+    @media (min-width: var(--breakpoint-sm)) {
+        @content;
+    }
+}
+
+@mixin md {
+    @media (min-width: var(--breakpoint-md)) {
+        @content;
+    }
+}
+
+@mixin lg {
+    @media (min-width: var(--breakpoint-lg)) {
+        @content;
+    }
+}
+
+@mixin xl {
+    @media (min-width: var(--breakpoint-xl)) {
+        @content;
+    }
+}

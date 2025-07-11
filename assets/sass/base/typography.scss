@@ -1,55 +1,205 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto');
+/* 
+ * Nails CSS Framework - Typography
+ * Modern typography styles for the Nails framework
+ */
 
-html,
-body {
-    font-family: $font-family;
-    font-size: $font-size;
-}
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    margin: 1rem 0 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid $color-grey-lightest;
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    margin-bottom: var(--spacing-md);
+    font-weight: var(--font-weight-bold);
+    line-height: 1.2;
+    color: var(--color-text);
 }
 
 h1 {
-    font-size: 1.8rem;
+    font-size: var(--font-size-3xl);
+    margin-top: var(--spacing-2xl);
 }
 
 h2 {
-    font-size: 1.6rem;
+    font-size: var(--font-size-2xl);
+    margin-top: var(--spacing-xl);
 }
 
 h3 {
-    font-size: 1.4rem;
+    font-size: var(--font-size-xl);
+    margin-top: var(--spacing-lg);
 }
 
 h4 {
-    font-size: 1.2rem;
+    font-size: var(--font-size-lg);
+    margin-top: var(--spacing-md);
 }
 
 h5 {
-    font-size: 1rem;
+    font-size: var(--font-size-md);
+    margin-top: var(--spacing-md);
 }
 
 h6 {
-    font-size: 0.8rem;
+    font-size: var(--font-size-sm);
+    margin-top: var(--spacing-md);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
+/* Paragraphs */
 p {
-    margin-bottom: 1.5rem;
-    line-height: 1.75rem;
+    margin-bottom: var(--spacing-md);
+    line-height: var(--line-height-base);
 }
 
+/* Links */
+a {
+    color: var(--color-brand);
+    text-decoration: none;
+    transition: color var(--transition-duration) var(--transition-timing);
+
+    &:hover {
+        color: var(--color-brand-dark);
+        text-decoration: underline;
+    }
+
+    &:focus {
+        outline: 3px solid var(--color-brand-light);
+        outline-offset: 2px;
+    }
+}
+
+/* Lists */
+ul, ol {
+    margin: 0 0 var(--spacing-md) var(--spacing-lg);
+
+    li {
+        margin-bottom: var(--spacing-xs);
+    }
+
+    ul, ol {
+        margin-bottom: 0;
+        margin-top: var(--spacing-xs);
+    }
+}
+
+/* Definition lists */
+dl {
+    margin-bottom: var(--spacing-md);
+
+    dt {
+        font-weight: var(--font-weight-bold);
+        margin-bottom: var(--spacing-xs);
+    }
+
+    dd {
+        margin-left: var(--spacing-md);
+        margin-bottom: var(--spacing-sm);
+    }
+}
+
+/* Blockquotes */
+blockquote {
+    margin: var(--spacing-md) 0;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-left: 4px solid var(--color-gray-300);
+    background-color: var(--color-gray-100);
+    font-style: italic;
+
+    p:last-child {
+        margin-bottom: 0;
+    }
+
+    cite {
+        display: block;
+        margin-top: var(--spacing-sm);
+        font-size: var(--font-size-sm);
+        font-style: normal;
+        color: var(--color-text-muted);
+    }
+}
+
+/* Code */
+code, pre {
+    font-family: monospace;
+    background-color: var(--color-gray-100);
+    border-radius: var(--border-radius-sm);
+}
+
+code {
+    padding: 0.2em 0.4em;
+    font-size: 0.9em;
+}
+
+pre {
+    margin: var(--spacing-md) 0;
+    padding: var(--spacing-md);
+    overflow-x: auto;
+
+    code {
+        padding: 0;
+        background-color: transparent;
+    }
+}
+
+/* Small text */
 small {
-    font-size: 0.8rem;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
 }
 
+/* Text utilities */
 .text-center {
     text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-justify {
+    text-align: justify;
+}
+
+.text-uppercase {
+    text-transform: uppercase;
+}
+
+.text-lowercase {
+    text-transform: lowercase;
+}
+
+.text-capitalize {
+    text-transform: capitalize;
+}
+
+.text-muted {
+    color: var(--color-text-muted);
+}
+
+.text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Font weights */
+.font-light {
+    font-weight: var(--font-weight-light);
+}
+
+.font-normal {
+    font-weight: var(--font-weight-normal);
+}
+
+.font-medium {
+    font-weight: var(--font-weight-medium);
+}
+
+.font-bold {
+    font-weight: var(--font-weight-bold);
 }

@@ -1,141 +1,811 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Nails CSS Styleguide</title>
-        <link rel="stylesheet" href="css/nails.min.css" type="text/css">
-    </head>
-    <body>
-        <div class="container">
-            <h1>Nails CSS Styleguide</h1>
-            <div class="panel">
-                <div class="panel__header">
-                    Typography
-                </div>
-                <div class="panel__body">
-                    <h1>Heading 1</h1>
-                    <h2>Heading 2</h2>
-                    <h3>Heading 3</h3>
-                    <h4>Heading 4</h4>
-                    <h5>Heading 5</h5>
-                    <h6>Heading 6</h6>
-                    <p>
-                        Nullam quis risus eget urna mollis ornare vel eu leo. Lorem ipsum dolor sit amet, consectetur
-                        adipiscing elit. Sed posuere consectetur est at lobortis. Maecenas faucibus mollis interdum.
-                        Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Sed posuere consectetur
-                        est at lobortis. Maecenas faucibus mollis interdum. Donec ullamcorper nulla non metus auctor
-                        fringilla. Vestibulum id ligula porta felis euismod semper. Curabitur blandit tempus porttitor.
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    </p>
-                    <p>
-                        Nullam quis risus eget urna mollis ornare vel eu leo. Lorem ipsum dolor sit amet, consectetur
-                        adipiscing elit. Sed posuere consectetur est at lobortis. Maecenas faucibus mollis interdum.
-                        Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Sed posuere consectetur
-                        est at lobortis. Maecenas faucibus mollis interdum. Donec ullamcorper nulla non metus auctor
-                        fringilla. Vestibulum id ligula porta felis euismod semper. Curabitur blandit tempus porttitor.
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    </p>
-                    <blockquote class="blockquote">
-                        <p>
-                            Nullam quis risus eget urna mollis ornare vel eu leo. Lorem ipsum dolor sit amet,
-                            consectetur adipiscing elit. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor
-                            auctor. Sed posuere consectetur est at lobortis.
-                        </p>
-                        <p class="blockquote__cite">
-                            Jane Doe
-                        </p>
-                    </blockquote>
-                    <ul class="list">
-                        <li>List item</li>
-                        <li>List item</li>
-                        <li>List item</li>
-                        <li>List item</li>
-                    </ul>
-                    <ol class="list">
-                        <li>List item</li>
-                        <li>List item</li>
-                        <li>List item</li>
-                        <li>List item</li>
-                    </ol>
-                </div>
-            </div>
+<head>
+    <meta charset="UTF-8">
+    <title>Nails CSS Styleguide</title>
+    <link rel="stylesheet" href="css/nails.min.css" type="text/css">
+</head>
+<body>
+<div class="container">
+    <h1>Nails CSS Styleguide</h1>
+    <h1>Typography</h1>
+    <div class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">
+                Headings
+            </h2>
+        </div>
+        <div class="panel__body">
+            <h1>Heading 1</h1>
+            <h2>Heading 2</h2>
+            <h3>Heading 3</h3>
+            <h4>Heading 4</h4>
+            <h5>Heading 5</h5>
+            <h6>Heading 6</h6>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">
+                Body text
+            </h2>
+        </div>
+        <div class="panel__body">
+            <p>
+                Nullam quis risus eget urna mollis ornare vel eu leo. Lorem ipsum dolor sit amet, consectetur
+                adipiscing elit. Sed posuere consectetur est at lobortis. Maecenas faucibus mollis interdum.
+                Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Sed posuere consectetur
+                est at lobortis. Maecenas faucibus mollis interdum. Donec ullamcorper nulla non metus auctor
+                fringilla. Vestibulum id ligula porta felis euismod semper. Curabitur blandit tempus porttitor.
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            </p>
+            <p>
+                Nullam quis risus eget urna mollis ornare vel eu leo. Lorem ipsum dolor sit amet, consectetur
+                adipiscing elit. Sed posuere consectetur est at lobortis. Maecenas faucibus mollis interdum.
+                Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Sed posuere consectetur
+                est at lobortis. Maecenas faucibus mollis interdum. Donec ullamcorper nulla non metus auctor
+                fringilla. Vestibulum id ligula porta felis euismod semper. Curabitur blandit tempus porttitor.
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            </p>
+            <blockquote class="blockquote">
+                <p>
+                    Nullam quis risus eget urna mollis ornare vel eu leo. Lorem ipsum dolor sit amet,
+                    consectetur adipiscing elit. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor
+                    auctor. Sed posuere consectetur est at lobortis.
+                </p>
+                <p class="blockquote__cite">
+                    Jane Doe
+                </p>
+            </blockquote>
+        </div>
+    </div>
 
-
-            <div class="panel">
-                <div class="panel__header">
-                    Palette
+    <h1>Palette</h1>
+    <div class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">
+                Brand Colours
+            </h2>
+        </div>
+        <div class="panel__body">
+            <div style="display: flex; flex-wrap: wrap;">
+                <div style="width: 100px; height: 100px; margin-right: 1rem; background-color: var(--color-brand); color: var(--color-brand-text); display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                    Brand
                 </div>
-                <div class="panel__body">
-                    @todo
+                <div style="width: 100px; height: 100px; margin-right: 1rem; background-color: var(--color-brand-light); color: var(--color-brand-text); display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                    Brand Light
                 </div>
-            </div>
-
-            <div class="panel">
-                <div class="panel__header">
-                    Alerts
-                </div>
-                <div class="panel__body">
-                    <p class="alert">
-                        .alert
-                    </p>
-                    <p class="alert alert--success">
-                        .alert.alert--success
-                    </p>
-                    <p class="alert alert--warning">
-                        .alert.alert--warning
-                    </p>
-                    <p class="alert alert--danger">
-                        .alert.alert--danger
-                    </p>
-                    <p class="alert alert--info">
-                        .alert.alert--info
-                    </p>
-                </div>
-            </div>
-
-            <div class="panel">
-                <div class="panel__header">
-                    Buttons
-                </div>
-                <div class="panel__body">
-                    <p>
-                        <button class="btn">
-                            .btn
-                        </button>
-                        <button class="btn btn--disabled">
-                            .btn.btn--disabled
-                        </button>
-                        <button class="btn btn--link">
-                            .btn.btn--link
-                        </button>
-                    </p>
-                    <p>
-                        <button class="btn btn--primary">
-                            .btn.btn--primary
-                        </button>
-                        <button class="btn btn--success">
-                            .btn.btn--success
-                        </button>
-                        <button class="btn btn--warning">
-                            .btn.btn--warning
-                        </button>
-                        <button class="btn btn--danger">
-                            .btn.btn--danger
-                        </button>
-                        <button class="btn btn--info">
-                            .btn.btn--info
-                        </button>
-                    </p>
-                    <p>
-                        <button class="btn btn--block">
-                            .btn.btn--block
-                        </button>
-                        <a href="#" class="btn btn--block">
-                            a.btn.btn--block
-                        </a>
-                    </p>
+                <div style="width: 100px; height: 100px; margin-right: 1rem; background-color: var(--color-brand-dark); color: var(--color-brand-text); display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                    Brand Dark
                 </div>
             </div>
         </div>
-    </body>
+    </div>
+    <div class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">
+                Neutral Colours
+            </h2>
+        </div>
+        <div class="panel__body">
+            <div style="display: flex; flex-wrap: wrap;">
+                <div style="width: 100px; height: 100px; margin-right: 1rem; background-color: var(--color-background); color: var(--color-text); display: flex; align-items: center; justify-content: center; border-radius: 4px; border: 1px solid var(--color-border);">
+                    Background
+                </div>
+                <div style="width: 100px; height: 100px; margin-right: 1rem; background-color: var(--color-surface); color: var(--color-text); display: flex; align-items: center; justify-content: center; border-radius: 4px; border: 1px solid var(--color-border);">
+                    Surface
+                </div>
+                <div style="width: 100px; height: 100px; margin-right: 1rem; background-color: var(--color-border); color: var(--color-text); display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                    Border
+                </div>
+                <div style="width: 100px; height: 100px; margin-right: 1rem; background-color: var(--color-text); color: var(--color-background); display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                    Text
+                </div>
+                <div style="width: 100px; height: 100px; margin-right: 1rem; background-color: var(--color-text-muted); color: var(--color-background); display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                    Text Muted
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">
+                Greyscale
+            </h2>
+        </div>
+        <div class="panel__body">
+            <div style="display: flex; flex-wrap: wrap;">
+                <div style="width: 100px; height: 100px; margin-right: 1rem; background-color: var(--color-gray-100); color: var(--color-text); display: flex; align-items: center; justify-content: center; border-radius: 4px; border: 1px solid var(--color-border);">
+                    Gray 100
+                </div>
+                <div style="width: 100px; height: 100px; margin-right: 1rem; background-color: var(--color-gray-200); color: var(--color-text); display: flex; align-items: center; justify-content: center; border-radius: 4px; border: 1px solid var(--color-border);">
+                    Gray 200
+                </div>
+                <div style="width: 100px; height: 100px; margin-right: 1rem; background-color: var(--color-gray-300); color: var(--color-text); display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                    Gray 300
+                </div>
+                <div style="width: 100px; height: 100px; margin-right: 1rem; background-color: var(--color-gray-400); color: var(--color-text); display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                    Gray 400
+                </div>
+                <div style="width: 100px; height: 100px; margin-right: 1rem; background-color: var(--color-gray-500); color: var(--color-background); display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                    Gray 500
+                </div>
+                <div style="width: 100px; height: 100px; margin-right: 1rem; background-color: var(--color-gray-600); color: var(--color-background); display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                    Gray 600
+                </div>
+                <div style="width: 100px; height: 100px; margin-right: 1rem; background-color: var(--color-gray-700); color: var(--color-background); display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                    Gray 700
+                </div>
+                <div style="width: 100px; height: 100px; margin-right: 1rem; background-color: var(--color-gray-800); color: var(--color-background); display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                    Gray 800
+                </div>
+                <div style="width: 100px; height: 100px; margin-right: 1rem; background-color: var(--color-gray-900); color: var(--color-background); display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                    Gray 900
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">
+                Status Colours
+            </h2>
+        </div>
+        <div class="panel__body">
+            <div style="display: flex; flex-wrap: wrap;">
+                <div style="width: 100px; height: 100px; margin-right: 1rem; background-color: var(--color-success); color: var(--color-background); display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                    Success
+                </div>
+                <div style="width: 100px; height: 100px; margin-right: 1rem; background-color: var(--color-warning); color: var(--color-warning-text); display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                    Warning
+                </div>
+                <div style="width: 100px; height: 100px; margin-right: 1rem; background-color: var(--color-danger); color: var(--color-background); display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                    Danger
+                </div>
+                <div style="width: 100px; height: 100px; margin-right: 1rem; background-color: var(--color-info); color: var(--color-background); display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                    Info
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h1>Panels</h1>
+    <div class="panel">
+        <div class="panel__header">
+            <p class="panel__title">
+                Panel title
+            </p>
+            <p class="panel__subtitle">
+                Panel subtitle
+            </p>
+        </div>
+        <div class="panel__body">
+            <p>
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad ea ipsa neque pariatur possimus quam quasi.
+                Enim fugiat laboriosam maiores neque unde. Ad enim omnis, porro quia repellat suscipit vel!
+            </p>
+        </div>
+        <div class="panel__footer">
+            Panel footer
+        </div>
+    </div>
+
+    <h1>Alerts</h1>
+    <p class="alert">
+        .alert
+    </p>
+    <p class="alert alert--success">
+        .alert.alert--success
+    </p>
+    <p class="alert alert--warning">
+        .alert.alert--warning
+    </p>
+    <p class="alert alert--danger">
+        .alert.alert--danger
+    </p>
+    <p class="alert alert--info">
+        .alert.alert--info
+    </p>
+
+    <h1>Buttons</h1>
+
+    <p>
+        <button class="btn">
+            .btn
+        </button>
+        <button class="btn" disabled>
+            .btn[disabled]
+        </button>
+        <button class="btn btn--link">
+            .btn.btn--link
+        </button>
+    </p>
+    <p>
+        <button class="btn btn--primary">
+            .btn.btn--primary
+        </button>
+        <button class="btn btn--success">
+            .btn.btn--success
+        </button>
+        <button class="btn btn--warning">
+            .btn.btn--warning
+        </button>
+        <button class="btn btn--danger">
+            .btn.btn--danger
+        </button>
+        <button class="btn btn--info">
+            .btn.btn--info
+        </button>
+    </p>
+    <p>
+        <button class="btn btn--primary" disabled>
+            .btn.btn--primary
+        </button>
+        <button class="btn btn--success" disabled>
+            .btn.btn--success
+        </button>
+        <button class="btn btn--warning" disabled>
+            .btn.btn--warning
+        </button>
+        <button class="btn btn--danger" disabled>
+            .btn.btn--danger
+        </button>
+        <button class="btn btn--info" disabled>
+            .btn.btn--info
+        </button>
+    </p>
+    <p>
+        <button class="btn btn--block">
+            .btn.btn--block
+        </button>
+        <a href="#" class="btn btn--block">
+            a.btn.btn--block
+        </a>
+        <button class="btn btn--block btn--primary">
+            .btn.btn--primary
+        </button>
+        <button class="btn btn--block btn--success">
+            .btn.btn--success
+        </button>
+        <button class="btn btn--block btn--warning">
+            .btn.btn--warning
+        </button>
+        <button class="btn btn--block btn--danger">
+            .btn.btn--danger
+        </button>
+        <button class="btn btn--block btn--info">
+            .btn.btn--info
+        </button>
+    </p>
+
+    <h1>Forms</h1>
+    <div class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">
+                Basic Form
+            </h2>
+        </div>
+        <div class="panel__body">
+            <p>
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusantium asperiores at blanditiis cumque dolor, dolores ea eos facilis hic iste minima mollitia nihil nisi quis reiciendis similique totam vero voluptatem.
+            </p>
+            <form class="form">
+                <div class="form__group">
+                    <label class="form__label">Name</label>
+                    <input type="text" class="form__control" placeholder="Enter your name">
+                    <p class="form__help">
+                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Alias corporis cupiditate dolorum.
+                    </p>
+                </div>
+                <div class="form__group">
+                    <label class="form__label">Email</label>
+                    <input type="email" class="form__control" placeholder="Enter your email">
+                </div>
+                <div class="form__group">
+                    <label class="form__label">Reason</label>
+                    <select class="form__control form__control--select">
+                        <option selected>Choose an option</option>
+                        <option value="1">Option 1</option>
+                        <option value="2">Option 2</option>
+                        <option value="3">Option 3</option>
+                    </select>
+                </div>
+                <div class="form__group">
+                    <label class="form__label">Multiple Select</label>
+                    <select class="form__control form__control--select" multiple>
+                        <option>Option 1</option>
+                        <option>Option 2</option>
+                        <option>Option 3</option>
+                        <option>Option 4</option>
+                        <option>Option 5</option>
+                    </select>
+                </div>
+                <div class="form__group">
+                    <label class="form__label">Message</label>
+                    <textarea class="form__control form__control--textarea" placeholder="Enter your message"></textarea>
+                </div>
+                <div class="form__group form__group--checkbox-compact">
+                    <input type="checkbox" id="accept-tcs">
+                    <label for="accept-tcs">I accept the T&Cs</label>
+                </div>
+                <div class="form__actions">
+                    <button type="submit" class="btn btn--primary">Submit</button>
+                    <button type="reset" class="btn">Reset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">
+                Form Row with Half Width
+            </h2>
+        </div>
+        <div class="panel__body">
+            <form class="form">
+                <div class="form__row">
+                    <div class="form__group form__group--half">
+                        <label class="form__label">First Name</label>
+                        <input type="text" class="form__control" placeholder="Enter your first name">
+                    </div>
+                    <div class="form__group form__group--half">
+                        <label class="form__label">Last Name</label>
+                        <input type="text" class="form__control" placeholder="Enter your last name">
+                    </div>
+                </div>
+                <div class="form__group">
+                    <label class="form__label">Email</label>
+                    <input type="email" class="form__control" placeholder="Enter your email">
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">
+                Control Sizes
+            </h2>
+        </div>
+        <div class="panel__body">
+            <form class="form">
+                <div class="form__group">
+                    <label class="form__label">Small Input</label>
+                    <input type="text" class="form__control form__control--sm" placeholder="Small input">
+                </div>
+                <div class="form__group">
+                    <label class="form__label">Default Input</label>
+                    <input type="text" class="form__control" placeholder="Default input">
+                </div>
+                <div class="form__group">
+                    <label class="form__label">Large Input</label>
+                    <input type="text" class="form__control form__control--lg" placeholder="Large input">
+                </div>
+                <div class="form__group">
+                    <label class="form__label">Small Select</label>
+                    <select class="form__control form__control--select form__control--sm">
+                        <option selected>Small select</option>
+                        <option value="1">Option 1</option>
+                        <option value="2">Option 2</option>
+                    </select>
+                </div>
+                <div class="form__group">
+                    <label class="form__label">Default Select</label>
+                    <select class="form__control form__control--select">
+                        <option selected>Small select</option>
+                        <option value="1">Option 1</option>
+                        <option value="2">Option 2</option>
+                    </select>
+                </div>
+                <div class="form__group">
+                    <label class="form__label">Large Select</label>
+                    <select class="form__control form__control--select form__control--lg">
+                        <option selected>Small select</option>
+                        <option value="1">Option 1</option>
+                        <option value="2">Option 2</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">
+                Disabled Controls
+            </h2>
+        </div>
+        <div class="panel__body">
+            <form class="form">
+                <div class="form__group">
+                    <label class="form__label">Input</label>
+                    <input type="text" class="form__control" placeholder="Default input" disabled>
+                </div>
+                <div class="form__group">
+                    <label class="form__label">Select</label>
+                    <select class="form__control form__control--select" disabled>
+                        <option selected>Small select</option>
+                        <option value="1">Option 1</option>
+                        <option value="2">Option 2</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">
+                Form Validation
+            </h2>
+        </div>
+        <div class="panel__body">
+            <form class="form">
+                <div class="form__group">
+                    <label class="form__label">Valid Input</label>
+                    <input type="text" class="form__control form__control--valid" value="Valid input">
+                    <div class="form__feedback form__feedback--valid">Looks good!</div>
+                </div>
+                <div class="form__group">
+                    <label class="form__label">Invalid Input</label>
+                    <input type="text" class="form__control form__control--invalid" value="Invalid input">
+                    <div class="form__feedback form__feedback--invalid">Please provide a valid input.</div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">
+                Checkboxes and radios
+            </h2>
+        </div>
+        <div class="panel__body">
+            <form class="form">
+                <div class="form__group">
+                    <label class="form__label">Checkboxes</label>
+                    <div class="form__group--checkbox">
+                        <input type="checkbox" id="checkbox1">
+                        <label for="checkbox1">Option 1</label>
+                    </div>
+                    <div class="form__group--checkbox">
+                        <input type="checkbox" id="checkbox2">
+                        <label for="checkbox2">Option 2</label>
+                    </div>
+                </div>
+                <div class="form__group">
+                    <label class="form__label">Radio Buttons</label>
+                    <div class="form__group--radio">
+                        <input type="radio" id="radio1" name="radioGroup">
+                        <label for="radio1">Option 1</label>
+                    </div>
+                    <div class="form__group--radio">
+                        <input type="radio" id="radio2" name="radioGroup">
+                        <label for="radio2">Option 2</label>
+                    </div>
+                </div>
+                <div class="form__group">
+                    <label class="form__label">Inline Checkboxes</label>
+                    <div>
+                        <div class="form__group--checkbox-inline">
+                            <input type="checkbox" id="inlineCheckbox1">
+                            <label for="inlineCheckbox1">Option 1</label>
+                        </div>
+                        <div class="form__group--checkbox-inline">
+                            <input type="checkbox" id="inlineCheckbox2">
+                            <label for="inlineCheckbox2">Option 2</label>
+                        </div>
+                        <div class="form__group--checkbox-inline">
+                            <input type="checkbox" id="inlineCheckbox3">
+                            <label for="inlineCheckbox3">Option 3</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form__group">
+                    <label class="form__label">Inline Radio Buttons</label>
+                    <div>
+                        <div class="form__group--radio-inline">
+                            <input type="radio" id="inlineRadio1" name="inlineRadioGroup">
+                            <label for="inlineRadio1">Option 1</label>
+                        </div>
+                        <div class="form__group--radio-inline">
+                            <input type="radio" id="inlineRadio2" name="inlineRadioGroup">
+                            <label for="inlineRadio2">Option 2</label>
+                        </div>
+                        <div class="form__group--radio-inline">
+                            <input type="radio" id="inlineRadio3" name="inlineRadioGroup">
+                            <label for="inlineRadio3">Option 3</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form__group">
+                    <label class="form__label">Compact Checkbox (Remember me style)</label>
+                    <div class="form__group--checkbox-compact">
+                        <input type="checkbox" id="rememberMe">
+                        <label for="rememberMe">Remember me</label>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+
+    <h1>Tables</h1>
+    <div class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">
+                Basic Table
+            </h2>
+        </div>
+        <div class="panel__body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Username</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Mark</td>
+                        <td>Otto</td>
+                        <td>@mdo</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Jacob</td>
+                        <td>Thornton</td>
+                        <td>@fat</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Larry</td>
+                        <td>the Bird</td>
+                        <td>@twitter</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">
+                Striped Table
+            </h2>
+        </div>
+        <div class="panel__body">
+            <table class="table table--striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Username</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Mark</td>
+                        <td>Otto</td>
+                        <td>@mdo</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Jacob</td>
+                        <td>Thornton</td>
+                        <td>@fat</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Larry</td>
+                        <td>the Bird</td>
+                        <td>@twitter</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">
+                Bordered Table
+            </h2>
+        </div>
+        <div class="panel__body">
+            <table class="table table--bordered">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Username</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Mark</td>
+                        <td>Otto</td>
+                        <td>@mdo</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Jacob</td>
+                        <td>Thornton</td>
+                        <td>@fat</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Larry</td>
+                        <td>the Bird</td>
+                        <td>@twitter</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">
+                Responsive Table
+            </h2>
+        </div>
+        <div class="panel__body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Mark</td>
+                            <td>Otto</td>
+                            <td>@mdo</td>
+                            <td>mark@example.com</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Jacob</td>
+                            <td>Thornton</td>
+                            <td>@fat</td>
+                            <td>jacob@example.com</td>
+                            <td>User</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Larry</td>
+                            <td>the Bird</td>
+                            <td>@twitter</td>
+                            <td>larry@example.com</td>
+                            <td>User</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <h1>Lists</h1>
+    <div class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">
+                Basic Lists
+            </h2>
+        </div>
+        <div class="panel__body">
+            <h3>Unordered List (Bulleted)</h3>
+            <ul class="list">
+                <li>List item 1</li>
+                <li>List item 2</li>
+                <li>List item 3
+                    <ul class="list">
+                        <li>Nested list item 1</li>
+                        <li>Nested list item 2</li>
+                    </ul>
+                </li>
+            </ul>
+            <h3>Ordered List (Numbered)</h3>
+            <ol class="list">
+                <li>List item 1</li>
+                <li>List item 2</li>
+                <li>List item 3</li>
+            </ol>
+            <h3>Unstyled Lists</h3>
+            <ul class="list list--unstyled">
+                <li>Unstyled list item 1</li>
+                <li>Unstyled list item 2</li>
+                <li>Unstyled list item 3</li>
+            </ul>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">
+                Ordered List Variants
+            </h2>
+        </div>
+        <div class="panel__body">
+            <h3>Roman Numerals</h3>
+            <ol class="list list--roman">
+                <li>Roman numeral item I</li>
+                <li>Roman numeral item II</li>
+                <li>Roman numeral item III</li>
+            </ol>
+            <h3>Alphabetical</h3>
+            <ol class="list list--alpha">
+                <li>Alpha item a</li>
+                <li>Alpha item b</li>
+                <li>Alpha item c</li>
+            </ol>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">
+                Unordered List Variants
+            </h2>
+        </div>
+        <div class="panel__body">
+            <h3>Circle Bullets</h3>
+            <ul class="list list--circle">
+                <li>Circle bullet item 1</li>
+                <li>Circle bullet item 2</li>
+                <li>Circle bullet item 3</li>
+            </ul>
+            <h3>Square Bullets</h3>
+            <ul class="list list--square">
+                <li>Square bullet item 1</li>
+                <li>Square bullet item 2</li>
+                <li>Square bullet item 3</li>
+            </ul>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">
+                Other List Variants
+            </h2>
+        </div>
+        <div class="panel__body">
+            <h3>Inline List</h3>
+            <ul class="list list--inline">
+                <li>Inline item 1</li>
+                <li>Inline item 2</li>
+                <li>Inline item 3</li>
+            </ul>
+            <h3>Bordered List</h3>
+            <ul class="list list--bordered">
+                <li>Bordered item 1</li>
+                <li>Bordered item 2</li>
+                <li>Bordered item 3</li>
+            </ul>
+            <h3>Striped List</h3>
+            <ul class="list list--striped">
+                <li>Striped item 1</li>
+                <li>Striped item 2</li>
+                <li>Striped item 3</li>
+            </ul>
+            <h3>Icon List (Check)</h3>
+            <ul class="list list--icon list--check">
+                <li>Check icon item 1</li>
+                <li>Check icon item 2</li>
+                <li>Check icon item 3</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+</body>
 </html>
