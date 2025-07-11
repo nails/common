@@ -141,6 +141,34 @@
         border-left-color: var(--color-gray-600);
         color: var(--color-gray-300);
         background-color: var(--color-gray-800);
+
+        &--success {
+            color: var(--color-success-text);
+            background-color: var(--color-success-light);
+            border-color: var(--color-success-dark);
+            border-left-color: var(--color-success);
+        }
+
+        &--warning {
+            color: var(--color-warning-text);
+            background-color: var(--color-warning-light);
+            border-color: var(--color-warning-dark);
+            border-left-color: var(--color-warning);
+        }
+
+        &--danger {
+            color: var(--color-danger-text);
+            background-color: var(--color-danger-light);
+            border-color: var(--color-danger-dark);
+            border-left-color: var(--color-danger);
+        }
+
+        &--info {
+            color: var(--color-info-text);
+            background-color: var(--color-info-light);
+            border-color: var(--color-info-dark);
+            border-left-color: var(--color-info);
+        }
     }
 
     .alert--icon {
