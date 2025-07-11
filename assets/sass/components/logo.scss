@@ -1,8 +1,213 @@
-.logo {
-    margin: 2rem 0;
-    text-align: center;
+/* 
+ * Nails CSS Framework - Logo Component
+ * Logo styles with different variants
+ */
 
-    img {
-        max-width: 50%;
+.logo {
+    display: inline-block;
+    max-width: 100%;
+    height: auto;
+
+    /* Logo sizes */
+    &--xs {
+        width: 24px;
+        height: 24px;
+    }
+
+    &--sm {
+        width: 32px;
+        height: 32px;
+    }
+
+    &--md {
+        width: 48px;
+        height: 48px;
+    }
+
+    &--lg {
+        width: 64px;
+        height: 64px;
+    }
+
+    &--xl {
+        width: 96px;
+        height: 96px;
+    }
+
+    /* Logo variants */
+    &--circle {
+        border-radius: 50%;
+        overflow: hidden;
+    }
+
+    &--rounded {
+        border-radius: var(--border-radius-md);
+        overflow: hidden;
+    }
+
+    &--bordered {
+        border: 1px solid var(--color-border);
+        padding: 2px;
+    }
+
+    &--shadow {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Logo with text */
+    &__wrapper {
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+        color: var(--color-text);
+
+        &:hover {
+            text-decoration: none;
+        }
+    }
+
+    &__text {
+        margin-left: var(--spacing-sm);
+
+        &-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        &-subtitle {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-muted);
+            margin: 0;
+        }
+    }
+
+    /* Logo positions */
+    &--center {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Logo with background */
+    &--primary {
+        background-color: var(--color-brand);
+        padding: var(--spacing-xs);
+    }
+
+    &--light {
+        background-color: var(--color-background);
+        padding: var(--spacing-xs);
+    }
+
+    &--dark {
+        background-color: var(--color-gray-900);
+        padding: var(--spacing-xs);
+    }
+
+    /* Logo effects */
+    &--grayscale {
+        filter: grayscale(100%);
+        transition: filter var(--transition-duration) var(--transition-timing);
+
+        &:hover {
+            filter: grayscale(0%);
+        }
+    }
+
+    &--hover-zoom {
+        transition: transform var(--transition-duration) var(--transition-timing);
+
+        &:hover {
+            transform: scale(1.1);
+        }
+    }
+
+    &--hover-rotate {
+        transition: transform var(--transition-duration) var(--transition-timing);
+
+        &:hover {
+            transform: rotate(15deg);
+        }
+    }
+}
+
+/* Logo grid for multiple logos */
+.logo-grid {
+    display: flex;
+    flex-wrap: wrap;
+    margin: calc(var(--spacing-md) * -0.5);
+
+    &__item {
+        padding: var(--spacing-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Logo grid columns */
+    &--2col {
+        .logo-grid__item {
+            width: 50%;
+        }
+    }
+
+    &--3col {
+        .logo-grid__item {
+            width: 33.333333%;
+        }
+    }
+
+    &--4col {
+        .logo-grid__item {
+            width: 25%;
+        }
+    }
+
+    &--5col {
+        .logo-grid__item {
+            width: 20%;
+        }
+    }
+
+    /* Responsive logo grid */
+    @media (max-width: 768px) {
+        &--2col,
+        &--3col,
+        &--4col,
+        &--5col {
+            .logo-grid__item {
+                width: 50%;
+            }
+        }
+    }
+
+    @media (max-width: 576px) {
+        &--2col,
+        &--3col,
+        &--4col,
+        &--5col {
+            .logo-grid__item {
+                width: 100%;
+            }
+        }
+    }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .logo {
+        &--bordered {
+            border-color: var(--color-border);
+        }
+
+        &--shadow {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        &--light {
+            background-color: var(--color-gray-800);
+        }
     }
 }

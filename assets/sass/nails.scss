@@ -3,7 +3,7 @@
 @use 'base/palette';
 @use 'base/reset';
 @use 'base/typography';
-@use 'base/utility';
+@use 'base/utilities';
 @use 'base/layout';
 
 //  Components
@@ -13,6 +13,6 @@
 @use 'components/form';
 @use 'components/hr';
 @use 'components/list';
+@use 'components/logo';
 @use 'components/panel';
 @use 'components/table';
-@use 'components/logo';

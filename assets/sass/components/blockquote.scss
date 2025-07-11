@@ -1,15 +1,124 @@
-@use "../base/palette";
+/* 
+ * Nails CSS Framework - Blockquote Component
+ * Blockquotes with different variants
+ */
 
 .blockquote {
-    border-left: 5px solid palette.$color-brand;
-    font-size: 1.2rem;
+    margin: var(--spacing-lg) 0;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-left: 4px solid var(--color-gray-300);
+    background-color: var(--color-gray-200) !important;
     font-style: italic;
-    padding-left: 1rem;
+    color: var(--color-text);
 
-    &__cite {
-        font-size: 1rem;
-        &:before {
-            content: '– ';
+    /* Blockquote content */
+    p {
+        margin-bottom: var(--spacing-md);
+        font-size: var(--font-size-lg);
+        line-height: 1.5;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    /* Blockquote footer */
+    &__footer {
+        display: block;
+        margin-top: var(--spacing-md);
+        font-size: var(--font-size-sm);
+        font-style: normal;
+        color: var(--color-text-muted);
+
+        &::before {
+            content: "\2014\00A0"; /* Em dash and non-breaking space */
+        }
+    }
+
+    /* Blockquote variants */
+    &--primary {
+        border-left-color: var(--color-brand);
+        background-color: rgba(var(--color-brand), 0.05) !important;
+    }
+
+    &--success {
+        border-left-color: var(--color-success);
+        background-color: var(--color-success-light) !important;
+    }
+
+    &--warning {
+        border-left-color: var(--color-warning);
+        background-color: var(--color-warning-light) !important;
+    }
+
+    &--danger {
+        border-left-color: var(--color-danger);
+        background-color: var(--color-danger-light) !important;
+    }
+
+    &--info {
+        border-left-color: var(--color-info);
+        background-color: var(--color-info-light) !important;
+    }
+
+    /* Blockquote modifiers */
+    &--center {
+        text-align: center;
+        border-left: 0;
+        border-top: 4px solid var(--color-gray-300);
+        border-bottom: 4px solid var(--color-gray-300);
+        padding: var(--spacing-lg) var(--spacing-lg);
+    }
+
+    &--right {
+        text-align: right;
+        border-left: 0;
+        border-right: 4px solid var(--color-gray-300);
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+
+    &--large {
+        font-size: var(--font-size-xl);
+
+        p {
+            font-size: var(--font-size-xl);
+        }
+
+        .blockquote__footer {
+            font-size: var(--font-size-md);
+        }
+    }
+
+    &--small {
+        font-size: var(--font-size-sm);
+
+        p {
+            font-size: var(--font-size-sm);
+        }
+
+        .blockquote__footer {
+            font-size: var(--font-size-xs);
+        }
+    }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .blockquote {
+        border-left-color: var(--color-gray-600);
+        background-color: var(--color-gray-800) !important;
+
+        &--primary {
+            background-color: rgba(var(--color-brand), 0.1) !important;
+        }
+
+        &--center {
+            border-top-color: var(--color-gray-600);
+            border-bottom-color: var(--color-gray-600);
+        }
+
+        &--right {
+            border-right-color: var(--color-gray-600);
         }
     }
 }

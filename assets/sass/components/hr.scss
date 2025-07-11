@@ -1,7 +1,136 @@
-@use "../base/palette";
+/* 
+ * Nails CSS Framework - Horizontal Rule Component
+ * Horizontal rules with different variants
+ */
 
-hr {
+.hr {
+    margin: var(--spacing-lg) 0;
     border: 0;
-    border-top: 1px solid palette.$color-grey;
-    margin: 1.5rem 0;
+    border-top: 1px solid var(--color-border);
+
+    /* HR variants */
+    &--thick {
+        border-top-width: 3px;
+    }
+
+    &--dashed {
+        border-top-style: dashed;
+    }
+
+    &--dotted {
+        border-top-style: dotted;
+    }
+
+    &--double {
+        border-top-style: double;
+        border-top-width: 3px;
+    }
+
+    &--primary {
+        border-top-color: var(--color-brand);
+    }
+
+    &--success {
+        border-top-color: var(--color-success);
+    }
+
+    &--warning {
+        border-top-color: var(--color-warning);
+    }
+
+    &--danger {
+        border-top-color: var(--color-danger);
+    }
+
+    &--info {
+        border-top-color: var(--color-info);
+    }
+
+    /* HR with text */
+    &--text {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        border-top: 0;
+
+        &::before,
+        &::after {
+            content: '';
+            flex: 1;
+            border-top: 1px solid var(--color-border);
+        }
+
+        &::before {
+            margin-right: var(--spacing-md);
+        }
+
+        &::after {
+            margin-left: var(--spacing-md);
+        }
+    }
+
+    /* HR with gradient */
+    &--gradient {
+        height: 1px;
+        background-image: linear-gradient(to right, transparent, var(--color-border), transparent);
+        border-top: 0;
+    }
+
+    /* HR with shadow */
+    &--shadow {
+        height: 10px;
+        border: 0;
+        box-shadow: inset 0 5px 5px -5px rgba(0, 0, 0, 0.2);
+        background: transparent;
+    }
+
+    /* HR sizes */
+    &--sm {
+        margin: var(--spacing-sm) 0;
+    }
+
+    &--lg {
+        margin: var(--spacing-xl) 0;
+    }
+
+    /* HR with width */
+    &--25 {
+        width: 25%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    &--50 {
+        width: 50%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    &--75 {
+        width: 75%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .hr {
+        border-top-color: var(--color-border);
+
+        &--gradient {
+            background-image: linear-gradient(to right, transparent, var(--color-border), transparent);
+        }
+
+        &--shadow {
+            box-shadow: inset 0 5px 5px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        &--text {
+            &::before,
+            &::after {
+                border-top-color: var(--color-border);
+            }
+        }
+    }
 }
