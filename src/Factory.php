@@ -17,6 +17,7 @@ use Nails\Common\Factory\Component;
 use Nails\Common\Helper\File;
 use Nails\Common\Model\Base;
 use Nails\Common\Resource;
+use Nails\Factory\Description;
 use Pimple\Container;
 
 class Factory
@@ -391,7 +392,7 @@ class Factory
          * a new instance of the item, which is undesireable.
          */
 
-        $sKey = md5($sComponent . $sName);
+        $sKey = $sComponent . '::' . $sName;
 
         if (!array_key_exists($sKey, $aTrackerArray)) {
 
@@ -693,7 +694,7 @@ class Factory
         ?string $sComponent = null
     ): bool {
         if (!$sKey) {
-            $sKey = md5($sComponent . $sName);
+            $sKey = $sComponent . '::' . $sName;
         }
 
         if (array_key_exists($sKey, $aTrackerArray)) {
@@ -736,5 +737,34 @@ class Factory
         }
 
         return $aOut;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Describes services and models. For a given object will return type (service|model)
+     * as well as the name and component which provides it. Note, an object must have been
+     * created via the Factory in order for this method to properly report.
+     *
+     * @param object|null $oClass The class to describe
+     */
+    public static function describe(?object $oClass): ?Description
+    {
+        if (is_object($oClass)) {
+            foreach (static::$aLoadedItems as $sType => $oLoadedItemType) {
+                foreach ($oLoadedItemType as $sKey => $oLoadedItem) {
+                    if ($oLoadedItem === $oClass) {
+                        [$sComponent, $sName] = explode('::', $sKey);
+                        return new Description(
+                            type: $sType,
+                            name: $sName,
+                            component: Components::getBySlug($sComponent)
+                        );
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }
