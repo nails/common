@@ -12,43 +12,42 @@ use Nails\Common\Resource;
  */
 class Entity extends Resource
 {
+    /**
+     * The entity's ID
+     */
+    public ?int $id = null;
+
+    /**
+     * The source's creation date
+     */
+    public ?Resource\DateTime $created;
+
+    /**
+     * The entity's creator's ID (or User object, if expanded)
+     */
+    public int|Resource|null $created_by;
+
+    /**
+     * The entity's modification date
+     */
+    public ?Resource\DateTime $modified;
+
+    /**
+     * The entity's modifier's ID (or User object, if expanded)
+     */
+    public int|Resource|null $modified_by;
+
+    // --------------------------------------------------------------------------
+
     public function __construct($mObj = [], protected ?Base $model = null)
     {
         parent::__construct($mObj);
     }
 
-    /**
-     * The entity's ID
-     *
-     * @var int|null
-     */
-    public $id = null;
+    // --------------------------------------------------------------------------
 
-    /**
-     * The source's creation date
-     *
-     * @var Resource\DateTime
-     */
-    public $created;
-
-    /**
-     * The entity's creator's ID
-     *
-     * @var int|Resource|null
-     */
-    public $created_by;
-
-    /**
-     * The entity's modification date
-     *
-     * @var Resource\DateTime
-     */
-    public $modified;
-
-    /**
-     * The entity's modifier's ID
-     *
-     * @var int|Resource|null
-     */
-    public $modified_by;
+    public function getModel(): ?Base
+    {
+        return $this->model;
+    }
 }
