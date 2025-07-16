@@ -701,5 +701,12 @@ return [
                 return new Resource($resource);
             }
         },
+        'Entity'         => function ($resource, $model): Resource\Entity {
+            if (class_exists('\App\Common\Entity')) {
+                return new \App\Common\Resource\Entity($resource, $model);
+            } else {
+                return new Resource\Entity($resource, $model);
+            }
+        },
     ],
 ];
