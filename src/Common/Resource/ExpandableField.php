@@ -16,12 +16,12 @@ class ExpandableField extends Resource
      *
      * @var int
      */
-    public $count = 0;
+    public int $count = 0;
 
     /**
      * The resources in the ExpandableFields collection
      *
-     * @var Resource[]
+     * @var Resource\Entity[]
      */
-    public $data = [];
+    public array $data = [];
 }

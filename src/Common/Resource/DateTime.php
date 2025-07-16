@@ -13,12 +13,10 @@ class DateTime extends Date
 {
     /**
      * DateTime constructor.
-     *
-     * @param array $mObj
      */
-    public function __construct($mObj = [])
+    public function __construct(self|\stdClass|array $resource = [])
     {
-        parent::__construct($mObj);
+        parent::__construct($resource);
         if (!empty($this->raw)) {
             $this->formatted = toUserDateTime($this->raw);
         }

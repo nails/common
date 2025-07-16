@@ -4,13 +4,14 @@ namespace Nails\Common\Resource;
 
 use Nails\Common\Model\Base;
 use Nails\Common\Resource;
+use \stdClass;
 
 /**
  * Class Entity
  *
  * @package Nails\Common\Resource
  */
-class Entity extends Resource
+abstract class Entity extends Resource
 {
     /**
      * The entity's ID
@@ -39,9 +40,9 @@ class Entity extends Resource
 
     // --------------------------------------------------------------------------
 
-    public function __construct($mObj = [], protected ?Base $model = null)
+    public function __construct(self|stdClass|array $resource = [], protected ?Base $model = null)
     {
-        parent::__construct($mObj);
+        parent::__construct($resource);
     }
 
     // --------------------------------------------------------------------------
