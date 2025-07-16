@@ -11,7 +11,7 @@ use \stdClass;
  *
  * @package Nails\Common\Resource
  */
-abstract class Entity extends Resource
+class Entity extends Resource
 {
     /**
      * The entity's ID
