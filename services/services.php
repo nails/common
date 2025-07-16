@@ -623,53 +623,60 @@ return [
     ],
 
     'resources' => [
-        'AppSetting'       => function ($oObj): Resource\AppSetting {
+        'AppSetting'       => function ($resource, $model): Resource\AppSetting {
+            //  @todo (Pablo 2025-07-15) - this should be a factory
             if (class_exists('\App\Common\Resource\AppSetting')) {
-                return new \App\Common\Resource\AppSetting($oObj);
+                return new \App\Common\Resource\AppSetting($resource);
             } else {
-                return new Resource\AppSetting($oObj);
+                return new Resource\AppSetting($resource);
             }
         },
-        'Cookie'           => function ($oObj): Resource\Cookie {
+        'Cookie'           => function ($resource, $model): Resource\Cookie {
+            //  @todo (Pablo 2025-07-15) - this should be a factory
             if (class_exists('\App\Common\Resource\Cookie')) {
-                return new \App\Common\Resource\Cookie($oObj);
+                return new \App\Common\Resource\Cookie($resource);
             } else {
-                return new Resource\Cookie($oObj);
+                return new Resource\Cookie($resource);
             }
         },
-        'Country'          => function ($oObj): Resource\Country {
+        'Country'          => function ($resource, $model): Resource\Country {
+            //  @todo (Pablo 2025-07-15) - this should be a factory
             if (class_exists('\App\Common\Resource\Country')) {
-                return new \App\Common\Resource\Country($oObj);
+                return new \App\Common\Resource\Country($resource);
             } else {
-                return new Resource\Country($oObj);
+                return new Resource\Country($resource);
             }
         },
-        'CountryContinent' => function ($oObj): Resource\Country\Continent {
+        'CountryContinent' => function ($resource, $model): Resource\Country\Continent {
+            //  @todo (Pablo 2025-07-15) - this should be a factory
             if (class_exists('\App\Common\Resource\Country\Continent')) {
-                return new \App\Common\Resource\Country\Continent($oObj);
+                return new \App\Common\Resource\Country\Continent($resource);
             } else {
-                return new Resource\Country\Continent($oObj);
+                return new Resource\Country\Continent($resource);
             }
         },
-        'CountryLanguage'  => function ($oObj): Resource\Country\Language {
+        'CountryLanguage'  => function ($resource, $model): Resource\Country\Language {
+            //  @todo (Pablo 2025-07-15) - this should be a factory
             if (class_exists('\App\Common\Resource\Country\Language')) {
-                return new \App\Common\Resource\Country\Language($oObj);
+                return new \App\Common\Resource\Country\Language($resource);
             } else {
-                return new Resource\Country\Language($oObj);
+                return new Resource\Country\Language($resource);
             }
         },
-        'Date'             => function ($oObj): Resource\Date {
+        'Date'             => function ($resource, $model): Resource\Date {
+            //  @todo (Pablo 2025-07-15) - this should be a factory
             if (class_exists('\App\Common\Resource\Date')) {
-                return new \App\Common\Resource\Date($oObj);
+                return new \App\Common\Resource\Date($resource);
             } else {
-                return new Resource\Date($oObj);
+                return new Resource\Date($resource);
             }
         },
-        'DateTime'         => function ($oObj): Resource\DateTime {
+        'DateTime'         => function ($resource, $model): Resource\DateTime {
+            //  @todo (Pablo 2025-07-15) - this should be a factory
             if (class_exists('\App\Common\Resource\DateTime')) {
-                return new \App\Common\Resource\DateTime($oObj);
+                return new \App\Common\Resource\DateTime($resource);
             } else {
-                return new Resource\DateTime($oObj);
+                return new Resource\DateTime($resource);
             }
         },
         'ExpandableField'  => function (): Resource\ExpandableField {
@@ -679,25 +686,19 @@ return [
                 return new Resource\ExpandableField();
             }
         },
-        'FileCacheItem'    => function ($oObj): Resource\FileCache\Item {
+        'FileCacheItem'    => function ($resource, $model): Resource\FileCache\Item {
+            //  @todo (Pablo 2025-07-15) - this should be a factory
             if (class_exists('\App\Common\Resource\FileCache\Item')) {
-                return new \App\Common\Resource\FileCache\Item($oObj);
+                return new \App\Common\Resource\FileCache\Item($resource);
             } else {
-                return new Resource\FileCache\Item($oObj);
+                return new Resource\FileCache\Item($resource);
             }
         },
-        'Resource'         => function ($oObj): Resource {
+        'Resource'         => function ($resource, $model): Resource {
             if (class_exists('\App\Common\Resource')) {
-                return new \App\Common\Resource($oObj);
+                return new \App\Common\Resource($resource);
             } else {
-                return new Resource($oObj);
-            }
-        },
-        'Entity'           => function ($oObj): Resource\Entity {
-            if (class_exists('\App\Common\Resource\Entity')) {
-                return new \App\Common\Resource\Entity($oObj);
-            } else {
-                return new Resource\Entity($oObj);
+                return new Resource($resource);
             }
         },
     ],

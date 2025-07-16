@@ -42,13 +42,11 @@ class Date extends Resource
     /**
      * Date constructor.
      *
-     * @param array $mObj
-     *
      * @throws Exception
      */
-    public function __construct($mObj = [])
+    public function __construct(self|\stdClass|array $resource = [])
     {
-        parent::__construct($mObj);
+        parent::__construct($resource);
         $this->oDateObj = $this->raw ? new \DateTime($this->raw) : null;
         if (!empty($this->raw)) {
             $this->formatted = toUserDate($this->raw);

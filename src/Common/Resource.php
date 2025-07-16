@@ -2,6 +2,8 @@
 
 namespace Nails\Common;
 
+use stdClass;
+
 /**
  * Class Resource
  *
@@ -13,11 +15,11 @@ class Resource
     /**
      * Resource constructor.
      *
-     * @param self|\stdClass|array $mObj The data to populate the resource with
+     * @param self|stdClass|array $resource The data to populate the resource with
      */
-    public function __construct($mObj = [])
+    public function __construct(self|stdClass|array $resource = [])
     {
-        foreach ($mObj as $sProperty => $mValue) {
+        foreach ($resource as $sProperty => $mValue) {
             $this->{$sProperty} = $mValue;
         }
     }

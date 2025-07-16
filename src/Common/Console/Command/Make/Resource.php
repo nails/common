@@ -162,8 +162,8 @@ class Resource extends BaseMaker
 
                     //  Generate the resource definition
                     $aDefinition            = [
-                        str_repeat(' ', $this->iServicesIndent) . '\'' . $aConfig['CLASS_NAME_NORMALISED'] . '\' => function ($oObj, $oModel) {',
-                        str_repeat(' ', $this->iServicesIndent) . '    return new ' . $aConfig['CLASS_NAME_FULL'] . '($oObj, $oModel);',
+                        str_repeat(' ', $this->iServicesIndent) . '\'' . $aConfig['CLASS_NAME_NORMALISED'] . '\' => function ($resource, $model) {',
+                        str_repeat(' ', $this->iServicesIndent) . '    return new ' . $aConfig['CLASS_NAME_FULL'] . '($resource, $model);',
                         str_repeat(' ', $this->iServicesIndent) . '},',
                     ];
                     $aResourceDefinitions[] = implode("\n", $aDefinition);
