@@ -13,7 +13,7 @@
         "sass": "^1.89",
         "postcss-loader": "^8.1",
         "sass-loader": "^16.0",
-        "webpack": "^5.99",
+        "webpack": "^5.101",
         "webpack-cli": "^6.0"
     },
     "scripts": {
