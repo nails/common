@@ -270,10 +270,12 @@ trait Slug
             );
         }
 
-        return (new AsciiSlugger())
+        $sSlug = (new AsciiSlugger())
             ->slug(
                 getFromArray($sKey, $aData)
             );
+
+        return strtolower($sSlug);
     }
 
     // --------------------------------------------------------------------------
