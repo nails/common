@@ -70,10 +70,10 @@ abstract class Base
      */
     public function getSetting($sProperty = null)
     {
-        if (property_exists($this->oSettings, $sProperty)) {
-            return $this->oSettings->{$sProperty};
-        } elseif (is_null($sProperty)) {
+        if (is_null($sProperty)) {
             return $this->oSettings;
+        } elseif (property_exists($this->oSettings, $sProperty)) {
+            return $this->oSettings->{$sProperty};
         } else {
             return null;
         }
