@@ -1289,8 +1289,8 @@ class Field
      */
     public static function timecode(array $aField): string
     {
-        $sKey     = getFromArray('key', $aField);
-        $sDefault = getFromArray('default', $aField);
+        $sKey     = ArrayHelper::get('key', $aField);
+        $sDefault = ArrayHelper::get('default', $aField);
         $sDefault = set_value($sKey, $sDefault);
 
         $aField['html'] = Form::timecode($sKey, $sDefault);

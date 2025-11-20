@@ -13,6 +13,7 @@
 namespace Nails\Common\Service;
 
 use Nails\Common\Exception;
+use Nails\Common\Helper\ArrayHelper;
 use Nails\Factory;
 use Nails\Common\Resource;
 
@@ -265,7 +266,7 @@ class Country
      */
     protected function lookup(string $sIso, array $aDatabase): ?Resource
     {
-        return getFromArray(strtoupper($sIso), $aDatabase);
+        return ArrayHelper::get(strtoupper($sIso), $aDatabase);
     }
 
     // --------------------------------------------------------------------------

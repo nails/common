@@ -4,6 +4,7 @@ namespace Nails\Common\Event\Listener\Locale;
 
 use Nails\Common\Events;
 use Nails\Common\Events\Subscription;
+use Nails\Common\Helper\ArrayHelper;
 use Nails\Common\Service\HttpCodes;
 use Nails\Common\Service\Locale;
 use Nails\Factory;
@@ -84,7 +85,7 @@ class Detect extends Subscription
      */
     protected function getUrl(): string
     {
-        return ltrim(getFromArray('REQUEST_URI', $_SERVER) ?? getFromArray('PATH_INFO', $_SERVER) ?? '', '/');
+        return ltrim(ArrayHelper::get('REQUEST_URI', $_SERVER) ?? getFromArray('PATH_INFO', $_SERVER) ?? '', '/');
     }
 
     // --------------------------------------------------------------------------

@@ -6,6 +6,7 @@ use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Exception\ValidationException;
 use Nails\Common\Factory\Model\Field;
+use Nails\Common\Helper\ArrayHelper;
 use Nails\Common\Model\Base;
 use Nails\Common\Service\FormValidation;
 use Nails\Factory;
@@ -234,7 +235,7 @@ class Validator
             } else {
                 $oFormValidation->set_message(
                     $sRule,
-                    getFromArray($sRule, $aMessages, lang('fv_' . $sRule))
+                    ArrayHelper::get($sRule, $aMessages, lang('fv_' . $sRule))
                 );
             }
         }

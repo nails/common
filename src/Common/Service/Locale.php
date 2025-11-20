@@ -2,6 +2,7 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Common\Helper\ArrayHelper;
 use Nails\Factory;
 
 /**
@@ -524,7 +525,7 @@ class Locale
         if ($oLocale == $this->getDefautLocale()) {
             return '';
         } else {
-            return getFromArray((string) $oLocale, static::URL_VANITY_MAP, (string) $oLocale);
+            return ArrayHelper::get((string) $oLocale, static::URL_VANITY_MAP, (string) $oLocale);
         }
     }
 }

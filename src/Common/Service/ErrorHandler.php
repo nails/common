@@ -461,10 +461,10 @@ class ErrorHandler
         //  Stops cascading errors if CI isn't available
         if (!class_exists('CI_Lang') || !class_exists('MX_Lang')) {
 
-            $sSubject = getFromArray('sSubject', $aData);
-            $sMessage = getFromArray('sMessage', $aData);
-            $sFile    = getFromArray('sFile', $aData);
-            $iLine    = getFromArray('iLine', $aData);
+            $sSubject = ArrayHelper::get('sSubject', $aData);
+            $sMessage = ArrayHelper::get('sMessage', $aData);
+            $sFile    = ArrayHelper::get('sFile', $aData);
+            $iLine    = ArrayHelper::get('iLine', $aData);
 
             if (!empty($sFile)) {
                 $sMessage .= '; File: ' . $sFile;
@@ -514,8 +514,8 @@ class ErrorHandler
 
         } else {
             static::halt(
-                getFromArray('sMessage', $aData),
-                getFromArray('sSubject', $aData),
+                ArrayHelper::get('sMessage', $aData),
+                ArrayHelper::get('sSubject', $aData),
                 $iCode
             );
         }

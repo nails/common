@@ -12,6 +12,7 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Common\Helper\ArrayHelper;
 use Nails\Common\Resource\Date;
 use Nails\Factory;
 
@@ -866,7 +867,7 @@ class DateTime
         foreach ($aAbbreviations as $sTzCode => $aValues) {
             if (strtolower($sCode) == $sTzCode) {
                 $aTimeZone = reset($aValues);
-                return getFromArray('timezone_id', $aTimeZone, false);
+                return ArrayHelper::get('timezone_id', $aTimeZone, false);
             }
         }
 
