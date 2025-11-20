@@ -50,7 +50,7 @@ class ListListeners extends Base
 
                 foreach ($aSubscribers as $oSubscriber) {
                     if (is_array($oSubscriber->callback)) {
-                        list($mObject, $sMethod) = $oSubscriber->callback;
+                        [$mObject, $sMethod] = $oSubscriber->callback;
                         if (is_object($mObject)) {
                             $sClass = get_class($mObject);
                         } else {
