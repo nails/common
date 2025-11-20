@@ -2,6 +2,7 @@
 
 namespace Nails\Common\Console\Command\Make;
 
+use Nails\Common\Helper\ArrayHelper;
 use Nails\Console\Command\BaseMaker;
 use Nails\Console\Exception\ConsoleException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -110,8 +111,8 @@ class Controller extends BaseMaker
                     throw new ConsoleException('Controllers cannot be deeper than one directory');
                 }
 
-                $aFields['MODULE_NAME']     = getFromArray(0, $aControllerBits);
-                $aFields['CONTROLLER_NAME'] = getFromArray(1, $aControllerBits, $aFields['MODULE_NAME']);
+                $aFields['MODULE_NAME']     = ArrayHelper::get(0, $aControllerBits);
+                $aFields['CONTROLLER_NAME'] = ArrayHelper::get(1, $aControllerBits, $aFields['MODULE_NAME']);
                 $this->oOutput->write('Creating controller <comment>' . $sController . '</comment>... ');
 
 

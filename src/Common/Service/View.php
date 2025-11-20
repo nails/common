@@ -17,6 +17,7 @@ use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Exception\ViewNotFoundCaseException;
 use Nails\Common\Exception\ViewNotFoundException;
+use Nails\Common\Helper\ArrayHelper;
 use Nails\Common\Traits\Caching;
 use Nails\Components;
 use Nails\Factory;
@@ -292,7 +293,7 @@ class View
         if (!$sResolvedPath) {
 
             $aDebug  = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
-            $aCaller = getFromArray(1, $aDebug);
+            $aCaller = ArrayHelper::get(1, $aDebug);
 
             if (!empty($aCaller)) {
 

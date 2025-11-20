@@ -2,9 +2,8 @@
 
 namespace Nails\Common\Console\Command\Events;
 
-use Nails\Common\Exception\EventException;
+use Nails\Common\Helper\ArrayHelper;
 use Nails\Common\Service\Event;
-use Nails\Components;
 use Nails\Console\Command\Base;
 use Nails\Factory;
 use Symfony\Component\Console\Input\InputArgument;
@@ -64,7 +63,7 @@ class ListListeners extends Base
                         //  Hack some info about the closure
                         $sDetails = print_r($oSubscriber->callback, true);
                         preg_match('/\[this\] => (.+) Object/', $sDetails, $aMatches);
-                        $sClass    = getFromArray(1, $aMatches, 'Unknown');
+                        $sClass    = ArrayHelper::get(1, $aMatches, 'Unknown');
                         $sListener = '<comment>' . $sClass . '</comment>::<info>{{Closure}}</info>';
                     } else {
                         $sListener = '<info>' . serialize($oSubscriber->callback) . '</info>';

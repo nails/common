@@ -4,6 +4,7 @@ namespace Nails\Common\Traits\Model;
 
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\ModelException;
+use Nails\Common\Helper\ArrayHelper;
 use Nails\Common\Resource;
 use Nails\Common\Service\Database;
 use Nails\Factory;
@@ -272,7 +273,7 @@ trait Slug
 
         $sSlug = (new AsciiSlugger())
             ->slug(
-                getFromArray($sKey, $aData)
+                ArrayHelper::get($sKey, $aData)
             );
 
         return strtolower($sSlug);
