@@ -236,7 +236,9 @@ class Asset
                 $this->checkIfOtherVueLoaded(static::LIBRARY_VUE2);
             })
             ->addLibrary(static::LIBRARY_VUE3, [
-                'https://cdn.jsdelivr.net/npm/vue@3.2.47/dist/vue.js',
+                Environment::is(Environment::ENV_PROD)
+                    ? 'https://cdn.jsdelivr.net/npm/vue@3.5.24/dist/vue.global.prod.min.js'
+                    : 'https://cdn.jsdelivr.net/npm/vue@3.5.24/dist/vue.global.min.js',
             ], function () {
                 $this->checkIfOtherVueLoaded(static::LIBRARY_VUE3);
             });
