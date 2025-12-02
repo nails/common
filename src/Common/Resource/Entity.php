@@ -4,7 +4,7 @@ namespace Nails\Common\Resource;
 
 use Nails\Common\Model\Base;
 use Nails\Common\Resource;
-use \stdClass;
+use stdClass;
 
 /**
  * Class Entity
