@@ -51,4 +51,24 @@ class Entity extends Resource
     {
         return $this->model;
     }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Custom debug info to prevent deep recursion when dumping the model property
+     */
+    public function __debugInfo(): array
+    {
+        $info = get_object_vars($this);
+
+        // If model is set, replace the object with its class name
+        if (isset($this->model)) {
+            $info['model'] = sprintf(
+                '%s Object ()',
+                get_class($this->model)
+            );
+        }
+
+        return $info;
+    }
 }
