@@ -238,7 +238,11 @@ html, body {
 /* Offset utilities */
 @for $i from 0 through 11 {
     .offset-#{$i} {
-        margin-left: if($i > 0, math.percentage(math.div($i, 12)), 0);
+        @if $i > 0 {
+            margin-left: math.percentage(math.div($i, 12));
+        } @else {
+            margin-left: 0;
+        }
     }
 }
 
@@ -246,7 +250,11 @@ html, body {
 @media (min-width: 576px) {
     @for $i from 0 through 11 {
         .offset-sm-#{$i} {
-            margin-left: if($i > 0, math.percentage(math.div($i, 12)), 0);
+            @if $i > 0 {
+                margin-left: math.percentage(math.div($i, 12));
+            } @else {
+                margin-left: 0;
+            }
         }
     }
 }
@@ -254,7 +262,11 @@ html, body {
 @media (min-width: 768px) {
     @for $i from 0 through 11 {
         .offset-md-#{$i} {
-            margin-left: if($i > 0, math.percentage(math.div($i, 12)), 0);
+            @if $i > 0 {
+                margin-left: math.percentage(math.div($i, 12));
+            } @else {
+                margin-left: 0;
+            }
         }
     }
 }
@@ -262,7 +274,11 @@ html, body {
 @media (min-width: 992px) {
     @for $i from 0 through 11 {
         .offset-lg-#{$i} {
-            margin-left: if($i > 0, math.percentage(math.div($i, 12)), 0);
+            @if $i > 0 {
+                margin-left: math.percentage(math.div($i, 12));
+            } @else {
+                margin-left: 0;
+            }
         }
     }
 }
@@ -270,7 +286,11 @@ html, body {
 @media (min-width: 1200px) {
     @for $i from 0 through 11 {
         .offset-xl-#{$i} {
-            margin-left: if($i > 0, math.percentage(math.div($i, 12)), 0);
+            @if $i > 0 {
+                margin-left: math.percentage(math.div($i, 12));
+            } @else {
+                margin-left: 0;
+            }
         }
     }
 }
