@@ -4,7 +4,8 @@
  */
 
 /* Display utilities */
-.d-none {
+.d-none,
+.hidden {
     display: none !important;
 }
 
