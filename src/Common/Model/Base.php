@@ -860,7 +860,7 @@ abstract class Base
      */
     public function includeDeleted(): self
     {
-        if (static::DESTRUCTIVE_DELETE) {
+        if ($this->isDestructiveDelete()) {
             throw new ModelException(sprintf(
                 '`%s` uses destructive deletes.',
                 static::class
