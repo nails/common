@@ -16,7 +16,7 @@ namespace Nails\Common\Factory\HttpRequest;
  *
  * @package Nails\Common\Factory\HttpRequest
  */
-class Delete extends Get
+class Delete extends Post
 {
     const HTTP_METHOD = 'DELETE';
 }
