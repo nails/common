@@ -13,7 +13,6 @@ namespace Nails\Common\Service;
 
 class HttpCodes
 {
-
     //  1xx Informational
     const STATUS_100                 = 'Continue';
     const STATUS_CONTINUE            = 100;
@@ -143,9 +142,98 @@ class HttpCodes
     // --------------------------------------------------------------------------
 
     /**
+     * Returns all the HTTP Codes and their human-friendly label
+     * @return array<int, string>
+     */
+    public static function all(): array
+    {
+        return [
+            //  1xx Informational
+            self::STATUS_CONTINUE            => self::STATUS_100,
+            self::STATUS_SWITCHING_PROTOCOLS => self::STATUS_101,
+
+            //  2xx Success
+            self::STATUS_OK                            => self::STATUS_200,
+            self::STATUS_CREATED                       => self::STATUS_201,
+            self::STATUS_ACCEPTED                      => self::STATUS_202,
+            self::STATUS_NON_AUTHORITATIVE_INFORMATION => self::STATUS_203,
+            self::STATUS_NO_CONTENT                    => self::STATUS_204,
+            self::STATUS_RESET_CONTENT                 => self::STATUS_205,
+            self::STATUS_PARTIAL_CONTENT               => self::STATUS_206,
+            self::STATUS_MULTI_STATUS                  => self::STATUS_207,
+            self::STATUS_ALREADY_IMPORTED              => self::STATUS_208,
+            self::STATUS_IM_USED                       => self::STATUS_226,
+
+            //  3xx Redirection
+            self::STATUS_MULTIPLE_CHOICES   =>  self::STATUS_300,
+            self::STATUS_MOVED_PERMANENTLY  =>  self::STATUS_301,
+            self::STATUS_FOUND              =>  self::STATUS_302,
+            self::STATUS_SEE_OTHER          =>  self::STATUS_303,
+            self::STATUS_NOT_MODIFIED       =>  self::STATUS_304,
+            self::STATUS_USE_PROXY          =>  self::STATUS_305,
+            self::STATUS_SWITCH_PROXY       =>  self::STATUS_306,
+            self::STATUS_TEMPORARY_REDIRECT =>  self::STATUS_307,
+            self::STATUS_PERMANENT_REDIRECT =>  self::STATUS_308,
+
+            //  4xxx Client Error
+            self::STATUS_BAD_REQUEST                     =>  self::STATUS_400,
+            self::STATUS_UNAUTHORIZED                    =>  self::STATUS_401,
+            self::STATUS_PAYMENT_REQUIRED                =>  self::STATUS_402,
+            self::STATUS_FORBIDDEN                       =>  self::STATUS_403,
+            self::STATUS_NOT_FOUND                       =>  self::STATUS_404,
+            self::STATUS_METHOD_NOT_ALLOWED              =>  self::STATUS_405,
+            self::STATUS_NOT_ACCEPTABLE                  =>  self::STATUS_406,
+            self::STATUS_PROXY_AUTHENTICATION_REQUIRED   =>  self::STATUS_407,
+            self::STATUS_REQUEST_TIMEOUT                 =>  self::STATUS_408,
+            self::STATUS_CONFLICT                        =>  self::STATUS_409,
+            self::STATUS_GONE                            =>  self::STATUS_410,
+            self::STATUS_LENGTH_REQUIRED                 =>  self::STATUS_411,
+            self::STATUS_PRECONDITION_FAILED             =>  self::STATUS_412,
+            self::STATUS_REQUEST_ENTITY_TOO_LARGE        =>  self::STATUS_413,
+            self::STATUS_REQUES_URI_TOO_LONG             =>  self::STATUS_414,
+            self::STATUS_UNSUPPORTED_MEDIA_TYPE          =>  self::STATUS_415,
+            self::STATUS_REQUESTED_RANGE_NOT_SATISFIABLE =>  self::STATUS_416,
+            self::STATUS_EXPECTATION_FAILED              =>  self::STATUS_417,
+            self::STATUS_MISDIRECTED_REQUEST             =>  self::STATUS_421,
+            self::STATUS_UNPROCESSABLE_ENTITY            =>  self::STATUS_422,
+            self::STATUS_LOCKED                          =>  self::STATUS_423,
+            self::STATUS_FAILED_DEPENDENCY               =>  self::STATUS_424,
+            self::STATUS_UPGRADE_REQUIRED                =>  self::STATUS_426,
+            self::STATUS_PRECONDITION_REQUIRED           =>  self::STATUS_428,
+            self::STATUS_TOO_MANY_REQUESTS               =>  self::STATUS_429,
+            self::STATUS_REQUEST_HEADER_FIELDS_TOO_LARGE =>  self::STATUS_431,
+
+            //  5xx Server Error
+            self::STATUS_INTERNAL_SERVER_ERROR           =>  self::STATUS_500,
+            self::STATUS_NOT_IMPLEMENTED                 =>  self::STATUS_501,
+            self::STATUS_BAD_GATEWAY                     =>  self::STATUS_502,
+            self::STATUS_SERVICE_UNAVAILABLE             =>  self::STATUS_503,
+            self::STATUS_GATEWAY_TIMEOUT                 =>  self::STATUS_504,
+            self::STATUS_HTTP_VERSION_NOT_SUPPORTED      =>  self::STATUS_505,
+            self::STATUS_VARIANT_ALSO_NEGOTIATES         =>  self::STATUS_506,
+            self::STATUS_INSUFFICIENT_STORAGE            =>  self::STATUS_507,
+            self::STATUS_LOOP_DETECTED                   =>  self::STATUS_508,
+            self::STATUS_NOT_EXTENDED                    =>  self::STATUS_510,
+            self::STATUS_NETWORK_AUTHENTICATION_REQUIRED =>  self::STATUS_511,
+        ];
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Determines whether an HTTP Status code is valid
+     */
+    public static function isValid(int $iCode): bool
+    {
+        return in_array($iCode, array_keys(self::all()));
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Returns the human readable portion of an HTTP status code
      *
-     * @param $iCode integer The numerical HTTP status code
+     * @param $iCode int The numerical HTTP status code
      *
      * @return string|null
      */
