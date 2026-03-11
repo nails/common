@@ -541,11 +541,12 @@ abstract class Base
         $oDb = Factory::service('Database');
 
         /**
-         * Note the current timestamp behaiour, if we want to skip it then we'll
-         * need to re-set it on each iteration of the loop as `update()` will
-         * reset it.
+         * Note the current timestamp and user behaviours, if we want to skip either
+         * then we'll need to re-set it on each iteration of the loop as `update()`
+         * will reset it.
          */
         $bSkipUpdateTimestamps = $this->bSkipUpdateTimestamp;
+        $bSkipUpdateUsers      = $this->bSkipUpdateUsers;
 
         try {
             $oDb->transaction()->start();
@@ -553,6 +554,10 @@ abstract class Base
 
                 if ($bSkipUpdateTimestamps) {
                     $this->skipUpdateTimestamp();
+                }
+
+                if ($bSkipUpdateUsers) {
+                    $this->skipUpdateUsers();
                 }
 
                 if (!$this->update($iId, $aData)) {
