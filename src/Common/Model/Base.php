@@ -1916,15 +1916,11 @@ abstract class Base
             }
 
             //  Get all associations for items in the resultset
-            $aTaxonomy = $oTaxonomyModel->getAll(
-                null,
-                null,
-                [
-                    'where_in' => [
-                        [$sTaxonomyItemIdColumn, $aItemIds],
-                    ],
-                ]
-            );
+            $aTaxonomy = $oTaxonomyModel->getAll([
+                'where_in' => [
+                    [$sTaxonomyItemIdColumn, $aItemIds],
+                ],
+            ]);
 
             if (!empty($aTaxonomy)) {
 
