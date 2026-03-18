@@ -1806,7 +1806,7 @@ abstract class Base
                 $aItemIds[] = $oItem->id;
 
                 //  Set the base property
-                $oItem->{$sItemProperty} = Factory::resource('ExpandableField');
+                $oItem->{$sItemProperty} = Factory::resource('ExpandableFieldData');
             }
 
             if (empty($aAssociatedModelData['where_in'])) {
@@ -1863,8 +1863,9 @@ abstract class Base
                 if (empty($aQueryData['where'])) {
                     $aQueryData['where'] = [];
                 }
-                $aQueryData['where'][]   = [$sAssociatedItemIdColumn, $oItem->id];
-                $oItem->{$sItemProperty} = $oAssociatedModel->countAll($aQueryData);
+                $aQueryData['where'][]          = [$sAssociatedItemIdColumn, $oItem->id];
+                $oItem->{$sItemProperty}        = Factory::resource('ExpandableFieldCount');
+                $oItem->{$sItemProperty}->count = $oAssociatedModel->countAll($aQueryData);
             }
         }
     }
@@ -1911,7 +1912,7 @@ abstract class Base
                 $aItemIds[] = $oItem->id;
 
                 //  Set the base property
-                $oItem->{$sItemProperty} = Factory::resource('ExpandableField');
+                $oItem->{$sItemProperty} = Factory::resource('ExpandableFieldData');
             }
 
             //  Get all associations for items in the resultset

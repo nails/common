@@ -679,7 +679,21 @@ return [
                 return new Resource\DateTime($resource);
             }
         },
-        'ExpandableField'  => function (): Resource\ExpandableField {
+        'ExpandableFieldCount' => function (): Resource\ExpandableFieldCount {
+            if (class_exists('\App\Common\Resource\ExpandableFieldCount')) {
+                return new \App\Common\Resource\ExpandableFieldCount();
+            } else {
+                return new Resource\ExpandableFieldCount();
+            }
+        },
+        'ExpandableFieldData'  => function (): Resource\ExpandableFieldData {
+            if (class_exists('\App\Common\Resource\ExpandableFieldData')) {
+                return new \App\Common\Resource\ExpandableFieldData();
+            } else {
+                return new Resource\ExpandableFieldData();
+            }
+        },
+        'ExpandableField'      => function (): Resource\ExpandableField {
             if (class_exists('\App\Common\Resource\ExpandableField')) {
                 return new \App\Common\Resource\ExpandableField();
             } else {
