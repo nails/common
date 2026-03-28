@@ -2,13 +2,14 @@
 
 namespace Nails\Common\Factory;
 
+use Closure;
 use Nails\Bootstrap;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\Redirect\InvalidDestinationException;
 use Nails\Common\Exception\Redirect\InvalidHttpResponseCodeException;
 use Nails\Common\Exception\Redirect\InvalidMethodException;
-use Nails\Common\Exception\Redirect\RedirectException;
 use Nails\Common\Service;
+use Nails\Common\Service\UserFeedback;
 use Nails\Config;
 use Nails\Factory;
 
@@ -27,11 +28,13 @@ class Redirect
 
     // --------------------------------------------------------------------------
 
-    protected string $sLocalHost;
     protected string $sUrl;
     protected string $sMethod;
     protected bool $bAllowExternal;
     protected int $iHttpResponseCode;
+    protected string $sAppDomain;
+    /** @var string[] */
+    protected array $aSafeDomains = [];
 
     /**
      * The following properties and associated constructor arguments make it
@@ -43,22 +46,24 @@ class Redirect
     // --------------------------------------------------------------------------
 
     /**
-     * @param string                    $sUrl
-     * @param string                    $sMethod
-     * @param int                       $iHttpResponseCode
-     * @param bool                      $bAllowExternal
-     * @param Service\UserFeedback|null $oUserFeedback
-     * @param string|null               $sBootstrapClass
+     * @param string            $sUrl
+     * @param string            $sMethod
+     * @param int               $iHttpResponseCode
+     * @param bool              $bAllowExternal
+     * @param array             $aSafeDomains
+     * @param UserFeedback|null $oUserFeedback
+     * @param string|null       $sBootstrapClass
      *
-     * @throws InvalidMethodException
-     * @throws RedirectException
      * @throws FactoryException
+     * @throws InvalidHttpResponseCodeException
+     * @throws InvalidMethodException
      */
     public function __construct(
         string $sUrl = '',
         string $sMethod = self::METHOD_LOCATION,
         int $iHttpResponseCode = self::HTTP_CODE_TEMPORARY,
         bool $bAllowExternal = false,
+        array $aSafeDomains = [],
 
         /**
          * The following properties and associated constructor arguments make it
@@ -71,10 +76,31 @@ class Redirect
             ->setUrl($sUrl)
             ->setMethod($sMethod)
             ->setHttpResponseCode($iHttpResponseCode)
-            ->allowExternal($bAllowExternal);
+            ->allowExternal($bAllowExternal)
+            ->setSafeDomains($aSafeDomains);
 
         $this->oUserFeedback   = $oUserFeedback ?? Factory::service('UserFeedback');
         $this->sBootstrapClass = $sBootstrapClass ?? Bootstrap::class;
+    }
+
+    // --------------------------------------------------------------------------
+
+    public function setAppDomain(string $sAppDomain): self
+    {
+        $this->sAppDomain = $sAppDomain;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the application's domain
+     *
+     * @return string
+     */
+    public function getAppDomain(): string
+    {
+        return $this->sAppDomain ?? Config::get('BASE_URL');
     }
 
     // --------------------------------------------------------------------------
@@ -103,24 +129,52 @@ class Redirect
     // --------------------------------------------------------------------------
 
     /**
-     * @param string $sLocalHost
+     * Adds a domain to the list of safe domains to which redirects are permitted.
+     * A URL whose host matches any safe domain is considered internal.
+     *
+     * @param string $sDomain A full URL or host – the host component is extracted for comparison.
      *
      * @return $this
      */
-    public function setLocalHost(string $sLocalHost): self
+    public function addSafeDomain(string $sDomain): self
     {
-        $this->sLocalHost = $sLocalHost;
+        $this->aSafeDomains[] = $sDomain;
         return $this;
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * @return string
+     * Replaces the entire list of safe domains.
+     *
+     * @param string[] $aDomains
+     *
+     * @return $this
      */
-    public function getLocalHost(): string
+    public function setSafeDomains(array $aDomains): self
     {
-        return $this->sLocalHost ?? Config::get('BASE_URL');
+        $this->aSafeDomains = $aDomains;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns all safe domains. The effective list is built by merging:
+     *   1. The application's URL (always included)
+     *   2. Any domains defined via the REDIRECT_SAFE_DOMAINS config variable
+     *   3. Any domains added at the instance level via the constructor or setter methods
+     *
+     * @return string[]
+     */
+    public function getSafeDomains(): array
+    {
+        $aConfigDomains = (array) (Config::get('REDIRECT_SAFE_DOMAINS') ?? []);
+        return array_values(array_filter(array_unique(array_merge(
+            [$this->getAppDomain()],
+            $aConfigDomains,
+            $this->aSafeDomains,
+        ))));
     }
 
     // --------------------------------------------------------------------------
@@ -240,16 +294,16 @@ class Redirect
     // --------------------------------------------------------------------------
 
     /**
-     * @param \Closure|null $cInspect
+     * @param Closure|null $cInspect
      *
      * @return void
      * @throws InvalidDestinationException
      */
-    public function execute(?\Closure $cInspect = null): void
+    public function execute(?Closure $cInspect = null): void
     {
         $sUrl = $this->getUrl();
         if (!preg_match('/^https?:\/\//', $sUrl)) {
-            $sUrl = $this->getLocalHost() . $sUrl;
+            $sUrl = $this->getAppDomain() . $sUrl;
         }
 
         // --------------------------------------------------------------------------
@@ -314,8 +368,13 @@ class Redirect
             return false;
         }
 
-        $aLocalHost = parse_url($this->getLocalHost());
+        foreach ($this->getSafeDomains() as $sSafeDomain) {
+            $aSafeDomain = parse_url($sSafeDomain);
+            if ($aUrl['host'] === ($aSafeDomain['host'] ?? null)) {
+                return false;
+            }
+        }
 
-        return $aUrl['host'] !== ($aLocalHost['host'] ?? null);
+        return true;
     }
 }
