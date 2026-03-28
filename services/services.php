@@ -592,21 +592,24 @@ return [
             string $sUrl = '',
             string $sMethod = Factory\Redirect::METHOD_LOCATION,
             int $iHttpResponseCode = Factory\Redirect::HTTP_CODE_TEMPORARY,
-            bool $bAllowExternal = false
+            bool $bAllowExternal = false,
+            array $aSafeDomains = []
         ): Factory\Redirect {
             if (class_exists('\App\Common\Factory\Redirect')) {
                 return new \App\Common\Factory\Redirect(
                     $sUrl,
                     $sMethod,
                     $iHttpResponseCode,
-                    $bAllowExternal
+                    $bAllowExternal,
+                    $aSafeDomains
                 );
             } else {
                 return new Factory\Redirect(
                     $sUrl,
                     $sMethod,
                     $iHttpResponseCode,
-                    $bAllowExternal
+                    $bAllowExternal,
+                    $aSafeDomains
                 );
             }
         },

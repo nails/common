@@ -17,6 +17,7 @@ class RedirectTest extends TestCase
         ?string $sMethod = null,
         ?int $iHttpResponseCode = null,
         ?bool $bAllowExternal = null,
+        ?array $aSafeDomains = null,
         $oUserFeedbackMock = null,
         $sBootstrapMock = null
     ): Redirect {
@@ -25,6 +26,7 @@ class RedirectTest extends TestCase
             $sMethod ?? Redirect::METHOD_LOCATION,
             $iHttpResponseCode ?? Redirect::HTTP_CODE_TEMPORARY,
             $bAllowExternal ?? false,
+            $aSafeDomains ?? [],
             $oUserFeedbackMock ?? $this->createUserFeedbackMock(),
             $sBootstrapMock ?? get_class($this->createBootstrapMock())
         );
@@ -52,7 +54,7 @@ class RedirectTest extends TestCase
                     }
                 }
             }
-            
+
             return new $sClassName();
         ");
     }
@@ -108,15 +110,168 @@ class RedirectTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
-     * @covers \Nails\Common\Factory\Redirect::setLocalHost
-     * @covers \Nails\Common\Factory\Redirect::getLocalHost
+     * @covers \Nails\Common\Factory\Redirect::__constructor
+     * @covers \Nails\Common\Factory\Redirect::getSafeDomains
      */
-    public function test_can_set_and_get_local_host(): void
+    public function test_can_set_safe_domains_via_constructor(): void
+    {
+        $aSafeDomains = ['https://trusted.com', 'https://partner.com'];
+        $oRedirect    = $this->getInstance(null, null, null, null, $aSafeDomains);
+        foreach ($aSafeDomains as $sDomain) {
+            $this->assertContains($sDomain, $oRedirect->getSafeDomains());
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * @covers \Nails\Common\Factory\Redirect::setAppDomain
+     * @covers \Nails\Common\Factory\Redirect::getAppDomain
+     */
+    public function test_can_set_and_get_app_domain(): void
     {
         $sUrl      = 'https://localhost.com';
         $oRedirect = $this->getInstance();
-        $oRedirect->setLocalHost($sUrl);
-        $this->assertEquals($sUrl, $oRedirect->getLocalHost());
+        $oRedirect->setAppDomain($sUrl);
+        $this->assertEquals($sUrl, $oRedirect->getAppDomain());
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * @covers \Nails\Common\Factory\Redirect::setAppDomain
+     * @covers \Nails\Common\Factory\Redirect::getSafeDomains
+     */
+    public function test_set_app_domain_preserves_additional_safe_domains(): void
+    {
+        $oRedirect = $this->getInstance();
+        $oRedirect
+            ->addSafeDomain('https://trusted.com')
+            ->setAppDomain('https://primary.com');
+
+        $this->assertContains('https://trusted.com', $oRedirect->getSafeDomains());
+        $this->assertEquals('https://primary.com', $oRedirect->getAppDomain());
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * @covers \Nails\Common\Factory\Redirect::addSafeDomain
+     * @covers \Nails\Common\Factory\Redirect::getSafeDomains
+     */
+    public function test_can_add_safe_domain(): void
+    {
+        $oRedirect = $this->getInstance();
+        $oRedirect->addSafeDomain('https://trusted.com');
+        $this->assertContains('https://trusted.com', $oRedirect->getSafeDomains());
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * @covers \Nails\Common\Factory\Redirect::addSafeDomain
+     * @covers \Nails\Common\Factory\Redirect::getSafeDomains
+     */
+    public function test_can_add_multiple_safe_domains(): void
+    {
+        $oRedirect = $this->getInstance();
+        $oRedirect
+            ->addSafeDomain('https://trusted.com')
+            ->addSafeDomain('https://partner.com');
+
+        $this->assertContains('https://trusted.com', $oRedirect->getSafeDomains());
+        $this->assertContains('https://partner.com', $oRedirect->getSafeDomains());
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * @covers \Nails\Common\Factory\Redirect::setSafeDomains
+     * @covers \Nails\Common\Factory\Redirect::getSafeDomains
+     */
+    public function test_can_set_and_get_safe_domains(): void
+    {
+        $aSafeDomains = ['https://trusted.com', 'https://partner.com'];
+        $oRedirect    = $this->getInstance();
+        $oRedirect->setSafeDomains($aSafeDomains);
+        foreach ($aSafeDomains as $sDomain) {
+            $this->assertContains($sDomain, $oRedirect->getSafeDomains());
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * @covers \Nails\Common\Factory\Redirect::setSafeDomains
+     * @covers \Nails\Common\Factory\Redirect::getSafeDomains
+     */
+    public function test_set_safe_domains_replaces_existing(): void
+    {
+        $oRedirect = $this->getInstance();
+        $oRedirect
+            ->addSafeDomain('https://old.com')
+            ->setSafeDomains(['https://new.com']);
+
+        $this->assertContains('https://new.com', $oRedirect->getSafeDomains());
+        $this->assertNotContains('https://old.com', $oRedirect->getSafeDomains());
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * @covers \Nails\Common\Factory\Redirect::getSafeDomains
+     */
+    public function test_get_safe_domains_always_includes_base_url(): void
+    {
+        $sBaseUrl  = Config::get('BASE_URL');
+        $oRedirect = $this->getInstance();
+        $this->assertContains($sBaseUrl, $oRedirect->getSafeDomains());
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * @covers \Nails\Common\Factory\Redirect::getSafeDomains
+     */
+    public function test_get_safe_domains_includes_base_url_even_when_safe_domains_replaced(): void
+    {
+        $sBaseUrl  = Config::get('BASE_URL');
+        $oRedirect = $this->getInstance();
+        $oRedirect->setSafeDomains(['https://other.com']);
+        $this->assertContains($sBaseUrl, $oRedirect->getSafeDomains());
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * @covers \Nails\Common\Factory\Redirect::getSafeDomains
+     */
+    public function test_get_safe_domains_includes_config_domains(): void
+    {
+        Config::set('REDIRECT_SAFE_DOMAINS', ['https://config-trusted.com']);
+
+        try {
+            $oRedirect = $this->getInstance();
+            $this->assertContains('https://config-trusted.com', $oRedirect->getSafeDomains());
+        } finally {
+            Config::set('REDIRECT_SAFE_DOMAINS', null);
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * @covers \Nails\Common\Factory\Redirect::getSafeDomains
+     */
+    public function test_get_safe_domains_returns_unique_values(): void
+    {
+        $oRedirect = $this->getInstance();
+        $oRedirect
+            ->addSafeDomain(Config::get('BASE_URL'))
+            ->addSafeDomain(Config::get('BASE_URL'));
+
+        $aSafeDomains = $oRedirect->getSafeDomains();
+        $this->assertCount(count(array_unique($aSafeDomains)), $aSafeDomains);
     }
 
     // --------------------------------------------------------------------------
@@ -242,7 +397,7 @@ class RedirectTest extends TestCase
     {
         $oRedirect = $this->getInstance();
         $oRedirect
-            ->setLocalHost('https://localhost.com')
+            ->setAppDomain('https://localhost.com')
             ->setUrl('/foo/bar')
             ->execute(function ($sHeader) {
                 $this->assertEquals('Location: https://localhost.com/foo/bar', $sHeader);
@@ -259,9 +414,9 @@ class RedirectTest extends TestCase
             ->expects($this->once())
             ->method('persist');
 
-        $oRedirect = $this->getInstance(null, null, null, null, $oUserFeedback);
+        $oRedirect = $this->getInstance(null, null, null, null, null, $oUserFeedback);
         $oRedirect
-            ->setLocalHost('https://localhost.com')
+            ->setAppDomain('https://localhost.com')
             ->setUrl('/foo/bar')
             ->execute(function ($sHeader) {
                 // closure prevents redirect from sending headers or exiting
@@ -278,9 +433,9 @@ class RedirectTest extends TestCase
 
         $this->expectException(\RuntimeException::class);
 
-        $oRedirect = $this->getInstance(null, null, null, null, null, get_class($oBootstrap));
+        $oRedirect = $this->getInstance(null, null, null, null, null, null, get_class($oBootstrap));
         $oRedirect
-            ->setLocalHost('https://localhost.com')
+            ->setAppDomain('https://localhost.com')
             ->setUrl('/foo/bar')
             ->execute(function ($sHeader) {
                 // closure prevents redirect from sending headers or exiting
@@ -295,7 +450,7 @@ class RedirectTest extends TestCase
 
         $oRedirect = $this->getInstance();
         $oRedirect
-            ->setLocalHost('https://localhost.com')
+            ->setAppDomain('https://localhost.com')
             ->setUrl('https://remotehost.com/foo/bar"')
             ->execute();
     }
@@ -306,11 +461,77 @@ class RedirectTest extends TestCase
     {
         $oRedirect = $this->getInstance();
         $oRedirect
-            ->setLocalHost('https://localhost.com')
+            ->setAppDomain('https://localhost.com')
             ->setUrl('https://remotehost.com/foo/bar')
             ->allowExternal()
             ->execute(function ($sHeader) {
                 $this->assertEquals('Location: https://remotehost.com/foo/bar', $sHeader);
             });
+    }
+
+    // --------------------------------------------------------------------------
+
+    public function test_safe_domain_is_not_considered_external()
+    {
+        $oRedirect = $this->getInstance();
+        $oRedirect
+            ->setAppDomain('https://localhost.com')
+            ->addSafeDomain('https://trusted.com')
+            ->setUrl('https://trusted.com/some/path')
+            ->execute(function ($sHeader) {
+                $this->assertEquals('Location: https://trusted.com/some/path', $sHeader);
+            });
+    }
+
+    // --------------------------------------------------------------------------
+
+    public function test_safe_domain_set_via_constructor_is_not_considered_external()
+    {
+        $oRedirect = $this->getInstance(
+            null,
+            null,
+            null,
+            null,
+            ['https://trusted.com']
+        );
+        $oRedirect
+            ->setAppDomain('https://localhost.com')
+            ->setUrl('https://trusted.com/some/path')
+            ->execute(function ($sHeader) {
+                $this->assertEquals('Location: https://trusted.com/some/path', $sHeader);
+            });
+    }
+
+    // --------------------------------------------------------------------------
+
+    public function test_safe_domain_set_via_config_is_not_considered_external()
+    {
+        Config::set('REDIRECT_SAFE_DOMAINS', ['https://config-trusted.com']);
+
+        try {
+            $oRedirect = $this->getInstance();
+            $oRedirect
+                ->setAppDomain('https://localhost.com')
+                ->setUrl('https://config-trusted.com/some/path')
+                ->execute(function ($sHeader) {
+                    $this->assertEquals('Location: https://config-trusted.com/some/path', $sHeader);
+                });
+        } finally {
+            Config::set('REDIRECT_SAFE_DOMAINS', null);
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    public function test_non_safe_domain_still_throws_exception()
+    {
+        $this->expectException(InvalidDestinationException::class);
+
+        $oRedirect = $this->getInstance();
+        $oRedirect
+            ->setAppDomain('https://localhost.com')
+            ->addSafeDomain('https://trusted.com')
+            ->setUrl('https://evil.com/phishing')
+            ->execute();
     }
 }
