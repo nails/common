@@ -45,12 +45,9 @@ class ArrayFilterMultiTest extends TestCase
 
     // --------------------------------------------------------------------------
 
-    /**
-     * ArrayFilterMultiTest constructor.
-     */
-    public function __construct($name = null, array $data = [], $dataName = '')
+    protected function setUp(): void
     {
-        parent::__construct($name, $data, $dataName);
+        parent::setUp();
 
         $this->aTestArrayArray = [
             $this->aTestItem1,
