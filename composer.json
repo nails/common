@@ -1,7 +1,6 @@
 {
     "name": "nails/common",
-    "keywords":
-    [
+    "keywords": [
         "Nails",
         "Shed Collective",
         "CodeIgniter"
@@ -9,8 +8,7 @@
     "homepage": "http://nailsapp.co.uk",
     "description": "Nails is a PHP framework to make building hand-crafted, exhilarating web apps fast and painless.",
     "license": "MIT",
-    "authors":
-    [
+    "authors": [
         {
             "name": "Pablo de la Pena",
             "email": "p@nailsapp.co.uk",
@@ -24,15 +22,13 @@
             "role": "Developer"
         }
     ],
-    "support":
-    {
+    "support": {
         "email": "hello@nailsapp.co.uk"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "require":
-    {
-        "php": ">=8",
+    "require": {
+        "php": ">=8.3",
         "ext-fileinfo": "*",
         "ext-intl": "*",
         "ext-json": "*",
@@ -53,39 +49,30 @@
         "symfony/translation-contracts": "3.*",
         "vlucas/phpdotenv": "5.*"
     },
-    "require-dev":
-    {
-        "phpunit/phpunit": "9.*",
+    "require-dev": {
+        "phpunit/phpunit": "^12.0",
         "phpstan/phpstan": "1.*"
     },
-    "scripts":
-    {
+    "scripts": {
         "test": "mkdir -p cache/private cache/public && ./vendor/bin/phpunit",
         "analyse": "./vendor/bin/phpstan analyse -c .phpstan/config.neon"
     },
-    "autoload":
-    {
-        "psr-4":
-        {
+    "autoload": {
+        "psr-4": {
             "Nails\\": "src/",
             "Nails\\Common\\": "src/Common/"
         }
     },
-    "extra":
-    {
-        "nails":
-        {
+    "extra": {
+        "nails": {
             "moduleName": "common",
             "type": "module",
             "namespace": "Nails\\Common\\",
-            "autoload":
-            {
-                "services":
-                [
+            "autoload": {
+                "services": [
                     "ErrorHandler"
                 ],
-                "helpers":
-                [
+                "helpers": [
                     "app_setting",
                     "array",
                     "asset",
@@ -110,18 +97,14 @@
                     "url"
                 ]
             },
-            "data":
-            {
-                "nails/module-cdn":
-                {
-                    "permitted-image-dimensions":
-                    [
+            "data": {
+                "nails/module-cdn": {
+                    "permitted-image-dimensions": [
                         "35x35"
                     ]
                 }
             },
-            "scripts":
-            {
+            "scripts": {
                 "install": "./scripts/install-mime-db.sh"
             }
         }
