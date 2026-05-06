@@ -26,6 +26,7 @@ use Nails\Components;
  * @property string    $slugUrl
  * @property string    $namespace
  * @property string    $name
+ * @property string    $version
  * @property string    $description
  * @property string    $homepage
  * @property array     $authors
@@ -46,6 +47,7 @@ final class Component
     private $slugUrl;
     private $namespace;
     private $name;
+    private $version;
     private $description;
     private $homepage;
     private $authors;
@@ -79,6 +81,7 @@ final class Component
         $this->slugUrl      = str_replace('/', '-', $this->slug);
         $this->namespace    = ArrayHelper::get('namespace', $aNailsData);
         $this->name         = ArrayHelper::get('name', $aNailsData, $this->slug);
+        $this->version      = ArrayHelper::get('version', $aPackage, '0.0.0');
         $this->description  = ArrayHelper::get('description', $aNailsData, ArrayHelper::get('description', $aPackage));
         $this->homepage     = ArrayHelper::get('homepage', $aNailsData, ArrayHelper::get('homepage', $aPackage));
         $this->authors      = ArrayHelper::get('authors', $aNailsData, ArrayHelper::get('authors', $aPackage));

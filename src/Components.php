@@ -311,6 +311,7 @@ final class Components
                     ? $aComposer['name']
                     : static::$sAppSlug,
 
+                'version'     => ArrayHelper::get('version', $aNails, ArrayHelper::get('version', $aComposer)),
                 'description' => ArrayHelper::get('description', $aNails, ArrayHelper::get('description', $aComposer)),
                 'homepage'    => ArrayHelper::get('homepage', $aNails, ArrayHelper::get('homepage', $aComposer)),
                 'authors'     => ArrayHelper::get('authors', $aNails, ArrayHelper::get('authors', $aComposer)),
