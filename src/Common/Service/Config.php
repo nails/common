@@ -119,19 +119,28 @@ class Config
         if (preg_match('/^(https?:\/\/|#)/', $sUri ?? '')) {
             //  Absolute URI; return unaltered
             return $sUri;
-
         }
 
-        $sBaseUrl = $bUseSecure
-            ? rtrim(\Nails\Config::get('SECURE_BASE_URL'), '/') . '/'
-            : rtrim(\Nails\Config::get('BASE_URL'), '/') . '/';
+        static $aCachedBaseUrls = [];
+        static $sCachedLocale   = null;
 
-        /** @var Locale $oLocale */
-        $oLocale = Factory::service('Locale');
-        $sLocale = $oLocale->getUrlSegment($oLocale->get());
-        $sLocale = $sLocale && $sUri ? $sLocale . '/' : $sLocale;
+        $sCacheKey = $bUseSecure ? 'secure' : 'base';
 
-        return $sBaseUrl . $sLocale . ltrim($sUri ?? '', '/');
+        if (!isset($aCachedBaseUrls[$sCacheKey])) {
+            $aCachedBaseUrls[$sCacheKey] = $bUseSecure
+                ? rtrim(\Nails\Config::get('SECURE_BASE_URL'), '/') . '/'
+                : rtrim(\Nails\Config::get('BASE_URL'), '/') . '/';
+        }
+
+        if ($sCachedLocale === null) {
+            /** @var Locale $oLocale */
+            $oLocale       = Factory::service('Locale');
+            $sCachedLocale = $oLocale->getUrlSegment($oLocale->get()) ?: '';
+        }
+
+        $sLocale = $sCachedLocale && $sUri ? $sCachedLocale . '/' : $sCachedLocale;
+
+        return $aCachedBaseUrls[$sCacheKey] . $sLocale . ltrim($sUri ?? '', '/');
     }
 
     // --------------------------------------------------------------------------
