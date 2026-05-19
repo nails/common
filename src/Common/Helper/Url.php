@@ -48,7 +48,8 @@ class Url
     public static function siteUrl(?string $sUrl = null, bool $bForceSecure = false): string
     {
         /** @var \Nails\Common\Service\Config $oConfig */
-        $oConfig = Factory::service('Config');
+        static $oConfig = null;
+        $oConfig ??= Factory::service('Config');
         return $oConfig::siteUrl($sUrl, $bForceSecure);
     }
 
@@ -128,7 +129,6 @@ class Url
         /** @var FileCache $oFileCache */
         $oFileCache = Factory::service('FileCache');
         $sCacheFile = 'php-domain-parser-public-suffix.dat';
-
 
         if (!preg_match('/https?\:\\/\\//', $sUrl)) {
             $sUrl = 'http://' . $sUrl;
