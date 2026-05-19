@@ -245,12 +245,6 @@ final class Bootstrap
         //  Logging
         Config::default('LOG_DIR', Config::get('NAILS_APP_PATH') . implode(DIRECTORY_SEPARATOR, ['application', 'logs', '']));
 
-        //  Profiling constants
-        Config::default('PROFILER_ENABLED', false);
-        if (!PROFILER_ENABLED) {
-            Profiler::disable();
-        }
-
         //  Ensure the app's constants file is also loaded
         //  @todo (Pablo - 2018-11-16) - Remove reliance on this feature
         if (is_file(self::$sBaseDirectory . 'application/config/constants.php')) {
@@ -264,7 +258,7 @@ final class Bootstrap
      * This method is largely a copy/pase of the CI index.php file. It has been
      * modified in the following ways:
      *
-     * - The iniatal section considering environments has been removed
+     * - The initial section considering environments has been removed
      * - The section detailing error reporting has been removed
      * - The $system_path variable has been updated to reflect its true location
      * - The working directory is set to self::$sBaseDirectory
