@@ -4,6 +4,7 @@ namespace Nails\Common\Service;
 
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\NailsException;
+use Nails\Config;
 use Nails\Factory;
 
 /**
@@ -13,6 +14,9 @@ use Nails\Factory;
  */
 class Profiler
 {
+    const REPORT_TYPE_JSON = 'JSON';
+    const REPORT_TYPE_HTML = 'HTML';
+
     /**
      * The values to give the various sections of the HTML profiler
      */
@@ -31,27 +35,34 @@ class Profiler
     /**
      * Whether profiling is enabled or not
      *
-     * @var bool
+     * @var bool|null
      */
-    protected static $bEnabled = true;
+    protected static ?bool $bEnabled = null;
 
     /**
      * Recorded marks
      *
      * @var array
      */
-    protected static $aMarks = [];
+    protected static array $aMarks = [];
+
+    /**
+     * The type of report to generate (HTML or JSON))
+     *
+     * @var string|null
+     */
+    protected static ?string $sReportType = null;
 
     // --------------------------------------------------------------------------
 
     /**
-     * Determines whetehr profiling is enabled or not
+     * Determines whether profiling is enabled or not
      *
      * @return bool
      */
     public static function isEnabled(): bool
     {
-        return static::$bEnabled;
+        return static::$bEnabled = static::$bEnabled ?? Config::get('PROFILER_ENABLED', false);
     }
 
     // --------------------------------------------------------------------------
@@ -85,17 +96,13 @@ class Profiler
     {
         if (static::isEnabled()) {
 
-            $aBacktrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-            $aImmediate = $aBacktrace[0];
-            $aCaller    = $aBacktrace[1];
-            $sCaller    = (!empty($aCaller['class']) ? $aCaller['class'] . '->' : '') .
-                (!empty($aCaller['function']) ? $aCaller['function'] . '()' : '<unknown>()') .
-                (!empty($aImmediate['line']) ? '@L' . $aImmediate['line'] : '');
-
             if (!$sLabel) {
-                $sLabel = $sCaller;
-            } else {
-                $sLabel = $sLabel . ' (' . $sCaller . ')';
+                $aBacktrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+                $aImmediate = $aBacktrace[0];
+                $aCaller    = $aBacktrace[1];
+                $sLabel     = (!empty($aCaller['class']) ? $aCaller['class'] . '->' : '') .
+                    (!empty($aCaller['function']) ? $aCaller['function'] . '()' : '<unknown>()') .
+                    (!empty($aImmediate['line']) ? '@L' . $aImmediate['line'] : '');
             }
 
             static::$aMarks[] = [
@@ -108,29 +115,103 @@ class Profiler
     // --------------------------------------------------------------------------
 
     /**
-     * Generates the profiling report
+     * Sets the type of report to generate
      *
-     * @param bool $bAsJson Return the report as JSON rather than HTML
+     * @param string $sReportType
+     *
+     * @throws NailsException
+     */
+    public static function setReportType(string $sReportType): void
+    {
+        $aValidTypes = [
+            static::REPORT_TYPE_HTML,
+            static::REPORT_TYPE_JSON,
+        ];
+
+        if (!in_array($sReportType, $aValidTypes)) {
+            throw new NailsException(sprintf(
+                'Invalid report type "%s", must be one of: %s',
+                $sReportType,
+                implode(', ', $aValidTypes)
+            ));
+        }
+
+        static::$sReportType = $sReportType;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the current report type, setting a default if not set
+     */
+    public static function getReportType(): string
+    {
+        return static::$sReportType = static::$sReportType ?? Config::get('PROFILER_REPORT_TYPE', static::REPORT_TYPE_JSON);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Generates the profiling report
      *
      * @return string
      * @throws FactoryException
      * @throws NailsException
      */
-    public function generateReport(bool $bAsJson = false): string
+    public function generateReport(): string
     {
         if (!static::isEnabled()) {
             throw new NailsException('Profiling is disabled');
         }
 
-        $oReport = [
+        $oReport = (object) [
             'Timestamps' => $this->summariseMarks(),
             'Database'   => $this->summariseQueries(),
         ];
 
-        if ($bAsJson) {
-            return json_encode($oReport, JSON_PRETTY_PRINT);
-        }
+        return match (self::getReportType()) {
+            static::REPORT_TYPE_HTML => $this->generateReportHtml($oReport),
+            static::REPORT_TYPE_JSON => $this->generateReportJson($oReport),
+            default => throw new NailsException('Invalid report type: ' . static::$sReportType),
+        };
+    }
 
+    // --------------------------------------------------------------------------
+
+    /**
+     * Writes a JSON report to disk
+     *
+     * @param object $oReport
+     *
+     * @throws FactoryException
+     */
+    protected function generateReportJson(object $oReport): string
+    {
+        /** @var FileCache $oFileCache */
+        $oFileCache = Factory::service('FileCache');
+        /** @var DateTime $oNow */
+        $oNow = Factory::factory('DateTime');
+
+        $oFileCache->write(
+            json_encode($oReport, JSON_PRETTY_PRINT),
+            'profiler-' . $oNow->format('Y-m-d-H-i-s') . '.json'
+        );
+
+        //  Return an empty string for output; JSON reports go to disk
+        return '';
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns an HTML report of the profiling data
+     *
+     * @param object $oReport
+     *
+     * @return string
+     */
+    protected function generateReportHtml(object $oReport): string
+    {
         ob_start();
         $this->renderStyles();
         $this->renderJavascript();
