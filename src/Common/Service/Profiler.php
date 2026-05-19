@@ -33,11 +33,12 @@ class Profiler
     // --------------------------------------------------------------------------
 
     /**
-     * Whether profiling is enabled or not
+     * Whether profiling is enabled or not. The Profiler is enabled internally so it can greedily
+     * capture bootstrapping marks.
      *
-     * @var bool|null
+     * @var bool
      */
-    protected static ?bool $bEnabled = null;
+    protected static bool $bEnabled = true;
 
     /**
      * Recorded marks
@@ -62,7 +63,7 @@ class Profiler
      */
     public static function isEnabled(): bool
     {
-        return static::$bEnabled = static::$bEnabled ?? Config::get('PROFILER_ENABLED', false);
+        return static::$bEnabled;
     }
 
     // --------------------------------------------------------------------------
@@ -146,7 +147,10 @@ class Profiler
      */
     public static function getReportType(): string
     {
-        return static::$sReportType = static::$sReportType ?? Config::get('PROFILER_REPORT_TYPE', static::REPORT_TYPE_JSON);
+        return static::$sReportType =
+            static::$sReportType
+            ?? Config::get('PROFILER_REPORT_TYPE')
+            ?? static::REPORT_TYPE_JSON;
     }
 
     // --------------------------------------------------------------------------
