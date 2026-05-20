@@ -14,6 +14,7 @@ namespace Nails;
 use Nails\Common\Events;
 use Nails\Common\Exception\EnvironmentException;
 use Nails\Common\Service\ErrorHandler;
+use Nails\Common\Service\Input;
 use Nails\Common\Service\Profiler;
 use Nails\Common\Service\Routes;
 
@@ -250,6 +251,13 @@ final class Bootstrap
         Config::default('PROFILER_ENABLED', false);
         if (!Config::get('PROFILER_ENABLED')) {
             Profiler::disable();
+        }
+
+        //  Enable the profiler if the secret header is set, enforce JSON
+        //  This allows programatic enabling of the profiler from the CLI
+        if (Profiler::isValidHeaderSecret(Input::header(Profiler::HEADER_PROFILER_ENABLE))) {
+            Profiler::enable();
+            Profiler::setReportType(Profiler::REPORT_TYPE_JSON);
         }
 
         //  Ensure the app's constants file is also loaded
