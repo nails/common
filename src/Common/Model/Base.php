@@ -1558,12 +1558,12 @@ abstract class Base
      * Fetch an object by it's ID
      *
      * @param int   $iId   The ID of the object to fetch
-     * @param mixed $aData Any data to pass to getCountCommon()
+     * @param array $aData Any data to pass to getCountCommon()
      *
      * @return Resource|null
      * @throws ModelException
      */
-    public function getById($iId, array $aData = [])
+    public function getById(int $iId, array $aData = [])
     {
         if (!$this->getColumnId()) {
             throw new ModelException(static::class . '::getById() Column variable not set.', 1);
