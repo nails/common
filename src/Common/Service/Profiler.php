@@ -17,6 +17,8 @@ class Profiler
     const REPORT_TYPE_JSON = 'JSON';
     const REPORT_TYPE_HTML = 'HTML';
 
+    const HEADER_PROFILER_ENABLE = 'X-Profiler-Enabled';
+
     /**
      * The values to give the various sections of the HTML profiler
      */
@@ -53,6 +55,27 @@ class Profiler
      * @var string|null
      */
     protected static ?string $sReportType = null;
+
+    // --------------------------------------------------------------------------
+
+    public static function headerSecret(int $windowSeconds = 60): string
+    {
+        $window = (int) floor(time() / $windowSeconds);
+        return hash_hmac('sha256', (string) $window, Config::get('PRIVATE_KEY'));
+    }
+
+    // --------------------------------------------------------------------------
+
+    public static function isValidHeaderSecret(string $sSecret, int $windowSeconds = 60): bool
+    {
+        $window = (int) floor(time() / $windowSeconds);
+        foreach ([$window, $window - 1] as $w) {
+            if (hash_equals(hash_hmac('sha256', (string) $w, Config::get('PRIVATE_KEY')), $sSecret)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     // --------------------------------------------------------------------------
 
