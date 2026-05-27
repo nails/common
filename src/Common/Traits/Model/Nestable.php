@@ -68,12 +68,12 @@ trait Nestable
     /**
      * Fetch an object by it's ID
      *
-     * @param int   $iId   The ID of the object to fetch
-     * @param array $aData Any data to pass to getCountCommon()
+     * @param int|null $iId   The ID of the object to fetch
+     * @param array    $aData Any data to pass to getCountCommon()
      *
      * @return Resource|false
      */
-    abstract public function getById(int $iId, array $aData = []);
+    abstract public function getById(?int $iId, array $aData = []);
 
     // --------------------------------------------------------------------------
 
