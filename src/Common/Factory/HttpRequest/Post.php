@@ -65,7 +65,7 @@ class Post extends Get
         if ($bIsJson) {
             $this
                 ->setHeader('Content-Type', 'application/json')
-                ->setHeader('Content-Length', strlen($sBody));
+                ->setHeader('Content-Length', (string) strlen($sBody));
         }
         return $this;
     }
