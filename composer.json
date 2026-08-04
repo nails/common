@@ -37,7 +37,7 @@
         "annexare/countries-list": "3.*",
         "axisofstevil/stop-words": "1.*",
         "defuse/php-encryption": "2.*",
-        "guzzlehttp/guzzle": "8.*",
+        "guzzlehttp/guzzle": "7.* || 8.*",
         "jeremykendall/php-domain-parser": "6.*",
         "mustache/mustache": "3.*",
         "pimple/pimple": "3.*",
