@@ -23,9 +23,9 @@ final class Config
     /**
      * Load .env configurations
      */
-    public static function dotenv()
+    public static function dotenv(string $sBaseDirectory)
     {
-        $dotenv = Dotenv::createImmutable(__DIR__ . '/../../../../');
+        $dotenv = Dotenv::createImmutable($sBaseDirectory);
         $dotenv->safeLoad();
     }
 
