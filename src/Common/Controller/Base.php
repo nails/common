@@ -342,7 +342,8 @@ abstract class Base extends \MX_Controller
                         $this->passwordProtectedRequest('Invalid credentials');
                     }
 
-                    //  @todo (Pablo 2026-08-06) - store the credentials in the session
+                    $oSession->setUserData('AUTH_USER', $sAuthUser);
+                    $oSession->setUserData('AUTH_PW', $sAuthPass);
 
                 } else {
                     $this->passwordProtectedRequest();
