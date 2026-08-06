@@ -1,0 +1,103 @@
+/*
+ * Nails CSS Framework - Theme Switcher Component
+ *
+ * A segmented control for choosing between light, dark and automatic colour
+ * schemes. Pair it with assets/js/theme.js, which handles persistence and
+ * applies `data-theme` to the document element:
+ *
+ *   <div class="theme-switcher" data-theme-switcher>
+ *       <button class="theme-switcher__option" data-theme-value="light">Light</button>
+ *       <button class="theme-switcher__option" data-theme-value="dark">Dark</button>
+ *       <button class="theme-switcher__option" data-theme-value="auto">Auto</button>
+ *   </div>
+ *
+ * The script sets `aria-pressed` on the active option; the styling below keys
+ * off that, so the control stays correct if the theme is changed elsewhere.
+ */
+
+.theme-switcher {
+    display: inline-flex;
+    align-items: stretch;
+    gap: 2px;
+    padding: 3px;
+    background-color: var(--color-surface-sunken);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-pill);
+    box-shadow: var(--color-input-shadow);
+
+    &__option {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+        padding: var(--spacing-xs) var(--spacing-md);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+        line-height: 1.4;
+        white-space: nowrap;
+        color: var(--color-text-muted);
+        background-color: transparent;
+        border: 0;
+        border-radius: var(--border-radius-pill);
+        cursor: pointer;
+        transition: color var(--transition-duration) var(--transition-timing),
+        background-color var(--transition-duration) var(--transition-timing),
+        box-shadow var(--transition-duration) var(--transition-timing);
+
+        &:hover {
+            color: var(--color-text);
+            background-color: var(--color-overlay-hover);
+        }
+
+        &:focus-visible {
+            outline: var(--focus-ring-width) solid var(--color-brand);
+            outline-offset: -1px;
+        }
+
+        /* Active option; lifted onto the content plane so the segmented
+         * control reads as a physical switch
+         */
+        &[aria-pressed='true'] {
+            color: var(--color-text);
+            background-color: var(--color-surface-1);
+            box-shadow: var(--shadow-inset-highlight), var(--shadow-xs);
+        }
+    }
+
+    &__icon {
+        width: 1em;
+        height: 1em;
+        flex: 0 0 auto;
+        background-color: currentColor;
+
+        &--light {
+            @include icon-mask("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000'%3E%3Cpath d='M12 7a5 5 0 100 10 5 5 0 000-10zm0-5a1 1 0 011 1v2a1 1 0 11-2 0V3a1 1 0 011-1zm0 17a1 1 0 011 1v2a1 1 0 11-2 0v-2a1 1 0 011-1zM2 12a1 1 0 011-1h2a1 1 0 110 2H3a1 1 0 01-1-1zm17 0a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1zM4.93 4.93a1 1 0 011.41 0l1.42 1.42a1 1 0 11-1.42 1.41L4.93 6.34a1 1 0 010-1.41zm11.31 11.31a1 1 0 011.41 0l1.42 1.42a1 1 0 01-1.42 1.41l-1.41-1.41a1 1 0 010-1.42zm2.83-11.31a1 1 0 010 1.41l-1.42 1.42a1 1 0 01-1.41-1.41l1.41-1.42a1 1 0 011.42 0zM7.76 16.24a1 1 0 010 1.42l-1.42 1.41a1 1 0 01-1.41-1.41l1.41-1.42a1 1 0 011.42 0z'/%3E%3C/svg%3E");
+        }
+
+        &--dark {
+            @include icon-mask("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000'%3E%3Cpath d='M21.64 13a1 1 0 00-1.05-.14 8 8 0 01-9.45-9.45A1 1 0 0010 2.36a10 10 0 1011.64 10.64 1 1 0 000-.99z'/%3E%3C/svg%3E");
+        }
+
+        &--auto {
+            @include icon-mask("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000'%3E%3Cpath d='M12 2a10 10 0 100 20 10 10 0 000-20zm0 2v16a8 8 0 010-16z'/%3E%3C/svg%3E");
+        }
+    }
+
+    /* Icon-only variant, for when the control lives in a toolbar */
+    &--compact {
+        .theme-switcher__option {
+            padding: var(--spacing-xs) var(--spacing-sm);
+        }
+
+        .theme-switcher__label {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    }
+}

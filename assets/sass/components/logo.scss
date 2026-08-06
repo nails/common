@@ -51,7 +51,7 @@
     }
 
     &--shadow {
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--shadow-sm);
     }
 
     /* Logo with text */
@@ -96,13 +96,16 @@
         padding: var(--spacing-xs);
     }
 
+    /* These name a literal backdrop rather than a role, so they hold their
+     * colour in both schemes
+     */
     &--light {
-        background-color: var(--color-background);
+        background-color: var(--color-fixed-light);
         padding: var(--spacing-xs);
     }
 
     &--dark {
-        background-color: var(--color-gray-900);
+        background-color: var(--color-fixed-dark);
         padding: var(--spacing-xs);
     }
 
@@ -191,23 +194,6 @@
             .logo-grid__item {
                 width: 100%;
             }
-        }
-    }
-}
-
-/* Dark mode adjustments */
-@media (prefers-color-scheme: dark) {
-    .logo {
-        &--bordered {
-            border-color: var(--color-border);
-        }
-
-        &--shadow {
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        &--light {
-            background-color: var(--color-gray-800);
         }
     }
 }

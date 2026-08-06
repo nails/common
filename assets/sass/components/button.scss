@@ -10,40 +10,63 @@
     white-space: nowrap;
     vertical-align: middle;
     user-select: none;
-    border: 1px solid var(--color-gray-300);
+    border: 1px solid var(--color-btn-border);
     padding: var(--spacing-sm) var(--spacing-md);
     font-size: var(--font-size-md);
     line-height: 1.5;
-    border-radius: var(--border-radius-md);
+    border-radius: var(--control-radius);
     transition: color var(--transition-duration) var(--transition-timing),
     background-color var(--transition-duration) var(--transition-timing),
     border-color var(--transition-duration) var(--transition-timing),
     box-shadow var(--transition-duration) var(--transition-timing);
     cursor: pointer;
     text-decoration: none;
-    color: var(--color-text);
-    background-color: var(--color-gray-100);
+    color: var(--color-btn-text);
+
+    /* A raised control: sits above whichever surface it lands on, rather than
+     * being tinted by the neutral ramp
+     */
+    background-color: var(--color-btn-bg);
+    box-shadow: var(--color-btn-shadow);
 
     /* Button focus styles */
     &:focus,
     &:focus-visible {
         outline: 0;
-        box-shadow: 0 0 0 0.2rem rgba(var(--color-brand), 0.25);
+        box-shadow: 0 0 0 3px var(--color-focus-ring);
     }
 
     /* Button hover styles */
     &:hover {
         text-decoration: none;
-        background-color: var(--color-gray-200);
-        border-color: var(--color-gray-400);
+        background-color: var(--color-btn-bg-hover);
+        border-color: var(--color-btn-border-hover);
     }
 
     /* Button active styles */
     &:active {
         transform: translateY(1px);
+        background-color: var(--color-btn-bg-active);
+        box-shadow: none;
     }
 
-    /* Button variants */
+    /* Button variants
+     * Filled buttons carry a hairline of light along their top edge, which is
+     * what stops them looking like flat rectangles in dark mode.
+     */
+    &--primary,
+    &--secondary,
+    &--success,
+    &--danger,
+    &--warning,
+    &--info {
+        box-shadow: var(--shadow-inset-highlight), var(--shadow-xs);
+
+        &:active {
+            box-shadow: none;
+        }
+    }
+
     &--primary {
         color: var(--color-brand-text);
         background-color: var(--color-brand);
@@ -56,30 +79,26 @@
         }
 
         &:focus {
-            box-shadow: 0 0 0 0.2rem rgba(var(--color-brand), 0.5);
+            box-shadow: 0 0 0 3px rgba(var(--color-brand-rgb), 0.5);
         }
     }
 
     &--secondary {
         color: var(--color-text);
-        background-color: var(--color-gray-200);
-        border-color: var(--color-gray-300);
+        background-color: var(--color-surface-3);
+        border-color: var(--color-border-strong);
 
         &:hover {
             color: var(--color-text);
-            background-color: var(--color-gray-300);
-            border-color: var(--color-gray-400);
-        }
-
-        &:focus {
-            box-shadow: 0 0 0 0.2rem rgba(var(--color-gray-400), 0.5);
+            background-color: var(--color-btn-bg-active);
+            border-color: var(--color-btn-border-hover);
         }
     }
 
     &--success {
         color: var(--color-btn-success-text);
-        background-color: var(--color-success);
-        border-color: var(--color-success);
+        background-color: var(--color-success-solid);
+        border-color: var(--color-success-solid);
 
         &:hover {
             color: var(--color-btn-success-text-hover);
@@ -88,14 +107,14 @@
         }
 
         &:focus {
-            box-shadow: 0 0 0 0.2rem rgba(var(--color-success), 0.5);
+            box-shadow: 0 0 0 3px rgba(var(--color-success-rgb), 0.5);
         }
     }
 
     &--danger {
         color: var(--color-btn-danger-text);
-        background-color: var(--color-danger);
-        border-color: var(--color-danger);
+        background-color: var(--color-danger-solid);
+        border-color: var(--color-danger-solid);
 
         &:hover {
             color: var(--color-btn-danger-text-hover);
@@ -104,14 +123,14 @@
         }
 
         &:focus {
-            box-shadow: 0 0 0 0.2rem rgba(var(--color-danger), 0.5);
+            box-shadow: 0 0 0 3px rgba(var(--color-danger-rgb), 0.5);
         }
     }
 
     &--warning {
         color: var(--color-btn-warning-text);
-        background-color: var(--color-warning);
-        border-color: var(--color-warning);
+        background-color: var(--color-warning-solid);
+        border-color: var(--color-warning-solid);
 
         &:hover {
             color: var(--color-btn-warning-text-hover);
@@ -120,14 +139,14 @@
         }
 
         &:focus {
-            box-shadow: 0 0 0 0.2rem rgba(var(--color-warning), 0.5);
+            box-shadow: 0 0 0 3px rgba(var(--color-warning-rgb), 0.5);
         }
     }
 
     &--info {
         color: var(--color-btn-info-text);
-        background-color: var(--color-info);
-        border-color: var(--color-info);
+        background-color: var(--color-info-solid);
+        border-color: var(--color-info-solid);
 
         &:hover {
             color: var(--color-btn-info-text-hover);
@@ -136,13 +155,13 @@
         }
 
         &:focus {
-            box-shadow: 0 0 0 0.2rem rgba(var(--color-info), 0.5);
+            box-shadow: 0 0 0 3px rgba(var(--color-info-rgb), 0.5);
         }
     }
 
     &--link {
         font-weight: var(--font-weight-normal);
-        color: var(--color-brand);
+        color: var(--color-link);
         background-color: transparent !important;
         border-color: transparent !important;
         border: none !important;
@@ -151,7 +170,7 @@
         padding-right: 0 !important;
 
         &:hover {
-            color: var(--color-brand-dark);
+            color: var(--color-link-hover);
             text-decoration: underline;
             background-color: transparent !important;
             border-color: transparent !important;
@@ -163,8 +182,20 @@
         }
     }
 
+    /* Outline variants
+     * These are unfilled, so the label takes the status colour itself
+     */
+    &--outline-primary,
+    &--outline-secondary,
+    &--outline-success,
+    &--outline-danger,
+    &--outline-warning,
+    &--outline-info {
+        box-shadow: none;
+    }
+
     &--outline-primary {
-        color: var(--color-brand-text);
+        color: var(--color-link);
         background-color: transparent;
         border-color: var(--color-brand);
 
@@ -176,14 +207,14 @@
     }
 
     &--outline-secondary {
-        color: var(--color-gray-700);
+        color: var(--color-text-muted);
         background-color: transparent;
-        border-color: var(--color-gray-500);
+        border-color: var(--color-border-strong);
 
         &:hover {
             color: var(--color-text);
-            background-color: var(--color-gray-200);
-            border-color: var(--color-gray-500);
+            background-color: var(--color-overlay-hover);
+            border-color: var(--color-btn-border-hover);
         }
     }
 
@@ -193,9 +224,9 @@
         border-color: var(--color-success);
 
         &:hover {
-            color: #fff;
-            background-color: var(--color-success);
-            border-color: var(--color-success);
+            color: var(--color-btn-success-text-hover);
+            background-color: var(--color-success-solid);
+            border-color: var(--color-success-solid);
         }
     }
 
@@ -205,9 +236,9 @@
         border-color: var(--color-danger);
 
         &:hover {
-            color: #fff;
-            background-color: var(--color-danger);
-            border-color: var(--color-danger);
+            color: var(--color-btn-danger-text-hover);
+            background-color: var(--color-danger-solid);
+            border-color: var(--color-danger-solid);
         }
     }
 
@@ -217,9 +248,9 @@
         border-color: var(--color-warning);
 
         &:hover {
-            color: var(--color-warning-text);
-            background-color: var(--color-warning);
-            border-color: var(--color-warning);
+            color: var(--color-btn-warning-text-hover);
+            background-color: var(--color-warning-solid);
+            border-color: var(--color-warning-solid);
         }
     }
 
@@ -229,9 +260,9 @@
         border-color: var(--color-info);
 
         &:hover {
-            color: #fff;
-            background-color: var(--color-info);
-            border-color: var(--color-info);
+            color: var(--color-btn-info-text-hover);
+            background-color: var(--color-info-solid);
+            border-color: var(--color-info-solid);
         }
     }
 
@@ -357,20 +388,5 @@
 @keyframes btn-spinner {
     to {
         transform: rotate(360deg);
-    }
-}
-
-/* Dark mode adjustments */
-@media (prefers-color-scheme: dark) {
-    /* Apply dark styles to default buttons and block buttons without other variants */
-    .btn:not([class*="btn--primary"]):not([class*="btn--secondary"]):not([class*="btn--success"]):not([class*="btn--danger"]):not([class*="btn--warning"]):not([class*="btn--info"]):not([class*="btn--link"]):not([class*="btn--outline"]) {
-        background-color: var(--color-gray-700);
-        border-color: var(--color-gray-600);
-        color: var(--color-text);
-
-        &:hover {
-            background-color: var(--color-gray-600);
-            border-color: var(--color-gray-500);
-        }
     }
 }

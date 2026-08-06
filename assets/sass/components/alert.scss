@@ -7,17 +7,17 @@
     position: relative;
     padding: var(--spacing-md);
     margin-bottom: var(--spacing-md);
-    border: 1px solid var(--color-gray-300);
-    border-radius: var(--border-radius-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--control-radius);
     border-left-width: 4px;
-    border-left-color: var(--color-gray-400);
-    color: var(--color-gray-700);
-    background-color: var(--color-gray-100);
+    border-left-color: var(--color-border-strong);
+    color: var(--color-text);
+    background-color: var(--color-surface-2);
 
     /* Alert variants */
     &--default {
         color: var(--color-text);
-        background-color: var(--color-surface);
+        background-color: var(--color-surface-2);
         border-color: var(--color-border);
     }
 
@@ -89,6 +89,9 @@
         padding-right: calc(var(--spacing-md) * 2 + var(--font-size-lg));
     }
 
+    /* Icons are masked rather than painted, so they take the alert's own text
+     * colour and a single asset works in both colour schemes
+     */
     &--icon {
         padding-left: calc(var(--spacing-md) * 2 + var(--font-size-xl));
 
@@ -99,25 +102,24 @@
             left: var(--spacing-md);
             width: var(--font-size-xl);
             height: var(--font-size-xl);
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: contain;
+            background-color: currentColor;
         }
 
         &.alert--success::before {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23155724'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/%3E%3C/svg%3E");
+            @include icon-mask("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/%3E%3C/svg%3E");
         }
 
         &.alert--warning::before {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23856404'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/%3E%3C/svg%3E");
+            @include icon-mask("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/%3E%3C/svg%3E");
         }
 
         &.alert--danger::before {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23721c24'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/%3E%3C/svg%3E");
+            @include icon-mask("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/%3E%3C/svg%3E");
         }
 
-        &.alert--info::before {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230c5460'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/%3E%3C/svg%3E");
+        &.alert--info::before,
+        &.alert--default::before {
+            @include icon-mask("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/%3E%3C/svg%3E");
         }
     }
 
@@ -130,62 +132,6 @@
         &:hover {
             color: inherit;
             text-decoration: none;
-        }
-    }
-}
-
-/* Dark mode adjustments */
-@media (prefers-color-scheme: dark) {
-    .alert {
-        border-color: var(--color-gray-700);
-        border-left-color: var(--color-gray-600);
-        color: var(--color-gray-300);
-        background-color: var(--color-gray-800);
-
-        &--success {
-            color: var(--color-success-text);
-            background-color: var(--color-success-light);
-            border-color: var(--color-success-dark);
-            border-left-color: var(--color-success);
-        }
-
-        &--warning {
-            color: var(--color-warning-text);
-            background-color: var(--color-warning-light);
-            border-color: var(--color-warning-dark);
-            border-left-color: var(--color-warning);
-        }
-
-        &--danger {
-            color: var(--color-danger-text);
-            background-color: var(--color-danger-light);
-            border-color: var(--color-danger-dark);
-            border-left-color: var(--color-danger);
-        }
-
-        &--info {
-            color: var(--color-info-text);
-            background-color: var(--color-info-light);
-            border-color: var(--color-info-dark);
-            border-left-color: var(--color-info);
-        }
-    }
-
-    .alert--icon {
-        &.alert--success::before {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%238fd19e'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/%3E%3C/svg%3E");
-        }
-
-        &.alert--warning::before {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffe083'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/%3E%3C/svg%3E");
-        }
-
-        &.alert--danger::before {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ea868f'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/%3E%3C/svg%3E");
-        }
-
-        &.alert--info::before {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236edff6'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/%3E%3C/svg%3E");
         }
     }
 }

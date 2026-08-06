@@ -1,88 +1,351 @@
-// Nails CSS Framework - Color Palette
-// These colors can be overridden by the root application for customization
+/*
+ * Nails CSS Framework - Colour Palette
+ *
+ * Everything the framework paints comes from a custom property declared here,
+ * so a consuming application can restyle the entire framework — in both colour
+ * schemes — without touching a component.
+ *
+ * The two schemes are declared as mixins and emitted four times:
+ *
+ *   :root                       – light, the default
+ *   prefers-color-scheme: dark  – dark, when the OS asks for it
+ *   [data-theme="light"]        – light, pinned
+ *   [data-theme="dark"]         – dark, pinned
+ *
+ * Emitting them this way (rather than nesting the media query behind an
+ * attribute selector) keeps the specificity of the automatic case at a plain
+ * `:root`, so an application can still override any token with its own `:root`
+ * block. To override a token in one scheme only, mirror the structure below.
+ *
+ * Surfaces are an elevation ladder rather than a single "background" colour.
+ * Higher numbers sit closer to the viewer, which in dark mode means lighter:
+ *
+ *   --color-surface-0        the page itself
+ *   --color-surface-1        panels, cards, tables — the default content plane
+ *   --color-surface-2        panel headers and footers, raised bars
+ *   --color-surface-3        menus, tooltips, hovered raised elements
+ *   --color-surface-sunken   inputs, wells, code blocks — recessed into the page
+ */
 
-:root {
-    // Brand colors
+//  ---------------------------------------------------------------------------
+//  Light
+//  ---------------------------------------------------------------------------
+
+@mixin nails-palette-light {
+
+    //  Brand
     --color-brand: #d53354;
     --color-brand-light: #e05e79;
     --color-brand-dark: #b02a46;
     --color-brand-text: #ffffff;
+    --color-brand-rgb: 213, 51, 84;
 
-    // Neutral colors - Light mode (default)
-    --color-background: #ffffff;
-    --color-surface: #f8f9fa;
-    --color-border: #dee2e6;
-    --color-text: #212529;
-    --color-text-muted: #6c757d;
+    //  Links
+    //  A shade off the brand: the brand itself lands at 4.26:1 against the page
+    //  canvas, which is under AA for body-sized text
+    --color-link: #cb2f4f;
+    --color-link-hover: var(--color-brand-dark);
 
-    // Gray scale
-    --color-gray-100: #f8f9fa;
-    --color-gray-200: #e9ecef;
-    --color-gray-300: #dee2e6;
-    --color-gray-400: #ced4da;
-    --color-gray-500: #adb5bd;
-    --color-gray-600: #6c757d;
-    --color-gray-700: #495057;
-    --color-gray-800: #343a40;
-    --color-gray-900: #212529;
+    //  Surfaces
+    --color-surface-0: #f1f3f6;
+    --color-surface-1: #ffffff;
+    --color-surface-2: #f7f8fa;
+    --color-surface-3: #eceff3;
+    --color-surface-sunken: #f4f6f8;
 
-    // Status colors
-    --color-success: #28a745;
-    --color-success-light: #d4edda;
-    --color-success-dark: #155724;
-    --color-success-border: #c3e6cb;
-    --color-success-text: #155724;
+    //  Legacy surface aliases; --color-background is the content plane and
+    //  --color-surface is the page behind it
+    --color-background: var(--color-surface-1);
+    --color-surface: var(--color-surface-0);
 
-    --color-warning: #ffc107;
-    --color-warning-light: #fff3cd;
-    --color-warning-dark: #856404;
-    --color-warning-border: #ffeeba;
-    --color-warning-text: #856404;
+    //  Borders
+    --color-border: #e2e6eb;
+    --color-border-strong: #cfd6de;
+    --color-border-subtle: #edf0f3;
 
-    --color-danger: #dc3545;
-    --color-danger-light: #f8d7da;
-    --color-danger-dark: #721c24;
-    --color-danger-border: #f5c6cb;
-    --color-danger-text: #721c24;
+    //  Text
+    --color-text: #1d2229;
+    --color-text-muted: #646e7a;
+    --color-text-subtle: #69737f;
+    --color-text-inverse: #ffffff;
 
-    --color-info: #17a2b8;
-    --color-info-light: #d1ecf1;
-    --color-info-dark: #0c5460;
-    --color-info-border: #bee5eb;
-    --color-info-text: #0c5460;
+    //  Overlays; used for hover and active tints so that they read correctly
+    //  against whichever surface they happen to land on
+    --color-overlay-hover: rgba(13, 22, 35, 0.035);
+    --color-overlay-active: rgba(13, 22, 35, 0.07);
+    --color-overlay-backdrop: rgba(13, 22, 35, 0.45);
 
-    //  Btn status colours
-    --color-btn-success-text: #fff;
-    --color-btn-success-text-hover: #fff;
-    --color-btn-warning-text: --color-gray-800;
-    --color-btn-warning-text-hover: #fff;
-    --color-btn-danger-text: #fff;
-    --color-btn-danger-text-hover: #fff;
-    --color-btn-info-text: #fff;
-    --color-btn-info-text-hover: #fff;
+    //  Elevation
+    --shadow-xs: 0 1px 1px rgba(16, 24, 40, 0.04);
+    --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.05);
+    --shadow-md: 0 2px 4px rgba(16, 24, 40, 0.05), 0 6px 16px rgba(16, 24, 40, 0.07);
+    --shadow-lg: 0 4px 8px rgba(16, 24, 40, 0.05), 0 16px 40px rgba(16, 24, 40, 0.1);
+    --shadow-inset-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+
+    //  Focus
+    --color-focus-ring: rgba(var(--color-brand-rgb), 0.35);
+
+    //  Gray scale
+    //  Read these as intensity rather than lightness: 100 is the subtlest
+    //  background and 900 the strongest ink. The ramp inverts in dark mode so
+    //  that anything built on it keeps working.
+    --color-gray-100: #f7f8fa;
+    --color-gray-200: #eceff3;
+    --color-gray-300: #e2e6eb;
+    --color-gray-400: #cfd6de;
+    --color-gray-500: #aab3bf;
+    --color-gray-600: #6b7581;
+    --color-gray-700: #4a545f;
+    --color-gray-800: #333c46;
+    --color-gray-900: #1d2229;
+
+    //  Fixed inks; these deliberately do not invert, for use on top of a colour
+    //  which is the same in both schemes (a warning button, for example)
+    --color-fixed-light: #ffffff;
+    --color-fixed-dark: #1d2229;
+
+    //  Status
+    //  Each status has three jobs, and one colour cannot do all of them: an
+    //  accent bright enough to read against a dark surface is too light to
+    //  carry white text. So they are split:
+    //
+    //    --color-{status}         accent — borders, icons, outline buttons
+    //    --color-{status}-solid   fill  — anything with white text on top
+    //    --color-{status}-light   tint  — alert and blockquote backgrounds
+    //    --color-{status}-text    ink   — text on the tint
+    //
+    //  `-dark` is the hover partner for `-solid`, and is kept under its old
+    //  name for the benefit of anything already referencing it.
+
+    //  Status - success
+    --color-success: #2c9c52;
+    --color-success-solid: #1f7a3e;
+    --color-success-light: #e6f4ea;
+    --color-success-dark: #175f30;
+    --color-success-border: #b7dfc4;
+    --color-success-text: #14622f;
+    --color-success-rgb: 44, 156, 82;
+
+    //  Status - warning
+    //  Yellow cannot carry white text at any usable saturation, so warning
+    //  fills take a dark ink instead
+    --color-warning: #f0ad00;
+    --color-warning-solid: #f0ad00;
+    --color-warning-light: #fdf4dd;
+    --color-warning-dark: #c98f00;
+    --color-warning-border: #f3dfa4;
+    --color-warning-text: #6b4d00;
+    --color-warning-rgb: 240, 173, 0;
+
+    //  Status - danger
+    --color-danger: #d63b47;
+    --color-danger-solid: #c9333f;
+    --color-danger-light: #fbeaec;
+    --color-danger-dark: #a82a34;
+    --color-danger-border: #f2c2c7;
+    --color-danger-text: #8a1f28;
+    --color-danger-rgb: 214, 59, 71;
+
+    //  Status - info
+    --color-info: #1a8fa8;
+    --color-info-solid: #177e94;
+    --color-info-light: #e3f3f7;
+    --color-info-dark: #126577;
+    --color-info-border: #b3dde7;
+    --color-info-text: #10586a;
+    --color-info-rgb: 26, 143, 168;
+
+    //  Buttons; the neutral button is a raised control, so it sits above the
+    //  content plane rather than being tinted by it
+    --color-btn-bg: #ffffff;
+    --color-btn-bg-hover: #f4f6f8;
+    --color-btn-bg-active: #eceff3;
+    --color-btn-border: #d3dae2;
+    --color-btn-border-hover: #bcc5cf;
+    --color-btn-text: var(--color-text);
+    --color-btn-shadow: var(--shadow-xs);
+
+    --color-btn-success-text: #ffffff;
+    --color-btn-success-text-hover: #ffffff;
+    --color-btn-warning-text: var(--color-fixed-dark);
+    --color-btn-warning-text-hover: var(--color-fixed-dark);
+    --color-btn-danger-text: #ffffff;
+    --color-btn-danger-text-hover: #ffffff;
+    --color-btn-info-text: #ffffff;
+    --color-btn-info-text-hover: #ffffff;
+
+    //  Form controls; slightly recessed by default and lifting to the content
+    //  plane on focus, which gives the field somewhere to go
+    --color-input-bg: #f7f9fb;
+    --color-input-bg-hover: #f2f5f8;
+    --color-input-bg-focus: #ffffff;
+    --color-input-bg-disabled: #eceff3;
+    --color-input-border: #d3dae2;
+    --color-input-border-hover: #bcc5cf;
+    --color-input-text: var(--color-text);
+    --color-input-placeholder: var(--color-text-subtle);
+    --color-input-shadow: inset 0 1px 2px rgba(16, 24, 40, 0.04);
+
+    //  The select indicator is a background image, so it cannot inherit
+    //  currentColor; it is tokenised instead
+    --form-select-indicator: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%236b7581' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+
+    //  Code
+    --color-code-bg: #f4f6f8;
+    --color-code-border: #e2e6eb;
+    --color-code-text: #a8306a;
 }
 
-// Dark mode
+//  ---------------------------------------------------------------------------
+//  Dark
+//  ---------------------------------------------------------------------------
+
+@mixin nails-palette-dark {
+
+    //  Brand
+    //  The brand colour itself is unchanged, but it is too heavy to read as
+    //  link text against a dark surface, so links use the lighter variant
+    --color-brand-light: #ef7a92;
+    --color-brand-dark: #b02a46;
+    --color-link: var(--color-brand-light);
+    --color-link-hover: #f7a3b4;
+
+    //  Surfaces
+    --color-surface-0: #0f1116;
+    --color-surface-1: #191c22;
+    --color-surface-2: #21252d;
+    --color-surface-3: #2a2f38;
+    --color-surface-sunken: #121419;
+
+    //  Borders
+    --color-border: #2d323b;
+    --color-border-strong: #3c434e;
+    --color-border-subtle: #23272f;
+
+    //  Text
+    --color-text: #e5e8ee;
+    --color-text-muted: #9aa4b2;
+    --color-text-subtle: #7b8593;
+    --color-text-inverse: #0f1116;
+
+    //  Overlays
+    --color-overlay-hover: rgba(255, 255, 255, 0.045);
+    --color-overlay-active: rgba(255, 255, 255, 0.085);
+    --color-overlay-backdrop: rgba(0, 0, 0, 0.65);
+
+    //  Elevation
+    //  Shadows do far less work on a dark background, so raised surfaces get a
+    //  hairline of light along their top edge as well
+    --shadow-xs: 0 1px 1px rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.4), 0 20px 48px rgba(0, 0, 0, 0.5);
+    --shadow-inset-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+    //  Focus
+    --color-focus-ring: rgba(var(--color-brand-rgb), 0.45);
+
+    //  Gray scale, inverted
+    --color-gray-100: #1b1f26;
+    --color-gray-200: #23272f;
+    --color-gray-300: #2d323b;
+    --color-gray-400: #3c434e;
+    --color-gray-500: #616b78;
+    --color-gray-600: #9aa4b2;
+    --color-gray-700: #c3cad3;
+    --color-gray-800: #dbe0e6;
+    --color-gray-900: #eef1f5;
+
+    //  Status
+    //  The accents brighten so they carry against a dark surface; the solid
+    //  fills stay dark enough for white text. The tints are mixed towards the
+    //  surface rather than towards black, which keeps them legible without
+    //  turning into holes in the page.
+    --color-success: #35b062;
+    --color-success-solid: #238644;
+    --color-success-light: #14291d;
+    --color-success-dark: #1c6e37;
+    --color-success-border: #245c39;
+    --color-success-text: #7fd7a0;
+
+    --color-warning: #f0ad00;
+    --color-warning-solid: #f0ad00;
+    --color-warning-light: #2b2210;
+    --color-warning-dark: #c98f00;
+    --color-warning-border: #5b4712;
+    --color-warning-text: #f2c66b;
+
+    --color-danger: #e04b58;
+    --color-danger-solid: #cf3b49;
+    --color-danger-light: #2b171b;
+    --color-danger-dark: #b3323d;
+    --color-danger-border: #5e2b31;
+    --color-danger-text: #f09aa2;
+
+    --color-info: #2aa7c0;
+    --color-info-solid: #19758a;
+    --color-info-light: #10262c;
+    --color-info-dark: #146575;
+    --color-info-border: #1f4d59;
+    --color-info-text: #6dd0e2;
+
+    //  Buttons
+    --color-btn-bg: #262b34;
+    --color-btn-bg-hover: #2f353f;
+    --color-btn-bg-active: #383f4a;
+    --color-btn-border: #3c434e;
+    --color-btn-border-hover: #4b5361;
+    --color-btn-shadow: 0 1px 2px rgba(0, 0, 0, 0.35), var(--shadow-inset-highlight);
+
+    //  Form controls
+    --color-input-bg: #12151a;
+    --color-input-bg-hover: #161a20;
+    --color-input-bg-focus: #1b1f26;
+    --color-input-bg-disabled: #1c2027;
+    --color-input-border: #363d47;
+    --color-input-border-hover: #454e5b;
+    --color-input-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+
+    --form-select-indicator: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%239aa4b2' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+
+    //  Code
+    --color-code-bg: #12151a;
+    --color-code-border: #2d323b;
+    --color-code-text: #f0a2bb;
+}
+
+//  ---------------------------------------------------------------------------
+//  Emit
+//  ---------------------------------------------------------------------------
+
+:root {
+    color-scheme: light dark;
+    @include nails-palette-light;
+}
+
 @media (prefers-color-scheme: dark) {
     :root {
-        // Neutral colors - Dark mode
-        --color-background: #121212;
-        --color-surface: #1e1e1e;
-        --color-border: #333333;
-        --color-text: #f8f9fa;
-        --color-text-muted: #adb5bd;
-
-        // Status colors - Dark mode adjustments
-        --color-success-light: #0d3a1f;
-        --color-success-text: #8fd19e;
-
-        --color-warning-light: #332701;
-        --color-warning-text: #ffe083;
-
-        --color-danger-light: #2c0b0e;
-        --color-danger-text: #ea868f;
-
-        --color-info-light: #062a30;
-        --color-info-text: #6edff6;
+        @include nails-palette-dark;
     }
+}
+
+:root[data-theme='light'] {
+    color-scheme: light;
+    @include nails-palette-light;
+}
+
+:root[data-theme='dark'] {
+    color-scheme: dark;
+    @include nails-palette-dark;
+}
+
+//  Set for the duration of a scheme change by assets/js/theme.js. Without this
+//  the handful of components which transition their background — form controls,
+//  table rows — fade across while everything else snaps, which reads as lag.
+
+:root[data-theme-switching],
+:root[data-theme-switching] *,
+:root[data-theme-switching] *::before,
+:root[data-theme-switching] *::after {
+    transition: none !important;
 }

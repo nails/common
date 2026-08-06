@@ -2,12 +2,158 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Nails CSS Styleguide</title>
+
+    <!--
+        Applies any stored colour scheme preference before the first paint, so
+        the page does not flash in the wrong scheme. This is the same snippet as
+        NailsTheme.inlineScript; it must run before the stylesheet loads.
+    -->
+    <script>(function () {
+        try {
+            var t = localStorage.getItem('nails-theme');
+            if (t === 'dark' || t === 'light') {
+                document.documentElement.setAttribute('data-theme', t);
+            }
+        } catch (e) {
+        }
+    })();</script>
+
     <link rel="stylesheet" href="css/nails.min.css" type="text/css">
+    <script src="js/nails.min.js" defer></script>
 </head>
 <body>
 <div class="container">
-    <h1>Nails CSS Styleguide</h1>
+    <div class="d-flex align-items-center justify-content-between flex-wrap my-lg">
+        <h1 class="mt-0 mb-0">Nails CSS Styleguide</h1>
+        <div class="theme-switcher" data-theme-switcher role="group" aria-label="Colour scheme">
+            <button type="button" class="theme-switcher__option" data-theme-value="light" aria-pressed="false">
+                <span class="theme-switcher__icon theme-switcher__icon--light" aria-hidden="true"></span>
+                <span class="theme-switcher__label">Light</span>
+            </button>
+            <button type="button" class="theme-switcher__option" data-theme-value="dark" aria-pressed="false">
+                <span class="theme-switcher__icon theme-switcher__icon--dark" aria-hidden="true"></span>
+                <span class="theme-switcher__label">Dark</span>
+            </button>
+            <button type="button" class="theme-switcher__option" data-theme-value="auto" aria-pressed="true">
+                <span class="theme-switcher__icon theme-switcher__icon--auto" aria-hidden="true"></span>
+                <span class="theme-switcher__label">Auto</span>
+            </button>
+        </div>
+    </div>
+
+    <h1>Surfaces</h1>
+    <div class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">
+                Elevation
+            </h2>
+            <p class="panel__subtitle">
+                Higher numbers sit closer to the viewer, which in dark mode means lighter. Components pick a
+                rung on this ladder rather than naming a colour, so depth survives the switch between schemes.
+            </p>
+        </div>
+        <div class="panel__body">
+            <div class="row">
+                <div class="col-md-4 mb-md">
+                    <div class="bg-canvas border rounded p-lg text-center">
+                        <code>--color-surface-0</code>
+                        <p class="text-muted mb-0"><small>The page</small></p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-md">
+                    <div class="bg-elevated border rounded p-lg text-center shadow-sm">
+                        <code>--color-surface-1</code>
+                        <p class="text-muted mb-0"><small>Panels, cards, tables</small></p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-md">
+                    <div class="bg-raised border rounded p-lg text-center shadow-sm">
+                        <code>--color-surface-2</code>
+                        <p class="text-muted mb-0"><small>Headers, footers, bars</small></p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-md">
+                    <div class="bg-overlay border rounded p-lg text-center shadow-md">
+                        <code>--color-surface-3</code>
+                        <p class="text-muted mb-0"><small>Menus, tooltips, hover</small></p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-md">
+                    <div class="bg-sunken border rounded p-lg text-center">
+                        <code>--color-surface-sunken</code>
+                        <p class="text-muted mb-0"><small>Inputs, wells, code</small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel__footer text-muted">
+            <small>
+                Pin the scheme with <code>&lt;html data-theme="dark"&gt;</code>, or leave the attribute off to
+                follow the operating system.
+            </small>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">
+                Switching scheme
+            </h2>
+            <p class="panel__subtitle">
+                Three ways in, depending on how much control you need.
+            </p>
+        </div>
+        <div class="panel__body">
+            <h4 class="mt-0">Markup only</h4>
+            <p>
+                The framework follows the operating system out of the box. To pin it, set the attribute on the
+                document element — server side, or by hand:
+            </p>
+            <pre><code>&lt;html data-theme="dark"&gt;   &lt;!-- always dark --&gt;
+&lt;html data-theme="light"&gt;  &lt;!-- always light --&gt;
+&lt;html&gt;                     &lt;!-- follow the OS --&gt;</code></pre>
+
+            <h4>The switcher component</h4>
+            <p>
+                <code>nails.min.js</code> wires up any element carrying <code>data-theme-switcher</code>, stores
+                the choice in <code>localStorage</code>, and keeps <code>aria-pressed</code> in step. The control
+                in the header of this page is the markup below.
+            </p>
+            <pre><code>&lt;div class="theme-switcher" data-theme-switcher role="group" aria-label="Colour scheme"&gt;
+    &lt;button type="button" class="theme-switcher__option" data-theme-value="light"&gt;
+        &lt;span class="theme-switcher__icon theme-switcher__icon--light" aria-hidden="true"&gt;&lt;/span&gt;
+        &lt;span class="theme-switcher__label"&gt;Light&lt;/span&gt;
+    &lt;/button&gt;
+    &lt;button type="button" class="theme-switcher__option" data-theme-value="dark"&gt;…&lt;/button&gt;
+    &lt;button type="button" class="theme-switcher__option" data-theme-value="auto"&gt;…&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+            <p>
+                Add <code>theme-switcher--compact</code> for an icon-only control.
+            </p>
+
+            <h4>The JavaScript API</h4>
+            <pre><code>NailsTheme.set('dark');   // pin, and remember the choice
+NailsTheme.set('auto');   // back to following the OS
+NailsTheme.toggle();      // light → dark → auto → light
+NailsTheme.get();         // 'light' | 'dark' | 'auto'
+NailsTheme.resolved();    // 'light' | 'dark' — what is actually showing
+
+document.addEventListener('nails.theme.change', (e) =&gt; {
+    console.log(e.detail.mode, e.detail.resolved);
+});</code></pre>
+
+            <div class="alert alert--warning alert--icon">
+                <p class="alert__content">
+                    Applying a stored preference from a deferred bundle means one frame in the wrong scheme.
+                    To avoid the flash, inline <code>NailsTheme.inlineScript</code> in the <code>&lt;head&gt;</code>,
+                    above the stylesheet.
+                </p>
+            </div>
+        </div>
+    </div>
+
     <h1>Typography</h1>
     <div class="panel">
         <div class="panel__header">
