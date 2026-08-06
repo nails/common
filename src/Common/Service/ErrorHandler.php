@@ -376,8 +376,6 @@ class ErrorHandler
 
         /** @var UserFeedback $oSession */
         $oUserFeedback = Factory::service('UserFeedback');
-        /** @var Input $oInput */
-        $oInput = Factory::service('Input');
 
         // --------------------------------------------------------------------------
 
@@ -401,7 +399,7 @@ class ErrorHandler
             // --------------------------------------------------------------------------
 
             /**
-             * Define a constant for easier identification of 404 pages
+             * Define a constant for easier identification of 401 pages
              */
             Config::set('NAILS_IS_401', true);
 
