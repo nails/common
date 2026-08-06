@@ -434,6 +434,23 @@ class ErrorHandler
 
     // --------------------------------------------------------------------------
 
+    public function show401LoginScreen(string $message = ''): void
+    {
+        /**
+         * Define a constant for easier identification of 401 pages
+         */
+        Config::set('NAILS_IS_401', true);
+        Config::set('NAILS_IS_401_LOGIN', true);
+
+        // --------------------------------------------------------------------------
+
+        set_status_header(HttpCodes::STATUS_UNAUTHORIZED);
+        $this->renderErrorView('401-login', ['message' => $message]);
+        exit(401);
+    }
+
+    // --------------------------------------------------------------------------
+
     /**
      * Renders the error view appropriate for the environment
      *
