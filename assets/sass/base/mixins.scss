@@ -1,0 +1,84 @@
+/*
+ * Nails CSS Framework - Mixins
+ * Shared tooling; must be imported before anything which consumes it
+ */
+
+//  Breakpoints
+//  ---------------------------------------------------------------------------
+//  These are duplicated as custom properties in base/variables.scss for the
+//  benefit of consuming applications, but media queries cannot read custom
+//  properties so the Sass variables below are the source of truth.
+
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+
+@mixin sm {
+    @media (min-width: $breakpoint-sm) {
+        @content;
+    }
+}
+
+@mixin md {
+    @media (min-width: $breakpoint-md) {
+        @content;
+    }
+}
+
+@mixin lg {
+    @media (min-width: $breakpoint-lg) {
+        @content;
+    }
+}
+
+@mixin xl {
+    @media (min-width: $breakpoint-xl) {
+        @content;
+    }
+}
+
+//  Colour scheme
+//  ---------------------------------------------------------------------------
+//  The framework supports three modes, driven by `data-theme` on the <html>
+//  element:
+//
+//      <html>                    – auto; follows the operating system
+//      <html data-theme="light"> – pinned to light
+//      <html data-theme="dark">  – pinned to dark
+//
+//  Practically everything is expressed as a custom property which is simply
+//  re-declared for dark mode (see base/palette.scss), so components rarely
+//  need these mixins. When a component genuinely cannot be expressed as a
+//  token, use `dark-mode` to target the dark variant from within the
+//  component's own selector.
+
+@mixin dark-mode {
+    @media (prefers-color-scheme: dark) {
+        :root:not([data-theme='light']) & {
+            @content;
+        }
+    }
+
+    :root[data-theme='dark'] & {
+        @content;
+    }
+}
+
+//  Icons
+//  ---------------------------------------------------------------------------
+//  Renders an inline SVG as a mask rather than a background image, so that the
+//  icon can be recoloured with `background-color` (including `currentColor`).
+//  This means a single asset works in both colour schemes.
+
+@mixin icon-mask($svg) {
+    background-image: none;
+    -webkit-mask-image: url($svg);
+    mask-image: url($svg);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}

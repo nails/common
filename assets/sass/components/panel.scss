@@ -9,23 +9,27 @@
     flex-direction: column;
     min-width: 0;
     word-wrap: break-word;
-    background-color: var(--color-background);
+
+    /* Sits one step above the page, with a header one step above that */
+    background-color: var(--color-surface-1);
     background-clip: border-box;
     border: 1px solid var(--color-border);
-    border-radius: var(--border-radius-md);
+    border-radius: var(--panel-radius);
+    box-shadow: var(--shadow-sm);
     margin-bottom: var(--spacing-lg);
 
     /* Panel elements */
     &__header {
         padding: var(--spacing-md) var(--spacing-lg);
         margin-bottom: 0;
-        background-color: var(--color-surface);
+        background-color: var(--color-surface-2);
         border-bottom: 1px solid var(--color-border);
-        border-top-left-radius: calc(var(--border-radius-md) - 1px);
-        border-top-right-radius: calc(var(--border-radius-md) - 1px);
+        border-top-left-radius: calc(var(--panel-radius) - 1px);
+        border-top-right-radius: calc(var(--panel-radius) - 1px);
 
         &:first-child {
-            border-radius: calc(var(--border-radius-md) - 1px) calc(var(--border-radius-md) - 1px) 0 0;
+            border-radius: calc(var(--panel-radius) - 1px) calc(var(--panel-radius) - 1px) 0 0;
+            box-shadow: var(--shadow-inset-highlight);
         }
 
         /* Header with tabs */
@@ -72,13 +76,13 @@
 
     &__footer {
         padding: var(--spacing-md) var(--spacing-lg);
-        background-color: var(--color-surface);
+        background-color: var(--color-surface-2);
         border-top: 1px solid var(--color-border);
-        border-bottom-right-radius: calc(var(--border-radius-md) - 1px);
-        border-bottom-left-radius: calc(var(--border-radius-md) - 1px);
+        border-bottom-right-radius: calc(var(--panel-radius) - 1px);
+        border-bottom-left-radius: calc(var(--panel-radius) - 1px);
 
         &:last-child {
-            border-radius: 0 0 calc(var(--border-radius-md) - 1px) calc(var(--border-radius-md) - 1px);
+            border-radius: 0 0 calc(var(--panel-radius) - 1px) calc(var(--panel-radius) - 1px);
         }
 
         & > *:last-child {
@@ -86,7 +90,10 @@
         }
     }
 
-    /* Panel variants */
+    /* Panel variants
+     * The header is filled with the status colour, so its text uses a fixed ink
+     * rather than a token which flips with the colour scheme.
+     */
     &--primary {
         border-color: var(--color-brand);
 
@@ -101,9 +108,9 @@
         border-color: var(--color-success);
 
         .panel__header {
-            background-color: var(--color-success);
-            border-color: var(--color-success);
-            color: #fff;
+            background-color: var(--color-success-solid);
+            border-color: var(--color-success-solid);
+            color: var(--color-fixed-light);
         }
     }
 
@@ -111,9 +118,9 @@
         border-color: var(--color-warning);
 
         .panel__header {
-            background-color: var(--color-warning);
-            border-color: var(--color-warning);
-            color: var(--color-warning-text);
+            background-color: var(--color-warning-solid);
+            border-color: var(--color-warning-solid);
+            color: var(--color-fixed-dark);
         }
     }
 
@@ -121,9 +128,9 @@
         border-color: var(--color-danger);
 
         .panel__header {
-            background-color: var(--color-danger);
-            border-color: var(--color-danger);
-            color: #fff;
+            background-color: var(--color-danger-solid);
+            border-color: var(--color-danger-solid);
+            color: var(--color-fixed-light);
         }
     }
 
@@ -131,9 +138,9 @@
         border-color: var(--color-info);
 
         .panel__header {
-            background-color: var(--color-info);
-            border-color: var(--color-info);
-            color: #fff;
+            background-color: var(--color-info-solid);
+            border-color: var(--color-info-solid);
+            color: var(--color-fixed-light);
         }
     }
 
@@ -146,6 +153,26 @@
         .panel__footer {
             background-color: transparent;
             border: 0;
+            box-shadow: none;
+        }
+    }
+
+    /* Sits flat on the page rather than above it; useful for panels nested
+     * inside another panel, where a second shadow would be noise
+     */
+    &--flat {
+        box-shadow: none;
+    }
+
+    /* Recessed into the page; the inverse of the default treatment */
+    &--sunken {
+        background-color: var(--color-surface-sunken);
+        box-shadow: none;
+
+        .panel__header,
+        .panel__footer {
+            background-color: transparent;
+            box-shadow: none;
         }
     }
 
@@ -162,7 +189,7 @@
     }
 
     &--shadow {
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        box-shadow: var(--shadow-lg);
     }
 }
 
@@ -172,7 +199,7 @@
 
     .panel {
         margin-bottom: 0;
-        border-radius: var(--border-radius-md);
+        border-radius: var(--panel-radius);
 
         + .panel {
             margin-top: var(--spacing-sm);
@@ -182,6 +209,7 @@
     &--accordion {
         .panel {
             overflow: hidden;
+            box-shadow: none;
 
             &:not(:first-of-type) {
                 border-top-left-radius: 0;
@@ -197,6 +225,11 @@
             .panel__header {
                 border-radius: 0;
                 cursor: pointer;
+                transition: background-color var(--transition-duration) var(--transition-timing);
+
+                &:hover {
+                    background-color: var(--color-surface-3);
+                }
 
                 &.collapsed {
                     border-bottom: 0;
@@ -206,26 +239,6 @@
             .panel__body {
                 border-top: 1px solid var(--color-border);
             }
-        }
-    }
-}
-
-/* Dark mode adjustments */
-@media (prefers-color-scheme: dark) {
-    .panel {
-        background-color: var(--color-surface);
-        border-color: var(--color-border);
-
-        &__header {
-            background-color: rgba(0, 0, 0, 0.2);
-        }
-
-        &__footer {
-            background-color: rgba(0, 0, 0, 0.2);
-        }
-
-        &--shadow {
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
         }
     }
 }

@@ -361,6 +361,14 @@
     border: 1px solid var(--color-border) !important;
 }
 
+.border-strong {
+    border: 1px solid var(--color-border-strong) !important;
+}
+
+.border-subtle {
+    border: 1px solid var(--color-border-subtle) !important;
+}
+
 .border-top {
     border-top: 1px solid var(--color-border) !important;
 }
@@ -421,17 +429,37 @@
     border-radius: 0 !important;
 }
 
-/* Background utilities */
+/* Background utilities
+ * The surface helpers name a position on the elevation ladder rather than a
+ * colour, so they hold their meaning in both schemes
+ */
 .bg-transparent {
     background-color: transparent !important;
 }
 
+.bg-canvas {
+    background-color: var(--color-surface-0) !important;
+}
+
+.bg-elevated,
 .bg-white {
-    background-color: var(--color-background) !important;
+    background-color: var(--color-surface-1) !important;
+}
+
+.bg-raised {
+    background-color: var(--color-surface-2) !important;
+}
+
+.bg-overlay {
+    background-color: var(--color-surface-3) !important;
+}
+
+.bg-sunken {
+    background-color: var(--color-surface-sunken) !important;
 }
 
 .bg-surface {
-    background-color: var(--color-surface) !important;
+    background-color: var(--color-surface-0) !important;
 }
 
 .bg-brand {
@@ -454,21 +482,50 @@
     background-color: var(--color-info) !important;
 }
 
+/* Text colour utilities */
+.text-brand {
+    color: var(--color-link) !important;
+}
+
+.text-subtle {
+    color: var(--color-text-subtle) !important;
+}
+
+.text-success {
+    color: var(--color-success-text) !important;
+}
+
+.text-warning {
+    color: var(--color-warning-text) !important;
+}
+
+.text-danger {
+    color: var(--color-danger-text) !important;
+}
+
+.text-info {
+    color: var(--color-info-text) !important;
+}
+
 /* Shadow utilities */
 .shadow-none {
     box-shadow: none !important;
 }
 
+.shadow-xs {
+    box-shadow: var(--shadow-xs) !important;
+}
+
 .shadow-sm {
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+    box-shadow: var(--shadow-sm) !important;
 }
 
 .shadow {
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    box-shadow: var(--shadow-md) !important;
 }
 
 .shadow-lg {
-    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
+    box-shadow: var(--shadow-lg) !important;
 }
 
 /* Overflow utilities */

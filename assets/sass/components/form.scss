@@ -136,38 +136,56 @@
         }
     }
 
-    /* Form control (inputs, selects, textareas) */
+    /* Form control (inputs, selects, textareas)
+     * Recessed relative to the surface it sits on, and lifting onto that
+     * surface when focused, so the active field is unambiguous in both schemes.
+     */
     &__control {
         display: block;
         width: 100%;
         padding: var(--spacing-sm) var(--spacing-md);
         font-size: var(--font-size-md);
         line-height: 1.5;
-        color: var(--color-text);
-        background-color: var(--color-background);
+        color: var(--color-input-text);
+        background-color: var(--color-input-bg);
         background-clip: padding-box;
-        border: 1px solid var(--color-border);
-        border-radius: var(--border-radius-md);
-        transition: border-color var(--transition-duration) var(--transition-timing),
+        border: 1px solid var(--color-input-border);
+        border-radius: var(--control-radius);
+        box-shadow: var(--color-input-shadow);
+        transition: color var(--transition-duration) var(--transition-timing),
+        background-color var(--transition-duration) var(--transition-timing),
+        border-color var(--transition-duration) var(--transition-timing),
         box-shadow var(--transition-duration) var(--transition-timing);
 
+        &:hover:not(:disabled):not([readonly]):not(:focus) {
+            background-color: var(--color-input-bg-hover);
+            border-color: var(--color-input-border-hover);
+        }
+
         &:focus {
-            color: var(--color-text);
-            background-color: var(--color-background);
-            border-color: var(--color-brand-light);
+            color: var(--color-input-text);
+            background-color: var(--color-input-bg-focus);
+            border-color: var(--color-brand);
             outline: 0;
-            box-shadow: 0 0 0 0.2rem rgba(var(--color-brand), 0.25);
+            box-shadow: 0 0 0 3px var(--color-focus-ring);
         }
 
         &::placeholder {
-            color: var(--color-text-muted);
+            color: var(--color-input-placeholder);
             opacity: 1;
         }
 
         &:disabled,
         &[readonly] {
-            background-color: var(--color-gray-100);
+            background-color: var(--color-input-bg-disabled);
+            border-color: var(--color-border);
+            color: var(--color-text-muted);
+            box-shadow: none;
             opacity: 1;
+        }
+
+        &:disabled {
+            cursor: not-allowed;
         }
 
         /* Form control sizes */
@@ -191,7 +209,8 @@
 
         &--select {
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+            cursor: pointer;
+            background-image: var(--form-select-indicator);
             background-repeat: no-repeat;
             background-position: right var(--spacing-md) center;
             background-size: 16px 12px;
@@ -209,11 +228,14 @@
             optgroup {
                 font-weight: var(--font-weight-bold);
                 color: var(--color-text);
+                background-color: var(--color-surface-1);
             }
 
             /* Style for options */
             option {
                 padding: var(--spacing-xs) var(--spacing-sm);
+                color: var(--color-text);
+                background-color: var(--color-surface-1);
             }
         }
 
@@ -223,7 +245,7 @@
 
             &:focus {
                 border-color: var(--color-success);
-                box-shadow: 0 0 0 0.2rem rgba(var(--color-success), 0.25);
+                box-shadow: 0 0 0 3px rgba(var(--color-success-rgb), 0.3);
             }
         }
 
@@ -232,7 +254,7 @@
 
             &:focus {
                 border-color: var(--color-danger);
-                box-shadow: 0 0 0 0.2rem rgba(var(--color-danger), 0.25);
+                box-shadow: 0 0 0 3px rgba(var(--color-danger-rgb), 0.3);
             }
         }
     }
@@ -260,13 +282,32 @@
             top: 0.25rem;
             width: 1.25rem;
             height: 1.25rem;
-            border: 1px solid var(--color-border);
-            background: var(--color-background);
+            border: 1px solid var(--color-input-border);
+            background: var(--color-input-bg);
+            box-shadow: var(--color-input-shadow);
             transition: all var(--transition-duration) var(--transition-timing);
         }
 
+        & + label:hover:before {
+            border-color: var(--color-input-border-hover);
+        }
+
         &:focus + label:before {
-            box-shadow: 0 0 0 3px rgba(var(--color-brand), 0.25);
+            border-color: var(--color-brand);
+            box-shadow: 0 0 0 3px var(--color-focus-ring);
+        }
+
+        /* Filled when checked, so the state reads at a glance rather than
+         * relying on a small mark against the field background
+         */
+        &:checked + label:before {
+            background: var(--color-brand);
+            border-color: var(--color-brand);
+            box-shadow: none;
+        }
+
+        &:checked:focus + label:before {
+            box-shadow: 0 0 0 3px var(--color-focus-ring);
         }
 
         &:checked + label:after {
@@ -282,7 +323,14 @@
         }
 
         &:disabled + label:before {
-            background: var(--color-gray-100);
+            background: var(--color-input-bg-disabled);
+            border-color: var(--color-border);
+            box-shadow: none;
+        }
+
+        &:disabled:checked + label:before {
+            background: var(--color-gray-500);
+            border-color: var(--color-gray-500);
         }
     }
 
@@ -293,11 +341,11 @@
         }
 
         &:checked + label:after {
-            left: 0.5rem;
+            left: 0.4375rem;
             top: 0.5rem;
-            width: 0.25rem;
-            height: 0.5rem;
-            border: solid var(--color-brand);
+            width: 0.3125rem;
+            height: 0.5625rem;
+            border: solid var(--color-brand-text);
             border-width: 0 2px 2px 0;
             transform: rotate(45deg);
         }
@@ -310,12 +358,12 @@
         }
 
         &:checked + label:after {
-            left: 0.3125rem;
-            top: 0.5625rem;
-            width: 0.625rem;
-            height: 0.625rem;
+            left: 0.375rem;
+            top: 0.625rem;
+            width: 0.5rem;
+            height: 0.5rem;
             border-radius: 50%;
-            background: var(--color-brand);
+            background: var(--color-brand-text);
         }
     }
 
@@ -372,7 +420,7 @@
 
     &:focus {
         border-color: var(--color-success);
-        box-shadow: 0 0 0 0.2rem rgba(var(--color-success), 0.25);
+        box-shadow: 0 0 0 3px rgba(var(--color-success-rgb), 0.3);
     }
 }
 
@@ -382,7 +430,7 @@
 
     &:focus {
         border-color: var(--color-danger);
-        box-shadow: 0 0 0 0.2rem rgba(var(--color-danger), 0.25);
+        box-shadow: 0 0 0 3px rgba(var(--color-danger-rgb), 0.3);
     }
 }
 
@@ -419,36 +467,28 @@
     }
 }
 
-/* Dark mode adjustments */
-@media (prefers-color-scheme: dark) {
-    .form {
-        &__control {
-            background-color: var(--color-surface);
-            border-color: var(--color-border);
+/* Fieldset
+ * A grouping device which reads as a well within the surrounding surface
+ */
+.form__fieldset {
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    background-color: var(--color-surface-sunken);
+    border: 1px solid var(--color-border);
+    border-radius: var(--panel-radius);
 
-            &:focus {
-                background-color: var(--color-surface);
-            }
+    &:last-child {
+        margin-bottom: 0;
+    }
 
-            &:disabled,
-            &[readonly] {
-                background-color: var(--color-gray-800);
-            }
-
-            &--select {
-                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23adb5bd' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
-            }
-        }
-
-        &__checkbox,
-        &__radio {
-            & + label:before {
-                background: var(--color-surface);
-            }
-
-            &:disabled + label:before {
-                background: var(--color-gray-800);
-            }
-        }
+    > legend,
+    > .form__fieldset-title {
+        padding: 0 var(--spacing-sm);
+        margin-left: calc(var(--spacing-sm) * -1);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--color-text-muted);
     }
 }

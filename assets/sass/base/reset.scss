@@ -37,7 +37,19 @@ body {
   font-family: var(--font-family-base, sans-serif);
   font-size: var(--font-size-base, 16px);
   color: var(--color-text, #212529);
-  background-color: var(--color-background, #ffffff);
+  background-color: var(--color-surface-0, #ffffff);
+
+  /* Light text on a dark background renders too heavy without this */
+  @include dark-mode {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Text selection */
+::selection {
+  background-color: rgba(var(--color-brand-rgb), 0.3);
+  color: var(--color-text);
 }
 
 /* Remove list styles on ul, ol elements with a class attribute */
@@ -66,6 +78,18 @@ button,
 textarea,
 select {
   font: inherit;
+}
+
+/* Native controls which are not styled by the framework — checkboxes, radios,
+ * range sliders, progress bars — still pick up the brand colour. Combined with
+ * `color-scheme` on the root, this keeps unstyled markup looking deliberate in
+ * both schemes.
+ */
+input,
+select,
+textarea,
+progress {
+  accent-color: var(--color-brand);
 }
 
 /* Remove all animations and transitions for people that prefer not to see them */
@@ -102,8 +126,8 @@ button {
 
 /* Focus styles */
 :focus {
-  outline: 3px solid var(--color-brand-light, #e05e79);
-  outline-offset: 2px;
+  outline: var(--focus-ring-width, 2px) solid var(--color-brand);
+  outline-offset: var(--focus-ring-offset, 2px);
 }
 
 :focus:not(:focus-visible) {
@@ -111,6 +135,6 @@ button {
 }
 
 :focus-visible {
-  outline: 3px solid var(--color-brand-light, #e05e79);
-  outline-offset: 2px;
+  outline: var(--focus-ring-width, 2px) solid var(--color-brand);
+  outline-offset: var(--focus-ring-offset, 2px);
 }

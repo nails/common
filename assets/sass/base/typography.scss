@@ -12,16 +12,19 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: var(--font-weight-bold);
     line-height: 1.2;
     color: var(--color-text);
+    text-wrap: balance;
 }
 
 h1 {
     font-size: var(--font-size-3xl);
     margin-top: var(--spacing-2xl);
+    letter-spacing: -0.02em;
 }
 
 h2 {
     font-size: var(--font-size-2xl);
     margin-top: var(--spacing-xl);
+    letter-spacing: -0.015em;
 }
 
 h3 {
@@ -54,18 +57,18 @@ p {
 
 /* Links */
 a {
-    color: var(--color-brand);
+    color: var(--color-link);
     text-decoration: none;
     transition: color var(--transition-duration) var(--transition-timing);
 
     &:hover {
-        color: var(--color-brand-dark);
+        color: var(--color-link-hover);
         text-decoration: underline;
     }
 
     &:focus {
-        outline: 3px solid var(--color-brand-light);
-        outline-offset: 2px;
+        outline: var(--focus-ring-width) solid var(--color-brand);
+        outline-offset: var(--focus-ring-offset);
     }
 }
 
@@ -102,8 +105,9 @@ dl {
 blockquote {
     margin: var(--spacing-md) 0;
     padding: var(--spacing-md) var(--spacing-lg);
-    border-left: 4px solid var(--color-gray-300);
-    background-color: var(--color-gray-100);
+    border-left: 4px solid var(--color-border-strong);
+    background-color: var(--color-surface-sunken);
+    border-radius: 0 var(--control-radius) var(--control-radius) 0;
     font-style: italic;
 
     p:last-child {
@@ -121,24 +125,31 @@ blockquote {
 
 /* Code */
 code, pre {
-    font-family: monospace;
-    background-color: var(--color-gray-100);
+    font-family: var(--font-family-mono);
+    background-color: var(--color-code-bg);
+    border: 1px solid var(--color-code-border);
     border-radius: var(--border-radius-sm);
 }
 
 code {
-    padding: 0.2em 0.4em;
-    font-size: 0.9em;
+    padding: 0.15em 0.4em;
+    font-size: 0.875em;
+    color: var(--color-code-text);
 }
 
 pre {
     margin: var(--spacing-md) 0;
     padding: var(--spacing-md);
     overflow-x: auto;
+    border-radius: var(--control-radius);
+    color: var(--color-text);
 
     code {
         padding: 0;
+        border: 0;
         background-color: transparent;
+        color: inherit;
+        font-size: 0.875rem;
     }
 }
 
