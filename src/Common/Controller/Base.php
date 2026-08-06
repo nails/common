@@ -31,6 +31,7 @@ use Nails\Common\Service\Profiler;
 use Nails\Common\Service\Session;
 use Nails\Common\Service\Uri;
 use Nails\Common\Service\UserFeedback;
+use Nails\Common\Service\View;
 use Nails\Common\Settings;
 use Nails\Components;
 use Nails\Config;
@@ -311,8 +312,10 @@ abstract class Base extends \MX_Controller
 
         /** @var Input $oInput */
         $oInput = Factory::service('Input');
+        /** @var Session $oSession */
+        $oSession = Factory::service('Session');
 
-        $aCredentials = $this->passwordProtectedIpCredentials();
+        $aCredentials = $this->passwordProtectedCredentials();
 
         if (!$oInput::isCli() && !empty($aCredentials)) {
 
@@ -321,20 +324,25 @@ abstract class Base extends \MX_Controller
 
             if (!$bWhitelisted) {
 
-                $sAuthUser = $oInput->server('PHP_AUTH_USER') ?: $oInput->header('X-Auth-User');
-                $sAuthPass = $oInput->server('PHP_AUTH_PW') ?: $oInput->header('X-Auth-Password');
+                $sAuthUser = $oInput->server('PHP_AUTH_USER')
+                    ?: $oInput->header('X-Auth-User')
+                        ?: $oInput->post('AUTH_USER')
+                            ?: $oSession->getUserData('AUTH_USER');
 
-                if (empty($sAuthUser)) {
-                    $this->passwordProtectedRequest();
-                }
+                $sAuthPass = $oInput->server('PHP_AUTH_PW')
+                    ?: $oInput->header('X-Auth-Password')
+                        ?: $oInput->post('AUTH_PW')
+                            ?: $oSession->getUserData('AUTH_PW');
 
-                if (!empty($sAuthUser) && !empty($sAuthPass)) {
+                if (!empty($sAuthUser) || !empty($sAuthPass)) {
 
                     $bExists  = array_key_exists($sAuthUser, $aCredentials);
                     $bIsEqual = $bExists && $aCredentials[$sAuthUser] == hash('sha256', $sAuthPass);
                     if (!$bExists || !$bIsEqual) {
-                        $this->passwordProtectedRequest();
+                        $this->passwordProtectedRequest('Invalid credentials');
                     }
+
+                    //  @todo (Pablo 2026-08-06) - store the credentials in the session
 
                 } else {
                     $this->passwordProtectedRequest();
@@ -352,7 +360,7 @@ abstract class Base extends \MX_Controller
      *
      * @return array
      */
-    protected function passwordProtectedIpCredentials(): array
+    protected function passwordProtectedCredentials(): array
     {
         $mConfig = Config::get('APP_USER_PASS_' . Environment::get());
         $sFile   = 'protect.' . strtolower(Environment::get()) . '.users.json';
@@ -389,20 +397,11 @@ abstract class Base extends \MX_Controller
      * @return void
      * @throws FactoryException
      */
-    protected function passwordProtectedRequest(): void
+    protected function passwordProtectedRequest(string $message = ''): void
     {
-        /** @var Input $oInput */
-        $oInput = Factory::service('Input');
         /** @var ErrorHandler $oErrorHandler */
         $oErrorHandler = Factory::service('ErrorHandler');
-        /** @var MetaData $oMetaData */
-        $oMetaData = Factory::service('MetaData');
-
-        //  Send headers immediately
-        header('WWW-Authenticate: Basic realm="' . $oMetaData->getAppName() . ' - Restricted Area"');
-        header($oInput->server('SERVER_PROTOCOL') . ' 401 Unauthorized');
-
-        $oErrorHandler->show401(null, null, true, true);
+        $oErrorHandler->show401LoginScreen($message);
     }
 
     // --------------------------------------------------------------------------
