@@ -21,7 +21,17 @@ module.exports = {
                         }
                     },
                     'postcss-loader',
-                    'sass-loader'
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            //  Prevents Dart Sass emitting a U+FEFF BOM when the output contains
+                            //  non-ASCII characters; the BOM is not hoisted with the @import
+                            //  statements and ends up mid-file, invalidating the following rule
+                            sassOptions: {
+                                charset: false
+                            }
+                        }
+                    }
                 ]
             },
         ]
