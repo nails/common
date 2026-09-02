@@ -277,6 +277,21 @@ class RedirectTest extends TestCase
     // --------------------------------------------------------------------------
 
     /**
+     * @covers \Nails\Common\Factory\Redirect::getSafeDomains
+     */
+    public function test_get_safe_domains_prepends_scheme_if_missing(): void
+    {
+        Config::set('REDIRECT_SAFE_DOMAINS', ['//proxy-scheme.com', 'no-scheme.com']);
+        $oRedirect    = $this->getInstance();
+        $aSafeDomains = $oRedirect->getSafeDomains();
+
+        $this->assertContains('https://proxy-scheme.com', $aSafeDomains);
+        $this->assertContains('https://no-scheme.com', $aSafeDomains);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * @covers \Nails\Common\Factory\Redirect::setUrl
      * @covers \Nails\Common\Factory\Redirect::getUrl
      */
