@@ -8,18 +8,28 @@ use Nails\Common\Exception\Redirect\InvalidMethodException;
 use Nails\Common\Factory\Redirect;
 use Nails\Common\Service\UserFeedback;
 use Nails\Config;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
+use Tests\Fixture\BootstrapSpy;
 
 class RedirectTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        BootstrapSpy::reset();
+    }
+
+    // --------------------------------------------------------------------------
+
     private function getInstance(
         ?string $sUrl = null,
         ?string $sMethod = null,
         ?int $iHttpResponseCode = null,
         ?bool $bAllowExternal = null,
         ?array $aSafeDomains = null,
-        $oUserFeedbackMock = null,
-        $sBootstrapMock = null
+        $oUserFeedback = null,
+        ?string $sBootstrapClass = null
     ): Redirect {
         return new Redirect(
             $sUrl ?? '',
@@ -27,36 +37,52 @@ class RedirectTest extends TestCase
             $iHttpResponseCode ?? Redirect::HTTP_CODE_TEMPORARY,
             $bAllowExternal ?? false,
             $aSafeDomains ?? [],
-            $oUserFeedbackMock ?? $this->createUserFeedbackMock(),
-            $sBootstrapMock ?? get_class($this->createBootstrapMock())
+            $oUserFeedback ?? $this->createUserFeedbackStub(),
+            $sBootstrapClass ?? BootstrapSpy::class
         );
     }
 
     // --------------------------------------------------------------------------
 
-    private function createUserFeedbackMock()
+    /**
+     * Executes the redirect and returns the header it sent.
+     *
+     * The closure passed to execute() stops the redirect sending real headers or
+     * exiting; capturing the header rather than asserting inside the closure
+     * means a closure which is never called fails the test, rather than silently
+     * passing with no assertions.
+     */
+    private function executeAndCaptureHeader(Redirect $oRedirect): string
     {
-        return $this->createMock(UserFeedback::class);
+        $sCaptured = null;
+
+        $oRedirect->execute(function (string $sHeader) use (&$sCaptured) {
+            $sCaptured = $sHeader;
+        });
+
+        $this->assertIsString($sCaptured, 'Redirect::execute() did not send a header');
+
+        return $sCaptured;
     }
 
     // --------------------------------------------------------------------------
 
-    private function createBootstrapMock()
+    /**
+     * A stub for the tests which do not care about how UserFeedback is used
+     */
+    private function createUserFeedbackStub(): UserFeedback&Stub
     {
-        $sClassName = 'Bootstrap_' . md5(microtime(true));
-        return eval("
-            class $sClassName {
-                public static \$bTestShutdown = false;
-                public static function shutdown()
-                {
-                    if (self::\$bTestShutdown) {
-                        throw new \RuntimeException(__METHOD__ . ' was called');
-                    }
-                }
-            }
+        return $this->createStub(UserFeedback::class);
+    }
 
-            return new $sClassName();
-        ");
+    // --------------------------------------------------------------------------
+
+    /**
+     * A mock for the tests which assert on how UserFeedback is used
+     */
+    private function createUserFeedbackMock(): UserFeedback&MockObject
+    {
+        return $this->createMock(UserFeedback::class);
     }
 
     // --------------------------------------------------------------------------
@@ -410,13 +436,14 @@ class RedirectTest extends TestCase
 
     public function test_execute_sends_redirect_header()
     {
-        $oRedirect = $this->getInstance();
-        $oRedirect
+        $oRedirect = $this->getInstance()
             ->setAppDomain('https://localhost.com')
-            ->setUrl('/foo/bar')
-            ->execute(function ($sHeader) {
-                $this->assertEquals('Location: https://localhost.com/foo/bar', $sHeader);
-            });
+            ->setUrl('/foo/bar');
+
+        $this->assertEquals(
+            'Location: https://localhost.com/foo/bar',
+            $this->executeAndCaptureHeader($oRedirect)
+        );
     }
 
     // --------------------------------------------------------------------------
@@ -442,19 +469,22 @@ class RedirectTest extends TestCase
 
     public function test_bootstrap_shutdown_method_is_called()
     {
-        $oBootstrap = $this->createBootstrapMock();
+        $iCallsWhenHeaderSent = null;
 
-        $oBootstrap::$bTestShutdown = true;
-
-        $this->expectException(\RuntimeException::class);
-
-        $oRedirect = $this->getInstance(null, null, null, null, null, null, get_class($oBootstrap));
+        $oRedirect = $this->getInstance();
         $oRedirect
             ->setAppDomain('https://localhost.com')
             ->setUrl('/foo/bar')
-            ->execute(function ($sHeader) {
-                // closure prevents redirect from sending headers or exiting
+            ->execute(function ($sHeader) use (&$iCallsWhenHeaderSent) {
+                $iCallsWhenHeaderSent = BootstrapSpy::$iShutdownCallCount;
             });
+
+        $this->assertSame(1, BootstrapSpy::$iShutdownCallCount);
+        $this->assertSame(
+            1,
+            $iCallsWhenHeaderSent,
+            'Shutdown is the last chance to clean up, so must be called before the header is sent'
+        );
     }
 
     // --------------------------------------------------------------------------
@@ -474,28 +504,30 @@ class RedirectTest extends TestCase
 
     public function test_external_host_sends_header_when_allow_external_is_set()
     {
-        $oRedirect = $this->getInstance();
-        $oRedirect
+        $oRedirect = $this->getInstance()
             ->setAppDomain('https://localhost.com')
             ->setUrl('https://remotehost.com/foo/bar')
-            ->allowExternal()
-            ->execute(function ($sHeader) {
-                $this->assertEquals('Location: https://remotehost.com/foo/bar', $sHeader);
-            });
+            ->allowExternal();
+
+        $this->assertEquals(
+            'Location: https://remotehost.com/foo/bar',
+            $this->executeAndCaptureHeader($oRedirect)
+        );
     }
 
     // --------------------------------------------------------------------------
 
     public function test_safe_domain_is_not_considered_external()
     {
-        $oRedirect = $this->getInstance();
-        $oRedirect
+        $oRedirect = $this->getInstance()
             ->setAppDomain('https://localhost.com')
             ->addSafeDomain('https://trusted.com')
-            ->setUrl('https://trusted.com/some/path')
-            ->execute(function ($sHeader) {
-                $this->assertEquals('Location: https://trusted.com/some/path', $sHeader);
-            });
+            ->setUrl('https://trusted.com/some/path');
+
+        $this->assertEquals(
+            'Location: https://trusted.com/some/path',
+            $this->executeAndCaptureHeader($oRedirect)
+        );
     }
 
     // --------------------------------------------------------------------------
@@ -511,10 +543,12 @@ class RedirectTest extends TestCase
         );
         $oRedirect
             ->setAppDomain('https://localhost.com')
-            ->setUrl('https://trusted.com/some/path')
-            ->execute(function ($sHeader) {
-                $this->assertEquals('Location: https://trusted.com/some/path', $sHeader);
-            });
+            ->setUrl('https://trusted.com/some/path');
+
+        $this->assertEquals(
+            'Location: https://trusted.com/some/path',
+            $this->executeAndCaptureHeader($oRedirect)
+        );
     }
 
     // --------------------------------------------------------------------------
@@ -524,13 +558,14 @@ class RedirectTest extends TestCase
         Config::set('REDIRECT_SAFE_DOMAINS', ['https://config-trusted.com']);
 
         try {
-            $oRedirect = $this->getInstance();
-            $oRedirect
+            $oRedirect = $this->getInstance()
                 ->setAppDomain('https://localhost.com')
-                ->setUrl('https://config-trusted.com/some/path')
-                ->execute(function ($sHeader) {
-                    $this->assertEquals('Location: https://config-trusted.com/some/path', $sHeader);
-                });
+                ->setUrl('https://config-trusted.com/some/path');
+
+            $this->assertEquals(
+                'Location: https://config-trusted.com/some/path',
+                $this->executeAndCaptureHeader($oRedirect)
+            );
         } finally {
             Config::set('REDIRECT_SAFE_DOMAINS', null);
         }
