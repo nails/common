@@ -63,6 +63,11 @@
             "Nails\\Common\\": "src/Common/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
     "extra": {
         "nails": {
             "moduleName": "common",
