@@ -167,14 +167,39 @@ class Redirect
      *
      * @return string[]
      */
-    public function getSafeDomains(): array
+    public function getSafeDomains(string $sDefaultScheme = 'https'): array
     {
         $aConfigDomains = (array) (Config::get('REDIRECT_SAFE_DOMAINS') ?? []);
-        return array_values(array_filter(array_unique(array_merge(
-            [$this->getAppDomain()],
-            $aConfigDomains,
-            $this->aSafeDomains,
-        ))));
+        $aSafeDomains   = array_values(
+            array_filter(
+                array_unique(
+                    array_merge(
+                        [$this->getAppDomain()],
+                        $aConfigDomains,
+                        $this->aSafeDomains,
+                    )
+                )
+            )
+        );
+
+        //  Ensure each domain has a scheme
+        return array_map(
+            function ($sSafeDomain) use ($sDefaultScheme) {
+                if (str_starts_with($sSafeDomain, '//')) {
+                    return sprintf('%s:%s', $sDefaultScheme, $sSafeDomain);
+
+                } elseif (str_starts_with($sSafeDomain, '/')) {
+                    return $sSafeDomain;
+
+                } elseif (!preg_match('#^[a-z][a-z0-9+.-]*://#i', $sSafeDomain)) {
+                    return sprintf('%s://%s', $sDefaultScheme, $sSafeDomain);
+
+                } else {
+                    return $sSafeDomain;
+                }
+            },
+            $aSafeDomains
+        );
     }
 
     // --------------------------------------------------------------------------
