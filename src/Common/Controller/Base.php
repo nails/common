@@ -21,6 +21,7 @@ use Nails\Common\Exception\NailsException;
 use Nails\Common\Factory\Locale;
 use Nails\Common\Service\Asset;
 use Nails\Common\Service\DateTime;
+use Nails\Common\Service\EnvironmentProtection;
 use Nails\Common\Service\ErrorHandler;
 use Nails\Common\Service\Event;
 use Nails\Common\Service\Input;
@@ -309,46 +310,56 @@ abstract class Base extends \MX_Controller
      */
     protected function passwordProtected(): self
     {
-
         /** @var Input $oInput */
         $oInput = Factory::service('Input');
-        /** @var Session $oSession */
-        $oSession = Factory::service('Session');
 
-        $aCredentials = $this->passwordProtectedCredentials();
+        if ($oInput::isCli()) {
+            return $this;
+        }
 
-        if (!$oInput::isCli() && !empty($aCredentials)) {
+        /** @var EnvironmentProtection $oEnvironmentProtection */
+        $oEnvironmentProtection = Factory::service('EnvironmentProtection');
 
-            $aWhitelistedIps = $this->passwordProtectedIpWhitelist();
-            $bWhitelisted    = !empty($aWhitelistedIps) && isIpInRange($oInput->ipAddress(), $aWhitelistedIps);
+        /**
+         * The credentials and whitelist are read back out of these methods so
+         * that apps which have overridden them continue to be respected.
+         */
+        $oEnvironmentProtection
+            ->setCredentials($this->passwordProtectedCredentials())
+            ->setIpWhitelist($this->passwordProtectedIpWhitelist());
 
-            if (!$bWhitelisted) {
+        if (!$oEnvironmentProtection->isProtected()) {
+            return $this;
 
-                $sAuthUser = $oInput->server('PHP_AUTH_USER')
-                    ?: $oInput->header('X-Auth-User')
-                        ?: $oInput->post('AUTH_USER')
-                            ?: $oSession->getUserData('AUTH_USER');
+        } elseif ($oEnvironmentProtection->isWhitelisted()) {
+            return $this;
 
-                $sAuthPass = $oInput->server('PHP_AUTH_PW')
-                    ?: $oInput->header('X-Auth-Password')
-                        ?: $oInput->post('AUTH_PW')
-                            ?: $oSession->getUserData('AUTH_PW');
+        } elseif ($oEnvironmentProtection->isAuthenticated()) {
+            return $this;
+        }
 
-                if (!empty($sAuthUser) || !empty($sAuthPass)) {
+        [$sAuthUser, $sAuthPass] = $oEnvironmentProtection->getCredentialsFromRequest();
 
-                    $bExists  = array_key_exists($sAuthUser, $aCredentials);
-                    $bIsEqual = $bExists && $aCredentials[$sAuthUser] == hash('sha256', $sAuthPass);
-                    if (!$bExists || !$bIsEqual) {
-                        $this->passwordProtectedRequest('Invalid credentials');
-                    }
+        if ($sAuthUser === null && $sAuthPass === null) {
+            $this->passwordProtectedRequest();
 
-                    $oSession->setUserData('AUTH_USER', $sAuthUser);
-                    $oSession->setUserData('AUTH_PW', $sAuthPass);
+        } elseif (!$oEnvironmentProtection->verifyCredentials($sAuthUser, $sAuthPass)) {
+            $this->passwordProtectedRequest('Invalid credentials');
+        }
 
-                } else {
-                    $this->passwordProtectedRequest();
-                }
-            }
+        /**
+         * Only the login form is issued a token. Credentials supplied via basic
+         * auth, or headers, unlock this request alone; tooling which
+         * authenticates on every request has no use for a cookie, and not
+         * setting one keeps a long lived token out of any response which might
+         * subsequently be cached.
+         *
+         * The redirect re-dispatches the request with the new token in play,
+         * and stops the credentials leaking into the app's POST data.
+         */
+        if ($oInput->post($oEnvironmentProtection->getFieldUser())) {
+            $oEnvironmentProtection->issueToken((string) $sAuthUser);
+            redirect(rtrim(siteUrl(), '/') . $oInput->server('REQUEST_URI'));
         }
 
         return $this;
@@ -360,16 +371,14 @@ abstract class Base extends \MX_Controller
      * Returns an array of key/value pairs for password protection
      *
      * @return array
+     * @throws FactoryException
      */
     protected function passwordProtectedCredentials(): array
     {
-        $mConfig = Config::get('APP_USER_PASS_' . Environment::get());
-        $sFile   = 'protect.' . strtolower(Environment::get()) . '.users.json';
-        if ($mConfig === null && file_exists($sFile)) {
-            $mConfig = @json_decode(file_get_contents($sFile)) ?? [];
-        }
+        /** @var EnvironmentProtection $oEnvironmentProtection */
+        $oEnvironmentProtection = Factory::service('EnvironmentProtection');
 
-        return (array) $mConfig;
+        return $oEnvironmentProtection->getCredentials();
     }
 
     // --------------------------------------------------------------------------
@@ -378,16 +387,14 @@ abstract class Base extends \MX_Controller
      * Returns an array of whitelisted IPs for password protection
      *
      * @return array
+     * @throws FactoryException
      */
     protected function passwordProtectedIpWhitelist(): array
     {
-        $mConfig = Config::get('APP_USER_PASS_WHITELIST_' . Environment::get());
-        $sFile   = 'protect.' . strtolower(Environment::get()) . '.whitelist.json';
-        if ($mConfig === null && file_exists($sFile)) {
-            $mConfig = @json_decode(file_get_contents($sFile)) ?? [];
-        }
+        /** @var EnvironmentProtection $oEnvironmentProtection */
+        $oEnvironmentProtection = Factory::service('EnvironmentProtection');
 
-        return (array) $mConfig;
+        return $oEnvironmentProtection->getIpWhitelist();
     }
 
     // --------------------------------------------------------------------------

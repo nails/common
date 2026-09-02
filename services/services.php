@@ -95,6 +95,13 @@ return [
                 return new Service\Encrypt();
             }
         },
+        'EnvironmentProtection'          => function (): Service\EnvironmentProtection {
+            if (class_exists('\App\Common\Service\EnvironmentProtection')) {
+                return new \App\Common\Service\EnvironmentProtection();
+            } else {
+                return new Service\EnvironmentProtection();
+            }
+        },
         'ErrorHandler'                   => function (): Service\ErrorHandler {
             if (class_exists('\App\Common\Service\ErrorHandler')) {
                 return new \App\Common\Service\ErrorHandler();

@@ -85,9 +85,14 @@ class Cookie
     /**
      * Writes a cookie, or overwrites an existing one
      *
-     * @param string   $sKey   The cookie's key
-     * @param string   $sValue The cookie's value
-     * @param int|null $iTTL   The cookie's TTL in seconds
+     * @param string      $sKey      The cookie's key
+     * @param string      $sValue    The cookie's value
+     * @param int|null    $iTTL      The cookie's TTL in seconds
+     * @param string      $sPath     The path the cookie is valid for
+     * @param string      $sDomain   The domain the cookie is valid for
+     * @param bool        $bSecure   Whether the cookie is restricted to HTTPS
+     * @param bool        $bHttpOnly Whether the cookie is hidden from JavaScript
+     * @param string|null $sSameSite The cookie's SameSite policy; Strict, Lax, or None
      *
      * @return bool
      */
@@ -98,9 +103,28 @@ class Cookie
         string $sPath = '',
         string $sDomain = '',
         bool $bSecure = false,
-        bool $bHttpOnly = false
+        bool $bHttpOnly = false,
+        ?string $sSameSite = null
     ): bool {
-        if (setcookie($sKey, $sValue, $iTTL ? time() + $iTTL : 0, $sPath, $sDomain, $bSecure, $bHttpOnly)) {
+        $iExpires = $iTTL ? time() + $iTTL : 0;
+
+        /**
+         * SameSite can only be expressed using setcookie()'s options array, but
+         * the positional form is retained when it is not in play so that the
+         * behaviour of existing calls is untouched.
+         */
+        $bResult = $sSameSite === null
+            ? setcookie($sKey, $sValue, $iExpires, $sPath, $sDomain, $bSecure, $bHttpOnly)
+            : setcookie($sKey, $sValue, [
+                'expires'  => $iExpires,
+                'path'     => $sPath,
+                'domain'   => $sDomain,
+                'secure'   => $bSecure,
+                'httponly' => $bHttpOnly,
+                'samesite' => $sSameSite,
+            ]);
+
+        if ($bResult) {
             $this->aCookies[$sKey] = Factory::resource(
                 'Cookie',
                 null,
@@ -120,13 +144,15 @@ class Cookie
     /**
      * Delete a cookie
      *
-     * @param string $sKey The cookie to delete, or an array of cookies
+     * @param string $sKey    The cookie to delete
+     * @param string $sPath   The path the cookie was written with
+     * @param string $sDomain The domain the cookie was written with
      *
      * @return bool
      */
-    public function delete(string $sKey): bool
+    public function delete(string $sKey, string $sPath = '', string $sDomain = ''): bool
     {
-        if (array_key_exists($sKey, $this->aCookies) && setcookie($sKey, '', 1)) {
+        if (array_key_exists($sKey, $this->aCookies) && setcookie($sKey, '', 1, $sPath, $sDomain)) {
             unset($this->aCookies[$sKey]);
             return true;
         }

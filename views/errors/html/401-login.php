@@ -1,6 +1,7 @@
 <?php
 
 use Nails\Common\Service\Asset;
+use Nails\Common\Service\EnvironmentProtection;
 use Nails\Common\Service\Input;
 use Nails\Common\Service\MetaData;
 use Nails\Config;
@@ -12,6 +13,8 @@ $metaDataService = Factory::service('MetaData');
 $inputService = Factory::service('Input');
 /** @var Asset $assetService */
 $assetService = Factory::service('Asset');
+/** @var EnvironmentProtection $environmentProtectionService */
+$environmentProtectionService = Factory::service('EnvironmentProtection');
 
 $assetService->clear();
 $assetService->load('nails.min.css', \Nails\Common\Constants::MODULE_SLUG);
@@ -59,11 +62,11 @@ $currentUrl = sprintf('%s%s', rtrim(siteUrl(), '/'), $inputService->server('REQU
                         ?>
                         <div class="form__group">
                             <label class="form__label" for="input-auth-user">Username</label>
-                            <?=form_input('AUTH_USER', '', 'id="input-auth-user" placeholder="Username" class="form__control"')?>
+                            <?=form_input($environmentProtectionService->getFieldUser(), '', 'id="input-auth-user" placeholder="Username" class="form__control" autocomplete="username" autocapitalize="none" autofocus')?>
                         </div>
                         <div class="form__group">
                             <label class="form__label" for="input-auth-pw">Password</label>
-                            <?=form_password('AUTH_PW', '', 'id="input-auth-pw" placeholder="Password" class="form__control"')?>
+                            <?=form_password($environmentProtectionService->getFieldPass(), '', 'id="input-auth-pw" placeholder="Password" class="form__control" autocomplete="current-password"')?>
                         </div>
                         <div class="form__actions">
                             <button type="submit" class="btn btn--block btn--primary">
