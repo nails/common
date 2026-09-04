@@ -290,7 +290,7 @@ class Field
      */
     private function checkIfFieldIsRequired(): self
     {
-        $this->setIsRequired(in_array(FormValidation::RULE_REQUIRED, $this->validation));
+        $this->setIsRequired(in_array(FormValidation::RULE_REQUIRED, $this->validation, true));
         return $this;
     }
 

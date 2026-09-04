@@ -102,5 +102,66 @@ if (!function_exists('form_dropdown_multiple')) {
 
 // --------------------------------------------------------------------------
 
+/**
+ * The following shadow CodeIgniter's form-validation helpers so that they read
+ * from the Nails FormValidation service rather than CodeIgniter's library; they
+ * therefore work with buildValidator(), the legacy set_rules() API and from the
+ * console alike. CodeIgniter's own definitions (included below) are skipped as
+ * they are guarded by function_exists().
+ */
+
+if (!function_exists('set_value')) {
+    /**
+     * Returns the submitted value of a field, for repopulating a form
+     *
+     * @param string $field       The field name (may be a bracketed path)
+     * @param mixed  $default     The value to use when nothing was submitted
+     * @param bool   $html_escape Whether to HTML-escape the value
+     *
+     * @return mixed
+     */
+    function set_value($field = '', $default = '', $html_escape = true)
+    {
+        return Form::setValue($field, $default, $html_escape);
+    }
+}
+
+if (!function_exists('set_select')) {
+    function set_select($field = '', $value = '', $default = false)
+    {
+        return Form::setSelect($field, $value, $default);
+    }
+}
+
+if (!function_exists('set_checkbox')) {
+    function set_checkbox($field = '', $value = '', $default = false)
+    {
+        return Form::setCheckbox($field, $value, $default);
+    }
+}
+
+if (!function_exists('set_radio')) {
+    function set_radio($field = '', $value = '', $default = false)
+    {
+        return Form::setRadio($field, $value, $default);
+    }
+}
+
+if (!function_exists('form_error')) {
+    function form_error($field = '', $prefix = '', $suffix = '')
+    {
+        return Form::error($field, $prefix, $suffix);
+    }
+}
+
+if (!function_exists('validation_errors')) {
+    function validation_errors($prefix = '', $suffix = '')
+    {
+        return Form::validationErrors($prefix, $suffix);
+    }
+}
+
+// --------------------------------------------------------------------------
+
 //  Include the CodeIgniter original
 include NAILS_CI_SYSTEM_PATH . 'helpers/form_helper.php';
