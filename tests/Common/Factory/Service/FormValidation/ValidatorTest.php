@@ -169,4 +169,128 @@ class ValidatorTest extends TestCase
     {
         self::assertInstanceOf(Validator::class, Factory::factory('FormValidationValidator'));
     }
+
+    // --------------------------------------------------------------------------
+
+    private function identityValidator(): Validator
+    {
+        return new class extends Validator {
+            protected function rules(): array
+            {
+                return [
+                    'email' => [FormValidation::RULE_REQUIRED, FormValidation::RULE_VALID_EMAIL],
+                    'name'  => [FormValidation::RULE_REQUIRED],
+                ];
+            }
+
+            protected function messages(): array
+            {
+                return [FormValidation::RULE_VALID_EMAIL => 'Not an email.'];
+            }
+
+            protected function labels(): array
+            {
+                return ['name' => 'Full name'];
+            }
+
+            protected function fieldMessages(): array
+            {
+                return ['name' => [FormValidation::RULE_REQUIRED => 'We need your {field}.']];
+            }
+        };
+    }
+
+    public function test_a_subclass_defines_its_own_rules_messages_and_labels(): void
+    {
+        $oValidator = $this->identityValidator();
+
+        self::assertArrayHasKey('email', $oValidator->getRules());
+
+        try {
+            $oValidator->run(['email' => 'nope', 'name' => '']);
+            self::fail('Expected a ValidationException');
+        } catch (ValidationException $e) {
+            self::assertSame(
+                ['email' => 'Not an email.', 'name' => 'We need your Full name.'],
+                $e->getData()
+            );
+        }
+    }
+
+    public function test_runtime_values_merge_over_a_subclass(): void
+    {
+        $oValidator = $this->identityValidator()
+            ->setRules(['email' => [FormValidation::RULE_REQUIRED]])   // replaces the email rules only
+            ->addRules(['age' => [FormValidation::RULE_INTEGER]])       // adds a field
+            ->setMessages([FormValidation::RULE_INTEGER => 'Whole numbers only.']);
+
+        self::assertSame(['email', 'name', 'age'], array_keys($oValidator->getRules()));
+        self::assertSame(
+            [FormValidation::RULE_VALID_EMAIL => 'Not an email.', FormValidation::RULE_INTEGER => 'Whole numbers only.'],
+            $oValidator->getMessages()
+        );
+
+        try {
+            $oValidator->run(['email' => 'not-an-email', 'name' => 'Ada', 'age' => 'x']);
+            self::fail('Expected a ValidationException');
+        } catch (ValidationException $e) {
+            //  valid_email no longer applies; integer does
+            self::assertSame(['age' => 'Whole numbers only.'], $e->getData());
+        }
+    }
+
+    public function test_a_rule_can_be_stubbed_with_a_closure_without_touching_the_shared_registry(): void
+    {
+        $aSeen      = [];
+        $oValidator = $this->oFormValidation
+            ->buildValidator(['email' => [FormValidation::RULE_VALID_EMAIL]], [], ['email' => 'a@b.com'])
+            ->stubRule(FormValidation::RULE_VALID_EMAIL, function ($mValue, Context $oContext) use (&$aSeen) {
+                $aSeen[] = [$mValue, $oContext->getField()];
+                return false;
+            });
+
+        try {
+            $oValidator->run();
+            self::fail('Expected the stub to fail the field');
+        } catch (ValidationException $e) {
+            self::assertSame(['email' => 'This must be a valid email.'], $e->getData(), 'stub keeps the original message');
+            self::assertSame([['a@b.com', 'email']], $aSeen);
+        }
+
+        //  A fresh validator still uses the real rule
+        $this->oFormValidation
+            ->buildValidator(['email' => [FormValidation::RULE_VALID_EMAIL]], [], ['email' => 'a@b.com'])
+            ->run();
+
+        //  ... and stubbing can be reverted
+        $oValidator->setEngine(null)->run();
+    }
+
+    public function test_a_stubbed_closure_may_throw_its_own_message(): void
+    {
+        $oValidator = $this->oFormValidation
+            ->buildValidator(['email' => 'is_unique[x.y]'], [], ['email' => 'a@b.com'])
+            ->stubRule(FormValidation::RULE_IS_UNIQUE, fn() => throw new ValidationException('Taken.'));
+
+        try {
+            $oValidator->run();
+            self::fail('Expected a ValidationException');
+        } catch (ValidationException $e) {
+            self::assertSame(['email' => 'Taken.'], $e->getData());
+        }
+    }
+
+    public function test_a_rule_can_be_stubbed_with_an_instance(): void
+    {
+        $oValidator = $this->oFormValidation
+            ->buildValidator(['name' => [FormValidation::RULE_REQUIRED]], [], ['name' => ''])
+            ->stubRule(FormValidation::RULE_REQUIRED, new class extends Required {
+                public function apply(mixed $mValue, Context $oContext): bool
+                {
+                    return true;
+                }
+            });
+
+        self::assertSame($oValidator, $oValidator->run());
+    }
 }

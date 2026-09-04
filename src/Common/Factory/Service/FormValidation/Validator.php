@@ -8,10 +8,13 @@ use Nails\Common\Factory\Model\Field as ModelField;
 use Nails\Common\Interfaces\Validation\Rule;
 use Nails\Common\Model\Base;
 use Nails\Common\Service\FormValidation;
+use Nails\Common\Validation\AbstractRule;
 use Nails\Common\Validation\Context;
+use Nails\Common\Validation\Engine;
 use Nails\Common\Validation\Exception\UnknownRuleException;
 use Nails\Common\Validation\Field;
 use Nails\Common\Validation\MessageStyle;
+use Nails\Common\Validation\Registry;
 use Nails\Common\Validation\Result;
 use Nails\Common\Validation\RuleSet;
 use Nails\Factory;
@@ -23,6 +26,23 @@ use Nails\Factory;
  * pipe-separated string or an array of: rule names (`required`, `max_length[5]`),
  * Rule class names, Rule instances, or closures. A closure receives
  * `(mixed $mValue, Context $oContext)` and fails by throwing a ValidationException.
+ *
+ * Use it ad hoc via `FormValidation::buildValidator()`, or extend it and override
+ * `rules()` (and optionally `messages()`, `labels()`, `fieldMessages()`) to give a
+ * rule set a name, a home for its dependencies, and a unit test:
+ *
+ *     class Identity extends Validator
+ *     {
+ *         public function __construct(private readonly ?int $iIgnoreUserId = null) { parent::__construct(); }
+ *         protected function rules(): array { return ['email' => [FormValidation::RULE_REQUIRED, ...]]; }
+ *     }
+ *
+ *     (new Identity($oUser->id))->run($aData);
+ *
+ * Values set at runtime (`setRules()`, `setMessages()`, ...) are merged over the
+ * class-defined ones, so a caller can add to or override a subclass's rule set.
+ * Data is always supplied by the caller (constructor or `run()`); a validator
+ * should never read `$_POST` itself, so it stays usable from the console and tests.
  *
  * @package Nails\Common\Factory\Service\FormValidation
  */
@@ -77,6 +97,55 @@ class Validator
      */
     protected $oResult = null;
 
+    /**
+     * An engine to run with instead of the shared one (tests, or stubbed rules)
+     *
+     * @var Engine|null
+     */
+    protected $oEngine = null;
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Rules defined by a subclass, field => rules; merged under any set at runtime
+     *
+     * @return array<string, string|array>
+     */
+    protected function rules(): array
+    {
+        return [];
+    }
+
+    /**
+     * Global per-rule messages defined by a subclass, rule => message
+     *
+     * @return string[]
+     */
+    protected function messages(): array
+    {
+        return [];
+    }
+
+    /**
+     * Field labels defined by a subclass, field => label
+     *
+     * @return string[]
+     */
+    protected function labels(): array
+    {
+        return [];
+    }
+
+    /**
+     * Per-field message overrides defined by a subclass, field => [rule => message]
+     *
+     * @return array<string, array<string, string>>
+     */
+    protected function fieldMessages(): array
+    {
+        return [];
+    }
+
     // --------------------------------------------------------------------------
 
     /**
@@ -110,13 +179,26 @@ class Validator
     }
 
     /**
-     * Get the rules array
+     * Merges rules into those already set at runtime
+     *
+     * @param array $aRules field => rules
+     *
+     * @return $this
+     */
+    public function addRules(array $aRules): static
+    {
+        $this->aRules = array_merge($this->aRules, $aRules);
+        return $this;
+    }
+
+    /**
+     * Get the rules array: the subclass's `rules()` with runtime rules merged over the top
      *
      * @return array
      */
     public function getRules(): array
     {
-        return $this->aRules;
+        return array_merge($this->rules(), $this->aRules);
     }
 
     // --------------------------------------------------------------------------
@@ -141,7 +223,7 @@ class Validator
      */
     public function getMessages(): array
     {
-        return $this->aMessages;
+        return array_merge($this->messages(), $this->aMessages);
     }
 
     // --------------------------------------------------------------------------
@@ -189,7 +271,7 @@ class Validator
      */
     public function getLabels(): array
     {
-        return $this->aLabels;
+        return array_merge($this->labels(), $this->aLabels);
     }
 
     // --------------------------------------------------------------------------
@@ -212,7 +294,7 @@ class Validator
      */
     public function getFieldMessages(): array
     {
-        return $this->aFieldMessages;
+        return array_merge_recursive($this->fieldMessages(), $this->aFieldMessages);
     }
 
     // --------------------------------------------------------------------------
@@ -256,16 +338,124 @@ class Validator
     {
         $oRuleSet = new RuleSet();
 
+        $aLabels        = $this->getLabels();
+        $aFieldMessages = $this->getFieldMessages();
+
         foreach ($this->getRules() as $sField => $mRules) {
             $oRuleSet->add(new Field(
                 (string) $sField,
-                (string) ($this->aLabels[$sField] ?? ''),
+                (string) ($aLabels[$sField] ?? ''),
                 FormValidation::splitRules($mRules),
-                $this->aFieldMessages[$sField] ?? []
+                $aFieldMessages[$sField] ?? []
             ));
         }
 
         return $oRuleSet;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Run with a specific engine rather than the shared one
+     *
+     * @param Engine|null $oEngine The engine, or null to revert to the shared engine
+     *
+     * @return $this
+     */
+    public function setEngine(?Engine $oEngine): static
+    {
+        $this->oEngine = $oEngine;
+        return $this;
+    }
+
+    /**
+     * The engine this validator will run with
+     *
+     * @throws FactoryException
+     */
+    public function getEngine(): Engine
+    {
+        return $this->oEngine ?? $this->getFormValidation()->getEngine();
+    }
+
+    /**
+     * Replaces a named rule for this validator only; intended for tests, e.g. to
+     * stub `is_unique` so a validator with database-backed rules can run without one.
+     *
+     * A closure is wrapped as a Rule carrying the replaced rule's name, aliases and
+     * empty-value/array behaviour; it receives `(mixed $mValue, Context $oContext)`
+     * and passes unless it returns false or throws a ValidationException.
+     *
+     * @param string        $sName The rule name to replace
+     * @param Rule|\Closure $mRule The replacement
+     *
+     * @return $this
+     * @throws FactoryException
+     */
+    public function stubRule(string $sName, Rule|\Closure $mRule): static
+    {
+        $oShared   = $this->getEngine();
+        $oRegistry = clone $oShared->getRegistry();
+
+        if ($mRule instanceof \Closure) {
+            $oOriginal = $oRegistry->has($sName) ? $oRegistry->get($sName) : null;
+            $mRule     = new class($sName, $mRule, $oOriginal) extends AbstractRule {
+                public function __construct(
+                    private readonly string $sName,
+                    private readonly \Closure $cRule,
+                    private readonly ?Rule $oOriginal,
+                ) {
+                }
+
+                public function getName(): string
+                {
+                    return $this->sName;
+                }
+
+                public function getAliases(): array
+                {
+                    return $this->oOriginal?->getAliases() ?? [];
+                }
+
+                public function runsOnEmpty(): bool
+                {
+                    return $this->oOriginal?->runsOnEmpty() ?? false;
+                }
+
+                public function acceptsArrays(): bool
+                {
+                    return $this->oOriginal?->acceptsArrays() ?? false;
+                }
+
+                public function getDefaultMessage(): string
+                {
+                    return $this->oOriginal?->getDefaultMessage() ?? parent::getDefaultMessage();
+                }
+
+                public function apply(mixed $mValue, Context $oContext): bool
+                {
+                    return ($this->cRule)($mValue, $oContext) !== false;
+                }
+            };
+        }
+
+        $oRegistry->register($mRule);
+
+        return $this->setEngine(new Engine(
+            $oRegistry,
+            $oShared->getMessageResolver(),
+            $this->getFormValidation()->getTranslation()
+        ));
+    }
+
+    /**
+     * @throws FactoryException
+     */
+    protected function getFormValidation(): FormValidation
+    {
+        /** @var FormValidation $oFormValidation */
+        $oFormValidation = Factory::service('FormValidation');
+        return $oFormValidation;
     }
 
     // --------------------------------------------------------------------------
@@ -288,10 +478,9 @@ class Validator
             $this->setData($aData);
         }
 
-        /** @var FormValidation $oFormValidation */
-        $oFormValidation = Factory::service('FormValidation');
+        $oFormValidation = $this->getFormValidation();
 
-        $this->oResult = $oFormValidation
+        $this->oResult = $this
             ->getEngine()
             ->run(
                 $this->buildRuleSet(),
