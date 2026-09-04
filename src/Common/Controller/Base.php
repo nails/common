@@ -26,6 +26,7 @@ use Nails\Common\Service\ErrorHandler;
 use Nails\Common\Service\Event;
 use Nails\Common\Service\Input;
 use Nails\Common\Service\Language;
+use Nails\Common\Service\Translation;
 use Nails\Common\Service\MetaData;
 use Nails\Common\Service\Output;
 use Nails\Common\Service\Profiler;
@@ -512,19 +513,22 @@ abstract class Base extends \MX_Controller
 
         // --------------------------------------------------------------------------
 
-        //  Set the language config item which CodeIgniter will use.
+        $sIdiom = function_exists('activeUser') && activeUser('language')
+            ? activeUser('language')
+            : Config::get('APP_DEFAULT_LANG_CODE');
+
+        //  Set the language config item which CodeIgniter's own libraries use.
         //  @todo (Pablo - 2020-06-18) - Move away from this ASAP
         /** @var \Nails\Common\Service\Config $oConfig */
         $oConfig = Factory::service('Config');
-        $oConfig->set_item(
-            'language',
-            function_exists('activeUser') && activeUser('language')
-                ? activeUser('language')
-                : Config::get('APP_DEFAULT_LANG_CODE')
-        );
+        $oConfig->set_item('language', $sIdiom);
 
-        //  Load the Nails. generic lang file
-        get_instance()->lang->load('nails');
+        //  Nails' language lines come from the Translation service
+        /** @var Translation $oTranslation */
+        $oTranslation = Factory::service('Translation');
+        $oTranslation
+            ->setIdiom($sIdiom)
+            ->load('nails');
 
         return $this;
     }
