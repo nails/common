@@ -1,9 +1,8 @@
 <?php
 
 /**
- * The class abstracts CI's FormValidation class.
- *
- * @todo (Pablo - 2018-04-18) - Remove dependency on CI
+ * The FormValidation service: builds validators, knows the available rules, and
+ * offers a (deprecated) CodeIgniter-compatible surface for legacy call sites.
  *
  * @package                   Nails
  * @subpackage                common
@@ -14,11 +13,20 @@
 
 namespace Nails\Common\Service;
 
+use BadMethodCallException;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\ValidationException;
-use Nails\Common\Factory\Model\Field;
 use Nails\Common\Factory\Service\FormValidation\Validator;
+use Nails\Common\Interfaces\Validation\Rule as RuleInterface;
 use Nails\Common\Model\Base;
+use Nails\Common\Validation\Engine;
+use Nails\Common\Validation\Field;
+use Nails\Common\Validation\MessageResolver;
+use Nails\Common\Validation\MessageStyle;
+use Nails\Common\Validation\Registry;
+use Nails\Common\Validation\Result;
+use Nails\Common\Validation\Rule;
+use Nails\Common\Validation\RuleSet;
 use Nails\Factory;
 
 /**
@@ -26,285 +34,189 @@ use Nails\Factory;
  *
  * @package Nails\Common\Service
  *
- * @property $validation_data = []
- *
- * The following are provied natively by CodeIgniter's FormValidation library
- *
- * @method alpha($str)
- * @method alpha_dash($str)
- * @method alpha_numeric($str)
- * @method alpha_numeric_spaces($str)
- * @method decimal($str)
- * @method differs($str, $field)
- * @method encode_php_tags($str)
- * @method error($field, $prefix = '', $suffix = '')
- * @method error_array()
- * @method error_string($prefix = '', $suffix = '')
- * @method exact_length($str, $val)
- * @method greater_than($str, $min)
- * @method greater_than_equal_to($str, $min)
- * @method has_rule($field)
- * @method in_list($value, $list)
- * @method integer($str)
- * @method is_natural($str)
- * @method is_natural_no_zero($str)
- * @method less_than($str, $max)
- * @method less_than_equal_to($str, $max)
- * @method matches($str, $field)
- * @method max_length($str, $val)
- * @method min_length($str, $val)
- * @method numeric($str)
- * @method prep_for_form($data)
- * @method prep_url($str = '')
- * @method regex_match($str, $regex)
- * @method required($str)
- * @method reset_validation()
- * @method run($config = null, &$data = null, $module = '')
- * @method set_checkbox($field = '', $value = '', $default = false)
- * @method set_data(array $data)
- * @method set_error_delimiters($prefix = '<p>', $suffix = '</p>')
- * @method set_message($lang, $val = '')
- * @method set_radio($field = '', $value = '', $default = false)
- * @method set_rules($field, $label = '', $rules = [], $errors = [])
- * @method set_select($field = '', $value = '', $default = false)
- * @method set_value($field = '', $default = '')
- * @method strip_image_tags($str)
- * @method valid_base64($str)
- * @method valid_emails($str)
- * @method valid_ip($ip, $which = '')
- * @method valid_url($str)
- *
- *
- * The following are provied by the Nails FormValidation extension
- *
- * @method alpha_dash_period($str)
- * @method cdnObjectPickerMultiAllRequired($aValues)
- * @method cdnObjectPickerMultiLabelRequired($aValues)
- * @method cdnObjectPickerMultiObjectRequired($aValues)
- * @method date_after($sDate, $sParams)
- * @method date_before($sDate, $sParams)
- * @method date_future($sDate, $sFormat)
- * @method date_past($sDate, $sFormat)
- * @method date_today($sDate, $sFormat)
- * @method datetime_after($sDateTime, $sParams)
- * @method datetime_before($sDateTime, $sParams)
- * @method datetime_future($sDateTime, $sFormat)
- * @method datetime_past($sDateTime, $sFormat)
- * @method getRules(): array
- * @method in_range($str, $field)
- * @method is($sValue, $sExpected)
- * @method is_bool($bValue)
- * @method is_id($bValue, $sParams)
- * @method is_unique($sString, $sParameters)
- * @method item_count(array $aArray, $sParam)
- * @method supportedLocale($sValue)
- * @method time_after($sTime, $sParams)
- * @method time_before($sTime, $sParams)
- * @method time_future($sTime, $sFormat)
- * @method time_past($sTime, $sFormat)
- * @method unique_if_diff($new, $params)
- * @method valid_date($sDate, $sFormat)
- * @method valid_datetime($sDateTime, $sFormat)
- * @method valid_email($str)
- * @method valid_postcode($str)
- * @method valid_time($sTime, $sFormat)
- * @method validTimecode($sTimecode)
+ * @property array $validation_data The data set with set_data() (deprecated)
  */
 class FormValidation
 {
     /**
-     * The following constants represent the various rules available.
+     * The following constants represent the rules bundled with Nails. Additional
+     * rules are discovered from every component's `Validation\Rule` namespace.
      */
-    const RULE_ALPHA                 = 'alpha';
-    const RULE_ALPHA_DASH            = 'alpha_dash';
-    const RULE_ALPHA_DASH_PERIOD     = 'alpha_dash_period';
-    const RULE_ALPHA_NUMERIC         = 'alpha_numeric';
-    const RULE_ALPHA_NUMERIC_SPACES  = 'alpha_numeric_spaces';
-    const RULE_DATETIME_AFTER        = 'datetime_after';
-    const RULE_DATETIME_BEFORE       = 'datetime_before';
-    const RULE_DATETIME_FUTURE       = 'datetime_future';
-    const RULE_DATETIME_PAST         = 'datetime_past';
-    const RULE_DATE_AFTER            = 'date_after';
-    const RULE_DATE_BEFORE           = 'date_before';
-    const RULE_DATE_FUTURE           = 'date_future';
-    const RULE_DATE_PAST             = 'date_past';
-    const RULE_DATE_TODAY            = 'date_today';
-    const RULE_DECIMAL               = 'decimal';
-    const RULE_DIFFERS               = 'differs';
-    const RULE_ENCODE_PHP_TAGS       = 'encode_php_tags';
-    const RULE_EXACT_LENGTH          = 'exact_length';
-    const RULE_GREATER_THAN          = 'greater_than';
-    const RULE_GREATER_THAN_EQUAL_TO = 'greater_than_equal_to';
-    const RULE_INTEGER               = 'integer';
-    const RULE_IN_LIST               = 'in_list';
-    const RULE_IN_RANGE              = 'in_range';
-    const RULE_IS                    = 'is';
-    const RULE_IS_BOOL               = 'is_bool';
-    const RULE_IS_ID                 = 'is_id';
-    const RULE_IS_NATURAL            = 'is_natural';
-    const RULE_IS_NATURAL_NO_ZERO    = 'is_natural_no_zero';
-    const RULE_IS_UNIQUE             = 'is_unique';
-    const RULE_ITEM_COUNT            = 'item_count';
-    const RULE_LESS_THAN             = 'less_than';
-    const RULE_LESS_THAN_EQUAL_TO    = 'less_than_equal_to';
-    const RULE_MATCHES               = 'matches';
-    const RULE_MAX_LENGTH            = 'max_length';
-    const RULE_MAX_WORDS             = 'maxWords';
-    const RULE_MIN_LENGTH            = 'min_length';
-    const RULE_NUMERIC               = 'numeric';
-    const RULE_PREP_FOR_FORM         = 'prep_for_form';
-    const RULE_PREP_URL              = 'prep_url';
-    const RULE_REGEX_MATCH           = 'regex_match';
-    const RULE_REQUIRED              = 'required';
-    const RULE_STRIP_IMAGE_TAGS      = 'strip_image_tags';
-    const RULE_SUPPORTED_LOCALE      = 'supportedLocale';
-    const RULE_TIME_AFTER            = 'time_after';
-    const RULE_TIME_BEFORE           = 'time_before';
-    const RULE_TIME_FUTURE           = 'time_future';
-    const RULE_TIME_PAST             = 'time_past';
-    const RULE_UNIQUE_IF_DIFF        = 'unique_if_diff';
-    const RULE_VALID_BASE64          = 'valid_base64';
-    const RULE_VALID_DATE            = 'valid_date';
-    const RULE_VALID_DATETIME        = 'valid_datetime';
-    const RULE_VALID_EMAIL           = 'valid_email';
-    const RULE_VALID_EMAILS          = 'valid_emails';
-    const RULE_VALID_IP              = 'valid_ip';
-    const RULE_VALID_POSTCODE        = 'valid_postcode';
-    const RULE_VALID_TIME            = 'valid_time';
-    const RULE_VALID_TIMECODE        = 'validTimecode';
-    const RULE_VALID_URL             = 'valid_url';
+    const RULE_ALPHA                    = Rule\Alpha::NAME;
+    const RULE_ALPHA_DASH               = Rule\AlphaDash::NAME;
+    const RULE_ALPHA_DASH_PERIOD        = Rule\AlphaDashPeriod::NAME;
+    const RULE_ALPHA_NUMERIC            = Rule\AlphaNumeric::NAME;
+    const RULE_ALPHA_NUMERIC_SPACES     = Rule\AlphaNumericSpaces::NAME;
+    const RULE_DATETIME_AFTER           = Rule\DatetimeAfter::NAME;
+    const RULE_DATETIME_BEFORE          = Rule\DatetimeBefore::NAME;
+    const RULE_DATETIME_FUTURE          = Rule\DatetimeFuture::NAME;
+    const RULE_DATETIME_PAST            = Rule\DatetimePast::NAME;
+    const RULE_DATE_AFTER               = Rule\DateAfter::NAME;
+    const RULE_DATE_BEFORE              = Rule\DateBefore::NAME;
+    const RULE_DATE_FUTURE              = Rule\DateFuture::NAME;
+    const RULE_DATE_PAST                = Rule\DatePast::NAME;
+    const RULE_DATE_TODAY               = Rule\DateToday::NAME;
+    const RULE_DECIMAL                  = Rule\Decimal::NAME;
+    const RULE_DIFFERS                  = Rule\Differs::NAME;
+    const RULE_ENCODE_PHP_TAGS          = Rule\EncodePhpTags::NAME;
+    const RULE_EXACT_LENGTH             = Rule\ExactLength::NAME;
+    const RULE_GREATER_THAN             = Rule\GreaterThan::NAME;
+    const RULE_GREATER_THAN_EQUAL_TO    = Rule\GreaterThanEqualTo::NAME;
+    const RULE_INTEGER                  = Rule\Integer::NAME;
+    const RULE_IN_LIST                  = Rule\InList::NAME;
+    const RULE_IN_RANGE                 = Rule\InRange::NAME;
+    const RULE_IS                       = Rule\Is::NAME;
+    const RULE_IS_BOOL                  = Rule\IsBool::NAME;
+    const RULE_IS_ID                    = Rule\IsId::NAME;
+    const RULE_IS_NATURAL               = Rule\IsNatural::NAME;
+    const RULE_IS_NATURAL_NO_ZERO       = Rule\IsNaturalNoZero::NAME;
+    const RULE_IS_UNIQUE                = Rule\IsUnique::NAME;
+    const RULE_ITEM_COUNT               = Rule\ItemCount::NAME;
+    const RULE_LESS_THAN                = Rule\LessThan::NAME;
+    const RULE_LESS_THAN_EQUAL_TO       = Rule\LessThanEqualTo::NAME;
+    const RULE_MATCHES                  = Rule\Matches::NAME;
+    const RULE_MAX_LENGTH               = Rule\MaxLength::NAME;
+    const RULE_MAX_WORDS                = Rule\MaxWords::NAME;
+    const RULE_MIN_LENGTH               = Rule\MinLength::NAME;
+    const RULE_NUMERIC                  = Rule\Numeric::NAME;
+    const RULE_PREP_FOR_FORM            = Rule\PrepForForm::NAME;
+    const RULE_PREP_URL                 = Rule\PrepUrl::NAME;
+    const RULE_REGEX_MATCH              = Rule\RegexMatch::NAME;
+    const RULE_REQUIRED                 = Rule\Required::NAME;
+    const RULE_STRIP_IMAGE_TAGS         = Rule\StripImageTags::NAME;
+    const RULE_SUPPORTED_LOCALE         = Rule\SupportedLocale::NAME;
+    const RULE_TIME_AFTER               = Rule\TimeAfter::NAME;
+    const RULE_TIME_BEFORE              = Rule\TimeBefore::NAME;
+    const RULE_TIME_FUTURE              = Rule\TimeFuture::NAME;
+    const RULE_TIME_PAST                = Rule\TimePast::NAME;
+    const RULE_UNIQUE_IF_DIFF           = Rule\UniqueIfDiff::NAME;
+    const RULE_VALID_DATE               = Rule\ValidDate::NAME;
+    const RULE_VALID_DATETIME           = Rule\ValidDatetime::NAME;
+    const RULE_VALID_EMAIL              = Rule\ValidEmail::NAME;
+    const RULE_VALID_EMAILS             = Rule\ValidEmails::NAME;
+    const RULE_VALID_IP                 = Rule\ValidIp::NAME;
+    const RULE_VALID_POSTCODE           = Rule\ValidPostcode::NAME;
+    const RULE_VALID_TIME               = Rule\ValidTime::NAME;
+    const RULE_VALID_TIMECODE           = Rule\ValidTimecode::NAME;
+    const RULE_VALID_URL                = Rule\ValidUrl::NAME;
 
-    //  @todo (Pablo - 2019-12-16) - Deprecate/remove/move these rules
+    /**
+     * @deprecated These rules are provided by the CDN module; use \Nails\Cdn\Constants::RULE_OBJECT_PICKER_MULTI_*
+     */
     const RULE_CDNOBJECTPICKERMULTIALLREQUIRED    = 'cdnObjectPickerMultiAllRequired';
     const RULE_CDNOBJECTPICKERMULTILABELREQUIRED  = 'cdnObjectPickerMultiLabelRequired';
     const RULE_CDNOBJECTPICKERMULTIOBJECTREQUIRED = 'cdnObjectPickerMultiObjectRequired';
 
-    // --------------------------------------------------------------------------
-
     /**
-     * The CI_Form_validation object
-     *
-     * @var \CI_Form_validation
+     * Splits a pipe-separated rule string, ignoring pipes inside `[...]`
      */
-    private $oFormValidation;
+    const RULE_SPLIT_REGEX = '/\|(?![^\[]*\])/';
 
     // --------------------------------------------------------------------------
 
-    /**
-     * FormValidation constructor.
-     */
+    protected RuleSet  $oPendingRules;
+    protected array    $aMessages       = [];
+    protected array    $aValidationData = [];
+    protected string   $sErrorPrefix    = '<p>';
+    protected string   $sErrorSuffix    = '</p>';
+    protected ?Result  $oLastResult     = null;
+    protected array    $aValueCursors   = [];
+    protected ?Registry $oRegistry      = null;
+    protected ?Engine  $oEngine         = null;
+
+    // --------------------------------------------------------------------------
+
     public function __construct()
     {
-        $oCi = get_instance();
-        $oCi->load->library('form_validation');
-        $this->oFormValidation = $oCi->form_validation;
+        $this->oPendingRules = new RuleSet();
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Route calls to the CodeIgniter FormValidation class
-     *
-     * @param string $sMethod    The method being called
-     * @param array  $aArguments Any arguments being passed
-     *
-     * @return mixed
+     * The registry of available rules (discovered lazily, once per process)
      */
-    public function __call($sMethod, $aArguments)
+    public function getRegistry(): Registry
     {
-        if (method_exists($this, $sMethod)) {
-            return call_user_func_array([$this, $sMethod], $aArguments);
-        } else {
-            return call_user_func_array([$this->oFormValidation, $sMethod], $aArguments);
-        }
+        return $this->oRegistry ??= Registry::discover();
     }
 
-    // --------------------------------------------------------------------------
-
     /**
-     * Pass any property "gets" to the CodeIgniter FormValidation class
+     * The service used to look up error messages
      *
-     * @param string $sProperty The property to get
-     *
-     * @return mixed
+     * @throws FactoryException
      */
-    public function __get($sProperty)
+    public function getTranslation(): Translation
     {
-        return $this->oFormValidation->{$sProperty};
+        /** @var Translation $oTranslation */
+        $oTranslation = Factory::service('Translation');
+        return $oTranslation;
     }
 
-    // --------------------------------------------------------------------------
+    /**
+     * The validation engine
+     *
+     * @throws FactoryException
+     */
+    public function getEngine(): Engine
+    {
+        return $this->oEngine ??= new Engine(
+            $this->getRegistry(),
+            new MessageResolver($this->getTranslation()),
+            $this->getTranslation()
+        );
+    }
 
     /**
-     * Sets a rule
-     *
-     * @param string|array $mKey   The key to set, or an array of key/value pairs
-     * @param string       $sRule  The rule to set
-     * @param string|null  $sLabel The field being validated, human friendly
-     *
-     * @return $this;
+     * The result of the most recent run (legacy run() or a Validator); this is
+     * what the set_value()/form_error() view helpers read.
      */
-    public function setRule($mKey, string $sRule, ?string $sLabel = null): self
+    public function getLastResult(): ?Result
     {
-        if (is_array($mKey)) {
-            foreach ($mKey as $sKey => $sRule) {
-                if (is_array($sRule)) {
-                    foreach ($sRule as $sRule) {
-                        $this->oFormValidation->set_rules($sKey, null, $sRule);
-                    }
-                } else {
-                    $this->oFormValidation->set_rules($sKey, null, $sRule);
-                }
-            }
+        return $this->oLastResult;
+    }
 
-        } else {
-            $this->oFormValidation->set_rules($mKey, $sLabel, $sRule);
-        }
-
+    /**
+     * Records a run's result as the most recent one
+     */
+    public function publish(Result $oResult): static
+    {
+        $this->oLastResult   = $oResult;
+        $this->aValueCursors = [];
         return $this;
     }
 
-    // --------------------------------------------------------------------------
-
     /**
-     * Sets a rule message
+     * Global per-rule message overrides (rule => message)
      *
-     * @param string $sRule    The rule to set the message for
-     * @param string $sMessage The message to set
-     *
-     * @return $this
+     * @return array<string, string>
      */
-    public function setMessage(string $sRule, string $sMessage): self
+    public function getMessages(): array
     {
-        $this->oFormValidation->set_message($sRule, $sMessage);
-        return $this;
+        return $this->aMessages;
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Returns validation errors
+     * Normalises a rule definition (pipe-separated string or array) into an array of rules
      *
-     * @return array
+     * @param string|array|null $mRules
+     *
+     * @return array<string|\Closure|RuleInterface>
      */
-    public function errors(): array
+    public static function splitRules(string|array|null $mRules): array
     {
-        return $this->oFormValidation->error_array();
-    }
+        if ($mRules === null || $mRules === '') {
+            return [];
+        }
 
-    // --------------------------------------------------------------------------
+        $aRules = is_array($mRules) ? $mRules : preg_split(static::RULE_SPLIT_REGEX, $mRules);
 
-    /**
-     * Pass any property "sets" to the CodeIgniter FormValidation class
-     *
-     * @param string $sProperty The property to set
-     * @param mixed  $mValue    The value to set
-     *
-     * @return void
-     */
-    public function __set($sProperty, $mValue)
-    {
-        $this->oFormValidation->{$sProperty} = $mValue;
+        return array_values(array_filter(
+            $aRules,
+            fn($mRule) => $mRule !== null && $mRule !== ''
+        ));
     }
 
     // --------------------------------------------------------------------------
@@ -322,13 +234,18 @@ class FormValidation
      */
     public function buildValidator(array $aRules = [], array $aMessages = [], ?array $aData = null): Validator
     {
-        $oInput = Factory::service('Input');
+        if ($aData === null) {
+            /** @var Input $oInput */
+            $oInput = Factory::service('Input');
+            $aData  = $oInput->post();
+        }
+
         return Factory::factory(
             'FormValidationValidator',
             null,
             $aRules,
             $aMessages,
-            $aData ?? $oInput->post()
+            $aData
         );
     }
 
@@ -372,5 +289,423 @@ class FormValidation
             $sRule,
             implode('.', $aArgs)
         );
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets a rule
+     *
+     * @param string|array $mKey   The key to set, or an array of key/value pairs
+     * @param string       $sRule  The rule to set
+     * @param string|null  $sLabel The field being validated, human friendly
+     *
+     * @return $this;
+     */
+    public function setRule($mKey, string $sRule, ?string $sLabel = null): self
+    {
+        if (is_array($mKey)) {
+            foreach ($mKey as $sKey => $mRule) {
+                if (is_array($mRule)) {
+                    foreach ($mRule as $sRule) {
+                        $this->set_rules($sKey, null, $sRule);
+                    }
+                } else {
+                    $this->set_rules($sKey, null, $mRule);
+                }
+            }
+
+        } else {
+            $this->set_rules($mKey, $sLabel, $sRule);
+        }
+
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets a rule message
+     *
+     * @param string $sRule    The rule to set the message for
+     * @param string $sMessage The message to set
+     *
+     * @return $this
+     */
+    public function setMessage(string $sRule, string $sMessage): self
+    {
+        $this->set_message($sRule, $sMessage);
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns validation errors
+     *
+     * @return array
+     */
+    public function errors(): array
+    {
+        return $this->error_array();
+    }
+
+    // --------------------------------------------------------------------------
+    //  CodeIgniter-compatible surface
+    // --------------------------------------------------------------------------
+
+    /**
+     * Declares a field's rules
+     *
+     * @param string|array $field  The field name, or an array of ['field', 'label', 'rules', 'errors'] rows
+     * @param string|null  $label  The field's label
+     * @param string|array $rules  Pipe-separated string or array of rules
+     * @param array        $errors Per-rule message overrides for this field
+     *
+     * @deprecated Use buildValidator()
+     */
+    public function set_rules($field, $label = null, $rules = null, $errors = []): static
+    {
+        if (is_array($field)) {
+            foreach ($field as $aRow) {
+                if (!isset($aRow['field'], $aRow['rules'])) {
+                    continue;
+                }
+                $this->set_rules(
+                    $aRow['field'],
+                    $aRow['label'] ?? $aRow['field'],
+                    $aRow['rules'],
+                    is_array($aRow['errors'] ?? null) ? $aRow['errors'] : []
+                );
+            }
+            return $this;
+        }
+
+        //  Nothing to do
+        if (empty($field) || empty($rules)) {
+            return $this;
+        }
+
+        //  No reason to set rules if we have no POST data and no validation data (CodeIgniter parity)
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST' && empty($this->aValidationData)) {
+            return $this;
+        }
+
+        $this->oPendingRules->add(new Field(
+            (string) $field,
+            (string) ($label ?? ''),
+            static::splitRules($rules),
+            (array) $errors
+        ));
+
+        return $this;
+    }
+
+    /**
+     * Sets the data to validate (instead of $_POST)
+     *
+     * @deprecated Use buildValidator()
+     */
+    public function set_data(array $data): static
+    {
+        if (!empty($data)) {
+            $this->aValidationData = $data;
+        }
+        return $this;
+    }
+
+    /**
+     * Sets a global per-rule error message
+     *
+     * @param string|array $lang The rule name, or an array of rule => message
+     * @param string       $val  The message
+     *
+     * @deprecated Use buildValidator()
+     */
+    public function set_message($lang, $val = ''): static
+    {
+        $this->aMessages = array_merge($this->aMessages, is_array($lang) ? $lang : [$lang => $val]);
+        return $this;
+    }
+
+    /**
+     * @deprecated
+     */
+    public function set_error_delimiters($prefix = '<p>', $suffix = '</p>'): static
+    {
+        $this->sErrorPrefix = (string) $prefix;
+        $this->sErrorSuffix = (string) $suffix;
+        return $this;
+    }
+
+    /**
+     * Runs the rules declared with set_rules() against the data set with set_data()
+     * (or $_POST). On success, when $_POST was validated, the processed values are
+     * written back into $_POST.
+     *
+     * @param mixed      $config Unused (an object here is used as the callback_* target, for parity)
+     * @param array|null $data   If passed, receives the processed data
+     * @param mixed      $module The object `callback_*` rules are methods of
+     *
+     * @deprecated Use buildValidator()
+     */
+    public function run($config = null, &$data = null, $module = ''): bool
+    {
+        $oCallbackTarget = match (true) {
+            is_object($module) => $module,
+            is_object($config) => $config,
+            function_exists('get_instance') => get_instance(),
+            default => null,
+        };
+
+        if (count($this->oPendingRules) === 0) {
+            return false;
+        }
+
+        $bUsesPost = empty($this->aValidationData);
+        $oResult   = $this->getEngine()->run(
+            $this->oPendingRules,
+            $bUsesPost ? $_POST : $this->aValidationData,
+            MessageStyle::WITH_FIELD,
+            $this->aMessages,
+            $oCallbackTarget
+        );
+
+        $this->publish($oResult);
+
+        if ($oResult->failed()) {
+            return false;
+        }
+
+        if (func_num_args() >= 2) {
+            $data = $oResult->getData();
+        } elseif ($bUsesPost) {
+            $_POST = $oResult->getData();
+        }
+
+        return true;
+    }
+
+    /**
+     * @deprecated Use Validator::getErrors()
+     */
+    public function error_array(): array
+    {
+        return $this->oLastResult?->getErrors() ?? [];
+    }
+
+    /**
+     * @deprecated
+     */
+    public function error($field, $prefix = '', $suffix = ''): string
+    {
+        $sError = $this->oLastResult?->getError((string) $field);
+        if (empty($sError)) {
+            return '';
+        }
+
+        return ($prefix === '' ? $this->sErrorPrefix : $prefix)
+            . $sError
+            . ($suffix === '' ? $this->sErrorSuffix : $suffix);
+    }
+
+    /**
+     * @deprecated
+     */
+    public function error_string($prefix = '', $suffix = ''): string
+    {
+        $sOut = '';
+        foreach ($this->error_array() as $sError) {
+            if ($sError !== '') {
+                $sOut .= ($prefix === '' ? $this->sErrorPrefix : $prefix)
+                    . $sError
+                    . ($suffix === '' ? $this->sErrorSuffix : $suffix)
+                    . "\n";
+            }
+        }
+        return $sOut;
+    }
+
+    /**
+     * Whether a field was declared (in the last run, or pending)
+     *
+     * @deprecated
+     */
+    public function has_rule($field): bool
+    {
+        return ($this->oLastResult?->hasField((string) $field) ?? false)
+            || $this->oPendingRules->has((string) $field);
+    }
+
+    /**
+     * The submitted (processed) value of a field, for repopulating forms;
+     * array values are returned one element at a time.
+     *
+     * @deprecated
+     */
+    public function set_value($field = '', $default = '')
+    {
+        $field = (string) $field;
+
+        if ($this->oLastResult === null || !$this->oLastResult->hasField($field)) {
+            return $default;
+        }
+
+        $mValue = $this->oLastResult->getValue($field);
+        if ($mValue === null) {
+            return $default;
+        }
+
+        if (is_array($mValue)) {
+            $aValues = array_values($mValue);
+            $iCursor = $this->aValueCursors[$field] ?? 0;
+            $this->aValueCursors[$field] = $iCursor + 1;
+            return $aValues[$iCursor] ?? null;
+        }
+
+        return $mValue;
+    }
+
+    /**
+     * @deprecated
+     */
+    public function set_select($field = '', $value = '', $default = false): string
+    {
+        return $this->setChoice((string) $field, $value, $default, ' selected="selected"');
+    }
+
+    /**
+     * @deprecated
+     */
+    public function set_radio($field = '', $value = '', $default = false): string
+    {
+        return $this->setChoice((string) $field, $value, $default, ' checked="checked"');
+    }
+
+    /**
+     * @deprecated
+     */
+    public function set_checkbox($field = '', $value = '', $default = false): string
+    {
+        return $this->set_radio($field, $value, $default);
+    }
+
+    /**
+     * Ports CodeIgniter's set_select/set_radio
+     */
+    protected function setChoice(string $sField, mixed $mOption, mixed $mDefault, string $sAttribute): string
+    {
+        $mValue = $this->oLastResult?->hasField($sField)
+            ? $this->oLastResult->getValue($sField)
+            : null;
+
+        if ($mValue === null) {
+            $iDeclared = $this->oLastResult !== null
+                ? count($this->oLastResult->getRuleSet())
+                : count($this->oPendingRules);
+            return ($mDefault === true && $iDeclared === 0) ? $sAttribute : '';
+        }
+
+        $sOption = (string) $mOption;
+
+        if (is_array($mValue)) {
+            foreach ($mValue as $mItem) {
+                if (is_scalar($mItem) && $sOption === (string) $mItem) {
+                    return $sAttribute;
+                }
+            }
+            return '';
+        }
+
+        $sValue = is_scalar($mValue) ? (string) $mValue : '';
+
+        return ($sValue === '' || $sOption === '' || $sValue !== $sOption) ? '' : $sAttribute;
+    }
+
+    /**
+     * Clears declared rules, messages, data and the last result
+     *
+     * @deprecated
+     */
+    public function reset_validation(): static
+    {
+        $this->oPendingRules   = new RuleSet();
+        $this->aMessages       = [];
+        $this->aValidationData = [];
+        $this->oLastResult     = null;
+        $this->aValueCursors   = [];
+        return $this;
+    }
+
+    /**
+     * Returns the declared rules, field => rules[]
+     *
+     * @deprecated
+     */
+    public function getRules(): array
+    {
+        $oRuleSet = count($this->oPendingRules) > 0
+            ? $this->oPendingRules
+            : ($this->oLastResult?->getRuleSet() ?? new RuleSet());
+
+        $aOut = [];
+        foreach ($oRuleSet as $oField) {
+            $aOut[$oField->name] = $oField->rules;
+        }
+        return $aOut;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * @deprecated Closures receive a Context; use $oContext->getValue('other_field')
+     */
+    public function __get($sProperty)
+    {
+        if ($sProperty === 'validation_data') {
+            return $this->aValidationData;
+        }
+
+        trigger_error(
+            sprintf('Undefined property %s::$%s', static::class, $sProperty),
+            E_USER_DEPRECATED
+        );
+        return null;
+    }
+
+    /**
+     * @deprecated
+     */
+    public function __set($sProperty, $mValue)
+    {
+        if ($sProperty === 'validation_data' && is_array($mValue)) {
+            $this->aValidationData = $mValue;
+            return;
+        }
+
+        trigger_error(
+            sprintf('Undefined property %s::$%s', static::class, $sProperty),
+            E_USER_DEPRECATED
+        );
+    }
+
+    /**
+     * Allows a rule to be invoked directly, e.g. $oFormValidation->valid_email($sEmail)
+     *
+     * @deprecated Use the rule classes directly
+     */
+    public function __call($sMethod, $aArguments): bool
+    {
+        if (!$this->getRegistry()->has($sMethod)) {
+            throw new BadMethodCallException(
+                sprintf('Call to undefined method %s::%s()', static::class, $sMethod)
+            );
+        }
+
+        $sParam   = isset($aArguments[1]) && $aArguments[1] !== false ? (string) $aArguments[1] : null;
+        $sRule    = $sParam !== null ? $sMethod . '[' . $sParam . ']' : $sMethod;
+        $oRuleSet = (new RuleSet())->add(new Field('value', '', [$sRule]));
+
+        return $this->getEngine()->run($oRuleSet, ['value' => $aArguments[0] ?? null])->passed();
     }
 }
