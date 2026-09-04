@@ -1,6 +1,20 @@
 # Change Log
 
 
+## Unreleased
+
+- **Validation no longer depends on CodeIgniter.** `Service\FormValidation` and `Factory\Service\FormValidation\Validator` now run on a standalone engine (`Nails\Common\Validation\*`), so validation works from the console and in tests. `CodeIgniter\Libraries\FormValidation` has been removed.
+- Rules are classes implementing `Nails\Common\Interfaces\Validation\Rule`, auto-discovered from every component's `Validation\Rule` namespace (app rules override module rules, which override common's). Rules may be referenced by name (`required`, `max_length[5]`), by class name, as an instance, or as a closure. Custom rule methods on `NAILS_Form_validation` / `App\Common\Service\FormValidation` must be ported to `App\Validation\Rule\*`.
+- Closures receive `(mixed $mValue, Nails\Common\Validation\Context $oContext)`; use `$oContext->getValue('other_field')` for cross-field checks (replaces reading `validation_data`). A closure returning `false` now fails.
+- Rules run in declared order, with `required`/`isset` hoisted first (CodeIgniter ran callbacks first).
+- Cross-field rules (`matches`, `differs`, `date_before`, ...) read the data being validated rather than `$_POST`.
+- Unknown rules throw `Nails\Common\Validation\Exception\UnknownRuleException` instead of silently failing the field; error messages are never blank (every rule carries a default).
+- New `Nails\Common\Service\Translation` (`Factory::service('Translation')`) loads `*_lang.php` files without CodeIgniter and is now the sole source for `lang()`. `CodeIgniter\Core\Lang` is removed: **delete `application/core/NAILS_Lang.php` from your app** (it extends the removed class and will fatal on boot); replace `get_instance()->lang->load('x')` with `Factory::service('Translation')->load('x')` (or nothing: lines are loaded lazily on first use). Language files from every component are loaded eagerly, app last, so a key resolves the same way on every request.
+- The CodeIgniter-style methods on `Service\FormValidation` (`set_rules`, `set_message`, `set_data`, `run`, `error_array`, `set_value`, ...) still work but are deprecated; `set_value()`, `form_error()`, `set_select()`, `set_radio()`, `set_checkbox()` and `validation_errors()` are now provided by Nails and read from the last validation run.
+- `Validator` gains `setLabels()`, `setFieldMessages()`, `getResult()` and `getValidatedData()` (the data with rule mutations such as `trim` applied); `getErrors()` no longer reads shared state.
+- The `cdnObjectPickerMulti*` rules have moved to `nails/module-cdn`.
+- Fixed: `date_today` never matched; `date_before` always failed; `maxWords` registered its message under `max_words`; several `fv_*` language lines had typos.
+
 ## Version 0.2.3
 
 Release date: 21st June 2014
