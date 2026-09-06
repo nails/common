@@ -210,6 +210,13 @@ return [
                 return new Service\Input();
             }
         },
+        'Translation'                    => function (?string $sIdiom = null): Service\Translation {
+            if (class_exists('\App\Common\Service\Translation')) {
+                return new \App\Common\Service\Translation($sIdiom);
+            } else {
+                return new Service\Translation($sIdiom);
+            }
+        },
         'Language'                       => function (): Service\Language {
             if (class_exists('\App\Common\Service\Language')) {
                 return new \App\Common\Service\Language();

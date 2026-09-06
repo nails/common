@@ -472,7 +472,136 @@ class Form
      */
     public static function error($field = '', $prefix = '', $suffix = '')
     {
-        return form_error($field, $prefix, $suffix);
+        return static::formValidation()->error((string) $field, $prefix, $suffix);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns every error from the last validation run, wrapped in the delimiters
+     *
+     * @param string $prefix The prefix to give each error
+     * @param string $suffix The suffix to give each error
+     *
+     * @return string
+     */
+    public static function validationErrors($prefix = '', $suffix = ''): string
+    {
+        return static::formValidation()->error_string($prefix, $suffix);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns the submitted value of a field (from the last validation run, else
+     * from $_POST), for repopulating a form
+     *
+     * @param string $field       The field name (may be a bracketed path, e.g. `question[0][answer]`)
+     * @param mixed  $default     The value to use when nothing was submitted
+     * @param bool   $html_escape Whether to HTML-escape the value
+     *
+     * @return mixed
+     */
+    public static function setValue($field = '', $default = '', $html_escape = true)
+    {
+        $field           = (string) $field;
+        $oFormValidation = static::formValidation();
+
+        $mValue = $oFormValidation->has_rule($field)
+            ? $oFormValidation->set_value($field, $default)
+            : static::postedValue($field);
+
+        if (!isset($mValue)) {
+            $mValue = $default;
+        }
+
+        return $html_escape && function_exists('html_escape') ? html_escape($mValue) : $mValue;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Returns ` selected="selected"` when $value was the submitted value of $field
+     *
+     * @param string $field   The field name
+     * @param mixed  $value   The option's value
+     * @param bool   $default Whether this option is selected by default
+     *
+     * @return string
+     */
+    public static function setSelect($field = '', $value = '', $default = false): string
+    {
+        return static::setChoice((string) $field, $value, $default, ' selected="selected"', 'set_select');
+    }
+
+    /**
+     * Returns ` checked="checked"` when $value was the submitted value of $field
+     */
+    public static function setRadio($field = '', $value = '', $default = false): string
+    {
+        return static::setChoice((string) $field, $value, $default, ' checked="checked"', 'set_radio');
+    }
+
+    /**
+     * Returns ` checked="checked"` when $value was the submitted value of $field
+     */
+    public static function setCheckbox($field = '', $value = '', $default = false): string
+    {
+        return static::setChoice((string) $field, $value, $default, ' checked="checked"', 'set_checkbox');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Shared body of setSelect/setRadio/setCheckbox (ports CodeIgniter's form helper)
+     */
+    protected static function setChoice(string $sField, mixed $mOption, mixed $mDefault, string $sAttribute, string $sMethod): string
+    {
+        $oFormValidation = static::formValidation();
+
+        if ($oFormValidation->has_rule($sField)) {
+            return $oFormValidation->{$sMethod}($sField, $mOption, $mDefault);
+        }
+
+        $mInput = static::postedValue($sField);
+        if ($mInput === null) {
+            return $mDefault === true ? $sAttribute : '';
+        }
+
+        $sOption = (string) $mOption;
+
+        if (is_array($mInput)) {
+            foreach ($mInput as $mItem) {
+                if (is_scalar($mItem) && $sOption === (string) $mItem) {
+                    return $sAttribute;
+                }
+            }
+            return '';
+        }
+
+        return is_scalar($mInput) && (string) $mInput === $sOption ? $sAttribute : '';
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Reads a (possibly bracketed) field out of $_POST; null when absent
+     */
+    protected static function postedValue(string $sField): mixed
+    {
+        return (new \Nails\Common\Validation\Field($sField, '', []))->extract($_POST ?? []);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * @return \Nails\Common\Service\FormValidation
+     */
+    protected static function formValidation(): \Nails\Common\Service\FormValidation
+    {
+        /** @var \Nails\Common\Service\FormValidation $oFormValidation */
+        $oFormValidation = Factory::service('FormValidation');
+        return $oFormValidation;
     }
 
     // --------------------------------------------------------------------------

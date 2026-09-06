@@ -10,19 +10,25 @@
  * @link
  */
 
+use Nails\Common\Service\Translation;
+use Nails\Factory;
+
 if (!function_exists('lang')) {
 
     /**
-     * Overriding the helper to incorporate language parameters
-     * @param  string $sLine   The Language line
-     * @param  array  $aParams The parameters to sub in
-     * @param  string $sId     The ID of the form element
-     * @return string
+     * Returns a language line, with parameters substituted (see Translation::line())
+     *
+     * @param string       $sLine   The language line
+     * @param array|string $aParams The parameters to sub in
+     * @param string       $sId     The ID of the form element (wraps the line in a <label>)
+     *
+     * @return string|false
      */
-    function lang($sLine, $aParams = array(), $sId = '')
+    function lang($sLine, $aParams = [], $sId = '')
     {
-        $oCi   =& get_instance();
-        $sLine = $oCi->lang->line($sLine, $aParams);
+        /** @var Translation $oTranslation */
+        $oTranslation = Factory::service('Translation');
+        $sLine        = $oTranslation->line((string) $sLine, $aParams ?: null);
 
         if ($sId != '') {
             $sLine = '<label for="' . $sId . '">' . $sLine . "</label>";
