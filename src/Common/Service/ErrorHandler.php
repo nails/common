@@ -670,9 +670,13 @@ class ErrorHandler
 
             require_once BASEPATH . 'core/Controller.php';
 
+            // Match pocketarc/codeigniter system/core/CodeIgniter.php:
+            // Security requires $charset; Input requires the Security instance.
+            $sCharset  = strtoupper((string) config_item('charset'));
+            $oSecurity =& load_class('Security', 'core', $sCharset);
+
             load_class('Output', 'core');
-            load_class('Security', 'core');
-            load_class('Input', 'core');
+            load_class('Input', 'core', $oSecurity);
             load_class('Lang', 'core');
 
             new NailsMockController();
