@@ -305,7 +305,7 @@ class ErrorHandler
     // --------------------------------------------------------------------------
 
     /**
-     * Renders the 404 page and halts script execution
+     * Renders the 404 page andhaltscript execution
      *
      * @param bool $bLogError Whether to log the error
      *
@@ -356,7 +356,7 @@ class ErrorHandler
     // --------------------------------------------------------------------------
 
     /**
-     * Renders the 401 page and halts script execution
+     * Renders the 401 page andhaltscript execution
      *
      * @param string $sFlashMessage The flash message to display to the user
      * @param string $sReturnUrl    The URL to return to after logging in
@@ -670,9 +670,13 @@ class ErrorHandler
 
             require_once BASEPATH . 'core/Controller.php';
 
+            // Match pocketarc/codeigniter system/core/CodeIgniter.php:
+            // Security requires $charset; Input requires the Security instance.
+            $sCharset  = strtoupper((string) config_item('charset'));
+            $oSecurity =& load_class('Security', 'core', $sCharset);
+
             load_class('Output', 'core');
-            load_class('Security', 'core');
-            load_class('Input', 'core');
+            load_class('Input', 'core', $oSecurity);
             load_class('Lang', 'core');
 
             new NailsMockController();
