@@ -497,7 +497,16 @@ class ErrorHandler
             );
         }
 
-        static::instantiateMockController();
+        try {
+            static::instantiateMockController();
+        } catch (\Throwable $e) {
+            static::halt(
+                ArrayHelper::get('sMessage', $aData) ?: $e->getMessage(),
+                ArrayHelper::get('sSubject', $aData),
+                $iCode,
+                $aTrace
+            );
+        }
 
         //  Flush the output buffer
         if ($bFlushBuffer) {
@@ -669,6 +678,14 @@ class ErrorHandler
         if (!$oEvent->hasBeenTriggered(Events::SYSTEM_STARTING)) {
 
             require_once BASEPATH . 'core/Controller.php';
+
+            // URI filtering (and other early failures) can occur before the MX
+            // Router is loaded. Nails\Common\Controller\Base extends MX_Controller,
+            // so the mock controller used to render error views must ensure MX is
+            // available. Modules.php registers the MX_* autoloader.
+            if (!class_exists('MX_Controller', false)) {
+                require_once Config::get('NAILS_COMMON_PATH') . 'MX/Modules.php';
+            }
 
             // Match pocketarc/codeigniter system/core/CodeIgniter.php:
             // Security requires $charset; Input requires the Security instance.
