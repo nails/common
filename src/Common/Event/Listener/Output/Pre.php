@@ -29,13 +29,17 @@ class Pre extends Subscription
 
     public function execute(): void
     {
-        /** @var Output $oOutout */
-        $oOutout = Factory::service('Output');
+        /** @var Output $oOutput */
+        $oOutput = Factory::service('Output');
         /** @var MetaData $oMetaData */
         $oMetaData = Factory::service('MetaData');
 
+        if (empty($oOutput->getHeader('Referrer-Policy'))) {
+            $oOutput->setHeader('Referrer-Policy: strict-origin-when-cross-origin');
+        }
+
         if ($oMetaData->getNoIndex()) {
-            $oOutout->setHeader('X-Robots-Tag: noindex');
+            $oOutput->setHeader('X-Robots-Tag: noindex');
         }
     }
 }
