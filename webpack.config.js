@@ -21,7 +21,21 @@ module.exports = {
                         }
                     },
                     'postcss-loader',
-                    'sass-loader'
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            /**
+                             * Sass prepends a charset declaration to any partial containing
+                             * non-ASCII characters, which becomes a byte order mark once the
+                             * output is concatenated. Landing mid-file, it invalidates the
+                             * selector that follows it — which silently dropped the :root
+                             * block holding the spacing and typography tokens.
+                             */
+                            sassOptions: {
+                                charset: false
+                            }
+                        }
+                    }
                 ]
             },
         ]
