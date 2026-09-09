@@ -410,6 +410,26 @@
                 margin-right: 0;
             }
         }
+
+        /**
+         * Full width buttons, stacked vertically rather than sitting side by side.
+         * Spacing comes from the gap so that buttons wrapped in their own form
+         * (i.e. those posting a different action) are spaced consistently.
+         */
+        &--stacked {
+            flex-direction: column;
+            align-items: stretch;
+            gap: var(--spacing-sm);
+
+            .btn {
+                margin-right: 0;
+                margin-bottom: 0;
+            }
+
+            > form {
+                margin-bottom: 0;
+            }
+        }
     }
 }
 
