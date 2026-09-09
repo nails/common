@@ -4,6 +4,7 @@ namespace Nails\Common\Factory;
 
 use Closure;
 use Nails\Bootstrap;
+use Nails\Common\Events;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Exception\Redirect\InvalidDestinationException;
 use Nails\Common\Exception\Redirect\InvalidHttpResponseCodeException;
@@ -334,6 +335,18 @@ class Redirect
         // --------------------------------------------------------------------------
 
         $this->isValidDestination($sUrl);
+
+        // --------------------------------------------------------------------------
+
+        if (!$cInspect) {
+            /** @var Service\Event $oEvent */
+            $oEvent = Factory::service('Event');
+            /** @var Service\Output $oOutput */
+            $oOutput = Factory::service('Output');
+
+            $oEvent->trigger(Events::OUTPUT_PRE);
+            $oOutput->sendHeaders();
+        }
 
         // --------------------------------------------------------------------------
 

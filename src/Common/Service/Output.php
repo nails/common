@@ -174,6 +174,23 @@ class Output
     // --------------------------------------------------------------------------
 
     /**
+     * Sends headers which have been queued on the output service.
+     *
+     * Redirect responses bypass the normal display lifecycle, so callers which
+     * terminate early must flush the queued headers explicitly.
+     */
+    public function sendHeaders(): self
+    {
+        foreach ($this->oOutput->headers as [$sHeader, $bReplace]) {
+            header($sHeader, $bReplace);
+        }
+
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Sets the HTTP status header
      *
      * @param int    $iCode The status code
