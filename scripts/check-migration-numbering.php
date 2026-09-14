@@ -42,10 +42,12 @@
 
 const DEFAULT_BRANCHES = ['develop', 'feature/pre-new-admin'];
 
-const MIGRATION_PATHS = [
-    'src/Database/Migration',
-    'src/Common/Database/Migration',
-];
+/**
+ * Migrations sit under Database/Migration, but how deep varies: modules use
+ * src/Database/Migration, common uses src/Common/Database/Migration, and drivers
+ * nest under their own namespace, as in src/Stripe/Database/Migration.
+ */
+const MIGRATION_PATTERN = '#(^|/)Database/Migration/Migration(\d+)\.php$#';
 
 // --------------------------------------------------------------------------
 
@@ -54,6 +56,7 @@ $aBranches = [];
 $aExclude  = [];
 $aOld      = null;
 $bEmit     = false;
+$sHead     = null;
 
 foreach (array_slice($argv, 1) as $sArg) {
     if (preg_match('/^--repo=(.+)$/', $sArg, $aM)) {
@@ -62,6 +65,8 @@ foreach (array_slice($argv, 1) as $sArg) {
         $aBranches[] = $aM[1];
     } elseif (preg_match('/^--exclude=(.*)$/', $sArg, $aM)) {
         $aExclude[] = $aM[1];
+    } elseif (preg_match('/^--head=(.+)$/', $sArg, $aM)) {
+        $sHead = $aM[1];
     } elseif ($sArg === '--strict') {
         $aOld = [];
     } elseif ($sArg === '--emit-waiver') {
@@ -93,29 +98,28 @@ function git(string $sRepo, array $aArgs, ?int &$iExit = null): array
 /**
  * Returns the migrations on a branch (or in the working tree) as number => contents
  */
-function migrations(string $sRepo, ?string $sBranch): array
+function migrations(string $sRepo, ?string $sRef): array
 {
     $aOut = [];
 
-    foreach (MIGRATION_PATHS as $sPath) {
+    if ($sRef === null) {
 
-        if ($sBranch === null) {
+        $oFiles = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($sRepo . '/src', FilesystemIterator::SKIP_DOTS)
+        );
 
-            foreach (glob($sRepo . '/' . $sPath . '/Migration*.php') as $sFile) {
-                if (preg_match('/^Migration(\d+)\.php$/', basename($sFile), $aM)) {
-                    $aOut[(int) $aM[1]] = file_get_contents($sFile);
-                }
+        foreach ($oFiles as $oFile) {
+            $sPath = str_replace('\\', '/', $oFile->getPathname());
+            if (preg_match(MIGRATION_PATTERN, $sPath, $aM)) {
+                $aOut[(int) $aM[2]] = file_get_contents($oFile->getPathname());
             }
+        }
 
-        } else {
+    } else {
 
-            foreach (git($sRepo, ['ls-tree', '--name-only', $sBranch . ':' . $sPath]) as $sName) {
-                if (preg_match('/^Migration(\d+)\.php$/', $sName, $aM)) {
-                    $aOut[(int) $aM[1]] = implode(
-                        "\n",
-                        git($sRepo, ['show', $sBranch . ':' . $sPath . '/' . $sName])
-                    );
-                }
+        foreach (git($sRepo, ['ls-tree', '-r', '--name-only', $sRef, 'src/']) as $sPath) {
+            if (preg_match(MIGRATION_PATTERN, $sPath, $aM)) {
+                $aOut[(int) $aM[2]] = implode("\n", git($sRepo, ['show', $sRef . ':' . $sPath]));
             }
         }
     }
@@ -185,12 +189,33 @@ function fingerprint(string $sBody): string
 
 // --------------------------------------------------------------------------
 
-//  Configuration from composer.json, unless overridden on the command line
-$aConfig = [];
-if (is_file($sRepo . '/composer.json')) {
-    $aComposer = json_decode(file_get_contents($sRepo . '/composer.json'), true);
-    $aConfig   = $aComposer['extra']['nails']['migrations'] ?? [];
+/**
+ * Normally the work in hand is whatever is checked out; --head reads it from a ref
+ * instead, for auditing a branch without checking it out
+ */
+$sLocalRef = null;
+
+if ($sHead !== null) {
+
+    $sLocalRef = resolveRef($sRepo, $sHead);
+
+    if ($sLocalRef === null) {
+        fwrite(STDERR, basename($sRepo) . ': ' . $sHead . ' not present' . PHP_EOL);
+        exit(2);
+    }
 }
+
+//  Configuration travels with the work being checked, so read it from the same place
+if ($sLocalRef === null) {
+    $sComposer = is_file($sRepo . '/composer.json')
+        ? file_get_contents($sRepo . '/composer.json')
+        : '';
+} else {
+    $sComposer = implode("\n", git($sRepo, ['show', $sLocalRef . ':composer.json']));
+}
+
+$aComposer = json_decode($sComposer, true) ?: [];
+$aConfig   = $aComposer['extra']['nails']['migrations'] ?? [];
 
 $aOld      = $aOld ?? $aConfig['grandfathered'] ?? [];
 $aBranches = $aBranches ?: ($aConfig['branches'] ?? DEFAULT_BRANCHES);
@@ -199,7 +224,7 @@ $sName = $aComposer['name'] ?? basename($sRepo);
 
 // --------------------------------------------------------------------------
 
-$aLocal = migrations($sRepo, null);
+$aLocal = migrations($sRepo, $sLocalRef);
 
 if (empty($aLocal)) {
     echo $sName . ': no migrations, nothing to check' . PHP_EOL;
@@ -210,8 +235,7 @@ if (empty($aLocal)) {
  * The line this work is destined for is not a counterpart to compare against: it will
  * not have the new migration yet, and once merged the two are the same line.
  */
-$aHead      = git($sRepo, ['rev-parse', '--abbrev-ref', 'HEAD']);
-$aExclude[] = $aHead[0] ?? '';
+$aExclude[] = $sHead ?? (git($sRepo, ['rev-parse', '--abbrev-ref', 'HEAD'])[0] ?? '');
 $aExclude   = array_filter($aExclude);
 
 $aErrors   = [];
