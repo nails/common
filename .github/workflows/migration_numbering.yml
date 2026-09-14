@@ -1,0 +1,35 @@
+name: migration_numbering
+on:
+    pull_request:
+    push:
+        branches: [ main, develop, feature/pre-new-admin ]
+        paths:
+            - 'src/**/Database/Migration/**'
+            - 'composer.json'
+            - '.github/workflows/migration_numbering.yml'
+
+env:
+    GITHUB_ACTIONS_NOTIFY_ON_FAILURE: false
+
+jobs:
+    numbering:
+        name: Migration Numbering
+        runs-on: ubuntu-latest
+        steps:
+            #   The check compares this branch against the other long-lived branch, so it
+            #   needs their history rather than a shallow single-branch clone
+            -   name: Checkout code
+                uses: actions/checkout@v4
+                with:
+                    fetch-depth: 0
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.5'
+
+            #   The branch being merged into is not a counterpart to compare against
+            -   name: Check migration numbering
+                run: |
+                    php scripts/check-migration-numbering.php \
+                        --exclude="${{ github.base_ref || github.ref_name }}"
