@@ -140,9 +140,14 @@ class Migrate extends Base
 
                 foreach ($aEnabledModules as $oModule) {
 
-                    $sStart = is_null($oModule->start) ? 'The beginning of time' : '#' . $oModule->start;
-                    $sLine  = ' - <comment>' . $oModule->slug . '</comment> from ';
-                    $sLine  .= '<info>' . $sStart . '</info> to <info>#' . $oModule->end . '</info>';
+                    $sLine = ' - <comment>' . $oModule->slug . '</comment> ';
+
+                    if ($oModule->start !== null && $oModule->start >= $oModule->end) {
+                        $sLine .= 'is up to date, <info>repeatable</info> migrations will be evaluated';
+                    } else {
+                        $sStart = is_null($oModule->start) ? 'The beginning of time' : '#' . $oModule->start;
+                        $sLine  .= 'from <info>' . $sStart . '</info> to <info>#' . $oModule->end . '</info>';
+                    }
 
                     $oOutput->writeln($sLine);
                 }
@@ -330,7 +335,7 @@ class Migrate extends Base
         foreach ($aModules as $oModule) {
             $oState = $this->determineModuleState($oModule);
 
-            if (($oState->start === null && $oState->end !== null) || ($oState->start < $oState->end)) {
+            if (($oState->start === null && $oState->end !== null) || ($oState->start < $oState->end) || $oState->repeatable) {
                 $aOut[] = $oState;
             }
         }
@@ -365,11 +370,16 @@ class Migrate extends Base
             'migrations' => static::getMigrationsForComponent($oComponent, $this->oDb),
             'start'      => null,
             'end'        => null,
+            'repeatable' => false,
         ];
 
         if (!empty($oState->migrations)) {
-            $oState->start = $this->getCurrentMigrationIndex($oComponent);
-            $oState->end   = end($oState->migrations)->getPriority();
+            $oState->start      = $this->getCurrentMigrationIndex($oComponent);
+            $oState->end        = end($oState->migrations)->getPriority();
+            $oState->repeatable = (bool) array_filter(
+                $oState->migrations,
+                fn(Interfaces\Database\Migration $oMigration) => $oMigration instanceof Interfaces\Database\Migration\Repeatable
+            );
         }
 
         return $oState;
@@ -468,19 +478,24 @@ class Migrate extends Base
 
             $iPriority = $oMigration->getPriority();
 
-            if (
-                ($oModule->start === null || $iPriority > $oModule->start) &&
-                ($oModule->end === null || $iPriority <= $oModule->end)
-            ) {
+            $bIsPending = ($oModule->start === null || $iPriority > $oModule->start) &&
+                ($oModule->end === null || $iPriority <= $oModule->end);
+
+            if ($bIsPending || $oMigration instanceof Interfaces\Database\Migration\Repeatable) {
                 try {
 
                     $this->trigger(Events::DB_MIGRATE_BEFORE, [$oModule, $oMigration]);
                     $oMigration->execute();
                     $this->trigger(Events::DB_MIGRATE_AFTER, [$oModule, $oMigration]);
 
-                    //  Mark this migration as complete
+                    /**
+                     * Mark this migration as complete. A repeatable migration can have a
+                     * lower priority than the version already recorded, so the value is only
+                     * ever allowed to move forwards; rewinding it would re-run everything
+                     * in between on the next pass.
+                     */
                     $oResult = $this->oDb->query(sprintf(
-                        'UPDATE `%s` SET `version` = %s WHERE `module` = \'%s\'',
+                        'UPDATE `%s` SET `version` = GREATEST(COALESCE(`version`, -1), %d) WHERE `module` = \'%s\'',
                         Config::get('NAILS_DB_PREFIX') . 'migration',
                         $iPriority,
                         $oModule->slug
