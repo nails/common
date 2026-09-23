@@ -66,8 +66,7 @@ class Field
         $_field_sub_label = $_field_sub_label ? '<small>' . $_field_sub_label . '</small>' : '';
 
         //  Has the field got a tip?
-        $_tipclass = $_tip['title'] ? 'with-tip' : '';
-        $_tip      = static::getTipHtml((object) $_tip);
+        $_tip = static::getTipHtml((object) $_tip);
 
         // --------------------------------------------------------------------------
 
@@ -181,12 +180,12 @@ class Field
             <label>
                 <span class="label">
                     $_field_label
+                    $_tip
                     $_field_sub_label
                 </span>
-                <span class="input $_tipclass">
+                <span class="input">
                     $_field_html
                     $_max_length_html
-                    $_tip
                     $_error
                     $info_block
                 </span>
@@ -240,6 +239,8 @@ class Field
             'html'        => ArrayHelper::get('html', $aField, ''),
         ];
 
+        $oTip = null;
+
         if (is_array($oField->tip) && !empty($oField->tip['title'])) {
             $oTip = (object) [
                 'class' => ArrayHelper::get('class', $oField->tip, 'tip'),
@@ -267,8 +268,7 @@ class Field
         $oField->sub_label = $oField->sub_label ? '<small>' . $oField->sub_label . '</small>' : '';
 
         //  Has the field got a tip?
-        $sTipClass = !empty($oTip) ? 'with-tip' : '';
-        $sTipHtml  = !empty($oTip) ? static::getTipHtml($oTip) : '';
+        $sTipHtml = !empty($oTip) ? static::getTipHtml($oTip) : '';
 
         // --------------------------------------------------------------------------
 
@@ -319,11 +319,11 @@ class Field
             <label>
                 <span class="label">
                     $oField->label
+                    $sTipHtml
                     $oField->sub_label
                 </span>
-                <span class="input $sTipClass">
+                <span class="input">
                     $oField->html
-                    $sTipHtml
                     $sError
                     $sInfoHtml
                 <span>
@@ -658,14 +658,14 @@ class Field
         $_out .= '<span class="label">';
         $_out .= $_field['label'];
         $_out .= $_field['required'] ? '*' : '';
+        $_out .= static::getTipHtml((object) $_tip);
         $_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
         $_out .= '</span>';
 
         // --------------------------------------------------------------------------
 
         //  Field
-        $_withtip = $_tip['title'] ? 'with-tip' : '';
-        $_out     .= '<span class="input ' . $_withtip . '">';
+        $_out .= '<span class="input">';
 
         //  Does the field have an id?
         $_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
@@ -719,9 +719,6 @@ class Field
         if ($_readonly) {
             $_out .= Form::hidden($_field['key'], $_field['default']);
         }
-
-        //  Tip
-        $_out .= static::getTipHtml((object) $_tip);
 
         //  Error
         $_out .= Form::error($_field['key'], '<span class="alert alert-danger">', '</span>');
@@ -801,14 +798,14 @@ class Field
         $_out .= '<span class="label">';
         $_out .= $_field['label'];
         $_out .= $_field['required'] ? '*' : '';
+        $_out .= static::getTipHtml((object) $_tip);
         $_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
         $_out .= '</span>';
 
         // --------------------------------------------------------------------------
 
         //  Field
-        $_withtip = $_tip['title'] ? 'with-tip' : '';
-        $_out     .= '<span class="input ' . $_withtip . '">';
+        $_out .= '<span class="input">';
 
         //  Does the field have an id?
         $_field['id'] = $_field['id'] ? 'id="' . $_field['id'] . '" ' : '';
@@ -857,9 +854,6 @@ class Field
         }
 
         // --------------------------------------------------------------------------
-
-        //  Tip
-        $_out .= static::getTipHtml((object) $_tip);
 
         //  Error
         $_out .= Form::error($_field['key'], '<span class="alert alert-danger">', '</span>');
@@ -950,12 +944,12 @@ class Field
         $_out .= '<span class="label">';
         $_out .= $_field['label'];
         $_out .= $_field['required'] ? '*' : '';
+        $_out .= static::getTipHtml((object) $_tip);
         $_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
         $_out .= '</span>';
 
         //  Field
-        $_tipclass = $_tip['title'] ? 'with-tip' : '';
-        $_out      .= '<span class="input ' . $_tipclass . '">';
+        $_out .= '<span class="input">';
         $_selected = set_value($_field['key'], (bool) $_field['default']);
 
         $_out .= Form::boolean(
@@ -974,9 +968,6 @@ class Field
                 )
             )
         );
-
-        //  Tip
-        $_out .= static::getTipHtml((object) $_tip);
 
         //  Error
         $_out .= Form::error($_field['key'], '<span class="alert alert-danger">', '</span>');
@@ -1082,6 +1073,7 @@ class Field
         $_out .= '<span class="label">';
         $_out .= $_field['label'];
         $_out .= $_field['required'] ? '*' : '';
+        $_out .= static::getTipHtml((object) $_tip);
         $_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
         $_out .= '</span>';
 
@@ -1091,10 +1083,9 @@ class Field
         //  Is the option disabled?
         $_disabled = !empty($_field['options'][0]['disabled']) ? 'disabled="disabled" ' : '';
 
-        $_tipclass      = $_tip['title'] ? 'with-tip' : '';
         $_disabledclass = $_disabled ? 'is-disabled' : '';
 
-        $_out .= '<span class="input ' . $_tipclass . ' ' . $_disabledclass . '">';
+        $_out .= '<span class="input ' . $_disabledclass . '">';
 
         /** @var Input $oInput */
         $oInput = Factory::service('Input');
@@ -1141,9 +1132,6 @@ class Field
             );
             $_out .= '<span class="text">' . $_field['options'][0]['label'] . '</span>';
         }
-
-        //  Tip
-        $_out .= static::getTipHtml((object) $_tip);
 
         $_out .= '</span>';
         $_out .= '</label>';
@@ -1407,8 +1395,8 @@ class Field
 
         return <<<EOT
             <span class="$sClass">
-                <span class="hint--left hint--large" aria-label="$sTitle">
-                    <b class="fa fa-question-circle fa-lg"></b>
+                <span class="hint--top hint--medium" aria-label="$sTitle">
+                    <b class="fa fa-question-circle"></b>
                 </span>
             </span>
         EOT;
