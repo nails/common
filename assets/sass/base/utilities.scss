@@ -349,11 +349,53 @@
     left: 0 !important;
 }
 
+/**
+ * Centres a block on the page.
+ *
+ * It used to be absolutely positioned at `left: 50%` with no width of its own.
+ * An auto width there is shrink-to-fit against only the space to the right of
+ * that offset, so on a phone the block collapsed to half the screen and sat in
+ * a wide margin. Translating it up by half its height also pushed the top off
+ * the viewport whenever the block was taller than the screen, and because it
+ * was out of flow there was no way to scroll back to it.
+ *
+ * In flow, with a real width, it fills up to its max-width and the page itself
+ * scrolls. `min-height` (rather than `height`) is what keeps a short block
+ * centred: a fixed height would bring the old clipping back.
+ */
 .center-screen {
-    position: absolute !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    transform: none !important;
+
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    max-width: 500px;
+    min-height: 100vh;
+    min-height: 100dvh;
+    margin-right: auto;
+    margin-left: auto;
+    padding-top: var(--spacing-lg);
+    padding-bottom: var(--spacing-lg);
+
+    @media (max-width: 576px) {
+        padding-right: var(--spacing-md);
+        padding-left: var(--spacing-md);
+    }
+
+    > :first-child {
+        margin-top: 0;
+    }
+
+    > :last-child {
+        margin-bottom: 0;
+    }
 }
 
 /* Border utilities */
