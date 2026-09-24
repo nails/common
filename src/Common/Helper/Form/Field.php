@@ -60,7 +60,7 @@ class Field
         // --------------------------------------------------------------------------
 
         //  Is the label required?
-        $_field_label .= $_field_required ? '*' : '';
+        $_field_label .= static::requiredMarker($_field_required);
 
         //  Prep sublabel
         $_field_sub_label = $_field_sub_label ? '<small>' . $_field_sub_label . '</small>' : '';
@@ -262,7 +262,7 @@ class Field
         // --------------------------------------------------------------------------
 
         //  Is the label required?
-        $oField->label .= $oField->required ? '*' : '';
+        $oField->label .= static::requiredMarker((bool) $oField->required);
 
         //  Prep sublabel
         $oField->sub_label = $oField->sub_label ? '<small>' . $oField->sub_label . '</small>' : '';
@@ -657,7 +657,7 @@ class Field
         //  Label
         $_out .= '<span class="label">';
         $_out .= $_field['label'];
-        $_out .= $_field['required'] ? '*' : '';
+        $_out .= static::requiredMarker((bool) $_field['required']);
         $_out .= static::getTipHtml((object) $_tip);
         $_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
         $_out .= '</span>';
@@ -797,7 +797,7 @@ class Field
         //  Label
         $_out .= '<span class="label">';
         $_out .= $_field['label'];
-        $_out .= $_field['required'] ? '*' : '';
+        $_out .= static::requiredMarker((bool) $_field['required']);
         $_out .= static::getTipHtml((object) $_tip);
         $_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
         $_out .= '</span>';
@@ -943,7 +943,7 @@ class Field
         //  Label
         $_out .= '<span class="label">';
         $_out .= $_field['label'];
-        $_out .= $_field['required'] ? '*' : '';
+        $_out .= static::requiredMarker((bool) $_field['required']);
         $_out .= static::getTipHtml((object) $_tip);
         $_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
         $_out .= '</span>';
@@ -1072,7 +1072,7 @@ class Field
         //  Label
         $_out .= '<span class="label">';
         $_out .= $_field['label'];
-        $_out .= $_field['required'] ? '*' : '';
+        $_out .= static::requiredMarker((bool) $_field['required']);
         $_out .= static::getTipHtml((object) $_tip);
         $_out .= $_field['sub_label'] ? '<small>' . $_field['sub_label'] . '</small>' : '';
         $_out .= '</span>';
@@ -1400,5 +1400,20 @@ class Field
                 </span>
             </span>
         EOT;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Visible required marker with an accessible name.
+     * Colour and weight live in module-admin `.field-required`.
+     */
+    public static function requiredMarker(bool $bRequired): string
+    {
+        if (!$bRequired) {
+            return '';
+        }
+
+        return ' <span class="field-required" title="Required"><span aria-hidden="true">*</span><span class="visually-hidden">required</span></span>';
     }
 }
