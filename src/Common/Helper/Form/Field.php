@@ -1395,7 +1395,7 @@ class Field
 
         return <<<EOT
             <span class="$sClass">
-                <span class="hint--top hint--medium" aria-label="$sTitle">
+                <span class="hint--top-left hint--medium" aria-label="$sTitle">
                     <b class="fa fa-question-circle"></b>
                 </span>
             </span>
