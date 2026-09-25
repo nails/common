@@ -14,6 +14,7 @@
 - `Validator` gains `setLabels()`, `setFieldMessages()`, `getResult()` and `getValidatedData()` (the data with rule mutations such as `trim` applied); `getErrors()` no longer reads shared state.
 - `Validator` can be extended: override `rules()` (and optionally `messages()`, `labels()`, `fieldMessages()`) to define a reusable, unit-testable rule set with its dependencies in the constructor; runtime `setRules()`/`addRules()`/`setMessages()`/... merge over the class-defined values. `stubRule($sName, $mRule)` replaces a named rule for one validator (e.g. stub `is_unique` in a test), and `setEngine()` swaps the engine entirely.
 - The `cdnObjectPickerMulti*` rules have moved to `nails/module-cdn`.
+- Fixed: `isIpInRange()` now supports IPv6 CIDR ranges. Previously an IPv6 range matched every IPv6 address, an IPv6 address matched any IPv4 range starting `0.0.0.0`, and a prefix longer than 32 bits threw an `ArithmeticError`. Addresses are now compared in binary, so exact IPv6 entries match regardless of notation, and invalid addresses or ranges never match.
 - Fixed: `date_today` never matched; `date_before` always failed; `maxWords` registered its message under `max_words`; several `fv_*` language lines had typos.
 
 ## Version 0.2.3
