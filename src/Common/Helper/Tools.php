@@ -87,10 +87,14 @@ class Tools
     // --------------------------------------------------------------------------
 
     /**
-     * Determines whether an IP Address falls within a CIDR range
+     * Determines whether an IP Address matches any of a set of addresses or CIDR ranges
+     *
+     * Supports IPv4 and IPv6, both as exact addresses and as CIDR ranges. An address
+     * never matches a range of the other family, and invalid addresses or ranges
+     * never match.
      *
      * @param $sIp    string The IP Address to test
-     * @param $mRange mixed  The CIDR range, either as a string, or an array of ranges
+     * @param $mRange mixed  The addresses/CIDR ranges, either as a comma/newline separated string, or an array
      *
      * @return bool
      */
@@ -117,32 +121,76 @@ class Tools
             $aRange = $mRange;
         }
 
-        foreach ($aRange as $sCIDRMask) {
+        $sIpBinary = static::ipToBinary($sIp);
+        if ($sIpBinary === null) {
+            return false;
+        }
 
-            if (strpos($sCIDRMask, '/') !== false) {
+        foreach ($aRange as $sRange) {
 
-                //  Hat tip: http://stackoverflow.com/a/594134/789224
-                [$sSubnet, $sBits] = explode('/', $sCIDRMask);
+            $sRange = trim((string) $sRange);
 
-                $iBits   = (int) $sBits;
-                $iIp     = ip2long($sIp);
-                $sSubnet = ip2long($sSubnet);
-                $iMask   = -1 << (32 - $iBits);
-                $sSubnet &= $iMask; # nb: in case the supplied subnet wasn't correctly aligned
+            if (strpos($sRange, '/') !== false) {
 
-                if (($iIp & $iMask) == $sSubnet) {
+                [$sSubnet, $sBits] = explode('/', $sRange, 2);
+
+                $sSubnetBinary = static::ipToBinary($sSubnet);
+
+                //  Only compare addresses of the same family (4 bytes for IPv4, 16 for IPv6)
+                if ($sSubnetBinary === null || strlen($sSubnetBinary) !== strlen($sIpBinary) || !ctype_digit($sBits)) {
+                    continue;
+                }
+
+                $iBits = (int) $sBits;
+                if ($iBits > strlen($sIpBinary) * 8) {
+                    continue;
+                }
+
+                //  Compare the whole bytes covered by the prefix, then the remaining bits
+                $iBytes     = intdiv($iBits, 8);
+                $iRemainder = $iBits % 8;
+
+                if (substr($sIpBinary, 0, $iBytes) !== substr($sSubnetBinary, 0, $iBytes)) {
+                    continue;
+                }
+
+                if ($iRemainder === 0) {
                     return true;
                 }
 
-            } else {
-
-                if ($sIp == $sCIDRMask) {
+                $iMask = (0xFF << (8 - $iRemainder)) & 0xFF;
+                if ((ord($sIpBinary[$iBytes]) & $iMask) === (ord($sSubnetBinary[$iBytes]) & $iMask)) {
                     return true;
                 }
+
+            } elseif (static::ipToBinary($sRange) === $sIpBinary) {
+                return true;
             }
         }
 
         return false;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Converts an IPv4 or IPv6 address to its packed binary form
+     *
+     * @param string $sIp The IP Address to convert
+     *
+     * @return string|null Null if the address is invalid
+     */
+    protected static function ipToBinary(string $sIp): ?string
+    {
+        $sIp = trim($sIp);
+
+        if (filter_var($sIp, FILTER_VALIDATE_IP) === false) {
+            return null;
+        }
+
+        $sBinary = inet_pton($sIp);
+
+        return $sBinary === false ? null : $sBinary;
     }
 
     // --------------------------------------------------------------------------
