@@ -16,7 +16,7 @@ use Nails\Factory;
 class Field
 {
     /**
-     * Whether the timezone catalogue JSON has already been emitted this request
+     * Whether the timezone catalogue has already been queued with the Asset service this request
      */
     protected static bool $bTimezoneCatalogueEmitted = false;
 
@@ -589,13 +589,7 @@ class Field
             $aField = static::applyTimezoneAware($aField);
         }
 
-        $sHtml = static::render($aField, $sTip);
-
-        if (!empty($aField['timezoneAware'])) {
-            $sHtml .= static::timezoneCatalogueHtml();
-        }
-
-        return $sHtml;
+        return static::render($aField, $sTip);
     }
 
     // --------------------------------------------------------------------------
@@ -641,6 +635,8 @@ class Field
         $aField['after_input'] = ($aField['after_input'] ?? '')
             . '<small class="timezone-channel">Times are in ' . $sLink . '</small>';
 
+        static::queueTimezoneCatalogue();
+
         return $aField;
     }
 
@@ -666,24 +662,29 @@ class Field
     // --------------------------------------------------------------------------
 
     /**
-     * Emit the IANA → English timezone catalogue once per request
+     * Queue the IANA → English timezone catalogue once per request via the Asset service
      */
-    protected static function timezoneCatalogueHtml(): string
+    protected static function queueTimezoneCatalogue(): void
     {
         if (static::$bTimezoneCatalogueEmitted) {
-            return '';
+            return;
         }
 
         static::$bTimezoneCatalogueEmitted = true;
 
         /** @var \Nails\Common\Service\DateTime $oDateTime */
-        $oDateTime  = Factory::service('DateTime');
-        $sJson      = json_encode(
+        $oDateTime = Factory::service('DateTime');
+        $sJson     = json_encode(
             $oDateTime->getAllTimezoneFlat(),
             JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP
         );
 
-        return '<script type="application/json" id="js-timezone-catalogue">' . $sJson . '</script>';
+        /** @var \Nails\Common\Service\Asset $oAsset */
+        $oAsset = Factory::service('Asset');
+        $oAsset->inline(
+            'window.NAILS = window.NAILS || {}; window.NAILS.TIMEZONE_CATALOGUE = ' . $sJson . ';',
+            $oAsset::TYPE_JS
+        );
     }
 
     // --------------------------------------------------------------------------
