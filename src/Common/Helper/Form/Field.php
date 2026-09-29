@@ -16,6 +16,11 @@ use Nails\Factory;
 class Field
 {
     /**
+     * Whether the timezone catalogue JSON has already been emitted this request
+     */
+    protected static bool $bTimezoneCatalogueEmitted = false;
+
+    /**
      * Generates a form field
      *
      * @param array  $field The config array
@@ -43,8 +48,10 @@ class Field
         $_field_info_class   = isset($field['info_class']) ? $field['info_class'] : false;
         $_field_max_length   = isset($field['max_length']) ? (int) $field['max_length'] : null;
         $_field_tip          = isset($field['tip']) ? $field['tip'] : $tip;
-        $_field_autocomplete = isset($field['autocomplete']) ? (bool) $field['autocomplete'] : true;
-        $_field_helper       = isset($field['helper']) ? $field['helper'] : '';
+        $_field_autocomplete  = isset($field['autocomplete']) ? (bool) $field['autocomplete'] : true;
+        $_field_helper        = isset($field['helper']) ? $field['helper'] : '';
+        $_field_container_cls = isset($field['container_class']) ? $field['container_class'] : '';
+        $_field_after_input   = isset($field['after_input']) ? $field['after_input'] : '';
 
         $_tip          = [];
         $_tip['class'] = is_array($_field_tip) && isset($_field_tip['class']) ? $_field_tip['class'] : null;
@@ -176,7 +183,7 @@ class Field
 
         $_out = <<<EOT
 
-        <div class="field $_error_class $_field_oddeven $_readonly_cls $_field_type" $_field_id_top $_field_attributes>
+        <div class="field $_error_class $_field_oddeven $_readonly_cls $_field_type $_field_container_cls" $_field_id_top $_field_attributes>
             <label>
                 <span class="label">
                     $_field_label
@@ -186,6 +193,7 @@ class Field
                 <span class="input">
                     $_field_html
                     $_max_length_html
+                    $_field_after_input
                     $_error
                     $info_block
                 </span>
@@ -577,7 +585,105 @@ class Field
         $aField['placeholder']  = 'YYYY-MM-DD HH:mm:ss';
         $aField['autocomplete'] = false;
 
-        return static::render($aField, $sTip);
+        if (!empty($aField['timezoneAware'])) {
+            $aField = static::applyTimezoneAware($aField);
+        }
+
+        $sHtml = static::render($aField, $sTip);
+
+        if (!empty($aField['timezoneAware'])) {
+            $sHtml .= static::timezoneCatalogueHtml();
+        }
+
+        return $sHtml;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Opt a datetime field into timezone-aware admin UI.
+     *
+     * The posted value stays a naive `Y-m-d H:i:s` string; the backend is
+     * responsible for converting it from the user's timezone.
+     *
+     * @param array $aField The field config
+     */
+    protected static function applyTimezoneAware(array $aField): array
+    {
+        /** @var \Nails\Common\Service\DateTime $oDateTime */
+        $oDateTime = Factory::service('DateTime');
+
+        $sUserTimezone = $oDateTime->getUserTimezone() ?: 'UTC';
+        $sAppTimezone  = $oDateTime->getNailsTimezone() ?: 'UTC';
+        $aCatalogue    = $oDateTime->getAllTimezoneFlat();
+        $sLabel        = $aCatalogue[$sUserTimezone] ?? $sUserTimezone;
+
+        $aField['data']                       = $aField['data'] ?? [];
+        $aField['data']['timezone-aware']     = 'true';
+        $aField['data']['user-timezone']      = $sUserTimezone;
+        $aField['data']['app-timezone']       = $sAppTimezone;
+
+        $aField['container_class'] = trim(($aField['container_class'] ?? '') . ' timezone-aware');
+
+        $sEditUrl      = static::timezoneEditUrl();
+        $sEscapedLabel = htmlentities($sLabel, ENT_QUOTES);
+
+        if ($sEditUrl) {
+            $sLink = sprintf(
+                '<a href="%s" class="confirm hint--top hint--medium" data-title="Continue to edit your account and update your timezone." data-body="You will lose unsaved changes." aria-label="Manage your timezone settings">%s</a>',
+                htmlentities($sEditUrl, ENT_QUOTES),
+                $sEscapedLabel
+            );
+        } else {
+            $sLink = $sEscapedLabel;
+        }
+
+        $aField['after_input'] = ($aField['after_input'] ?? '')
+            . '<small class="timezone-channel">Times are in ' . $sLink . '</small>';
+
+        return $aField;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * URL for the current user to edit their timezone, if Auth admin is available
+     */
+    protected static function timezoneEditUrl(): string
+    {
+        if (!function_exists('activeUser') || !activeUser('id')) {
+            return '';
+        }
+
+        $sAccounts = 'Nails\\Auth\\Admin\\Controller\\Accounts';
+        if (!class_exists($sAccounts)) {
+            return '';
+        }
+
+        return $sAccounts::url('edit/' . activeUser('id'));
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Emit the IANA → English timezone catalogue once per request
+     */
+    protected static function timezoneCatalogueHtml(): string
+    {
+        if (static::$bTimezoneCatalogueEmitted) {
+            return '';
+        }
+
+        static::$bTimezoneCatalogueEmitted = true;
+
+        /** @var \Nails\Common\Service\DateTime $oDateTime */
+        $oDateTime  = Factory::service('DateTime');
+        $sJson      = json_encode(
+            $oDateTime->getAllTimezoneFlat(),
+            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP
+        );
+
+        return '<script type="application/json" id="js-timezone-catalogue">' . $sJson . '</script>';
     }
 
     // --------------------------------------------------------------------------

@@ -3,6 +3,7 @@
 
 ## Unreleased
 
+- `form_field_datetime()` accepts `timezoneAware => true`, which marks the input `data-timezone-aware` and sits a one-line timezone channel under the control. The posted value is still a naive `Y-m-d H:i:s` string; conversion to the app timezone remains the caller's job.
 - **Validation no longer depends on CodeIgniter.** `Service\FormValidation` and `Factory\Service\FormValidation\Validator` now run on a standalone engine (`Nails\Common\Validation\*`), so validation works from the console and in tests. `CodeIgniter\Libraries\FormValidation` has been removed.
 - Rules are classes implementing `Nails\Common\Interfaces\Validation\Rule`, auto-discovered from every component's `Validation\Rule` namespace (app rules override module rules, which override common's). Rules may be referenced by name (`required`, `max_length[5]`), by class name, as an instance, or as a closure. Custom rule methods on `NAILS_Form_validation` / `App\Common\Service\FormValidation` must be ported to `App\Validation\Rule\*`.
 - Closures receive `(mixed $mValue, Nails\Common\Validation\Context $oContext)`; use `$oContext->getValue('other_field')` for cross-field checks (replaces reading `validation_data`). A closure returning `false` now fails.
