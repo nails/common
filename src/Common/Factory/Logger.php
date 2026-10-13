@@ -15,6 +15,7 @@
 namespace Nails\Common\Factory;
 
 use Nails\Common\Exception\FactoryException;
+use Nails\Common\Log\Plain;
 use Nails\Config;
 use Nails\Factory;
 
@@ -129,13 +130,18 @@ class Logger
                 write_file($sLogPath, PHP_EOL, 'a');
 
             } else {
+                $sPlain = Plain::line((string) $sLine);
+                if ($sPlain === '') {
+                    return $this;
+                }
+
                 write_file(
                     $sLogPath,
                     sprintf(
                         $this->sFormat . PHP_EOL,
                         $sType ?? self::TYPE_INFO,
                         $oNow->format('Y-m-d H:i:s'),
-                        trim($sLine)
+                        $sPlain
                     ),
                     'a'
                 );
