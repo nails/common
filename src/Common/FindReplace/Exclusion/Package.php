@@ -10,6 +10,7 @@ class Package implements Exclusion
     {
         return [
             NAILS_DB_PREFIX . 'app_setting',
+            NAILS_DB_PREFIX . 'migration',
         ];
     }
 
