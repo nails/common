@@ -63,3 +63,5 @@ if (!empty($_ENV['ENVIRONMENT']) && $_ENV['ENVIRONMENT'] === 'TESTING') {
 
     Testing::bootstrapModule(__FILE__);
 }
+
+require_once dirname(__DIR__) . '/src/FindReplace/Interfaces/Exclusion.php';
