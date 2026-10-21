@@ -5,6 +5,9 @@ on:
     pull_request:
         branches: [ main, develop ]
 
+env:
+    COMPOSER_ROOT_VERSION: dev-develop
+
 jobs:
     test:
         name: PHP ${{ matrix.php-version }} Test
