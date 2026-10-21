@@ -60,9 +60,13 @@ class TranslationTest extends TestCase
     public function test_every_bundled_rule_has_both_language_lines(): void
     {
         $oTranslation = new Translation('english');
+        $oRegistry    = \Nails\Common\Validation\Registry::discover();
         $aMissing     = [];
 
-        foreach (\Nails\Common\Validation\Registry::discover()->names() as $sName) {
+        foreach ($oRegistry->names() as $sName) {
+            if (!str_starts_with($oRegistry->get($sName)::class, 'Nails\\Common\\Validation\\Rule\\')) {
+                continue;
+            }
             if (in_array($sName, ['trim', 'prep_for_form', 'prep_url', 'strip_image_tags', 'encode_php_tags'], true)) {
                 continue; // mutators never fail
             }
