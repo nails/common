@@ -19,6 +19,7 @@ class PackageTest extends TestCase
         self::assertSame(
             [
                 NAILS_DB_PREFIX . 'app_setting',
+                NAILS_DB_PREFIX . 'migration',
             ],
             (new Package())->hidden()
         );
