@@ -3,6 +3,7 @@
 
 ## Unreleased
 
+- The `app_setting.key` column is widened from 50 to 150 characters (Migration 7), so longer setting keys no longer fail with `Data too long for column 'key'`.
 - Log lines drop ANSI colour codes and banner rules (`-----------------`). A line that is only decoration is not written. Every written entry still ends with a newline. An empty line is still a blank line.
 
 - **Validation no longer depends on CodeIgniter.** `Service\FormValidation` and `Factory\Service\FormValidation\Validator` now run on a standalone engine (`Nails\Common\Validation\*`), so validation works from the console and in tests. `CodeIgniter\Libraries\FormValidation` has been removed.
