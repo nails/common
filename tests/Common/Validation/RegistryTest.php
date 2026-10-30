@@ -31,7 +31,14 @@ class RegistryTest extends TestCase
             'valid_postcode', 'valid_time', 'validTimecode', 'valid_url',
         ];
 
-        $aNames = Registry::discover()->names();
+        $oRegistry = Registry::discover();
+        $aNames    = array_values(array_filter(
+            $oRegistry->names(),
+            static fn(string $name): bool => str_starts_with(
+                $oRegistry->get($name)::class,
+                'Nails\\Common\\Validation\\Rule\\'
+            )
+        ));
         sort($aExpected);
         sort($aNames);
 
