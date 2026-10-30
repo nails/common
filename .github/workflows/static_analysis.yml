@@ -13,6 +13,7 @@ on:
 
 env:
     GITHUB_ACTIONS_NOTIFY_ON_FAILURE: false
+    COMPOSER_ROOT_VERSION: dev-feature/pre-new-admin
 
 jobs:
     phpstan:
