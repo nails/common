@@ -11,6 +11,7 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Common\Exception\Input\InvalidEncodingException;
 use Nails\Common\Helper\ArrayHelper;
 use Nails\Factory;
 
@@ -223,27 +224,43 @@ class Input
     // --------------------------------------------------------------------------
 
     /**
-     * Rejects the request with a 400 if $_GET, $_POST or $_COOKIE contain invalid UTF-8.
+     * Throws if $_GET, $_POST or $_COOKIE contain invalid UTF-8; callers are
+     * expected to catch this close to the top of the request and respond with
+     * a 400 (see Base::__construct(), which mirrors the pattern used for
+     * invalid URI characters in Uri::filter_uri()).
      *
      * CLI requests are never rejected; there's no HTTP response to send a status
      * on, and CLI input doesn't arrive via these superglobals in the same way.
      *
      * @return void
-     * @throws \Nails\Common\Exception\FactoryException
+     * @throws InvalidEncodingException
      */
-    public static function guardEncoding(): void
+    public static function validateEncoding(): void
     {
-        if (static::isCli() || !static::hasInvalidEncoding()) {
+        if (static::isCli()) {
             return;
         }
 
-        /** @var ErrorHandler $oErrorHandler */
-        $oErrorHandler = Factory::service('ErrorHandler');
-        $oErrorHandler::halt(
-            'The request contains characters which are not valid UTF-8.',
-            '',
-            HttpCodes::STATUS_BAD_REQUEST
-        );
+        static::assertValidEncoding();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * The CLI-unaware half of validateEncoding(), split out so it can be
+     * exercised directly in tests without needing to fake the SAPI.
+     *
+     * @return void
+     * @throws InvalidEncodingException
+     */
+    protected static function assertValidEncoding(): void
+    {
+        if (static::hasInvalidEncoding()) {
+            throw new InvalidEncodingException(
+                'The request contains characters which are not valid UTF-8.',
+                HttpCodes::STATUS_BAD_REQUEST
+            );
+        }
     }
 
     // --------------------------------------------------------------------------

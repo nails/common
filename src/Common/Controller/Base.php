@@ -17,6 +17,7 @@ use Nails\Common\Constants;
 use Nails\Common\Events;
 use Nails\Common\Exception\AssetException;
 use Nails\Common\Exception\FactoryException;
+use Nails\Common\Exception\Input\InvalidEncodingException;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Factory\Locale;
 use Nails\Common\Service\Asset;
@@ -87,9 +88,20 @@ abstract class Base extends \MX_Controller
      */
     public function __construct()
     {
-        /** @var Input $oInput */
-        $oInput = Factory::service('Input');
-        $oInput::guardEncoding();
+        /**
+         * This has to run before the SYSTEM_STARTING event is triggered, not as
+         * a listener on it: listeners on that event aren't guaranteed to run in
+         * any particular order, and at least one of them (module-auth's
+         * User\Init, which reads the remember-me cookie and queries the User
+         * model) does exactly what this check exists to run ahead of.
+         */
+        try {
+            /** @var Input $oInput */
+            $oInput = Factory::service('Input');
+            $oInput::validateEncoding();
+        } catch (InvalidEncodingException $e) {
+            ErrorHandler::halt($e->getMessage(), '', $e->getCode());
+        }
 
         Profiler::mark('CONTROLLER:PRE');
         Factory::service('Event')
