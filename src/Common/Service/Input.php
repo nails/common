@@ -11,6 +11,7 @@
 
 namespace Nails\Common\Service;
 
+use Nails\Common\Exception\Input\InvalidEncodingException;
 use Nails\Common\Helper\ArrayHelper;
 use Nails\Factory;
 
@@ -179,6 +180,87 @@ class Input
     public static function isAjax()
     {
         return static::server('HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest';
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Whether $_GET, $_POST or $_COOKIE contain a key or value which is not valid UTF-8
+     *
+     * @return bool
+     */
+    public static function hasInvalidEncoding(): bool
+    {
+        return !static::isValidEncoding($_GET ?? [])
+            || !static::isValidEncoding($_POST ?? [])
+            || !static::isValidEncoding($_COOKIE ?? []);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Recursively checks that every string key and value in $mValue is valid UTF-8
+     *
+     * @param mixed $mValue The value to check
+     *
+     * @return bool
+     */
+    protected static function isValidEncoding($mValue): bool
+    {
+        if (is_array($mValue)) {
+            foreach ($mValue as $sKey => $mItem) {
+                if (is_string($sKey) && !mb_check_encoding($sKey, 'UTF-8')) {
+                    return false;
+                } elseif (!static::isValidEncoding($mItem)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        return !is_string($mValue) || mb_check_encoding($mValue, 'UTF-8');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Throws if $_GET, $_POST or $_COOKIE contain invalid UTF-8; callers are
+     * expected to catch this close to the top of the request and respond with
+     * a 400 (see Base::__construct(), which mirrors the pattern used for
+     * invalid URI characters in Uri::filter_uri()).
+     *
+     * CLI requests are never rejected; there's no HTTP response to send a status
+     * on, and CLI input doesn't arrive via these superglobals in the same way.
+     *
+     * @return void
+     * @throws InvalidEncodingException
+     */
+    public static function validateEncoding(): void
+    {
+        if (static::isCli()) {
+            return;
+        }
+
+        static::assertValidEncoding();
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * The CLI-unaware half of validateEncoding(), split out so it can be
+     * exercised directly in tests without needing to fake the SAPI.
+     *
+     * @return void
+     * @throws InvalidEncodingException
+     */
+    protected static function assertValidEncoding(): void
+    {
+        if (static::hasInvalidEncoding()) {
+            throw new InvalidEncodingException(
+                'The request contains characters which are not valid UTF-8.',
+                HttpCodes::STATUS_BAD_REQUEST
+            );
+        }
     }
 
     // --------------------------------------------------------------------------

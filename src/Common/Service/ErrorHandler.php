@@ -15,6 +15,7 @@ namespace Nails\Common\Service;
 use Nails\Common\Controller\NailsMockController;
 use Nails\Common\Events;
 use Nails\Common\Exception\FactoryException;
+use Nails\Common\Exception\InvalidRequestException;
 use Nails\Common\Exception\ViewNotFoundException;
 use Nails\Common\Helper\ArrayHelper;
 use Nails\Components;
@@ -167,6 +168,17 @@ class ErrorHandler
 
     public static function handleException($oException, $bHaltExecution = true): void
     {
+        /**
+         * Requests rejected early for being malformed (invalid encoding,
+         * disallowed URI characters, ...) halt immediately with their own
+         * message and status code, rather than being reported as a generic
+         * fatal error (which would be a 500).
+         */
+        if ($oException instanceof InvalidRequestException) {
+            static::halt($oException->getMessage(), '', $oException->getCode());
+            return;
+        }
+
         if (!Factory::isReady()) {
             static::halt(sprintf(
                 'Uncaught %s Exception: code %s in file: %s on line: %s',

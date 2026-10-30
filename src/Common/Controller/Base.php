@@ -87,6 +87,22 @@ abstract class Base extends \MX_Controller
      */
     public function __construct()
     {
+        /**
+         * This has to run before the SYSTEM_STARTING event is triggered, not as
+         * a listener on it: listeners on that event aren't guaranteed to run in
+         * any particular order, and at least one of them (module-auth's
+         * User\Init, which reads the remember-me cookie and queries the User
+         * model) does exactly what this check exists to run ahead of.
+         *
+         * If invalid, this throws an InvalidEncodingException; it's deliberately
+         * left uncaught here, as ErrorHandler::handleException() special-cases
+         * that exception family and halts with its status code, rather than
+         * letting it surface as a 500.
+         */
+        /** @var Input $oInput */
+        $oInput = Factory::service('Input');
+        $oInput::validateEncoding();
+
         Profiler::mark('CONTROLLER:PRE');
         Factory::service('Event')
             ->trigger(Events::SYSTEM_STARTING);
