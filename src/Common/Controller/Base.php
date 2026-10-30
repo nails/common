@@ -87,6 +87,10 @@ abstract class Base extends \MX_Controller
      */
     public function __construct()
     {
+        /** @var Input $oInput */
+        $oInput = Factory::service('Input');
+        $oInput::guardEncoding();
+
         Profiler::mark('CONTROLLER:PRE');
         Factory::service('Event')
             ->trigger(Events::SYSTEM_STARTING);

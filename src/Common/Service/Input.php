@@ -184,6 +184,71 @@ class Input
     // --------------------------------------------------------------------------
 
     /**
+     * Whether $_GET, $_POST or $_COOKIE contain a key or value which is not valid UTF-8
+     *
+     * @return bool
+     */
+    public static function hasInvalidEncoding(): bool
+    {
+        return !static::isValidEncoding($_GET ?? [])
+            || !static::isValidEncoding($_POST ?? [])
+            || !static::isValidEncoding($_COOKIE ?? []);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Recursively checks that every string key and value in $mValue is valid UTF-8
+     *
+     * @param mixed $mValue The value to check
+     *
+     * @return bool
+     */
+    protected static function isValidEncoding($mValue): bool
+    {
+        if (is_array($mValue)) {
+            foreach ($mValue as $sKey => $mItem) {
+                if (is_string($sKey) && !mb_check_encoding($sKey, 'UTF-8')) {
+                    return false;
+                } elseif (!static::isValidEncoding($mItem)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        return !is_string($mValue) || mb_check_encoding($mValue, 'UTF-8');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Rejects the request with a 400 if $_GET, $_POST or $_COOKIE contain invalid UTF-8.
+     *
+     * CLI requests are never rejected; there's no HTTP response to send a status
+     * on, and CLI input doesn't arrive via these superglobals in the same way.
+     *
+     * @return void
+     * @throws \Nails\Common\Exception\FactoryException
+     */
+    public static function guardEncoding(): void
+    {
+        if (static::isCli() || !static::hasInvalidEncoding()) {
+            return;
+        }
+
+        /** @var ErrorHandler $oErrorHandler */
+        $oErrorHandler = Factory::service('ErrorHandler');
+        $oErrorHandler::halt(
+            'The request contains characters which are not valid UTF-8.',
+            '',
+            HttpCodes::STATUS_BAD_REQUEST
+        );
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
      * Returns keys from the supplied $aArray array
      *
      * @param string|array $mKeys     The key(s) to return
