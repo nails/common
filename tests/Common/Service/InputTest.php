@@ -3,6 +3,7 @@
 namespace Tests\Common\Service;
 
 use Nails\Common\Exception\Input\InvalidEncodingException;
+use Nails\Common\Exception\InvalidRequestException;
 use Nails\Common\Service\HttpCodes;
 use Nails\Common\Traits\TestHelper;
 use PHPUnit\Framework\TestCase;
@@ -234,6 +235,21 @@ class InputTest extends TestCase
             '\Nails\Common\Service\Input',
             'assertValidEncoding',
             []
+        );
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * InvalidEncodingException must stay part of the InvalidRequestException
+     * family, as that's what ErrorHandler::handleException() switches on to
+     * halt early instead of reporting a generic fatal error.
+     */
+    public function test_invalid_encoding_exception_is_an_invalid_request_exception(): void
+    {
+        $this->assertInstanceOf(
+            InvalidRequestException::class,
+            new InvalidEncodingException()
         );
     }
 

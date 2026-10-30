@@ -12,8 +12,8 @@
 
 namespace Nails\Common\Exception\Input;
 
-use Nails\Common\Exception\NailsException;
+use Nails\Common\Exception\InvalidRequestException;
 
-class InvalidEncodingException extends NailsException
+class InvalidEncodingException extends InvalidRequestException
 {
 }
