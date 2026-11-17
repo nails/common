@@ -23,8 +23,7 @@ class ExtractRegistrableDomainTest extends TestCase
      */
     public function test_accepts_null_as_first_arg(): void
     {
-        $this->expectNotToPerformAssertions();
-        Url::extractRegistrableDomain(null);
+        $this->assertSame('', Url::extractRegistrableDomain(null));
     }
 
     // --------------------------------------------------------------------------
