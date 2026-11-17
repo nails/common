@@ -25,7 +25,6 @@ trait TestHelper
         $oInstance = new $sClass();
 
         $oMethod = $oClass->getMethod($sMethod);
-        $oMethod->setAccessible(true);
 
         return $oMethod->invokeArgs($oInstance, $aArguments);
     }

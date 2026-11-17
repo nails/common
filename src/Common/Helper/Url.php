@@ -108,7 +108,7 @@ class Url
     public static function tel(?string $sUrl = null, ?string $sTitle = null, string $sAttributes = ''): string
     {
         $sTitle = empty($sTitle) ? $sUrl : $sTitle;
-        $sUrl   = preg_replace('/[^+0-9]/', '', $sUrl);
+        $sUrl   = preg_replace('/[^+0-9]/', '', (string) $sUrl);
         $sUrl   = 'tel://' . $sUrl;
 
         return anchor($sUrl, $sTitle, $sAttributes);
@@ -129,6 +129,11 @@ class Url
         /** @var FileCache $oFileCache */
         $oFileCache = Factory::service('FileCache');
         $sCacheFile = 'php-domain-parser-public-suffix.dat';
+
+        // preg_match() does not accept null. An empty string keeps the existing result.
+        if ($sUrl === null) {
+            $sUrl = '';
+        }
 
         if (!preg_match('/https?\:\\/\\//', $sUrl)) {
             $sUrl = 'http://' . $sUrl;
