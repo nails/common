@@ -305,6 +305,9 @@ class ArrayHelper
      */
     public static function arrayFlattenWithDotNotation($mInput): array
     {
+        // PHP 8.5 deprecates an object as ArrayIterator's backing store, including
+        // every nested object RecursiveArrayIterator walks into.
+        $mInput    = static::normaliseArrayTree($mInput);
         $oIterator = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($mInput));
         $aResult   = [];
 
@@ -317,6 +320,40 @@ class ArrayHelper
         }
 
         return $aResult;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Recursively converts an array or object tree into arrays.
+     *
+     * ArrayIterator reads ArrayObject and ArrayIterator storage, and the public
+     * properties of any other object. Scalars are left untouched so a non-iterable
+     * input still raises the iterator's TypeError.
+     *
+     * @param mixed $mInput The value to normalise
+     *
+     * @return mixed
+     */
+    private static function normaliseArrayTree($mInput)
+    {
+        if ($mInput instanceof \ArrayIterator || $mInput instanceof \ArrayObject) {
+            $mInput = $mInput->getArrayCopy();
+        } elseif (is_object($mInput)) {
+            $mInput = get_object_vars($mInput);
+        }
+
+        if (!is_array($mInput)) {
+            return $mInput;
+        }
+
+        foreach ($mInput as $mKey => $mValue) {
+            if (is_array($mValue) || is_object($mValue)) {
+                $mInput[$mKey] = static::normaliseArrayTree($mValue);
+            }
+        }
+
+        return $mInput;
     }
 
     // --------------------------------------------------------------------------
