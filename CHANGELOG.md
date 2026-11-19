@@ -3,6 +3,7 @@
 
 ## Unreleased
 
+- `HttpRequest` (Get, Post, Put, Patch, Delete, Head, Options) can pass any Guzzle client setting and request option through to the client. `timeout()`, `connectTimeout()`, and `readTimeout()` set the three Guzzle timeouts (zero disables that limit). `setOption()` / `setOptions()` pass through the rest — proxy, cert, json, multipart, sink, curl, verify, allow_redirects, and so on — and override the values the helper would otherwise build. `setClientConfig()` / `clientConfig()` override the client defaults (`verify`, `allow_redirects`, `http_errors`, `base_uri`) and set client-only settings (`handler`, connection limits, `transport_sharing`). A request option wins over the same key set on the client.
 - The `app_setting.key` column is widened from 50 to 150 characters (Migration 7), so longer setting keys no longer fail with `Data too long for column 'key'`.
 - Log lines drop ANSI colour codes and banner rules (`-----------------`). A line that is only decoration is not written. Every written entry still ends with a newline. An empty line is still a blank line.
 
