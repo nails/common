@@ -8,7 +8,7 @@ use Nails\Common\Validation\Context;
 /**
  * Rule: `is`
  */
-class Is extends AbstractRule
+class IsExactly extends AbstractRule
 {
     public const NAME            = 'is';
     public const DEFAULT_MESSAGE = 'The {field} field must be exactly "{param}"';

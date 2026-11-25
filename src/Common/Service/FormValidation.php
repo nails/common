@@ -65,7 +65,7 @@ class FormValidation
     const RULE_INTEGER                  = Rule\Integer::NAME;
     const RULE_IN_LIST                  = Rule\InList::NAME;
     const RULE_IN_RANGE                 = Rule\InRange::NAME;
-    const RULE_IS                       = Rule\Is::NAME;
+    const RULE_IS                       = Rule\IsExactly::NAME;
     const RULE_IS_BOOL                  = Rule\IsBool::NAME;
     const RULE_IS_ID                    = Rule\IsId::NAME;
     const RULE_IS_NATURAL               = Rule\IsNatural::NAME;
