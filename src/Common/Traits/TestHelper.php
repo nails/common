@@ -26,6 +26,7 @@ trait TestHelper
 
         $oMethod = $oClass->getMethod($sMethod);
 
-        return $oMethod->invokeArgs($oInstance, $aArguments);
+        //  PHP 8.6 deprecates passing an object when invoking a static method
+        return $oMethod->invokeArgs($oMethod->isStatic() ? null : $oInstance, $aArguments);
     }
 }
