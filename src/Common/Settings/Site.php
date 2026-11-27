@@ -2,7 +2,7 @@
 
 namespace Nails\Common\Settings;
 
-use Nails\Admin\Traits;
+use Nails\Common\Admin\Permission;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Helper\Form;
 use Nails\Common\Interfaces;
@@ -40,11 +40,9 @@ class Site implements Interfaces\Component\Settings
     /**
      * @inheritDoc
      */
-    public function getPermissions(): array
+    public function getPermission(): string
     {
-        return [
-            'maintenance' => 'Maintenance Mode',
-        ];
+        return Permission\Settings\Site::class;
     }
 
     // --------------------------------------------------------------------------

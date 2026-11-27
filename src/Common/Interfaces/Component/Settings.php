@@ -16,11 +16,15 @@ interface Settings
     // --------------------------------------------------------------------------
 
     /**
-     * Any additional permissions to collect
+     * The permission class-string that guards this settings page.
      *
-     * @return string[]
+     * A user may access the page if they hold this permission, the
+     * settings sudo permission (`Nails\Admin\Admin\Permission\Settings\Manage`),
+     * or are a super user.
+     *
+     * @return class-string
      */
-    public function getPermissions(): array;
+    public function getPermission(): string;
 
     // --------------------------------------------------------------------------
 
